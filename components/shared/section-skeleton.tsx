@@ -1,7 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
-
-const GRID_CLASS =
-  "grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6";
+import { ANIME_GRID_CLASS } from "@/lib/ui/anime-grid-layout";
 
 export function SectionSkeleton() {
   return (
@@ -15,18 +13,18 @@ export function SectionSkeleton() {
           <Skeleton className="h-6 w-40" />
           <Skeleton className="h-4 w-56" />
         </div>
-        <Skeleton className="h-8 w-20" />
+        <Skeleton className="h-4 w-20" />
       </div>
-      <div className={GRID_CLASS}>
+      <div className={ANIME_GRID_CLASS}>
         {Array.from({ length: 6 }).map((_, index) => (
           <div
             key={index}
-            className="flex flex-col overflow-hidden rounded-lg border border-border/80 bg-card"
+            className="flex flex-col overflow-hidden rounded-md border border-border/80 bg-card"
           >
-            <Skeleton className="aspect-[3/4] w-full rounded-none" />
+            <Skeleton className="aspect-[2/3] max-h-[15rem] w-full rounded-none" />
             <div className="flex flex-col gap-1.5 p-2.5">
-              <Skeleton className="h-3.5 w-full" />
-              <Skeleton className="h-3 w-3/4" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-3.5 w-3/4" />
             </div>
           </div>
         ))}

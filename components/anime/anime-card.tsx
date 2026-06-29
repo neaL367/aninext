@@ -44,15 +44,17 @@ export function AnimeCard({
   const card = (
     <article
       className={cn(
-        "flex h-full flex-col overflow-hidden rounded-lg border border-border/80 bg-card shadow-sm",
+        "flex h-full flex-col overflow-hidden rounded-md border border-border/70 bg-card",
         className
       )}
     >
-      <Link href={`/anime/${media.id}`} className="flex h-full flex-col">
+      <Link href={`/anime/${media.id}`} prefetch className="flex h-full flex-col">
         <div
           className={cn(
             "relative w-full shrink-0 overflow-hidden bg-muted",
-            compact ? "aspect-[2/3]" : "aspect-[3/4]"
+            compact
+              ? "aspect-[2/3] max-h-[11rem]"
+              : "aspect-[2/3] max-h-[13.5rem] sm:max-h-[15rem] lg:max-h-[16rem]"
           )}
           style={{
             backgroundColor: media.coverImage?.color ?? "var(--muted)",
@@ -63,7 +65,7 @@ export function AnimeCard({
               src={coverUrl}
               alt={title}
               fill
-              sizes={compact ? "120px" : "(max-width: 640px) 45vw, 180px"}
+              sizes={compact ? "100px" : "(max-width: 640px) 30vw, 140px"}
               className="object-cover"
             />
           ) : null}
@@ -76,25 +78,30 @@ export function AnimeCard({
             className={cn(
               "absolute z-10",
               media.rank != null && media.rank > 0
-                ? "bottom-2 left-2"
-                : "top-2 left-2"
+                ? "bottom-1 left-1"
+                : "top-1 left-1"
             )}
           >
             <StatusBadge
               status={media.status}
-              className="border-border/50 bg-background/90 px-1.5 py-0 text-[10px] backdrop-blur-sm"
+              className="border-border/50 bg-background/90 px-1 py-0 text-[9px] backdrop-blur-sm"
             />
           </div>
 
           {score !== "—" && !compact ? (
-            <div className="absolute top-2 right-2 z-10 inline-flex items-center gap-0.5 rounded-md border border-border/50 bg-background/90 px-1.5 py-0.5 text-[11px] font-medium backdrop-blur-sm tabular-nums">
+            <div className="absolute top-1 right-1 z-10 inline-flex items-center gap-0.5 rounded border border-border/50 bg-background/90 px-1 py-0 text-[11px] font-medium backdrop-blur-sm tabular-nums">
               <StarIcon className="size-3 fill-amber-400 text-amber-400" />
               {score}
             </div>
           ) : null}
         </div>
 
-        <div className={cn("flex flex-1 flex-col", compact ? "gap-1 p-2" : "gap-1.5 p-2.5")}>
+        <div
+          className={cn(
+            "flex flex-1 flex-col",
+            compact ? "gap-1 p-2" : "gap-1.5 p-2.5"
+          )}
+        >
           <h3
             className={cn(
               "line-clamp-2 font-medium leading-snug text-foreground",
@@ -106,7 +113,7 @@ export function AnimeCard({
 
           {!compact ? (
             <>
-              <p className="line-clamp-1 text-[11px] text-muted-foreground">
+              <p className="line-clamp-1 text-xs text-muted-foreground">
                 {[
                   primaryGenre,
                   format !== "—" ? format : null,
@@ -116,7 +123,7 @@ export function AnimeCard({
                   .join(" · ")}
               </p>
 
-              <p className="mt-auto text-[11px] tabular-nums text-muted-foreground">
+              <p className="mt-auto text-xs tabular-nums text-muted-foreground">
                 {formatEpisodeCount(media.episodes)} eps
                 {media.duration ? (
                   <>
