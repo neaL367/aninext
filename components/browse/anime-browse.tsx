@@ -50,6 +50,7 @@ export function AnimeBrowse({ initialParams, genres }: AnimeBrowseProps) {
     isPending,
     isFetching,
     isFetchingNextPage,
+    isPlaceholderData,
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
@@ -105,13 +106,14 @@ export function AnimeBrowse({ initialParams, genres }: AnimeBrowseProps) {
     (maxPage === null || media.length < maxPage * LISTING_PAGE_SIZE);
 
   const showInitialSkeleton = isPending && !data;
-  const showSearchOverlay = isFetching && !isPending && !isFetchingNextPage;
+  const showSearchOverlay =
+    isFetching && !isPending && !isFetchingNextPage && isPlaceholderData;
 
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Anime"
-        description="Search, sort, and filter — results update as you adjust options."
+        description="Search and filter — use the navigation above to switch lists."
       />
 
       <AnimeBrowseToolbar
