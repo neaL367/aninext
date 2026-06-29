@@ -1,0 +1,110 @@
+#import "./media-card.graphql"
+
+fragment MediaDetailFields on Media {
+  ...MediaCardFields
+  bannerImage
+  synonyms
+  source
+  season
+  startDate {
+    year
+    month
+    day
+  }
+  endDate {
+    year
+    month
+    day
+  }
+  duration
+  countryOfOrigin
+  trailer {
+    id
+    site
+  }
+  externalLinks {
+    id
+    site
+    url
+    type
+  }
+  streamingEpisodes {
+    title
+    thumbnail
+    url
+    site
+  }
+  airingSchedule(perPage: 50) {
+    nodes {
+      id
+      episode
+      airingAt
+      timeUntilAiring
+    }
+  }
+  relations {
+    edges {
+      relationType
+      node {
+        id
+        title {
+          romaji
+          english
+          native
+        }
+        coverImage {
+          large
+          medium
+          color
+        }
+        format
+        status
+      }
+    }
+  }
+  recommendations(perPage: 12, sort: RATING_DESC) {
+    nodes {
+      mediaRecommendation {
+        ...MediaCardFields
+      }
+    }
+  }
+  characters(perPage: 12, sort: ROLE) {
+    edges {
+      role
+      node {
+        id
+        name {
+          full
+        }
+        image {
+          large
+        }
+      }
+      voiceActors(language: JAPANESE, sort: RELEVANCE) {
+        id
+        name {
+          full
+        }
+        languageV2
+        image {
+          large
+        }
+      }
+    }
+  }
+  staff(perPage: 12, sort: RELEVANCE) {
+    edges {
+      role
+      node {
+        id
+        name {
+          full
+        }
+        image {
+          large
+        }
+      }
+    }
+  }
+}

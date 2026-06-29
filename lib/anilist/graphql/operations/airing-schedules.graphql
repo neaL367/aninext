@@ -1,0 +1,30 @@
+#import "../fragments/media-card.graphql"
+
+fragment AiringMediaFields on Media {
+  ...MediaCardFields
+  externalLinks {
+    id
+    site
+    url
+    type
+  }
+}
+
+query AiringSchedules($airingAt_greater: Int, $airingAt_lesser: Int) {
+  Page(page: 1, perPage: 100) {
+    airingSchedules(
+      airingAt_greater: $airingAt_greater
+      airingAt_lesser: $airingAt_lesser
+      sort: TIME
+      notYetAired: true
+    ) {
+      id
+      airingAt
+      episode
+      timeUntilAiring
+      media {
+        ...AiringMediaFields
+      }
+    }
+  }
+}
