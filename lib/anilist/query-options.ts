@@ -7,8 +7,8 @@ import {
   LISTING_PAGE_SIZE,
   TOP_100_LIMIT,
 } from "./constants";
+import { fetchAllAiringSchedules } from "@/lib/anilist/fetch-airing-schedules";
 import {
-  AiringSchedulesDocument,
   GenreCollectionDocument,
   MediaDetailDocument,
   MediaPageDocument,
@@ -23,7 +23,6 @@ import {
 import { getHomeSections } from "@/lib/anilist/server/get-home-sections";
 import { queryKeys } from "./query-keys";
 import {
-  normalizeAiringSchedules,
   normalizeMediaDetail,
   normalizeMediaPageResult,
   type MediaCard,
@@ -58,6 +57,8 @@ function mediaCarouselOptions(
       const result = normalizeMediaPageResult(data);
       return applyPopularityPercents(result.media);
     },
+    staleTime: 300_000,
+    refetchOnMount: false,
   });
 }
 
@@ -68,19 +69,17 @@ export function mediaDetailOptions(id: number) {
       const data = await executeGraphQL(MediaDetailDocument, { id });
       return normalizeMediaDetail(data);
     },
+    staleTime: 600_000,
+    refetchOnMount: false,
   });
 }
 
 export function airingSchedulesOptions(start: number, end: number) {
   return queryOptions({
     queryKey: queryKeys.airing.range(start, end),
-    queryFn: async () => {
-      const data = await executeGraphQL(AiringSchedulesDocument, {
-        airingAt_greater: start,
-        airingAt_lesser: end,
-      });
-      return normalizeAiringSchedules(data);
-    },
+    queryFn: () => fetchAllAiringSchedules(start, end),
+    staleTime: 900_000,
+    refetchOnMount: false,
   });
 }
 
@@ -197,6 +196,9 @@ export function mediaPageInfiniteOptions(
       return normalizeMediaPageResult(data);
     },
     initialPageParam: 1,
+    staleTime: 300_000,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
     getNextPageParam: (lastPage, allPages, lastPageParam) => {
       const loadedCount = allPages.flatMap((page) => page.media).length;
 

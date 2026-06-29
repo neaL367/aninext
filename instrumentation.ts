@@ -23,7 +23,7 @@ export async function register() {
       new Agent({
         keepAliveTimeout: 30_000,
         keepAliveMaxTimeout: 60_000,
-        connections: 8,
+        connections: 12,
       })
     );
   }
