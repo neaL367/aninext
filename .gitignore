@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# graphql codegen (regenerated on install / dev / build)
+/lib/anilist/generated/
+
+# local agent and design tooling
+skills-lock.json
+.agents/
+design-system/
