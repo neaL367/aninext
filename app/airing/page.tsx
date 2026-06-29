@@ -26,7 +26,7 @@ async function AiringPageContent() {
 
 export default function AiringPage() {
   return (
-    <PageContainer className="flex flex-col gap-6 py-8 lg:gap-8 lg:py-10">
+    <PageContainer className="flex flex-col gap-4 py-6 lg:gap-5 lg:py-8">
       <PageHeader
         title="Airing Schedule"
         description="Anime grouped by weekday and format for the current week."
