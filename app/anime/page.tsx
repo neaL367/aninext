@@ -5,14 +5,13 @@ import { AnimeBrowse } from "@/components/browse/anime-browse";
 import { BrowseSkeleton } from "@/components/browse/browse-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { getGenreCollection } from "@/lib/anilist/server/get-genre-collection";
-import { mediaPageInfiniteOptions } from "@/lib/anilist/query-options";
+import { mediaPageInfiniteOptions } from "@/lib/anilist/query-options.server";
 import {
   getCurrentAnimeSeason,
   getNextAnimeSeason,
 } from "@/lib/anilist/utils/season";
-import {
-  parseAnimeListParams,
-} from "@/lib/routes/search-params";
+import { buildAnimeBrowseHref } from "@/lib/routes/browse-url";
+import { parseAnimeListParams } from "@/lib/routes/search-params";
 import { createPageMetadata } from "@/lib/seo/metadata";
 import { getQueryClient } from "@/lib/react-query/get-query-client";
 
@@ -36,16 +35,19 @@ async function AnimeListingContent({ searchParams }: AnimeListingPageProps) {
   const nextSeason = getNextAnimeSeason();
   const queryClient = getQueryClient();
 
-  await queryClient.prefetchInfiniteQuery(
+  const genres = await getGenreCollection();
+  void queryClient.prefetchInfiniteQuery(
     mediaPageInfiniteOptions(params, currentSeason, nextSeason)
   );
-
-  const genres = await getGenreCollection();
 
   return (
     <PageContainer className="py-8 lg:py-10">
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <AnimeBrowse initialParams={params} genres={genres} />
+        <AnimeBrowse
+          key={buildAnimeBrowseHref(params)}
+          initialParams={params}
+          genres={genres}
+        />
       </HydrationBoundary>
     </PageContainer>
   );
