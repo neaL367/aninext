@@ -24,7 +24,7 @@ Read `node_modules/next/dist/docs/` before changing routing, caching, or data fe
 - **Suspense + `connection()`**: wrap runtime/uncached data in `<Suspense>`; call `await connection()` before request-time fetches (search params, parallel slots, season-based keys).
 - **`instant` route config**: static shells use `export const instant = true`; dynamic routes use `instant = false`. Home hero (`app/(home)/page.tsx`) is `instant = true` while `app/(home)/layout.tsx` is `instant = false` so carousels stream without blocking the hero.
 - **Dedupe fetches**: use React `cache()` for data shared by `page` and `generateMetadata` (see `lib/anilist/server/get-media-detail.ts`).
-- **AniList fetch stack**: all GraphQL goes through `lib/anilist/graphql-client.ts` (keep-alive agent, in-flight dedup, concurrency limit). Home uses one batched `HomeSections` query via `prefetch-home-sections.ts`. Genres use `"use cache"` in `get-genre-collection.ts`.
+- **AniList fetch stack**: all GraphQL goes through `lib/anilist/graphql-client.ts` (keep-alive agent, in-flight dedup, concurrency limit). Home sections fetch via `get-home-sections.ts` with per-section `"use cache"`. Genres use `"use cache"` in `get-genre-collection.ts`.
 - **Prefetch**: use `<Link prefetch>` for primary nav targets.
 - **Images**: use `next/image` with `sizes`; remote patterns in `next.config.ts`.
 - **Codegen**: run `bun run codegen` after `.graphql` changes; never edit `lib/anilist/generated/`.

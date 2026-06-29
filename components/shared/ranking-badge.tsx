@@ -11,7 +11,7 @@ export function RankingBadge({ rank, className }: RankingBadgeProps) {
     <Badge
       variant="secondary"
       className={cn(
-        "absolute left-1.5 top-1.5 z-10 border border-border bg-background/95 font-medium tabular-nums",
+        "border border-border/60 bg-background/95 font-semibold tabular-nums",
         className
       )}
     >

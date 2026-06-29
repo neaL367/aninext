@@ -26,12 +26,12 @@ export function BrowseSkeleton({ className }: BrowseSkeletonProps) {
         </div>
         <div className="flex flex-wrap gap-1.5">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-7 w-16" />
+            <Skeleton key={i} className="h-7 w-24" />
           ))}
         </div>
       </div>
 
-      <AnimeGridSkeleton count={12} />
+      <AnimeGridSkeleton count={12} variant="browse" />
     </div>
   );
 }
