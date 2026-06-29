@@ -26,7 +26,7 @@ export function StreamingService({
       className={cn(
         "inline-flex items-center gap-2 text-muted-foreground",
         size === "sm" ? "text-xs" : "text-sm",
-        url && "hover:text-foreground",
+        url && "hover:text-foreground hover:underline",
         className
       )}
     >

@@ -7,7 +7,6 @@ import { FilterChips } from "@/components/browse/filter-chips";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import {
   Sheet,
   SheetContent,
@@ -16,14 +15,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { countBrowseFilters } from "@/lib/routes/search-params";
 import {
-  ANIME_SORTS,
   getActiveFilterChips,
   type AnimeListParams,
 } from "@/lib/routes/search-params";
-import { ANIME_SORT_LABELS } from "@/lib/anilist/utils/labels";
 
 type GenreOption = { id: number; name: string };
 
@@ -50,14 +46,6 @@ export function AnimeBrowseToolbar({
 }: AnimeBrowseToolbarProps) {
   const filterCount = countBrowseFilters(filterParams);
   const hasChips = getActiveFilterChips(filterParams).length > 0;
-
-  const handleSortChange = (value: string[]) => {
-    const sort = value[0];
-    if (!sort || !ANIME_SORTS.includes(sort as (typeof ANIME_SORTS)[number])) {
-      return;
-    }
-    onApply({ ...filterParams, sort: sort as AnimeListParams["sort"] });
-  };
 
   return (
     <div className="flex flex-col gap-3">
@@ -109,24 +97,6 @@ export function AnimeBrowseToolbar({
           </SheetContent>
         </Sheet>
       </div>
-
-      <ScrollArea className="w-full">
-        <ToggleGroup
-          value={[filterParams.sort]}
-          onValueChange={handleSortChange}
-          variant="outline"
-          size="sm"
-          spacing={0}
-          className="w-max min-w-full flex-nowrap"
-        >
-          {ANIME_SORTS.map((sort) => (
-            <ToggleGroupItem key={sort} value={sort} className="shrink-0 px-2.5 text-xs">
-              {ANIME_SORT_LABELS[sort]}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
 
       <AnimeQuickFilters params={filterParams} onChange={onApply} />
 

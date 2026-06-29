@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Route } from "next";
-import { Button } from "@/components/ui/button";
+import { viewAllLinkClassName } from "@/lib/ui/nav-link-styles";
 
 type SectionHeaderProps = {
   title: string;
@@ -33,15 +33,9 @@ export function SectionHeader({
         ) : null}
       </div>
       {href ? (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="shrink-0 text-muted-foreground hover:text-foreground"
-          render={<Link href={href} />}
-          nativeButton={false}
-        >
+        <Link href={href} prefetch className={viewAllLinkClassName}>
           {viewAllLabel}
-        </Button>
+        </Link>
       ) : null}
     </div>
   );
