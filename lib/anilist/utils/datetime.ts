@@ -79,7 +79,7 @@ export function getWeekdayShortLabel(dateKey: string): string {
   return new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date);
 }
 
-export function formatRelativeAiringTime(
+export function formatAiringContextLabel(
   timestampSeconds: number,
   now = new Date()
 ): string {
@@ -87,15 +87,14 @@ export function formatRelativeAiringTime(
   const targetMs = timestampSeconds * 1000;
   const diffMs = targetMs - nowMs;
   const diffHours = Math.round(diffMs / 3_600_000);
-
   const dateKey = toLocalDateKey(timestampSeconds);
   const dayLabel = getRelativeDayLabel(dateKey, now);
 
   if (diffMs < 0) {
-    return formatLocalTime(timestampSeconds);
+    return dayLabel;
   }
 
-  if (diffHours < 1 && diffMs >= 0) {
+  if (diffMs < 3_600_000) {
     const mins = Math.max(1, Math.round(diffMs / 60_000));
     return `In ${mins} min`;
   }
@@ -104,11 +103,18 @@ export function formatRelativeAiringTime(
     return `In ${diffHours} hr`;
   }
 
-  if (dayLabel === "Today" || dayLabel === "Tomorrow") {
-    return `${dayLabel} · ${formatLocalTime(timestampSeconds)}`;
-  }
+  return dayLabel;
+}
 
-  return `${dayLabel} · ${formatLocalTime(timestampSeconds)}`;
+export function formatRelativeAiringTime(
+  timestampSeconds: number,
+  now = new Date()
+): string {
+  const context = formatAiringContextLabel(timestampSeconds, now);
+  if (context.startsWith("In ")) {
+    return context;
+  }
+  return `${context} · ${formatLocalTime(timestampSeconds)}`;
 }
 
 export function groupByLocalDate<T extends { airingAt: number }>(

@@ -1,17 +1,23 @@
-import Image from "next/image";
+"use client";
+
 import Link from "next/link";
 import { AiringItemTooltipContent } from "@/components/airing/airing-item-tooltip-content";
+import { AiringCountdown } from "@/components/shared/countdown";
 import { MediaTooltip, AIRING_TOOLTIP_WIDTH } from "@/components/shared/media-tooltip";
+import { ProgressiveImage } from "@/components/shared/progressive-image";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Badge } from "@/components/ui/badge";
 import type { AiringScheduleItem } from "@/lib/anilist/types";
+import { coverCardImageUrl } from "@/lib/anilist/utils/image-urls";
 import {
-  formatLocalTime,
-  formatRelativeAiringTime,
-} from "@/lib/anilist/utils/datetime";
+  AIRING_ITEM_COVER_CLASS,
+  AIRING_ITEM_COVER_IMAGE_CLASS,
+} from "@/lib/ui/airing-item-cover";
 import { formatDisplayTitle } from "@/lib/anilist/utils/format";
 import { formatMediaFormat } from "@/lib/anilist/utils/labels";
 import { cn } from "@/lib/utils";
+
+const AIRING_BADGE_CLASS = "h-auto px-1.5 py-0.5 text-[10px] font-normal";
 
 type AiringItemCardProps = {
   item: AiringScheduleItem;
@@ -21,44 +27,50 @@ type AiringItemCardProps = {
 export function AiringItemCard({ item, className }: AiringItemCardProps) {
   const media = item.media;
   const title = media ? formatDisplayTitle(media.title) : "—";
-  const cover = media?.coverImage?.medium ?? media?.coverImage?.large;
+  const coverUrl = coverCardImageUrl(media?.coverImage ?? null);
   const animeId = media?.id ?? 0;
 
   const card = (
     <article
       className={cn(
-        "flex gap-2.5 rounded-md border border-border bg-card p-2.5",
+        "flex items-start gap-3 rounded-md border border-border bg-card p-3",
         className
       )}
     >
       <Link
         href={`/anime/${animeId}`}
         prefetch
-        className="relative w-10 shrink-0 overflow-hidden rounded-md border border-border"
-        style={{
-          aspectRatio: "2/3",
-          backgroundColor: media?.coverImage?.color ?? "var(--muted)",
-        }}
+        className={AIRING_ITEM_COVER_CLASS}
       >
-        {cover ? (
-          <Image src={cover} alt="" fill className="object-cover" sizes="40px" />
+        {coverUrl ? (
+          <ProgressiveImage
+            sources={[coverUrl]}
+            alt=""
+            fill
+            className={AIRING_ITEM_COVER_IMAGE_CLASS}
+            sizes="80px"
+            loading="lazy"
+          />
         ) : null}
       </Link>
 
       <div className="flex min-w-0 flex-1 items-start justify-between gap-2">
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
           <div className="flex flex-wrap items-center gap-1">
-            <Badge variant="outline" className="px-1 py-0 text-[10px] font-normal tabular-nums">
+            <Badge
+              variant="outline"
+              className={cn(AIRING_BADGE_CLASS, "tabular-nums")}
+            >
               Ep {item.episode}
             </Badge>
             {media?.format ? (
-              <Badge variant="outline" className="px-1 py-0 text-[10px] font-normal">
+              <Badge variant="outline" className={AIRING_BADGE_CLASS}>
                 {formatMediaFormat(media.format)}
               </Badge>
             ) : null}
             <StatusBadge
               status={media?.status ?? null}
-              className="px-1 py-0 text-[9px]"
+              className={cn(AIRING_BADGE_CLASS, "text-[9px]")}
             />
           </div>
 
@@ -71,17 +83,10 @@ export function AiringItemCard({ item, className }: AiringItemCardProps) {
           </Link>
         </div>
 
-        <div className="flex shrink-0 flex-col items-end gap-0.5 text-right">
-          <time
-            dateTime={new Date(item.airingAt * 1000).toISOString()}
-            className="text-sm font-medium tabular-nums"
-          >
-            {formatLocalTime(item.airingAt)}
-          </time>
-          <p className="text-[11px] text-muted-foreground">
-            {formatRelativeAiringTime(item.airingAt)}
-          </p>
-        </div>
+        <AiringCountdown
+          airingAt={item.airingAt}
+          timeUntilAiring={item.timeUntilAiring}
+        />
       </div>
     </article>
   );

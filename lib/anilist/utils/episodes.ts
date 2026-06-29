@@ -39,10 +39,18 @@ function normalizeEpisodeTitle(
   return title;
 }
 
+function getEpisodeThumbnailFallback(media: MediaDetail): string | null {
+  return (
+    media.bannerImage ??
+    media.coverImage?.large ??
+    media.coverImage?.medium ??
+    null
+  );
+}
+
 export function buildEpisodeCards(media: MediaDetail): EpisodeCardData[] {
   const runtime = media.duration ? `${media.duration} min` : null;
-  const coverFallback =
-    media.coverImage?.medium ?? media.coverImage?.large ?? null;
+  const thumbnailFallback = getEpisodeThumbnailFallback(media);
   const mediaTitle = media.title?.english ?? media.title?.romaji ?? "";
   const airingByEpisode = new Map<number, number>();
 
@@ -65,7 +73,7 @@ export function buildEpisodeCards(media: MediaDetail): EpisodeCardData[] {
         title,
         airDate: airingAt ? formatLocalDateTime(airingAt) : null,
         runtime,
-        thumbnail: ep?.thumbnail ?? coverFallback,
+        thumbnail: ep?.thumbnail ?? thumbnailFallback,
         url: ep?.url ?? null,
         site: ep?.site ?? null,
         isFiller: flags.isFiller,
@@ -84,7 +92,7 @@ export function buildEpisodeCards(media: MediaDetail): EpisodeCardData[] {
       title: `Episode ${node.episode}`,
       airDate: node.airingAt ? formatLocalDateTime(node.airingAt) : null,
       runtime,
-      thumbnail: coverFallback,
+      thumbnail: thumbnailFallback,
       url: null,
       site: null,
       isFiller: false,
@@ -98,7 +106,7 @@ export function buildEpisodeCards(media: MediaDetail): EpisodeCardData[] {
       title: `Episode ${i + 1}`,
       airDate: null,
       runtime,
-      thumbnail: coverFallback,
+      thumbnail: thumbnailFallback,
       url: null,
       site: null,
       isFiller: false,

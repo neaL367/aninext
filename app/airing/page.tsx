@@ -1,11 +1,9 @@
-import { connection } from "next/server";
 import { Suspense } from "react";
 import { AiringScheduleView } from "@/components/airing/airing-schedule-view";
 import { AiringSkeleton } from "@/components/airing/airing-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
-import { getAiringSchedules } from "@/lib/anilist/server/get-airing-schedules";
-import { getWeekRange } from "@/lib/anilist/utils/season";
+import { getAiringSchedulesForRequest } from "@/lib/anilist/server/get-airing-schedules";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const instant = false;
@@ -17,14 +15,13 @@ export const metadata = createPageMetadata({
 });
 
 async function AiringPageContent() {
-  await connection();
-  const week = getWeekRange();
-  const schedules = (await getAiringSchedules(week.start, week.end)) ?? [];
-
-  return <AiringScheduleView schedules={schedules} />;
+  const schedules = await getAiringSchedulesForRequest();
+  return <AiringScheduleView schedules={schedules ?? []} />;
 }
 
-export default function AiringPage() {
+export default async function AiringPage() {
+  void getAiringSchedulesForRequest();
+
   return (
     <PageContainer className="flex flex-col gap-4 py-6 lg:gap-5 lg:py-8">
       <PageHeader
