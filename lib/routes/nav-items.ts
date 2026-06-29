@@ -1,6 +1,6 @@
 import type { Route } from "next";
 import { ANIME_SORT_LABELS } from "@/lib/anilist/utils/labels";
-import { animeBrowseHref } from "@/lib/routes/browse-hrefs";
+import { animeBrowseHref } from "@/lib/routes/browse-url";
 import { ANIME_SORTS, type AnimeSort } from "@/lib/routes/search-params";
 
 export type NavItem = {

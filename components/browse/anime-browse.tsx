@@ -2,17 +2,19 @@
 
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AnimeBrowseToolbar } from "@/components/browse/anime-browse-toolbar";
 import { AnimeGrid, AnimeGridSkeleton } from "@/components/anime/anime-grid";
+import { AnimeBrowseToolbar } from "@/components/browse/anime-browse-toolbar";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/layout/page-header";
 import { useDebouncedValue } from "@/lib/hooks/use-debounced-value";
-import { mediaPageInfiniteOptions } from "@/lib/anilist/query-options";
+import { LISTING_PAGE_SIZE } from "@/lib/anilist/constants";
+import { mediaPageInfiniteOptions } from "@/lib/anilist/query-options.client";
 import {
   getCurrentAnimeSeason,
   getNextAnimeSeason,
 } from "@/lib/anilist/utils/season";
 import {
+  buildAnimeBrowseHref,
   readAnimeBrowseParamsFromLocation,
   replaceAnimeBrowseUrl,
 } from "@/lib/routes/browse-url";
@@ -21,7 +23,6 @@ import {
   getListingMaxPage,
   type AnimeListParams,
 } from "@/lib/routes/search-params";
-import { LISTING_PAGE_SIZE } from "@/lib/anilist/constants";
 
 type GenreOption = { id: number; name: string };
 
@@ -41,6 +42,13 @@ export function AnimeBrowse({ initialParams, genres }: AnimeBrowseProps) {
     () => ({ ...debouncedFilterParams, q: debouncedSearch }),
     [debouncedFilterParams, debouncedSearch]
   );
+
+  const serverParamsKey = buildAnimeBrowseHref(initialParams);
+
+  useEffect(() => {
+    setFilterParams(initialParams);
+    setSearchInput(initialParams.q);
+  }, [serverParamsKey, initialParams]);
 
   const currentSeason = useMemo(() => getCurrentAnimeSeason(), []);
   const nextSeason = useMemo(() => getNextAnimeSeason(), []);
@@ -124,12 +132,11 @@ export function AnimeBrowse({ initialParams, genres }: AnimeBrowseProps) {
         genres={genres}
         onApply={applyFilters}
         onReset={resetFilters}
-        isSearching={showSearchOverlay}
       />
 
       <div className="relative flex flex-col gap-4">
         {showInitialSkeleton ? (
-          <AnimeGridSkeleton />
+          <AnimeGridSkeleton variant="browse" />
         ) : !media.length ? (
           <EmptyState
             title="No anime matched your filters"
@@ -140,14 +147,14 @@ export function AnimeBrowse({ initialParams, genres }: AnimeBrowseProps) {
             className={showSearchOverlay ? "opacity-60" : ""}
             aria-busy={showSearchOverlay}
           >
-            <AnimeGrid media={media} />
+            <AnimeGrid media={media} variant="browse" />
           </div>
         )}
 
         {showLoadMore ? (
           <div ref={loadMoreRef} className="py-6" aria-busy={isFetchingNextPage}>
             {isFetchingNextPage ? (
-              <AnimeGridSkeleton count={4} />
+              <AnimeGridSkeleton count={4} variant="browse" />
             ) : null}
           </div>
         ) : null}

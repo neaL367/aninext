@@ -59,7 +59,7 @@ export function FilterMoreOptions({ params, onPatch }: FilterMoreOptionsProps) {
 
   useEffect(() => {
     onPatchRef.current = onPatch;
-  });
+  }, [onPatch]);
 
   useEffect(() => {
     const nextTags = parseTagsInput(debouncedTagInput);
@@ -73,8 +73,20 @@ export function FilterMoreOptions({ params, onPatch }: FilterMoreOptionsProps) {
     params.country != null ||
     params.tags.length > 0;
 
+  const [openSections, setOpenSections] = useState<string[]>(() =>
+    hasMore ? ["more"] : []
+  );
+
+  useEffect(() => {
+    if (hasMore) {
+      setOpenSections((current) =>
+        current.includes("more") ? current : ["more"]
+      );
+    }
+  }, [hasMore]);
+
   return (
-    <Accordion defaultValue={hasMore ? ["more"] : []}>
+    <Accordion value={openSections} onValueChange={setOpenSections}>
       <AccordionItem value="more">
         <AccordionTrigger className="py-2 text-xs font-medium text-muted-foreground hover:no-underline">
           More options

@@ -1,7 +1,8 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import { useState } from "react";
 import { SearchIcon, SlidersHorizontalIcon } from "lucide-react";
-import { AdvancedFilters } from "@/components/browse/advanced-filters";
 import { AnimeQuickFilters } from "@/components/browse/anime-quick-filters";
 import { FilterChips } from "@/components/browse/filter-chips";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +22,14 @@ import {
   type AnimeListParams,
 } from "@/lib/routes/search-params";
 
+const AdvancedFilters = dynamic(
+  () =>
+    import("@/components/browse/advanced-filters").then(
+      (module) => module.AdvancedFilters
+    ),
+  { ssr: false }
+);
+
 type GenreOption = { id: number; name: string };
 
 type AnimeBrowseToolbarProps = {
@@ -31,7 +40,6 @@ type AnimeBrowseToolbarProps = {
   genres: GenreOption[];
   onApply: (params: AnimeListParams) => void;
   onReset: () => void;
-  isSearching?: boolean;
 };
 
 export function AnimeBrowseToolbar({
@@ -42,8 +50,8 @@ export function AnimeBrowseToolbar({
   genres,
   onApply,
   onReset,
-  isSearching = false,
 }: AnimeBrowseToolbarProps) {
+  const [sheetOpen, setSheetOpen] = useState(false);
   const filterCount = countBrowseFilters(filterParams);
   const hasChips = getActiveFilterChips(filterParams).length > 0;
 
@@ -61,11 +69,10 @@ export function AnimeBrowseToolbar({
             placeholder="Search anime..."
             autoComplete="off"
             className="h-9 pl-9"
-            aria-busy={isSearching}
           />
         </div>
 
-        <Sheet>
+        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
           <SheetTrigger
             render={
               <Button variant="outline" size="sm" className="h-9 shrink-0 gap-1.5 px-3">
@@ -79,20 +86,29 @@ export function AnimeBrowseToolbar({
               </Button>
             }
           />
-          <SheetContent side="right" className="w-full gap-0 overflow-y-auto p-0 sm:max-w-md">
-            <SheetHeader className="border-b border-border">
+          <SheetContent
+            side="right"
+            className="flex h-full w-full flex-col gap-0 p-0 sm:max-w-md"
+          >
+            <SheetHeader className="shrink-0 border-b border-border">
               <SheetTitle>Filters</SheetTitle>
               <SheetDescription>
                 Toggles apply instantly. Sliders update when you release.
               </SheetDescription>
             </SheetHeader>
-            <div className="p-4">
-              <AdvancedFilters
-                params={filterParams}
-                genres={genres}
-                onApply={onApply}
-                onReset={onReset}
-              />
+            <div
+              className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4"
+              data-lenis-prevent
+              data-lenis-prevent-wheel
+            >
+              {sheetOpen ? (
+                <AdvancedFilters
+                  params={filterParams}
+                  genres={genres}
+                  onApply={onApply}
+                  onReset={onReset}
+                />
+              ) : null}
             </div>
           </SheetContent>
         </Sheet>
