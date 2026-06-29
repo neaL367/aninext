@@ -1,31 +1,18 @@
-import { connection } from "next/server";
-import { Suspense } from "react";
-import { HomeSectionSlot } from "@/components/home/home-section-slot";
-import { SectionSkeleton } from "@/components/shared/section-skeleton";
+import { HomeSectionPage } from "@/components/home/home-section-page";
 import {
   formatSeasonLabel,
   getNextAnimeSeason,
 } from "@/lib/anilist/utils/season";
-import { HOME_SECTION_BROWSE_HREFS } from "@/lib/routes/browse-hrefs";
-
-async function UpcomingNextSeasonContent() {
-  await connection();
-  const season = getNextAnimeSeason();
-
-  return (
-    <HomeSectionSlot
-      title="Upcoming Next Season"
-      subtitle={formatSeasonLabel(season)}
-      href={HOME_SECTION_BROWSE_HREFS.upcomingNextSeason}
-      section="upcomingNextSeason"
-    />
-  );
-}
+import { HOME_SECTION_BROWSE_HREFS } from "@/lib/routes/browse-url";
 
 export default function UpcomingNextSeasonSlot() {
   return (
-    <Suspense fallback={<SectionSkeleton />}>
-      <UpcomingNextSeasonContent />
-    </Suspense>
+    <HomeSectionPage
+      section="upcomingNextSeason"
+      title="Upcoming Next Season"
+      getSubtitle={() => formatSeasonLabel(getNextAnimeSeason())}
+      href={HOME_SECTION_BROWSE_HREFS.upcomingNextSeason}
+      needsConnection
+    />
   );
 }

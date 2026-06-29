@@ -1,7 +1,6 @@
 import type { Route } from "next";
-import { connection } from "next/server";
 import { HomeSection } from "@/components/home/home-section";
-import type { HomeSectionId } from "@/lib/anilist/home-sections";
+import type { HomeSectionId } from "@/lib/anilist/server/get-home-sections";
 import { getHomeSectionMedia } from "@/lib/anilist/server/get-home-sections";
 
 type HomeSectionSlotProps = {
@@ -19,7 +18,6 @@ export async function HomeSectionSlot({
   showCountdown = false,
   section,
 }: HomeSectionSlotProps) {
-  await connection();
   const media = await getHomeSectionMedia(section);
 
   return (

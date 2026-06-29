@@ -1,14 +1,14 @@
 "use client";
 
-import { SectionError } from "@/components/shared/section-error";
+import { HomeSectionError } from "@/components/home/home-section-error";
 
-export default function PopularThisSeasonError({ reset }: { error: Error; reset: () => void }) {
+export default function PopularThisSeasonError({
+  reset,
+}: {
+  error: Error;
+  reset: () => void;
+}) {
   return (
-    <div className="flex flex-col gap-3">
-      <SectionError title="Popular This Season unavailable" />
-      <button type="button" onClick={reset} className="text-sm font-medium underline underline-offset-4">
-        Retry
-      </button>
-    </div>
+    <HomeSectionError title="Popular This Season unavailable" reset={reset} />
   );
 }

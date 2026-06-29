@@ -1,6 +1,6 @@
 "use client";
 
-import { SectionError } from "@/components/shared/section-error";
+import { HomeSectionError } from "@/components/home/home-section-error";
 
 export default function TrendingNowError({
   reset,
@@ -8,16 +8,5 @@ export default function TrendingNowError({
   error: Error;
   reset: () => void;
 }) {
-  return (
-    <div className="flex flex-col gap-3">
-      <SectionError title="Trending Now unavailable" />
-      <button
-        type="button"
-        onClick={reset}
-        className="text-sm font-medium text-foreground underline underline-offset-4"
-      >
-        Retry
-      </button>
-    </div>
-  );
+  return <HomeSectionError title="Trending Now unavailable" reset={reset} />;
 }
