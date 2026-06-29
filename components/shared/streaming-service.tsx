@@ -1,5 +1,8 @@
 import Image from "next/image";
-import { getStreamingFaviconUrl } from "@/lib/anilist/utils/streaming";
+import {
+  getStreamingFaviconUrl,
+  getStreamingSiteDomain,
+} from "@/lib/anilist/utils/streaming";
 import { cn } from "@/lib/utils";
 
 type StreamingServiceProps = {
@@ -9,6 +12,8 @@ type StreamingServiceProps = {
   className?: string;
   /** When false, renders label only (avoids nested anchors inside link wrappers). */
   linked?: boolean;
+  /** Pill-style chip for detail watch grid. */
+  variant?: "inline" | "pill";
 };
 
 export function StreamingService({
@@ -17,16 +22,22 @@ export function StreamingService({
   size = "md",
   className,
   linked = true,
+  variant = "inline",
 }: StreamingServiceProps) {
-  const favicon = getStreamingFaviconUrl(site);
-  const iconSize = size === "sm" ? 14 : 16;
+  const favicon = getStreamingFaviconUrl(site, url);
+  const iconSize = size === "sm" ? 16 : 18;
+  const isPill = variant === "pill";
 
   const inner = (
     <span
       className={cn(
-        "inline-flex items-center gap-2 text-muted-foreground",
-        size === "sm" ? "text-xs" : "text-sm",
-        url && "hover:text-foreground hover:underline",
+        "inline-flex min-w-0 items-center gap-2 text-muted-foreground transition-colors",
+        isPill
+          ? "rounded-md border border-border bg-background/80 px-2.5 py-1.5 text-sm hover:border-border hover:bg-muted/50 hover:text-foreground"
+          : size === "sm"
+            ? "text-xs"
+            : "text-sm",
+        url && "hover:text-foreground",
         className
       )}
     >
@@ -36,24 +47,31 @@ export function StreamingService({
           alt=""
           width={iconSize}
           height={iconSize}
-          className="rounded-sm"
+          className="size-4 shrink-0 rounded-sm object-contain"
           unoptimized
         />
       ) : (
         <span
           aria-hidden
-          className="inline-flex size-3.5 items-center justify-center rounded-sm border border-border text-[9px] font-medium"
+          className="inline-flex size-4 shrink-0 items-center justify-center rounded-sm bg-muted text-[9px] font-semibold uppercase text-muted-foreground"
         >
-          {site.charAt(0)}
+          {(getStreamingSiteDomain(site, url) ?? site).charAt(0)}
         </span>
       )}
-      <span>{site}</span>
+      <span className={cn("min-w-0 truncate", isPill && "font-medium")}>
+        {site}
+      </span>
     </span>
   );
 
   if (url && linked) {
     return (
-      <a href={url} target="_blank" rel="noopener noreferrer">
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="min-w-0 max-w-full"
+      >
         {inner}
       </a>
     );
