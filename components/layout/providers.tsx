@@ -1,7 +1,8 @@
 "use client";
 
 import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/sonner";
+import { LenisRoot } from "@/components/layout/lenis-root";
+import { ThemeProvider } from "@/components/layout/theme-provider";
 import { getQueryClient } from "@/lib/react-query/get-query-client";
 
 type ProvidersProps = {
@@ -13,8 +14,9 @@ export function Providers({ children }: ProvidersProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
-      <Toaster richColors closeButton position="bottom-right" />
+      <ThemeProvider>
+        <LenisRoot>{children}</LenisRoot>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
