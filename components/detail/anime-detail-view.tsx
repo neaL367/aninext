@@ -1,10 +1,10 @@
 import Link from "next/link";
-import Image from "next/image";
 import { DetailMainHeader } from "@/components/detail/detail-main-header";
 import { DetailSection } from "@/components/detail/detail-section";
 import { DetailSidebar } from "@/components/detail/detail-sidebar";
+import { DetailTaxonomy } from "@/components/detail/detail-taxonomy";
 import { DetailTrailer } from "@/components/detail/detail-trailer";
-import { DetailWatchLinks } from "@/components/detail/detail-watch-links";
+import { ProgressiveImage } from "@/components/shared/progressive-image";
 import {
   DetailCharactersSection,
   DetailEpisodesSection,
@@ -28,6 +28,7 @@ import {
   formatEpisodeCount,
   stripHtml,
 } from "@/lib/anilist/utils/format";
+import { buildProgressiveImageSources } from "@/lib/anilist/utils/image-urls";
 import { getStreamingLinks } from "@/lib/anilist/utils/streaming";
 
 type AnimeDetailViewProps = {
@@ -96,6 +97,8 @@ export function AnimeDetailView({ media }: AnimeDetailViewProps) {
       .map((node) => node!.mediaRecommendation)
       .filter((item): item is NonNullable<typeof item> => Boolean(item)) ?? [];
 
+  const bannerSources = buildProgressiveImageSources(media.bannerImage);
+
   return (
     <>
       <div className="relative h-52 w-full overflow-hidden sm:h-64 lg:h-80 xl:h-96">
@@ -103,9 +106,9 @@ export function AnimeDetailView({ media }: AnimeDetailViewProps) {
           className="absolute inset-0"
           style={{ backgroundColor: media.coverImage?.color ?? "var(--muted)" }}
         />
-        {media.bannerImage ? (
-          <Image
-            src={media.bannerImage}
+        {bannerSources.length ? (
+          <ProgressiveImage
+            sources={bannerSources}
             alt=""
             fill
             priority
@@ -123,11 +126,15 @@ export function AnimeDetailView({ media }: AnimeDetailViewProps) {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink render={<Link href="/" />}>Home</BreadcrumbLink>
+              <BreadcrumbLink render={<Link href="/" />}>
+                Home
+              </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbLink render={<Link href="/anime" />}>Anime</BreadcrumbLink>
+              <BreadcrumbLink render={<Link href="/anime" />}>
+                Anime
+              </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
@@ -142,10 +149,9 @@ export function AnimeDetailView({ media }: AnimeDetailViewProps) {
           <div className="flex min-w-0 flex-col gap-8 lg:gap-10">
             <DetailMainHeader media={media} />
 
-        <div className="flex flex-col gap-4">
-              <DetailWatchLinks streamingLinks={streamingLinks} />
-              <DetailTrailer media={media} />
-            </div>
+            <DetailTaxonomy media={media} streamingLinks={streamingLinks} />
+
+            <DetailTrailer media={media} />
 
             {media.description ? (
               <section className="rounded-xl border border-border bg-card/40 p-5 sm:p-6">

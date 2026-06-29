@@ -1,8 +1,7 @@
-import Image from "next/image";
 import { StarIcon } from "lucide-react";
-import { StatusBadge } from "@/components/shared/status-badge";
-import { Badge } from "@/components/ui/badge";
+import { ProgressiveImage } from "@/components/shared/progressive-image";
 import type { MediaDetail } from "@/lib/anilist/types";
+import { coverProgressiveSources } from "@/lib/anilist/utils/image-urls";
 import {
   formatDisplayTitle,
   formatEpisodeCount,
@@ -35,7 +34,7 @@ function SidebarFact({ label, value }: { label: string; value: string }) {
 export function DetailSidebar({ media }: DetailSidebarProps) {
   const title = formatDisplayTitle(media.title);
   const score = formatScore(media.averageScore);
-  const genres = media.genres?.filter(Boolean) ?? [];
+  const coverSources = coverProgressiveSources(media.coverImage);
 
   return (
     <aside className="flex flex-col gap-4 lg:sticky lg:top-20 lg:self-start">
@@ -43,9 +42,9 @@ export function DetailSidebar({ media }: DetailSidebarProps) {
         className="relative mx-auto aspect-[2/3] w-full max-w-[13rem] overflow-hidden rounded-xl border border-border shadow-lg ring-1 ring-border/60 sm:max-w-[15rem] lg:mx-0 lg:max-w-none"
         style={{ backgroundColor: media.coverImage?.color ?? "var(--muted)" }}
       >
-        {media.coverImage?.large ? (
-          <Image
-            src={media.coverImage.large}
+        {coverSources.length ? (
+          <ProgressiveImage
+            sources={coverSources}
             alt={title}
             fill
             className="object-cover"
@@ -62,15 +61,6 @@ export function DetailSidebar({ media }: DetailSidebarProps) {
           <span className="text-sm text-muted-foreground">user score</span>
         </div>
       ) : null}
-
-      <div className="flex flex-wrap justify-center gap-1.5 lg:justify-start">
-        <StatusBadge status={media.status} />
-        {genres.map((genre) => (
-          <Badge key={genre} variant="outline" className="font-normal">
-            {genre}
-          </Badge>
-        ))}
-      </div>
 
       <div className="flex flex-col gap-2.5 rounded-xl border border-border bg-card/50 p-4">
         <p className="text-sm font-medium">Information</p>

@@ -1,5 +1,6 @@
-import Image from "next/image";
+import { ProgressiveImage } from "@/components/shared/progressive-image";
 import type { EpisodeCardData } from "@/lib/anilist/utils/episodes";
+import { buildProgressiveImageSources, isAnilistCdnUrl } from "@/lib/anilist/utils/image-urls";
 import { formatEpisodeAirDate } from "@/lib/anilist/utils/episodes";
 import { Badge } from "@/components/ui/badge";
 import { StreamingService } from "@/components/shared/streaming-service";
@@ -9,14 +10,6 @@ type EpisodeCardProps = {
   episode: EpisodeCardData;
   className?: string;
 };
-
-function isAniListCdn(url: string): boolean {
-  try {
-    return new URL(url).hostname.endsWith("anilist.co");
-  } catch {
-    return false;
-  }
-}
 
 export function EpisodeCard({ episode, className }: EpisodeCardProps) {
   const isExternalLink = Boolean(episode.url);
@@ -31,20 +24,21 @@ export function EpisodeCard({ episode, className }: EpisodeCardProps) {
     >
       <div className="relative aspect-video w-28 shrink-0 overflow-hidden rounded-md border border-border bg-muted sm:w-32">
         {thumbnail ? (
-          isAniListCdn(thumbnail) ? (
-            <Image
-              src={thumbnail}
+          isAnilistCdnUrl(thumbnail) ? (
+            <ProgressiveImage
+              sources={buildProgressiveImageSources(thumbnail)}
               alt=""
               fill
-              className="object-cover"
+              className="object-cover object-center"
               sizes="128px"
+              loading="lazy"
             />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={thumbnail}
               alt=""
-              className="size-full object-cover"
+              className="size-full object-cover object-center"
               loading="lazy"
               referrerPolicy="no-referrer"
             />

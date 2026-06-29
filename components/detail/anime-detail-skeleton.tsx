@@ -14,18 +14,18 @@ export function AnimeDetailSkeleton() {
           <Skeleton className="h-4 w-48" />
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-[240px_1fr] lg:gap-10">
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,240px)_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[minmax(0,260px)_minmax(0,1fr)]">
           <div className="flex flex-col gap-4">
-          <Skeleton className="aspect-[3/4] max-h-[11.5rem] w-full rounded-xl lg:max-w-none" />
+            <Skeleton className="mx-auto aspect-[2/3] w-full max-w-[13rem] rounded-xl sm:max-w-[15rem] lg:mx-0 lg:max-w-none" />
             <Skeleton className="h-14 w-full rounded-xl" />
-              <Skeleton className="h-48 w-full rounded-xl" />
+            <Skeleton className="h-48 w-full rounded-xl" />
           </div>
 
-          <div className="flex flex-col gap-8">
+          <div className="flex min-w-0 flex-col gap-8 lg:gap-10">
             <div className="flex flex-col gap-3 border-b border-border pb-6">
               <Skeleton className="h-10 w-4/5" />
               <Skeleton className="h-4 w-3/5" />
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {Array.from({ length: 4 }).map((_, i) => (
                   <Skeleton key={i} className="h-6 w-16" />
                 ))}

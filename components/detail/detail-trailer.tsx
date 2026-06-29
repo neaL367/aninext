@@ -1,15 +1,21 @@
+"use client";
+
+import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { MediaDetail } from "@/lib/anilist/types";
 import {
   getTrailerEmbedUrl,
   getTrailerSiteLabel,
   getTrailerWatchUrl,
 } from "@/lib/anilist/utils/trailer";
+import { cn } from "@/lib/utils";
 
 type DetailTrailerProps = {
   media: MediaDetail;
 };
 
 export function DetailTrailer({ media }: DetailTrailerProps) {
+  const [isLoaded, setIsLoaded] = useState(false);
   const embedUrl = getTrailerEmbedUrl(media.trailer);
   const watchUrl = getTrailerWatchUrl(media.trailer);
 
@@ -36,10 +42,17 @@ export function DetailTrailer({ media }: DetailTrailerProps) {
       </div>
       <div className="overflow-hidden rounded-xl border border-border bg-black shadow-sm">
         <div className="relative aspect-video w-full">
+          {!isLoaded ? (
+            <Skeleton className="absolute inset-0 size-full rounded-none" />
+          ) : null}
           <iframe
             src={embedUrl}
             title={`${siteLabel} trailer`}
-            className="absolute inset-0 size-full"
+            className={cn(
+              "absolute inset-0 size-full transition-opacity duration-300",
+              isLoaded ? "opacity-100" : "opacity-0"
+            )}
+            onLoad={() => setIsLoaded(true)}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
             loading="lazy"
