@@ -46,11 +46,19 @@ export function formatLocalDateTime(timestampSeconds: number): string {
 }
 
 export function toLocalDateKey(timestampSeconds: number): string {
-  const d = new Date(timestampSeconds * 1000);
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
+  return toLocalDateKeyFromDate(new Date(timestampSeconds * 1000));
+}
+
+export function toLocalDateKeyFromDate(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
+}
+
+export function parseLocalDateKey(dateKey: string): Date {
+  const [y, m, d] = dateKey.split("-").map(Number);
+  return new Date(y!, m! - 1, d!, 12, 0, 0, 0);
 }
 
 export function getRelativeDayLabel(dateKey: string, now = new Date()): string {
@@ -62,9 +70,13 @@ export function getRelativeDayLabel(dateKey: string, now = new Date()): string {
   if (dateKey === todayKey) return "Today";
   if (dateKey === tomorrowKey) return "Tomorrow";
 
-  const [y, m, d] = dateKey.split("-").map(Number);
-  const date = new Date(y!, m! - 1, d);
+  const date = parseLocalDateKey(dateKey);
   return new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(date);
+}
+
+export function getWeekdayShortLabel(dateKey: string): string {
+  const date = parseLocalDateKey(dateKey);
+  return new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date);
 }
 
 export function formatRelativeAiringTime(
@@ -113,4 +125,20 @@ export function groupByLocalDate<T extends { airingAt: number }>(
   }
 
   return grouped;
+}
+
+/** Local date keys (YYYY-MM-DD) for Monday through Sunday of the given week. */
+export function getWeekDateKeys(date: Date = new Date()): string[] {
+  const anchor = new Date(date);
+  anchor.setHours(12, 0, 0, 0);
+  const weekday = anchor.getDay();
+  const diff = weekday === 0 ? -6 : 1 - weekday;
+  const monday = new Date(anchor);
+  monday.setDate(anchor.getDate() + diff);
+
+  return Array.from({ length: 7 }, (_, index) => {
+    const day = new Date(monday);
+    day.setDate(monday.getDate() + index);
+    return toLocalDateKeyFromDate(day);
+  });
 }
