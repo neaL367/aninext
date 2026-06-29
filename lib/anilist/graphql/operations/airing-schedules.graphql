@@ -1,8 +1,7 @@
-#import "../fragments/media-card.graphql"
+#import "../fragments/media-card-compact.graphql"
 
 fragment AiringMediaFields on Media {
-  ...MediaCardFields
-  bannerImage
+  ...MediaCardCompactFields
   externalLinks {
     id
     site

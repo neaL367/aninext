@@ -1,0 +1,23 @@
+#import "../fragments/media-card-compact.graphql"
+
+query HomeSectionMedia(
+  $perPage: Int!
+  $sort: [MediaSort]
+  $season: MediaSeason
+  $seasonYear: Int
+  $status: MediaStatus
+  $status_in: [MediaStatus]
+) {
+  Page(page: 1, perPage: $perPage) {
+    media(
+      type: ANIME
+      sort: $sort
+      season: $season
+      seasonYear: $seasonYear
+      status: $status
+      status_in: $status_in
+    ) {
+      ...MediaCardCompactFields
+    }
+  }
+}

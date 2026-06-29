@@ -1,7 +1,7 @@
 import type {
   AiringMediaFieldsFragment,
   AiringSchedulesQuery,
-  MediaCardFieldsFragment,
+  MediaCardCompactFieldsFragment,
   MediaDetailFieldsFragment,
   MediaPageQuery,
 } from "./generated/graphql";
@@ -14,7 +14,7 @@ export type {
   MediaStatus,
 } from "./generated/graphql";
 
-export type MediaCard = MediaCardFieldsFragment & {
+export type MediaCard = MediaCardCompactFieldsFragment & {
   popularityPercent?: number | null;
   rank?: number;
 };

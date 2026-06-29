@@ -1,8 +1,20 @@
 import { cache } from "react";
-import { airingSchedulesOptions } from "@/lib/anilist/query-options";
-import { getQueryClient } from "@/lib/react-query/get-query-client";
+import { connection } from "next/server";
+import { getWeekRange } from "@/lib/anilist/utils/season";
+import { getCachedAiringSchedules } from "@/lib/anilist/server/get-cached-airing-schedules";
+import type { AiringScheduleItem } from "@/lib/anilist/types";
 
-export const getAiringSchedules = cache(async (start: number, end: number) => {
-  const queryClient = getQueryClient();
-  return queryClient.fetchQuery(airingSchedulesOptions(start, end));
-});
+export const getAiringSchedules = cache(
+  async (start: number, end: number): Promise<AiringScheduleItem[]> => {
+    return getCachedAiringSchedules(start, end);
+  }
+);
+
+/** One in-flight airing week fetch per request (cached across refreshes). */
+export const getAiringSchedulesForRequest = cache(
+  async (): Promise<AiringScheduleItem[]> => {
+    await connection();
+    const { start, end } = getWeekRange();
+    return getCachedAiringSchedules(start, end);
+  }
+);

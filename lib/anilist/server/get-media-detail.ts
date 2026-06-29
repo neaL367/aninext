@@ -1,9 +1,7 @@
 import { cache } from "react";
-import { mediaDetailOptions } from "@/lib/anilist/query-options";
-import { getQueryClient } from "@/lib/react-query/get-query-client";
+import { getCachedMediaDetail } from "@/lib/anilist/server/get-cached-media-detail";
 
-/** Dedupes media detail fetches within a single request (page + generateMetadata). */
+/** Per-request dedupe (page + generateMetadata) atop cross-request cache. */
 export const getMediaDetail = cache(async (mediaId: number) => {
-  const queryClient = getQueryClient();
-  return queryClient.fetchQuery(mediaDetailOptions(mediaId));
+  return getCachedMediaDetail(mediaId);
 });
