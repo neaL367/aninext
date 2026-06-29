@@ -22,22 +22,22 @@ function CharacterCard({ edge }: { edge: NonNullable<CharacterEdge> }) {
 
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-card">
-      <div className="flex items-center gap-3 p-3">
-        <div className="relative size-12 shrink-0 overflow-hidden rounded-md border border-border bg-muted">
+      <div className="flex items-center gap-4 p-4">
+        <div className="relative size-[4.75rem] shrink-0 overflow-hidden rounded-lg border border-border bg-muted sm:size-20">
           {characterImage ? (
             <Image
               src={characterImage}
               alt=""
               fill
               className="object-cover"
-              sizes="48px"
+              sizes="80px"
             />
           ) : null}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium">{characterName}</p>
+          <p className="truncate text-base font-medium sm:text-lg">{characterName}</p>
           {edge.role ? (
-            <p className="truncate text-xs text-muted-foreground">{edge.role}</p>
+            <p className="truncate text-sm text-muted-foreground">{edge.role}</p>
           ) : null}
         </div>
       </div>
@@ -45,23 +45,25 @@ function CharacterCard({ edge }: { edge: NonNullable<CharacterEdge> }) {
       {voiceActor ? (
         <>
           <Separator />
-          <div className="flex items-center gap-2.5 bg-muted/40 px-3 py-2.5">
-            <div className="relative size-8 shrink-0 overflow-hidden rounded-full border border-border bg-muted">
+          <div className="flex items-center gap-3.5 bg-muted/40 px-4 py-3.5">
+            <div className="relative size-12 shrink-0 overflow-hidden rounded-full border border-border bg-muted sm:size-14">
               {voiceActor.image?.large ? (
                 <Image
                   src={voiceActor.image.large}
                   alt=""
                   fill
                   className="object-cover"
-                  sizes="32px"
+                  sizes="56px"
                 />
               ) : null}
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] font-medium tracking-wide text-muted-foreground uppercase">
+              <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                 Voice · {voiceActor.languageV2 ?? "Japanese"}
               </p>
-              <p className="truncate text-sm">{voiceActor.name?.full ?? "—"}</p>
+              <p className="truncate text-base font-medium">
+                {voiceActor.name?.full ?? "—"}
+              </p>
             </div>
           </div>
         </>
@@ -80,16 +82,16 @@ function StaffCard({
   image: string | null;
 }) {
   return (
-    <div className="flex items-center gap-2.5 rounded-lg border border-border p-2.5">
-      <div className="relative size-10 shrink-0 overflow-hidden rounded-md border border-border bg-muted">
+    <div className="flex items-center gap-3.5 rounded-lg border border-border p-3.5">
+      <div className="relative size-16 shrink-0 overflow-hidden rounded-lg border border-border bg-muted sm:size-[4.5rem]">
         {image ? (
-          <Image src={image} alt="" fill className="object-cover" sizes="40px" />
+          <Image src={image} alt="" fill className="object-cover" sizes="72px" />
         ) : null}
       </div>
       <div className="min-w-0">
-        <p className="truncate text-sm font-medium">{name}</p>
+        <p className="truncate text-base font-medium">{name}</p>
         {role ? (
-          <p className="truncate text-xs text-muted-foreground">{role}</p>
+          <p className="truncate text-sm text-muted-foreground">{role}</p>
         ) : null}
       </div>
     </div>
@@ -123,7 +125,7 @@ export function DetailCharactersSection({
       items={edges}
       initialCount={6}
       step={6}
-      gridClassName="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3"
+      gridClassName="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
       loadMoreLabel="Load more characters"
       renderItem={(edge) => <CharacterCard key={edge.node!.id} edge={edge} />}
     />
@@ -140,7 +142,7 @@ export function DetailStaffSection({
       items={edges}
       initialCount={8}
       step={8}
-      gridClassName="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+      gridClassName="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
       loadMoreLabel="Load more staff"
       renderItem={(edge, index) => (
         <StaffCard
@@ -164,9 +166,9 @@ export function DetailMediaCardsSection({
   return (
     <DetailLoadMoreGrid
       items={media}
-      initialCount={6}
-      step={6}
-      gridClassName="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8"
+      initialCount={8}
+      step={8}
+      gridClassName="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7"
       loadMoreLabel={loadMoreLabel}
       renderItem={(item) => (
         <AnimeCard key={item.id} media={item} showTooltip={false} compact />
