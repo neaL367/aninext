@@ -56,7 +56,7 @@ function TooltipContent({
           data-slot="tooltip-content"
           className={cn(
             isCard
-              ? "z-50 w-fit max-w-none overflow-hidden rounded-lg border border-border bg-popover p-0 text-popover-foreground shadow-lg"
+              ? "z-50 block overflow-hidden rounded-lg border border-border bg-popover p-0 text-popover-foreground shadow-lg"
               : "z-50 inline-flex w-fit max-w-xs items-center gap-1.5 rounded-md bg-foreground px-3 py-1.5 text-xs text-background has-data-[slot=kbd]:pr-1.5 **:data-[slot=kbd]:relative **:data-[slot=kbd]:isolate **:data-[slot=kbd]:z-50 **:data-[slot=kbd]:rounded-sm",
             className
           )}
