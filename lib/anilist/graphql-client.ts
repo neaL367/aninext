@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { print } from "graphql";
 import {
@@ -14,6 +16,16 @@ type GraphQLResponse<T> = {
   readonly data?: T;
   readonly errors?: readonly { message: string }[];
 };
+
+const printedQueries = new WeakMap<object, string>();
+
+function getPrintedQuery(document: TypedDocumentNode<unknown, unknown>): string {
+  const cached = printedQueries.get(document);
+  if (cached) return cached;
+  const printed = print(document);
+  printedQueries.set(document, printed);
+  return printed;
+}
 
 async function sleep(ms: number): Promise<void> {
   await new Promise((resolve) => setTimeout(resolve, ms));
@@ -33,6 +45,19 @@ function parseRetryAfterMs(response: Response): number | undefined {
   return undefined;
 }
 
+function buildGraphQLHeaders(): HeadersInit {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+
+  if (process.env.NODE_ENV === "development") {
+    headers["Accept-Encoding"] = "identity";
+  }
+
+  return headers;
+}
+
 async function fetchGraphQLOnce<TData, TVariables extends Record<string, unknown>>(
   document: TypedDocumentNode<TData, TVariables>,
   variables?: TVariables
@@ -40,13 +65,11 @@ async function fetchGraphQLOnce<TData, TVariables extends Record<string, unknown
   const started = Date.now();
   const response = await fetch(ANILIST_API_URL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "Accept-Encoding": "identity",
-    },
+    headers: buildGraphQLHeaders(),
     body: JSON.stringify({
-      query: print(document),
+      query: getPrintedQuery(
+        document as TypedDocumentNode<unknown, unknown>
+      ),
       variables: variables ?? {},
     }),
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
@@ -69,14 +92,42 @@ async function fetchGraphQLOnce<TData, TVariables extends Record<string, unknown
     );
   }
 
+  let payload: GraphQLResponse<TData>;
+  try {
+    payload = (await response.json()) as GraphQLResponse<TData>;
+  } catch (error) {
+    if (!response.ok) {
+      throw new AniListError(
+        "network",
+        `AniList request failed with status ${response.status}`,
+        error
+      );
+    }
+    throw new AniListError(
+      "validation",
+      "AniList response was not valid JSON",
+      error
+    );
+  }
+
+  // AniList returns HTTP 404 with `{ data: { Media: null }, errors: [...] }` for missing records.
+  if (response.status === 404) {
+    if (payload.data !== undefined) {
+      return payload.data;
+    }
+    throw new AniListError(
+      "not_found",
+      payload.errors?.map((error) => error.message).join("; ") ??
+        "AniList resource not found"
+    );
+  }
+
   if (!response.ok) {
     throw new AniListError(
       "network",
       `AniList request failed with status ${response.status}`
     );
   }
-
-  const payload = (await response.json()) as GraphQLResponse<TData>;
 
   if (payload.errors?.length) {
     throw new AniListError(
@@ -140,8 +191,10 @@ export async function executeGraphQL<
   document: TypedDocumentNode<TData, TVariables>,
   variables?: TVariables
 ): Promise<TData> {
-  const query = print(document);
-  const key = buildRequestKey(query, variables);
+  const key = buildRequestKey(
+    getPrintedQuery(document as TypedDocumentNode<unknown, unknown>),
+    variables
+  );
 
   return dedupeRequest(key, () =>
     withConcurrencyLimit(() => executeGraphQLWithRetry(document, variables))

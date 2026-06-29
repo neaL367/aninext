@@ -2,6 +2,7 @@ export type AniListErrorCode =
   | "rate_limit"
   | "graphql"
   | "network"
+  | "not_found"
   | "validation";
 
 export class AniListError extends Error {
