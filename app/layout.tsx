@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Suspense } from "react";
 import { SiteFooter } from "@/components/layout/site-footer";
-import { SiteHeader } from "@/components/layout/site-header";
+import { SiteHeader } from "@/components/layout/site-nav";
 import { SkipLink } from "@/components/layout/skip-link";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Providers } from "@/components/layout/providers";
@@ -33,25 +32,20 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} min-h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
-        <TooltipProvider delay={300}>
-          <Providers>
+        <Providers>
+          <TooltipProvider>
             <SkipLink />
-            <Suspense
-              fallback={
-                <header className="sticky top-0 z-40 h-14 border-b border-border bg-background" />
-              }
-            >
-              <SiteHeader />
-            </Suspense>
+            <SiteHeader />
             <main id="main-content" className="min-w-0 flex-1">
               {children}
             </main>
             <SiteFooter />
-          </Providers>
-        </TooltipProvider>
+          </TooltipProvider>
+        </Providers>
       </body>
     </html>
   );

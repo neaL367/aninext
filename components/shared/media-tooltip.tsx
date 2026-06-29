@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -8,10 +9,10 @@ import {
 import { cn } from "@/lib/utils";
 
 const DEFAULT_TOOLTIP_WIDTH =
-  "min-w-80 w-80 sm:min-w-96 sm:w-96";
+  "min-w-0 max-w-[min(100vw-1.5rem,24rem)] w-80 sm:max-w-[min(100vw-1.5rem,28rem)] sm:w-96";
 
 type MediaTooltipProps = {
-  content: React.ReactNode;
+  content: ReactNode;
   children: React.ReactNode;
   contentClassName?: string;
 };
@@ -27,7 +28,7 @@ export function MediaTooltip({
 
   return (
     <Tooltip>
-      <TooltipTrigger className="block h-full w-full rounded-lg text-left outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+      <TooltipTrigger className="block w-full rounded-lg text-left outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
         {children}
       </TooltipTrigger>
       <TooltipContent
@@ -43,4 +44,4 @@ export function MediaTooltip({
 }
 
 export const AIRING_TOOLTIP_WIDTH =
-  "min-w-96 w-96 sm:min-w-[28rem] sm:w-[28rem]";
+  "min-w-0 max-w-[min(100vw-1.5rem,28rem)] w-96 sm:max-w-[min(100vw-1.5rem,32rem)] sm:w-[28rem]";
