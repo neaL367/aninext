@@ -8,6 +8,10 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     inlineCss: true,
+    useLightningcss: true,
+    lightningCssFeatures: {
+      include: ["oklab-colors", "hex-alpha-colors"],
+    },
     turbopackFileSystemCacheForDev: true,
     turbopackMemoryEviction: "full",
     turbopackFileSystemCacheForBuild: true,
