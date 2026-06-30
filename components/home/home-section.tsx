@@ -1,6 +1,6 @@
 import type { Route } from "next";
-import type { MediaCard } from "@/lib/anilist/types";
-import { AnimeGrid } from "@/components/anime/anime-grid";
+import type { AnimeCardMedia } from "@/components/anime/anime-card-parts";
+import { AnimeMediaGrid } from "@/components/anime/anime-media-grid";
 import { EmptyState } from "@/components/shared/empty-state";
 import { SectionHeader } from "@/components/shared/section-header";
 
@@ -8,10 +8,7 @@ type HomeSectionProps = {
   title: string;
   subtitle?: string;
   href?: Route;
-  media: readonly (MediaCard & {
-    popularityPercent?: number | null;
-    rank?: number;
-  })[];
+  media: readonly AnimeCardMedia[];
   showCountdown?: boolean;
 };
 
@@ -33,7 +30,7 @@ export function HomeSection({
       {!media.length ? (
         <EmptyState title="No anime found" />
       ) : (
-        <AnimeGrid media={media} showCountdown={showCountdown} />
+        <AnimeMediaGrid media={media} showCountdown={showCountdown} />
       )}
     </section>
   );

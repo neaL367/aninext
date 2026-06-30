@@ -7,16 +7,16 @@ type HomeSectionSlotProps = {
   title: string;
   subtitle?: string;
   href?: Route;
-  showCountdown?: boolean;
   section: HomeSectionId;
+  showCountdown?: boolean;
 };
 
 export async function HomeSectionSlot({
   title,
   subtitle,
   href,
-  showCountdown = false,
   section,
+  showCountdown = false,
 }: HomeSectionSlotProps) {
   const media = await getHomeSectionMedia(section);
 

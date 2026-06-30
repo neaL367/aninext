@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { memo } from "react";
 import { AiringItemTooltipContent } from "@/components/airing/airing-item-tooltip-content";
 import { AiringCountdown } from "@/components/shared/countdown";
 import { MediaTooltip, AIRING_TOOLTIP_WIDTH } from "@/components/shared/media-tooltip";
@@ -24,7 +25,7 @@ type AiringItemCardProps = {
   className?: string;
 };
 
-export function AiringItemCard({ item, className }: AiringItemCardProps) {
+export const AiringItemCard = memo(function AiringItemCard({ item, className }: AiringItemCardProps) {
   const media = item.media;
   const title = media ? formatDisplayTitle(media.title) : "—";
   const coverUrl = coverCardImageUrl(media?.coverImage ?? null);
@@ -92,11 +93,11 @@ export function AiringItemCard({ item, className }: AiringItemCardProps) {
   );
 
   return (
-    <MediaTooltip
-      content={<AiringItemTooltipContent item={item} />}
-      contentClassName={AIRING_TOOLTIP_WIDTH}
-    >
-      {card}
+    <MediaTooltip>
+      <MediaTooltip.Trigger>{card}</MediaTooltip.Trigger>
+      <MediaTooltip.Content className={AIRING_TOOLTIP_WIDTH}>
+        <AiringItemTooltipContent item={item} />
+      </MediaTooltip.Content>
     </MediaTooltip>
   );
-}
+});

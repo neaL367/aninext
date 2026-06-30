@@ -103,7 +103,9 @@ export function AiringScheduleInteractive({
         {activeItems.length ? (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {activeItems.map((item) => (
-              <AiringItemCard key={item.id} item={item} />
+              <div key={item.id} className="airing-item-cell">
+                <AiringItemCard item={item} />
+              </div>
             ))}
           </div>
         ) : (

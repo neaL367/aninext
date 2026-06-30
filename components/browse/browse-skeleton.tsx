@@ -1,4 +1,4 @@
-import { AnimeGridSkeleton } from "@/components/anime/anime-grid";
+import { AnimeMediaGridSkeleton } from "@/components/anime/anime-media-grid";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -31,7 +31,7 @@ export function BrowseSkeleton({ className }: BrowseSkeletonProps) {
         </div>
       </div>
 
-      <AnimeGridSkeleton count={12} variant="browse" />
+      <AnimeMediaGridSkeleton layout="browse" count={12} />
     </div>
   );
 }

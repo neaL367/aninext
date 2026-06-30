@@ -141,6 +141,11 @@
   .anime-browse-grid-cell {
     contain-intrinsic-size: auto 24.5rem;
   }
+
+  .airing-item-cell {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 6.5rem;
+  }
 }
 
 @layer base {
