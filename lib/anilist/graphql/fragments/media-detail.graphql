@@ -45,18 +45,8 @@ fragment MediaDetailFields on Media {
       relationType
       node {
         id
-        title {
-          romaji
-          english
-          native
-        }
-        coverImage {
-          large
-          medium
-          color
-        }
-        format
-        status
+        type
+        ...MediaCardGridFields
       }
     }
   }

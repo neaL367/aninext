@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimeCompactCard } from "@/components/anime/anime-compact-card";
+import { DetailRelationCard, type DetailRelationItem } from "@/components/detail/detail-relation-card";
 import { DetailCharacterCard, DetailStaffCard } from "@/components/detail/detail-cards";
 import { DetailLoadMoreGrid } from "@/components/detail/detail-load-more-grid";
 import { EpisodeCard } from "@/components/detail/episode-card";
@@ -60,6 +61,28 @@ export function DetailStaffSection({
           name={edge.node!.name?.full ?? "—"}
           role={edge.role ?? null}
           image={edge.node!.image?.large ?? null}
+        />
+      )}
+    />
+  );
+}
+
+export function DetailRelationsSection({
+  items,
+}: {
+  items: DetailRelationItem[];
+}) {
+  return (
+    <DetailLoadMoreGrid
+      items={items}
+      initialCount={8}
+      step={8}
+      gridClassName="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6"
+      loadMoreLabel="Load more relations"
+      renderItem={(item) => (
+        <DetailRelationCard
+          key={`${item.media.id}-${item.relationType}`}
+          item={item}
         />
       )}
     />
