@@ -1,5 +1,10 @@
 import type { Route } from "next";
 import {
+  HOME_SECTION_IDS,
+  type HomeSectionId,
+} from "@/lib/anilist/domain/home-sections";
+import { homeSectionToListParams } from "@/lib/browse/anilist-queries";
+import {
   animeListParamsToQuery,
   DEFAULT_ANIME_LIST_PARAMS,
   type AnimeListParams,
@@ -31,15 +36,10 @@ export function animeBrowseHref(
   }) as Route;
 }
 
-/** Canonical "View all" targets matching each home carousel query. */
-export const HOME_SECTION_BROWSE_HREFS = {
-  trending: animeBrowseHref({ sort: "trending" }),
-  airingNow: animeBrowseHref({
-    sort: "all-time-popular",
-    statuses: ["RELEASING"],
-  }),
-  popularThisSeason: animeBrowseHref({ sort: "popular-this-season" }),
-  upcomingNextSeason: animeBrowseHref({ sort: "upcoming-next-season" }),
-  allTimePopular: animeBrowseHref({ sort: "all-time-popular" }),
-  top100: animeBrowseHref({ sort: "top-100" }),
-} as const satisfies Record<string, Route>;
+/** Canonical "View all" targets — derived from the same mapping as home carousels. */
+export const HOME_SECTION_BROWSE_HREFS = Object.fromEntries(
+  HOME_SECTION_IDS.map((section) => [
+    section,
+    buildAnimeBrowseHref(homeSectionToListParams(section)),
+  ])
+) as Record<HomeSectionId, Route>;
