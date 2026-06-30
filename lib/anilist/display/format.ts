@@ -1,3 +1,5 @@
+import { normalizeAniListDescription } from "@/lib/anilist/display/parse-anilist-description";
+
 export const MISSING_VALUE = "—";
 
 export function formatValue(value: string | number | null | undefined): string {
@@ -33,6 +35,36 @@ export function formatEpisodeCount(episodes: number | null | undefined): string 
     return MISSING_VALUE;
   }
   return episodes === 0 ? "?" : String(episodes);
+}
+
+export function formatChapterCount(chapters: number | null | undefined): string {
+  if (chapters === null || chapters === undefined) {
+    return MISSING_VALUE;
+  }
+  return chapters === 0 ? "?" : String(chapters);
+}
+
+export function formatVolumeCount(volumes: number | null | undefined): string {
+  if (volumes === null || volumes === undefined) {
+    return MISSING_VALUE;
+  }
+  return volumes === 0 ? "?" : String(volumes);
+}
+
+export function formatPersonName(
+  name:
+    | {
+        full?: string | null;
+        native?: string | null;
+        userPreferred?: string | null;
+      }
+    | null
+    | undefined
+): string {
+  if (!name) {
+    return MISSING_VALUE;
+  }
+  return name.userPreferred ?? name.full ?? name.native ?? MISSING_VALUE;
 }
 
 export function formatDisplayTitle(
@@ -77,14 +109,11 @@ export function stripHtml(html: string | null | undefined): string {
   if (!html) {
     return MISSING_VALUE;
   }
-  return html
-    .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<[^>]+>/g, "")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
+
+  return normalizeAniListDescription(html)
+    .replace(/__([^_]+?)__/g, "$1")
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, "$1")
+    .replace(/_([^_]+)_/g, "$1")
     .trim();
 }
 

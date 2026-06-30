@@ -17,10 +17,10 @@ import { DetailBreadcrumb } from "@/components/detail/detail-breadcrumb";
 import { DetailReturnAnchor } from "@/components/detail/detail-return-anchor";
 import type { MediaDetail, MediaRelation } from "@/lib/anilist/domain/types";
 import { buildEpisodeCards } from "@/lib/anilist/display/episodes";
+import { AniListDescription } from "@/components/shared/anilist-description";
 import {
   formatDisplayTitle,
   formatEpisodeCount,
-  stripHtml,
 } from "@/lib/anilist/display/format";
 import { buildProgressiveImageSources } from "@/lib/anilist/display/image-urls";
 import { getStreamingLinks } from "@/lib/anilist/display/streaming";
@@ -166,9 +166,7 @@ export function AnimeDetailBody({ media }: AnimeDetailMediaProps) {
           {media.description ? (
             <section className="rounded-xl border border-border bg-card/40 p-5 sm:p-6">
               <h2 className="mb-3 text-lg font-medium tracking-tight">Synopsis</h2>
-              <p className="text-base leading-relaxed text-muted-foreground whitespace-pre-line">
-                {stripHtml(media.description)}
-              </p>
+              <AniListDescription text={media.description} />
             </section>
           ) : null}
 

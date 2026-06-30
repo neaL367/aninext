@@ -3,10 +3,12 @@ import { ProgressiveImage } from "@/components/shared/progressive-image";
 import type { MediaDetail } from "@/lib/anilist/domain/types";
 import { coverProgressiveSources } from "@/lib/anilist/display/image-urls";
 import {
+  formatChapterCount,
   formatDisplayTitle,
   formatEpisodeCount,
   formatFuzzyDate,
   formatScore,
+  formatVolumeCount,
 } from "@/lib/anilist/display/format";
 import {
   formatCountry,
@@ -35,6 +37,7 @@ export function DetailSidebar({ media }: DetailSidebarProps) {
   const title = formatDisplayTitle(media.title);
   const score = formatScore(media.averageScore);
   const coverSources = coverProgressiveSources(media.coverImage);
+  const isManga = media.type === "MANGA";
 
   return (
     <aside className="flex flex-col gap-4 lg:sticky lg:top-20 lg:self-start">
@@ -66,12 +69,36 @@ export function DetailSidebar({ media }: DetailSidebarProps) {
         <p className="text-sm font-medium">Information</p>
         <dl className="flex flex-col gap-2.5">
           <SidebarFact label="Format" value={formatMediaFormat(media.format)} />
-          <SidebarFact label="Episodes" value={formatEpisodeCount(media.episodes)} />
-          <SidebarFact label="Duration" value={formatDuration(media.duration)} />
-          <SidebarFact
-            label="Season"
-            value={formatSeasonYear(media.season ?? null, media.seasonYear ?? null)}
-          />
+          {isManga ? (
+            <>
+              <SidebarFact
+                label="Chapters"
+                value={formatChapterCount(media.chapters)}
+              />
+              <SidebarFact
+                label="Volumes"
+                value={formatVolumeCount(media.volumes)}
+              />
+            </>
+          ) : (
+            <>
+              <SidebarFact
+                label="Episodes"
+                value={formatEpisodeCount(media.episodes)}
+              />
+              <SidebarFact
+                label="Duration"
+                value={formatDuration(media.duration)}
+              />
+              <SidebarFact
+                label="Season"
+                value={formatSeasonYear(
+                  media.season ?? null,
+                  media.seasonYear ?? null
+                )}
+              />
+            </>
+          )}
           <SidebarFact label="Started" value={formatFuzzyDate(media.startDate)} />
           <SidebarFact label="Ended" value={formatFuzzyDate(media.endDate)} />
           <SidebarFact label="Source" value={formatMediaSource(media.source)} />

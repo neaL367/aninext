@@ -58,6 +58,7 @@ export function DetailStaffSection({
       renderItem={(edge, index) => (
         <DetailStaffCard
           key={`${edge.node!.id}-${edge.role ?? "staff"}-${index}`}
+          staffId={edge.node!.id}
           name={edge.node!.name?.full ?? "—"}
           role={edge.role ?? null}
           image={edge.node!.image?.large ?? null}
