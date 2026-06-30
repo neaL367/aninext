@@ -6,6 +6,7 @@ import type {
   MediaDetailFieldsFragment,
   MediaPageQuery,
 } from "./generated/graphql";
+import { filterNonNullMedia } from "./utils/normalize-media-list";
 
 const MEDIA_CARD_TOOLTIP_KEYS = [
   "description",
@@ -24,10 +25,12 @@ export function hasMediaCardTooltipFields(
 
 export type {
   MediaFormat,
+  MediaRelation,
   MediaSeason,
   MediaSort,
   MediaSource,
   MediaStatus,
+  MediaType,
 } from "./generated/graphql";
 
 export type MediaCardGrid = MediaCardGridFieldsFragment;
@@ -76,8 +79,8 @@ export function normalizeMediaPageResult(data: MediaPageQuery): MediaPageResult 
     throw new Error("Invalid AniList page info");
   }
 
-  const media = (data.Page?.media ?? []).filter(
-    (item): item is MediaCard => item !== null
+  const media = filterNonNullMedia(
+    data.Page?.media as Array<MediaCard | null> | null | undefined
   );
 
   return {

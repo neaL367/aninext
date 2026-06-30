@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { DetailMainHeader } from "@/components/detail/detail-main-header";
 import { DetailSection } from "@/components/detail/detail-section";
 import { DetailSidebar } from "@/components/detail/detail-sidebar";
@@ -9,19 +8,15 @@ import {
   DetailCharactersSection,
   DetailEpisodesSection,
   DetailMediaCardsSection,
+  DetailRelationsSection,
   DetailStaffSection,
 } from "@/components/detail/detail-sections";
+import type { DetailRelationItem } from "@/components/detail/detail-relation-card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageContainer } from "@/components/layout/page-container";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import type { MediaCard, MediaDetail } from "@/lib/anilist/types";
+import { DetailBreadcrumb } from "@/components/detail/detail-breadcrumb";
+import { DetailReturnAnchor } from "@/components/detail/detail-return-anchor";
+import type { MediaDetail, MediaRelation } from "@/lib/anilist/types";
 import { buildEpisodeCards } from "@/lib/anilist/utils/episodes";
 import {
   formatDisplayTitle,
@@ -85,11 +80,20 @@ export function AnimeDetailView({ media }: AnimeDetailViewProps) {
         Boolean(edge?.node)
     ) ?? [];
 
-  const relationMedia =
+  const relationItems: DetailRelationItem[] =
     media.relations?.edges
-      ?.filter((edge) => Boolean(edge))
-      .map((edge) => edge!.node)
-      .filter((node): node is NonNullable<typeof node> => Boolean(node)) ?? [];
+      ?.filter(
+        (
+          edge
+        ): edge is NonNullable<typeof edge> & {
+          relationType: MediaRelation;
+          node: NonNullable<NonNullable<typeof edge>["node"]>;
+        } => Boolean(edge?.node?.id && edge.relationType)
+      )
+      .map((edge) => ({
+        relationType: edge.relationType,
+        media: edge.node,
+      })) ?? [];
 
   const recommendationMedia =
     media.recommendations?.nodes
@@ -101,6 +105,7 @@ export function AnimeDetailView({ media }: AnimeDetailViewProps) {
 
   return (
     <>
+      <DetailReturnAnchor mediaId={media.id} title={title} />
       <div className="relative h-52 w-full overflow-hidden sm:h-64 lg:h-80 xl:h-96">
         <div
           className="absolute inset-0"
@@ -123,25 +128,7 @@ export function AnimeDetailView({ media }: AnimeDetailViewProps) {
       </div>
 
       <PageContainer className="relative -mt-6 flex flex-col gap-6 pb-10 pt-4 sm:-mt-8 lg:gap-8 lg:pb-12 lg:pt-6">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink render={<Link href="/" />}>
-                Home
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink render={<Link href="/anime" />}>
-                Anime
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>{title}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+        <DetailBreadcrumb title={title} />
 
         <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,240px)_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[minmax(0,260px)_minmax(0,1fr)]">
           <DetailSidebar media={media} />
@@ -187,12 +174,9 @@ export function AnimeDetailView({ media }: AnimeDetailViewProps) {
               </DetailSection>
             ) : null}
 
-            {relationMedia.length ? (
+            {relationItems.length ? (
               <DetailSection title="Relations" bordered={false}>
-                <DetailMediaCardsSection
-                  media={relationMedia as MediaCard[]}
-                  loadMoreLabel="Load more relations"
-                />
+                <DetailRelationsSection items={relationItems} />
               </DetailSection>
             ) : null}
 
