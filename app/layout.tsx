@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SiteFooter } from "@/components/layout/site-footer";
-import { SiteHeader } from "@/components/layout/site-nav";
+import { SiteHeader } from "@/components/layout/site-header";
 import { SkipLink } from "@/components/layout/skip-link";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Providers } from "@/components/layout/providers";
-import { createPageMetadata } from "@/lib/seo/metadata";
+import { createRootLayoutMetadata } from "@/lib/seo/metadata";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = createPageMetadata({
+export const metadata: Metadata = createRootLayoutMetadata({
   title: "AniNext",
   description:
     "Discover trending, seasonal, and airing anime with a fast, server-driven browsing experience.",
@@ -37,7 +37,7 @@ export default function RootLayout({
     >
       <body className="flex min-h-full flex-col">
         <Providers>
-          <TooltipProvider>
+          <TooltipProvider delay={250}>
             <SkipLink />
             <SiteHeader />
             <main id="main-content" className="min-w-0 flex-1">

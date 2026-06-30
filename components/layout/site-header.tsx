@@ -60,24 +60,26 @@ export function SiteHeader() {
             >
               <MenuIcon className="size-4" />
             </SheetTrigger>
-            <SheetContent side="right" className="flex h-full w-full max-w-xs flex-col gap-0 p-0">
-              <SheetHeader className="shrink-0">
-                <SheetTitle>Menu</SheetTitle>
-              </SheetHeader>
-              <nav
-                aria-label="Mobile navigation"
-                className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-6"
-                data-lenis-prevent
-                data-lenis-prevent-wheel
-              >
-                <NavLinksSuspense
-                  pathname={pathname}
-                  orientation="vertical"
-                  compact={false}
-                  onNavigate={() => setOpen(false)}
-                />
-              </nav>
-            </SheetContent>
+            {open ? (
+              <SheetContent side="right" className="flex h-full w-full max-w-xs flex-col gap-0 p-0">
+                <SheetHeader className="shrink-0">
+                  <SheetTitle>Menu</SheetTitle>
+                </SheetHeader>
+                <nav
+                  aria-label="Mobile navigation"
+                  className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-6"
+                  data-lenis-prevent
+                  data-lenis-prevent-wheel
+                >
+                  <NavLinksSuspense
+                    pathname={pathname}
+                    orientation="vertical"
+                    compact={false}
+                    onNavigate={() => setOpen(false)}
+                  />
+                </nav>
+              </SheetContent>
+            ) : null}
           </Sheet>
         </div>
       </PageContainer>
