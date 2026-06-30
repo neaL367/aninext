@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { memo } from "react";
 import { AiringItemTooltipContent } from "@/components/airing/airing-item-tooltip-content";
 import { AiringCountdown } from "@/components/shared/countdown";
 import { MediaTooltip, AIRING_TOOLTIP_WIDTH } from "@/components/shared/media-tooltip";
@@ -27,7 +26,9 @@ type AiringItemCardProps = {
   className?: string;
 };
 
-export const AiringItemCard = memo(function AiringItemCard({ item, className }: AiringItemCardProps) {
+export function AiringItemCard({ item, className }: AiringItemCardProps) {
+  "use memo";
+
   const media = item.media;
   const title = media ? formatDisplayTitle(media.title) : "—";
   const coverUrl = coverCardImageUrl(media?.coverImage ?? null);
@@ -110,4 +111,4 @@ export const AiringItemCard = memo(function AiringItemCard({ item, className }: 
       </MediaTooltip.Content>
     </MediaTooltip>
   );
-});
+}

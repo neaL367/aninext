@@ -26,6 +26,8 @@ function AiringEpisodeBlock({
   item: AiringScheduleItem;
   totalEpisodes: number | null;
 }) {
+  "use memo";
+
   const remaining = useCountdownRemaining(item.airingAt, item.timeUntilAiring);
   const episodeProgress =
     totalEpisodes && totalEpisodes > 0
@@ -75,6 +77,8 @@ function AiringItemTooltipBody({
   contentReady: boolean;
   onBannerLoad: () => void;
 }) {
+  "use memo";
+
   const title = formatDisplayTitle(media.title);
   const streaming = getStreamingLinks(media.externalLinks ?? null);
   const synopsis = excerptSynopsis(media.description);
@@ -133,6 +137,8 @@ function AiringItemTooltipBody({
 }
 
 export function AiringItemTooltipContent({ item }: AiringItemTooltipContentProps) {
+  "use memo";
+
   const media = item.media;
   const [contentReady, setContentReady] = useState(!media?.bannerImage);
   const handleBannerLoad = useCallback(() => setContentReady(true), []);

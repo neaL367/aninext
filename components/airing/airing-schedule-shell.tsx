@@ -17,6 +17,8 @@ import { cn } from "@/lib/utils";
 
 /** Static shell shown while day promises are wired up; mirrors the interactive layout. */
 export function AiringScheduleShell() {
+  "use memo";
+
   const { dateKeys, todayKey, timezoneLabel, weekRangeLabel } = useMemo(() => {
     const keys = getWeekDateKeys();
     const start = parseLocalDateKey(keys[0]!);

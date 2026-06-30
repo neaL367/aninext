@@ -43,6 +43,8 @@ export function AiringScheduleInteractive({
   dateKeys,
   dayPromises,
 }: AiringScheduleInteractiveProps) {
+  "use memo";
+
   const { todayKey, timezoneLabel, weekRangeLabel } = useMemo(() => {
     return {
       todayKey: toLocalDateKeyFromDate(new Date()),
