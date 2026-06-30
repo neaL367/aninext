@@ -1,4 +1,4 @@
-#import "../fragments/media-card-grid.graphql"
+#import "../fragments/media-card.graphql"
 
 query HomeSectionMedia(
   $perPage: Int!
@@ -17,7 +17,7 @@ query HomeSectionMedia(
       status: $status
       status_in: $status_in
     ) {
-      ...MediaCardGridFields
+      ...MediaCardFields
     }
   }
 }

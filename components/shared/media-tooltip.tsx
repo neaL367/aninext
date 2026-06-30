@@ -33,6 +33,11 @@ function useMediaTooltipContext() {
   return context;
 }
 
+/** Whether the tooltip popup is open (for lazy-loading tooltip data). */
+export function useMediaTooltipOpen(): boolean {
+  return useMediaTooltipContext().open;
+}
+
 function MediaTooltipRoot({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
 

@@ -13,6 +13,7 @@ import { MediaCardTooltipHero } from "@/components/shared/media-card-tooltip-her
 import { mediaCardTooltipOptions } from "@/lib/anilist/tooltip-query-options";
 import type { MediaCard } from "@/lib/anilist/types";
 import { hasMediaCardTooltipFields } from "@/lib/anilist/types";
+import { useMediaTooltipOpen } from "@/components/shared/media-tooltip";
 import { formatDisplayTitle, formatScore } from "@/lib/anilist/utils/format";
 import {
   excerptSynopsis,
@@ -134,6 +135,7 @@ function AnimeCardTooltipLoaded({
 }
 
 export function AnimeCardTooltipContent({ media }: AnimeCardTooltipContentProps) {
+  const tooltipOpen = useMediaTooltipOpen();
   const hasEmbeddedTooltipFields = hasMediaCardTooltipFields(media);
 
   const {
@@ -142,7 +144,7 @@ export function AnimeCardTooltipContent({ media }: AnimeCardTooltipContentProps)
     isError,
   } = useQuery({
     ...mediaCardTooltipOptions(media.id),
-    enabled: !hasEmbeddedTooltipFields,
+    enabled: tooltipOpen && !hasEmbeddedTooltipFields,
   });
 
   const mergedMedia = useMemo(() => {
