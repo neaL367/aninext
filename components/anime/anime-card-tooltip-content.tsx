@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from "react";
 import { CalendarClockIcon, StarIcon, UsersIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { MediaCardTooltipBodySkeleton } from "@/components/shared/media-card-tooltip-skeleton";
+import { MediaTooltipGenreChips } from "@/components/shared/media-tooltip-genre-chips";
 import {
   formatCountdownRemaining,
   useCountdownRemaining,
@@ -92,6 +93,8 @@ function AnimeCardTooltipLoaded({
               {tooltipFailed ? "Details unavailable." : "No synopsis available."}
             </p>
           )}
+
+          <MediaTooltipGenreChips genres={mergedMedia.genres} />
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-border pt-3 text-sm text-muted-foreground">
             {studio ? (

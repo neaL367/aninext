@@ -2,18 +2,18 @@
 
 import { useCallback, useState } from "react";
 import { PlayCircleIcon } from "lucide-react";
-import { StreamingService } from "@/components/shared/streaming-service";
+import { StreamingLinksGrid } from "@/components/shared/streaming-links-grid";
 import {
   formatCountdownRemaining,
   useCountdownRemaining,
 } from "@/components/shared/countdown";
 import { MediaCardTooltipBodySkeleton } from "@/components/shared/media-card-tooltip-skeleton";
+import { MediaTooltipGenreChips } from "@/components/shared/media-tooltip-genre-chips";
 import { MediaCardTooltipHero } from "@/components/shared/media-card-tooltip-hero";
 import type { AiringScheduleItem } from "@/lib/anilist/domain/types";
 import { formatDisplayTitle } from "@/lib/anilist/display/format";
-import { excerptSynopsis } from "@/lib/anilist/display/tooltip";
+import { excerptSynopsis, getDisplayGenres } from "@/lib/anilist/display/tooltip";
 import { getStreamingLinks } from "@/lib/anilist/display/streaming";
-import { cn } from "@/lib/utils";
 
 type AiringItemTooltipContentProps = {
   item: AiringScheduleItem;
@@ -83,6 +83,8 @@ function AiringItemTooltipBody({
   const streaming = getStreamingLinks(media.externalLinks ?? null);
   const synopsis = excerptSynopsis(media.description);
   const totalEpisodes = media.episodes ?? null;
+  const genres = getDisplayGenres(media.genres);
+  const hasContentAboveStreaming = Boolean(synopsis || genres.length);
 
   return (
     <div className="flex min-w-0 w-full flex-col overflow-hidden">
@@ -107,27 +109,19 @@ function AiringItemTooltipBody({
               </p>
             ) : null}
 
+            <MediaTooltipGenreChips genres={media.genres} />
+
             {streaming.length > 0 ? (
-              <div
-                className={cn(
-                  "flex flex-col gap-2.5",
-                  synopsis ? "border-t border-border pt-3" : ""
-                )}
-              >
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Watch on
-                </p>
-                <div className="flex flex-wrap gap-x-4 gap-y-2">
-                  {streaming.slice(0, 5).map((link) => (
-                    <StreamingService
-                      key={`${link.site}-${link.url}`}
-                      site={link.site}
-                      url={link.url}
-                      size="sm"
-                    />
-                  ))}
-                </div>
-              </div>
+              <StreamingLinksGrid
+                links={streaming}
+                limit={5}
+                size="sm"
+                className={
+                  hasContentAboveStreaming
+                    ? "border-t border-border pt-3"
+                    : undefined
+                }
+              />
             ) : null}
           </>
         )}

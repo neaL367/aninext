@@ -54,3 +54,13 @@ export function getTopTags(
     .slice(0, limit)
     .map((tag) => tag.name);
 }
+
+export function getDisplayGenres(
+  genres: readonly (string | null)[] | null | undefined,
+  limit = 6
+): string[] {
+  return (genres?.filter((genre): genre is string => Boolean(genre)) ?? []).slice(
+    0,
+    limit
+  );
+}

@@ -1,28 +1,31 @@
 import { DetailTaxonomyTags } from "@/components/detail/detail-taxonomy-tags";
-import { StreamingService } from "@/components/shared/streaming-service";
+import { StreamingLinksGrid } from "@/components/shared/streaming-links-grid";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import type { ReactNode } from "react";
 import type { MediaDetail } from "@/lib/anilist/domain/types";
+import {
+  TAXONOMY_CHIP_CLASS,
+  TAXONOMY_CHIP_ROW_CLASS,
+  TAXONOMY_SECTION_LABEL_CLASS,
+} from "@/lib/styles/taxonomy-chips";
 
 type DetailTaxonomyProps = {
   media: MediaDetail;
   streamingLinks: { site: string; url: string }[];
 };
 
-type TaxonomyRowProps = {
+type TaxonomySectionProps = {
   label: string;
   children: ReactNode;
 };
 
-function TaxonomyRow({ label, children }: TaxonomyRowProps) {
+function TaxonomySection({ label, children }: TaxonomySectionProps) {
   return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:gap-4">
-      <p className="shrink-0 text-xs font-medium uppercase tracking-wide text-muted-foreground sm:w-24 sm:pt-1.5">
-        {label}
-      </p>
-      <div className="min-w-0 flex-1">{children}</div>
+    <div className="flex flex-col gap-2.5">
+      <p className={TAXONOMY_SECTION_LABEL_CLASS}>{label}</p>
+      <div className="min-w-0">{children}</div>
     </div>
   );
 }
@@ -36,61 +39,55 @@ export function DetailTaxonomy({ media, streamingLinks }: DetailTaxonomyProps) {
       )
       .sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99)) ?? [];
 
-  if (
-    !media.status &&
-    genres.length === 0 &&
-    tags.length === 0 &&
-    streamingLinks.length === 0
-  ) {
+  const hasClassification =
+    Boolean(media.status) || genres.length > 0 || tags.length > 0;
+
+  if (!hasClassification && streamingLinks.length === 0) {
     return null;
   }
 
   return (
     <section
       aria-label="Classification and streaming"
-      className="flex flex-col gap-4 rounded-xl border border-border bg-card/40 p-4 sm:gap-5 sm:p-5"
+      className="flex flex-col gap-5 rounded-xl border border-border bg-card/40 p-4 sm:p-5"
     >
       {media.status ? (
-        <TaxonomyRow label="Status">
-          <StatusBadge status={media.status} />
-        </TaxonomyRow>
+        <TaxonomySection label="Status">
+          <div className={TAXONOMY_CHIP_ROW_CLASS}>
+            <StatusBadge
+              status={media.status}
+              className={TAXONOMY_CHIP_CLASS}
+            />
+          </div>
+        </TaxonomySection>
       ) : null}
 
       {genres.length > 0 ? (
-        <TaxonomyRow label="Genres">
-          <div className="flex flex-wrap gap-1.5">
+        <TaxonomySection label="Genres">
+          <div className={TAXONOMY_CHIP_ROW_CLASS}>
             {genres.map((genre) => (
-              <Badge key={genre} variant="secondary" className="font-normal">
+              <Badge
+                key={genre}
+                variant="secondary"
+                className={TAXONOMY_CHIP_CLASS}
+              >
                 {genre}
               </Badge>
             ))}
           </div>
-        </TaxonomyRow>
+        </TaxonomySection>
       ) : null}
 
       {tags.length > 0 ? (
-        <TaxonomyRow label="Tags">
+        <TaxonomySection label="Tags">
           <DetailTaxonomyTags tags={tags} />
-        </TaxonomyRow>
+        </TaxonomySection>
       ) : null}
 
       {streamingLinks.length > 0 ? (
         <>
-          {media.status || genres.length > 0 || tags.length > 0 ? (
-            <Separator />
-          ) : null}
-          <TaxonomyRow label="Watch on">
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {streamingLinks.map((link) => (
-                <StreamingService
-                  key={`${link.site}-${link.url}`}
-                  site={link.site}
-                  url={link.url}
-                  variant="pill"
-                />
-              ))}
-            </div>
-          </TaxonomyRow>
+          {hasClassification ? <Separator /> : null}
+          <StreamingLinksGrid links={streamingLinks} />
         </>
       ) : null}
     </section>

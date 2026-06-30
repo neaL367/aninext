@@ -33,7 +33,7 @@ export function StreamingService({
       className={cn(
         "inline-flex min-w-0 items-center gap-2 text-muted-foreground transition-colors",
         isPill
-          ? "rounded-md border border-border bg-background/80 px-2.5 py-1.5 text-sm hover:border-border hover:bg-muted/50 hover:text-foreground"
+          ? "rounded-md border border-border/80 bg-background/90 px-3 py-1.5 text-sm shadow-sm hover:border-border hover:bg-muted/60 hover:text-foreground"
           : size === "sm"
             ? "text-xs"
             : "text-sm",
@@ -58,7 +58,7 @@ export function StreamingService({
           {(getStreamingSiteDomain(site, url) ?? site).charAt(0)}
         </span>
       )}
-      <span className={cn("min-w-0 truncate", isPill && "font-medium")}>
+      <span className={cn("min-w-0", isPill ? "whitespace-nowrap font-medium" : "truncate")}>
         {site}
       </span>
     </span>

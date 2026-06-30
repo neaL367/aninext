@@ -15,6 +15,7 @@ const STREAMING_DOMAINS: Record<string, string> = {
   iQiyi: "iq.com",
   iQIYI: "iq.com",
   IQIYI: "iq.com",
+  iQ: "iq.com",
   IQ: "iq.com",
   Youku: "youku.com",
   QQ: "v.qq.com",
