@@ -19,12 +19,27 @@ export function filterNonNullMedia(
   return (media ?? []).filter((item): item is MediaCard => item !== null);
 }
 
+function dedupeMediaById(media: MediaCard[]): MediaCard[] {
+  const seen = new Set<number>();
+
+  return media.filter((item) => {
+    if (seen.has(item.id)) {
+      return false;
+    }
+
+    seen.add(item.id);
+    return true;
+  });
+}
+
 /** Shared list post-processing for home carousels and browse infinite scroll. */
 export function normalizeListedMedia(
   media: Array<MediaCard | null> | null | undefined,
   options: NormalizeListedMediaOptions = {}
 ): MediaCard[] {
-  let result = applyPopularityPercents(filterNonNullMedia(media));
+  let result = applyPopularityPercents(
+    dedupeMediaById(filterNonNullMedia(media))
+  );
 
   if (options.rankMode === "top100") {
     const limit = options.limit ?? TOP_100_LIMIT;
