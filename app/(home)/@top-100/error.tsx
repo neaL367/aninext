@@ -1,12 +1,5 @@
 "use client";
 
-import { HomeSectionError } from "@/components/home/home-section-error";
+import { createHomeSectionError } from "@/components/home/create-home-section-error";
 
-export default function Top100Error({
-  reset,
-}: {
-  error: Error;
-  reset: () => void;
-}) {
-  return <HomeSectionError title="Top 100 unavailable" reset={reset} />;
-}
+export default createHomeSectionError("Top 100");

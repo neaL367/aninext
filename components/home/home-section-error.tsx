@@ -1,6 +1,6 @@
 "use client";
 
-import { SectionError } from "@/components/shared/section-error";
+import { RetryError } from "@/components/shared/retry-error";
 
 type HomeSectionErrorProps = {
   title: string;
@@ -8,16 +8,5 @@ type HomeSectionErrorProps = {
 };
 
 export function HomeSectionError({ title, reset }: HomeSectionErrorProps) {
-  return (
-    <div className="flex flex-col gap-3">
-      <SectionError title={title} />
-      <button
-        type="button"
-        onClick={reset}
-        className="text-sm font-medium text-foreground underline underline-offset-4"
-      >
-        Retry
-      </button>
-    </div>
-  );
+  return <RetryError title={title} reset={reset} variant="section" />;
 }

@@ -11,8 +11,8 @@ type HomeSectionPageProps = {
   subtitle?: string;
   getSubtitle?: () => string;
   href?: Route;
-  showCountdown?: boolean;
   needsConnection?: boolean;
+  showCountdown?: boolean;
 };
 
 async function HomeSectionPageContent({
@@ -21,8 +21,8 @@ async function HomeSectionPageContent({
   subtitle,
   getSubtitle,
   href,
-  showCountdown = false,
   needsConnection = false,
+  showCountdown = false,
 }: HomeSectionPageProps) {
   if (needsConnection) {
     await connection();
