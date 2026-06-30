@@ -2,7 +2,7 @@
 
 import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -11,31 +11,31 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 
+function subscribeToMount(callback: () => void) {
+  const timeoutId = window.setTimeout(callback, 0);
+  return () => window.clearTimeout(timeoutId);
+}
+
+function getMountedSnapshot() {
+  return true;
+}
+
+function getServerMountedSnapshot() {
+  return false;
+}
+
 export function ThemeToggle() {
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    subscribeToMount,
+    getMountedSnapshot,
+    getServerMountedSnapshot
+  );
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return (
-      <Button
-        variant="ghost"
-        size="icon"
-        className="size-9 shrink-0"
-        aria-label="Theme"
-        disabled
-      >
-        <SunIcon className="size-4" />
-      </Button>
-    );
-  }
-
-  const activeTheme = theme ?? "system";
-  const ThemeIcon =
-    activeTheme === "system"
+  const activeTheme = mounted ? (theme ?? "system") : "system";
+  const ThemeIcon = !mounted
+    ? SunIcon
+    : activeTheme === "system"
       ? MonitorIcon
       : resolvedTheme === "dark"
         ? MoonIcon
@@ -44,6 +44,7 @@ export function ThemeToggle() {
   return (
     <Select
       value={activeTheme}
+      disabled={!mounted}
       onValueChange={(value) => {
         if (value === "light" || value === "dark" || value === "system") {
           setTheme(value);

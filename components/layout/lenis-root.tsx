@@ -1,6 +1,11 @@
 "use client";
 
-import { ReactLenis } from "lenis/react";
+import {
+  useEffect,
+  useState,
+  type ComponentType,
+  type ReactNode,
+} from "react";
 
 const lenisOptions = {
   autoRaf: true,
@@ -11,14 +16,39 @@ const lenisOptions = {
   naiveDimensions: true,
 } as const;
 
-type LenisRootProps = {
-  children: React.ReactNode;
+type ReactLenisProps = {
+  root?: boolean;
+  options?: typeof lenisOptions;
+  children: ReactNode;
 };
 
+type LenisRootProps = {
+  children: ReactNode;
+};
+
+/**
+ * Smooth scroll after hydration. App content stays a sibling so SSR, hydration,
+ * and instant-route validation are never blocked by a client-only wrapper.
+ */
 export function LenisRoot({ children }: LenisRootProps) {
+  const [ReactLenis, setReactLenis] = useState<ComponentType<ReactLenisProps> | null>(
+    null
+  );
+
+  useEffect(() => {
+    void import("lenis/react").then((mod) => {
+      setReactLenis(() => mod.ReactLenis);
+    });
+  }, []);
+
   return (
-    <ReactLenis root options={lenisOptions}>
+    <>
       {children}
-    </ReactLenis>
+      {ReactLenis ? (
+        <ReactLenis root options={lenisOptions}>
+          <span hidden aria-hidden />
+        </ReactLenis>
+      ) : null}
+    </>
   );
 }
