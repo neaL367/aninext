@@ -1,59 +1,44 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import {
-  AiringDayCountSuspense,
-  AiringDayListSuspense,
-  AiringDayShowCountSuspense,
-} from "@/components/airing/airing-day-chunks";
+import { AiringDayListSkeleton } from "@/components/airing/airing-day-chunks";
 import { Button } from "@/components/ui/button";
-import type { AiringScheduleItem } from "@/lib/anilist/types";
 import {
   formatLocalDate,
   formatTimezoneLabel,
   getRelativeDayLabel,
   getUserTimezone,
+  getWeekDateKeys,
   getWeekdayShortLabel,
   parseLocalDateKey,
   toLocalDateKeyFromDate,
 } from "@/lib/anilist/utils/datetime";
 import { cn } from "@/lib/utils";
 
-type AiringDayPromises = Record<string, Promise<AiringScheduleItem[]>>;
+/** Static shell shown while day promises are wired up; mirrors the interactive layout. */
+export function AiringScheduleShell() {
+  const { dateKeys, todayKey, timezoneLabel, weekRangeLabel } = useMemo(() => {
+    const keys = getWeekDateKeys();
+    const start = parseLocalDateKey(keys[0]!);
+    const end = parseLocalDateKey(keys[6]!);
 
-type AiringScheduleInteractiveProps = {
-  dateKeys: readonly string[];
-  dayPromises: AiringDayPromises;
-};
-
-function buildWeekRangeLabel(dateKeys: readonly string[]) {
-  const start = parseLocalDateKey(dateKeys[0]!);
-  const end = parseLocalDateKey(dateKeys[6]!);
-  return {
-    start: formatLocalDate(start, { month: "long", day: "numeric" }),
-    end: formatLocalDate(end, {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    }),
-  };
-}
-
-export function AiringScheduleInteractive({
-  dateKeys,
-  dayPromises,
-}: AiringScheduleInteractiveProps) {
-  const { todayKey, timezoneLabel, weekRangeLabel } = useMemo(() => {
     return {
+      dateKeys: keys,
       todayKey: toLocalDateKeyFromDate(new Date()),
       timezoneLabel: formatTimezoneLabel(getUserTimezone()),
-      weekRangeLabel: buildWeekRangeLabel(dateKeys),
+      weekRangeLabel: {
+        start: formatLocalDate(start, { month: "long", day: "numeric" }),
+        end: formatLocalDate(end, {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        }),
+      },
     };
-  }, [dateKeys]);
+  }, []);
 
   const [selectedDay, setSelectedDay] = useState(todayKey);
   const activeDay = dateKeys.includes(selectedDay) ? selectedDay : todayKey;
-  const activePromise = dayPromises[activeDay];
   const activeDate = parseLocalDateKey(activeDay);
 
   return (
@@ -79,7 +64,6 @@ export function AiringScheduleInteractive({
         {dateKeys.map((dateKey) => {
           const isToday = dateKey === todayKey;
           const isSelected = dateKey === activeDay;
-          const promise = dayPromises[dateKey];
 
           return (
             <Button
@@ -96,13 +80,9 @@ export function AiringScheduleInteractive({
               <span className="text-[10px] font-semibold uppercase tracking-wide">
                 {getWeekdayShortLabel(dateKey)}
               </span>
-              {promise ? (
-                <AiringDayCountSuspense promise={promise} />
-              ) : (
-                <span className="text-[11px] font-medium tabular-nums opacity-40">
-                  —
-                </span>
-              )}
+              <span className="text-[11px] font-medium tabular-nums opacity-40">
+                —
+              </span>
             </Button>
           );
         })}
@@ -125,18 +105,13 @@ export function AiringScheduleInteractive({
               })}
             </p>
           </div>
-          <div className="text-sm font-medium tabular-nums text-muted-foreground">
-            {activePromise ? (
-              <AiringDayShowCountSuspense promise={activePromise} />
-            ) : (
-              "—"
-            )}
-          </div>
+          <span
+            aria-hidden
+            className="inline-block h-4 w-16 animate-pulse rounded-md bg-muted"
+          />
         </header>
 
-        {activePromise ? (
-          <AiringDayListSuspense key={activeDay} promise={activePromise} />
-        ) : null}
+        <AiringDayListSkeleton />
       </section>
     </div>
   );

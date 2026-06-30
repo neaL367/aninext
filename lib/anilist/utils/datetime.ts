@@ -117,6 +117,22 @@ export function formatRelativeAiringTime(
   return `${context} · ${formatLocalTime(timestampSeconds)}`;
 }
 
+/** Local start/end unix seconds for one calendar day (end exclusive). */
+export function getDayRangeFromDateKey(dateKey: string): {
+  start: number;
+  end: number;
+} {
+  const [y, m, d] = dateKey.split("-").map(Number);
+  const startDate = new Date(y!, m! - 1, d!, 0, 0, 0, 0);
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + 1);
+
+  return {
+    start: Math.floor(startDate.getTime() / 1000),
+    end: Math.floor(endDate.getTime() / 1000),
+  };
+}
+
 export function groupByLocalDate<T extends { airingAt: number }>(
   items: readonly T[]
 ): Map<string, T[]> {

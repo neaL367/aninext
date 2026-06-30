@@ -18,3 +18,19 @@ export async function getCachedAiringSchedules(
 
   return fetchAllAiringSchedules(start, end);
 }
+
+/** Cross-request cached single-day airing slice. */
+export async function getCachedAiringSchedulesForDay(
+  dateKey: string,
+  start: number,
+  end: number
+): Promise<AiringScheduleItem[]> {
+  "use cache";
+
+  cacheLife("minutes");
+  cacheTag(anilistCacheTags.airing);
+  cacheTag(anilistCacheTags.airingDay(dateKey));
+  cacheTag(anilistCacheTags.airingRange(start, end));
+
+  return fetchAllAiringSchedules(start, end);
+}
