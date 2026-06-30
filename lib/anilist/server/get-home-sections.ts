@@ -10,6 +10,7 @@ import { anilistCacheTags } from "@/lib/anilist/server/cache-tags";
 import type { MediaCard } from "@/lib/anilist/types";
 import { buildHomeSectionVariables } from "@/lib/anilist/utils/media-list-query";
 import { normalizeListedMedia } from "@/lib/anilist/utils/normalize-media-list";
+import { sortMediaByNextAiring } from "@/lib/anilist/utils/sort-media-by-airing";
 import {
   getCurrentAnimeSeason,
   getNextAnimeSeason,
@@ -51,9 +52,11 @@ async function getCachedHomeSectionMedia(
     buildHomeSectionVariables(section, current, next)
   );
 
-  return normalizeListedMedia(data.Page?.media, {
+  const media = normalizeListedMedia(data.Page?.media, {
     sort: section === "top100" ? "top100" : undefined,
   });
+
+  return section === "airingNow" ? sortMediaByNextAiring(media) : media;
 }
 
 export async function getHomeSectionMedia(
