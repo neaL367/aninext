@@ -5,6 +5,8 @@ fragment MediaDetailFields on Media {
   ...MediaCardFields
   synonyms
   source
+  chapters
+  volumes
   startDate {
     year
     month

@@ -1,0 +1,36 @@
+#import "./media-card-grid.graphql"
+
+fragment CharacterDetailFields on Character {
+  id
+  name {
+    full
+    native
+    alternative
+    userPreferred
+  }
+  image {
+    large
+    medium
+  }
+  description
+  gender
+  dateOfBirth {
+    year
+    month
+    day
+  }
+  age
+  bloodType
+  favourites
+  siteUrl
+  media(page: 1, perPage: 12, sort: POPULARITY_DESC) {
+    edges {
+      characterRole
+      node {
+        id
+        type
+        ...MediaCardGridFields
+      }
+    }
+  }
+}

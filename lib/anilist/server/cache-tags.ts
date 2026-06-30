@@ -11,6 +11,8 @@ export const anilistCacheTags = {
     `anilist-home-${section}-${currentSeason}-${currentYear}-${nextSeason}-${nextYear}`,
   media: "anilist-media",
   mediaDetail: (id: number) => `anilist-media-${id}`,
+  characterDetail: (id: number) => `anilist-character-${id}`,
+  staffDetail: (id: number) => `anilist-staff-${id}`,
   mediaPages: "anilist-media-pages",
   mediaPage: (page: number, filterKey: string) =>
     `anilist-media-page-${filterKey}-p${page}`,

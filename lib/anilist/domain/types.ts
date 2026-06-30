@@ -1,10 +1,12 @@
 import type {
   AiringMediaFieldsFragment,
   AiringSchedulesQuery,
+  CharacterDetailFieldsFragment,
   MediaCardGridFieldsFragment,
   MediaCardTooltipFieldsFragment,
   MediaDetailFieldsFragment,
   MediaPageQuery,
+  StaffDetailFieldsFragment,
 } from "@/lib/anilist/generated/graphql";
 import { filterNonNullMedia } from "@/lib/anilist/domain/normalize-media-list";
 
@@ -44,6 +46,10 @@ export type MediaCard = MediaCardGrid &
   };
 
 export type MediaDetail = MediaDetailFieldsFragment;
+
+export type CharacterDetail = CharacterDetailFieldsFragment;
+
+export type StaffDetail = StaffDetailFieldsFragment;
 
 export type AiringScheduleMedia = AiringMediaFieldsFragment;
 
@@ -113,4 +119,16 @@ export function normalizeMediaDetail(
   data: { Media: MediaDetailFieldsFragment | null }
 ): MediaDetail | null {
   return data.Media;
+}
+
+export function normalizeCharacterDetail(
+  data: { Character: CharacterDetailFieldsFragment | null }
+): CharacterDetail | null {
+  return data.Character;
+}
+
+export function normalizeStaffDetail(
+  data: { Staff: StaffDetailFieldsFragment | null }
+): StaffDetail | null {
+  return data.Staff;
 }
