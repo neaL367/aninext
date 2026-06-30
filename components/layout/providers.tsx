@@ -2,6 +2,7 @@
 
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { AppQueryProvider } from "@/components/layout/app-query-provider";
+import { DetailScrollRestore } from "@/components/navigation/detail-scroll-restore";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { LenisRoot } from "@/components/layout/lenis-root";
 
@@ -14,6 +15,7 @@ export function Providers({ children }: ProvidersProps) {
     <NuqsAdapter>
       <AppQueryProvider>
         <ThemeProvider>
+          <DetailScrollRestore />
           <LenisRoot>{children}</LenisRoot>
         </ThemeProvider>
       </AppQueryProvider>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
 import { StarIcon } from "lucide-react";
 import { Countdown } from "@/components/shared/countdown";
 import { ProgressiveImage } from "@/components/shared/progressive-image";
@@ -36,6 +37,7 @@ import {
   ANIME_CARD_STATS_CLASS,
   ANIME_CARD_TITLE_CLASS,
 } from "@/lib/ui/anime-grid-layout";
+import { saveDetailReturnFromCurrentPage } from "@/lib/navigation/detail-return";
 import { cn } from "@/lib/utils";
 
 export type AnimeCardMedia = MediaCard & {
@@ -90,6 +92,12 @@ export function AnimeCardArticle({
   const hasRank = media.rank != null && media.rank > 0;
   const isCompact = layout === "compact";
   const showScore = score !== "—" && !isCompact;
+  const pathname = usePathname() || "/";
+  const searchParams = useSearchParams();
+
+  const handleNavigateToDetail = () => {
+    saveDetailReturnFromCurrentPage(pathname, searchParams.toString());
+  };
 
   return (
     <article className={cn(ANIME_CARD_ROOT_CLASS, className)}>
@@ -97,6 +105,7 @@ export function AnimeCardArticle({
         href={`/anime/${media.id}`}
         prefetch
         className={ANIME_CARD_LINK_CLASS}
+        onClick={handleNavigateToDetail}
       >
         <div
           className={COVER_CLASS_BY_LAYOUT[layout]}

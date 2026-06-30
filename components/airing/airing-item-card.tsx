@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
 import { memo } from "react";
 import { AiringItemTooltipContent } from "@/components/airing/airing-item-tooltip-content";
 import { AiringCountdown } from "@/components/shared/countdown";
@@ -16,6 +17,7 @@ import {
 } from "@/lib/ui/airing-item-cover";
 import { formatDisplayTitle } from "@/lib/anilist/utils/format";
 import { formatMediaFormat } from "@/lib/anilist/utils/labels";
+import { saveDetailReturnFromCurrentPage } from "@/lib/navigation/detail-return";
 import { cn } from "@/lib/utils";
 
 const AIRING_BADGE_CLASS = "h-auto px-1.5 py-0.5 text-[10px] font-normal";
@@ -30,6 +32,12 @@ export const AiringItemCard = memo(function AiringItemCard({ item, className }: 
   const title = media ? formatDisplayTitle(media.title) : "—";
   const coverUrl = coverCardImageUrl(media?.coverImage ?? null);
   const animeId = media?.id ?? 0;
+  const pathname = usePathname() || "/";
+  const searchParams = useSearchParams();
+
+  const handleNavigateToDetail = () => {
+    saveDetailReturnFromCurrentPage(pathname, searchParams.toString());
+  };
 
   const card = (
     <article
@@ -42,6 +50,7 @@ export const AiringItemCard = memo(function AiringItemCard({ item, className }: 
         href={`/anime/${animeId}`}
         prefetch
         className={AIRING_ITEM_COVER_CLASS}
+        onClick={handleNavigateToDetail}
       >
         {coverUrl ? (
           <ProgressiveImage
@@ -79,6 +88,7 @@ export const AiringItemCard = memo(function AiringItemCard({ item, className }: 
             href={`/anime/${animeId}`}
             prefetch
             className="line-clamp-2 text-sm font-medium leading-snug underline-offset-2 hover:underline"
+            onClick={handleNavigateToDetail}
           >
             {title}
           </Link>
