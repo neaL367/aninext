@@ -1,15 +1,15 @@
-import { AiringSkeleton } from "@/components/airing/airing-skeleton";
+import { AiringScheduleShell } from "@/components/airing/airing-schedule-shell";
 import { PageContainer } from "@/components/layout/page-container";
-import { Skeleton } from "@/components/ui/skeleton";
+import { PageHeader } from "@/components/layout/page-header";
 
 export default function AiringLoading() {
   return (
     <PageContainer className="flex flex-col gap-4 py-6 lg:gap-5 lg:py-8">
-      <div className="flex flex-col gap-2">
-        <Skeleton className="h-8 w-40" />
-        <Skeleton className="h-4 w-64 max-w-full" />
-      </div>
-      <AiringSkeleton />
+      <PageHeader
+        title="Airing Schedule"
+        description="Anime grouped by weekday and format for the current week."
+      />
+      <AiringScheduleShell />
     </PageContainer>
   );
 }
