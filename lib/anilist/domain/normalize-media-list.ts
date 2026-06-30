@@ -1,8 +1,17 @@
-import { CAROUSEL_PER_PAGE, TOP_100_LIMIT } from "@/lib/anilist/infra/constants";
+import {
+  CAROUSEL_PER_PAGE,
+  TOP_100_LIMIT,
+} from "@/lib/anilist/domain/listing";
 import type { MediaCard } from "@/lib/anilist/domain/types";
-import type { AnimeSort } from "@/lib/browse/params";
 import { applyPopularityPercents } from "@/lib/anilist/display/format";
 import { withTop100Ranks } from "@/lib/anilist/domain/rank";
+
+export type ListedMediaRankMode = "top100";
+
+export type NormalizeListedMediaOptions = {
+  rankMode?: ListedMediaRankMode;
+  limit?: number;
+};
 
 export function filterNonNullMedia(
   media: Array<MediaCard | null> | null | undefined
@@ -13,19 +22,24 @@ export function filterNonNullMedia(
 /** Shared list post-processing for home carousels and browse infinite scroll. */
 export function normalizeListedMedia(
   media: Array<MediaCard | null> | null | undefined,
-  options: { sort?: AnimeSort | "top100"; limit?: number } = {}
+  options: NormalizeListedMediaOptions = {}
 ): MediaCard[] {
   let result = applyPopularityPercents(filterNonNullMedia(media));
 
-  const isTop100 =
-    options.sort === "top-100" || options.sort === "top100";
-
-  if (isTop100) {
-    const limit =
-      options.limit ??
-      (options.sort === "top100" ? CAROUSEL_PER_PAGE : TOP_100_LIMIT);
+  if (options.rankMode === "top100") {
+    const limit = options.limit ?? TOP_100_LIMIT;
     result = withTop100Ranks(result).slice(0, limit);
   }
 
   return result;
+}
+
+/** Home carousel top-100 slice uses carousel page size. */
+export function normalizeHomeTop100Media(
+  media: Array<MediaCard | null> | null | undefined
+): MediaCard[] {
+  return normalizeListedMedia(media, {
+    rankMode: "top100",
+    limit: CAROUSEL_PER_PAGE,
+  });
 }

@@ -2,14 +2,14 @@ import "server-only";
 
 import { cacheLife, cacheTag } from "next/cache";
 import { GenreCollectionDocument } from "@/lib/anilist/generated/graphql";
+import { anilistCacheLife } from "@/lib/anilist/server/cache-policy";
 import { anilistCacheTags } from "@/lib/anilist/server/cache-tags";
+import type { GenreOption } from "@/lib/anilist/domain/genres";
 import { executeGraphQL } from "@/lib/anilist/infra/graphql-client";
-
-export type GenreOption = { id: number; name: string };
 
 export async function getGenreCollection(): Promise<GenreOption[]> {
   "use cache";
-  cacheLife("days");
+  cacheLife(anilistCacheLife.genreCollection);
   cacheTag(anilistCacheTags.genres);
 
   const data = await executeGraphQL(GenreCollectionDocument, {});

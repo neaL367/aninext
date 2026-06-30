@@ -5,28 +5,19 @@ import { connection } from "next/server";
 import {
   HomeSectionMediaDocument,
 } from "@/lib/anilist/generated/graphql";
+import type { HomeSectionId } from "@/lib/anilist/domain/home-sections";
 import { executeGraphQL } from "@/lib/anilist/infra/graphql-client";
+import { anilistCacheLife } from "@/lib/anilist/server/cache-policy";
 import { anilistCacheTags } from "@/lib/anilist/server/cache-tags";
 import type { MediaCard } from "@/lib/anilist/domain/types";
 import { buildHomeSectionVariables } from "@/lib/browse/anilist-queries";
-import { normalizeListedMedia } from "@/lib/anilist/domain/normalize-media-list";
+import { normalizeHomeTop100Media, normalizeListedMedia } from "@/lib/anilist/domain/normalize-media-list";
 import { sortMediaByNextAiring } from "@/lib/anilist/domain/sort-media-by-airing";
 import {
   getCurrentAnimeSeason,
   getNextAnimeSeason,
   type AnimeSeason,
-} from "@/lib/anilist/display/season";
-
-export const HOME_SECTION_IDS = [
-  "trending",
-  "airingNow",
-  "popularThisSeason",
-  "upcomingNextSeason",
-  "allTimePopular",
-  "top100",
-] as const;
-
-export type HomeSectionId = (typeof HOME_SECTION_IDS)[number];
+} from "@/lib/anilist/domain/season";
 
 /** Per-section cache so parallel home slots can stream independently. */
 async function getCachedHomeSectionMedia(
@@ -36,7 +27,7 @@ async function getCachedHomeSectionMedia(
 ): Promise<MediaCard[]> {
   "use cache";
 
-  cacheLife("hours");
+  cacheLife(anilistCacheLife.homeSection);
   cacheTag(
     anilistCacheTags.homeSection(
       section,
@@ -52,9 +43,10 @@ async function getCachedHomeSectionMedia(
     buildHomeSectionVariables(section, current, next)
   );
 
-  const media = normalizeListedMedia(data.Page?.media, {
-    sort: section === "top100" ? "top100" : undefined,
-  });
+  const media =
+    section === "top100"
+      ? normalizeHomeTop100Media(data.Page?.media)
+      : normalizeListedMedia(data.Page?.media);
 
   return section === "airingNow" ? sortMediaByNextAiring(media) : media;
 }

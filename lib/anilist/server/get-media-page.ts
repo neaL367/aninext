@@ -6,6 +6,7 @@ import {
   type MediaPageQueryVariables,
 } from "@/lib/anilist/generated/graphql";
 import { executeGraphQL } from "@/lib/anilist/infra/graphql-client";
+import { anilistCacheLife } from "@/lib/anilist/server/cache-policy";
 import {
   anilistCacheTags,
   mediaPageFilterKey,
@@ -23,7 +24,7 @@ export async function getCachedMediaPage(
     variables as Record<string, unknown>
   );
 
-  cacheLife("minutes");
+  cacheLife(anilistCacheLife.mediaPage);
   cacheTag(anilistCacheTags.mediaPages);
   cacheTag(anilistCacheTags.mediaPage(page, filterKey));
 

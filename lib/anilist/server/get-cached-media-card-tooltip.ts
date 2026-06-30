@@ -3,6 +3,7 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { MediaCardTooltipDocument } from "@/lib/anilist/generated/graphql";
 import { executeGraphQL } from "@/lib/anilist/infra/graphql-client";
+import { anilistCacheLife } from "@/lib/anilist/server/cache-policy";
 import { anilistCacheTags } from "@/lib/anilist/server/cache-tags";
 import type { MediaCardTooltip } from "@/lib/anilist/domain/types";
 
@@ -12,7 +13,7 @@ export async function getCachedMediaCardTooltip(
 ): Promise<MediaCardTooltip | null> {
   "use cache";
 
-  cacheLife("hours");
+  cacheLife(anilistCacheLife.tooltip);
   cacheTag(anilistCacheTags.media);
   cacheTag(anilistCacheTags.mediaDetail(mediaId));
 

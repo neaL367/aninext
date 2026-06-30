@@ -1,7 +1,6 @@
 /** Shared cache tag namespaces for AniList data (use with cacheTag). */
 export const anilistCacheTags = {
   genres: "anilist-genres",
-  home: (season: string, year: number) => `anilist-home-${season}-${year}`,
   homeSection: (
     section: string,
     currentSeason: string,
