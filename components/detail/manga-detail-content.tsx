@@ -3,22 +3,22 @@ import {
   DetailCoverBanner,
 } from "@/components/detail/anime-detail-view";
 import type { SlugDetailParams } from "@/lib/anilist/domain/detail-route-params";
-import { resolveAnimeDetailMedia } from "@/lib/anilist/server/resolve-anime-detail-media";
+import { resolveMangaDetailMedia } from "@/lib/anilist/server/resolve-manga-detail-media";
 import { createAnimeJsonLd } from "@/lib/seo/json-ld";
 
-type AnimeDetailLoaderProps = {
+type MangaDetailLoaderProps = {
   params: SlugDetailParams;
 };
 
-export async function DetailCoverBannerLoader({
+export async function MangaDetailCoverBannerLoader({
   params,
-}: AnimeDetailLoaderProps) {
-  const media = await resolveAnimeDetailMedia(params);
+}: MangaDetailLoaderProps) {
+  const media = await resolveMangaDetailMedia(params);
   return <DetailCoverBanner media={media} />;
 }
 
-export async function AnimeDetailBodyLoader({ params }: AnimeDetailLoaderProps) {
-  const media = await resolveAnimeDetailMedia(params);
+export async function MangaDetailBodyLoader({ params }: MangaDetailLoaderProps) {
+  const media = await resolveMangaDetailMedia(params);
   const jsonLd = createAnimeJsonLd(media);
 
   return (

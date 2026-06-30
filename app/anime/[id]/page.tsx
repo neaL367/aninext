@@ -1,50 +1,31 @@
-import type { Metadata } from "next";
-import { Suspense } from "react";
-import {
-  AnimeDetailBodyLoader,
-  DetailCoverBannerLoader,
-} from "@/components/detail/anime-detail-content";
-import { AnimeDetailPageFrame } from "@/components/detail/anime-detail-page-frame";
-import { AnimeDetailBodySkeleton } from "@/components/detail/anime-detail-body-skeleton";
-import { resolveAnimeDetailMedia } from "@/lib/anilist/server/resolve-anime-detail-media";
-import { formatDisplayTitle, stripHtml } from "@/lib/anilist/display/format";
-import { createDetailMetadata } from "@/lib/seo/metadata";
+import { permanentRedirect } from "next/navigation";
+import { notFound } from "next/navigation";
+import { formatDisplayTitle } from "@/lib/anilist/display/format";
+import { getMediaDetail } from "@/lib/anilist/server/get-media-detail";
+import { parseDetailId } from "@/lib/anilist/server/parse-detail-id";
+import { animeDetailPath, mangaDetailPath } from "@/lib/navigation/detail-paths";
 
-export const instant = false;
-
-type AnimeDetailPageProps = {
+type LegacyAnimeDetailRedirectProps = {
   params: Promise<{ id: string }>;
 };
 
-/** Build-time sample for Cache Components validation (One Piece). */
-export async function generateStaticParams() {
-  return [{ id: "21" }];
-}
-
-export async function generateMetadata({
+/** Redirect legacy `/anime/[id]` URLs to the slugged detail route. */
+export default async function LegacyAnimeDetailRedirect({
   params,
-}: AnimeDetailPageProps): Promise<Metadata> {
-  const media = await resolveAnimeDetailMedia(params);
+}: LegacyAnimeDetailRedirectProps) {
+  const { id } = await params;
+  const mediaId = parseDetailId(id);
+  const media = await getMediaDetail(mediaId);
+
+  if (!media) {
+    notFound();
+  }
+
   const title = formatDisplayTitle(media.title);
-  const description = media.description
-    ? stripHtml(media.description).slice(0, 160)
-    : `Anime details for ${title} on AniNext.`;
+  const path =
+    media.type === "MANGA"
+      ? mangaDetailPath(media.id, title)
+      : animeDetailPath(media.id, title);
 
-  return createDetailMetadata(title, description, media.id);
-}
-
-export default function AnimeDetailPage({ params }: AnimeDetailPageProps) {
-  return (
-    <AnimeDetailPageFrame
-      cover={
-        <Suspense fallback={null}>
-          <DetailCoverBannerLoader params={params} />
-        </Suspense>
-      }
-    >
-      <Suspense fallback={<AnimeDetailBodySkeleton />}>
-        <AnimeDetailBodyLoader params={params} />
-      </Suspense>
-    </AnimeDetailPageFrame>
-  );
+  permanentRedirect(path);
 }

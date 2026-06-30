@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { Route } from "next";
 import { usePathname, useSearchParams } from "next/navigation";
 import { StarIcon } from "lucide-react";
 import { Countdown } from "@/components/shared/countdown";
@@ -38,6 +39,7 @@ import {
   ANIME_CARD_TITLE_CLASS,
 } from "@/lib/styles/anime-grid-layout";
 import { saveDetailReturnFromCurrentPage } from "@/lib/navigation/detail-return";
+import { getMediaDetailHref } from "@/lib/anilist/display/media-links";
 import { cn } from "@/lib/utils";
 
 export type AnimeCardMedia = MediaCard & {
@@ -97,18 +99,17 @@ export function AnimeCardArticle({
   const pathname = usePathname() || "/";
   const searchParams = useSearchParams();
 
+  const { href, external } = getMediaDetailHref(media.id, media.type, title);
+
   const handleNavigateToDetail = () => {
-    saveDetailReturnFromCurrentPage(pathname, searchParams.toString());
+    if (!external) {
+      saveDetailReturnFromCurrentPage(pathname, searchParams.toString());
+    }
   };
 
-  return (
-    <article className={cn(ANIME_CARD_ROOT_CLASS, className)}>
-      <Link
-        href={`/anime/${media.id}`}
-        prefetch
-        className={ANIME_CARD_LINK_CLASS}
-        onClick={handleNavigateToDetail}
-      >
+  const linkClassName = ANIME_CARD_LINK_CLASS;
+  const cardContent = (
+    <>
         <div
           className={COVER_CLASS_BY_LAYOUT[layout]}
           style={
@@ -215,7 +216,31 @@ export function AnimeCardArticle({
             />
           ) : null}
         </div>
-      </Link>
+    </>
+  );
+
+  return (
+    <article className={cn(ANIME_CARD_ROOT_CLASS, className)}>
+      {external ? (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={linkClassName}
+          aria-label={`${title} on AniList`}
+        >
+          {cardContent}
+        </a>
+      ) : (
+        <Link
+          href={href as Route}
+          prefetch
+          className={linkClassName}
+          onClick={handleNavigateToDetail}
+        >
+          {cardContent}
+        </Link>
+      )}
     </article>
   );
 }

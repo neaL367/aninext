@@ -1,6 +1,9 @@
 "use client";
 
+"use client";
+
 import Link from "next/link";
+import type { Route } from "next";
 import { usePathname, useSearchParams } from "next/navigation";
 import { AiringItemTooltipContent } from "@/components/airing/airing-item-tooltip-content";
 import { AiringCountdown } from "@/components/shared/countdown";
@@ -15,6 +18,7 @@ import {
   AIRING_ITEM_COVER_IMAGE_CLASS,
 } from "@/lib/styles/airing-item-cover";
 import { formatDisplayTitle } from "@/lib/anilist/display/format";
+import { animeDetailPath } from "@/lib/navigation/detail-paths";
 import { formatMediaFormat } from "@/lib/anilist/display/labels";
 import { saveDetailReturnFromCurrentPage } from "@/lib/navigation/detail-return";
 import { cn } from "@/lib/utils";
@@ -40,6 +44,10 @@ export function AiringItemCard({ item, className }: AiringItemCardProps) {
     saveDetailReturnFromCurrentPage(pathname, searchParams.toString());
   };
 
+  const detailHref = animeId
+    ? (animeDetailPath(animeId, title) as Route)
+    : ("/anime" as Route);
+
   const card = (
     <article
       className={cn(
@@ -48,7 +56,7 @@ export function AiringItemCard({ item, className }: AiringItemCardProps) {
       )}
     >
       <Link
-        href={`/anime/${animeId}`}
+        href={detailHref}
         prefetch
         className={AIRING_ITEM_COVER_CLASS}
         onClick={handleNavigateToDetail}
@@ -86,7 +94,7 @@ export function AiringItemCard({ item, className }: AiringItemCardProps) {
           </div>
 
           <Link
-            href={`/anime/${animeId}`}
+            href={detailHref}
             prefetch
             className="line-clamp-2 text-sm font-medium leading-snug underline-offset-2 hover:underline"
             onClick={handleNavigateToDetail}

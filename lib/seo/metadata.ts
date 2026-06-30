@@ -69,21 +69,21 @@ export function createPageMetadata({
 export function createDetailMetadata(
   title: string,
   description: string,
-  id: number
+  path: string
 ): Metadata {
-  const path = `/anime/${id}`;
+  const canonicalPath = path.startsWith("/") ? path : `/${path}`;
 
   return {
     title,
     description,
     alternates: {
-      canonical: path,
+      canonical: canonicalPath,
     },
     openGraph: {
       title,
       description,
       type: "website",
-      url: path,
+      url: canonicalPath,
     },
     twitter: {
       card: "summary_large_image",

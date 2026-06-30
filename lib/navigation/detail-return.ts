@@ -1,4 +1,5 @@
 import { readScrollY } from "@/lib/navigation/scroll-restore";
+import { animeDetailPath } from "@/lib/navigation/detail-paths";
 
 const DETAIL_RETURN_KEY = "aninext:detail-return";
 const DETAIL_CURRENT_KEY = "aninext:detail-current";
@@ -17,7 +18,7 @@ export type DetailBreadcrumbCrumb = {
   preferHistoryBack?: boolean;
 };
 
-const DETAIL_PATH = /^\/anime\/\d+$/;
+const DETAIL_PATH = /^\/(anime|manga|character|staff)\/\d+\/[^/]+$/;
 
 export function isHomeReturn(detailReturn: DetailReturn): boolean {
   const pathname = detailReturn.href.split("?")[0];
@@ -100,7 +101,7 @@ export function saveDetailCurrent(mediaId: number, title: string): void {
   if (typeof window === "undefined") return;
 
   const payload: DetailReturn = {
-    href: `/anime/${mediaId}`,
+    href: animeDetailPath(mediaId, title),
     label: title,
   };
 
