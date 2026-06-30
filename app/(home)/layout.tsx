@@ -1,9 +1,5 @@
 import type { ReactNode } from "react";
-import { Suspense } from "react";
 import { PageContainer } from "@/components/layout/page-container";
-import { SectionSkeleton } from "@/components/shared/section-skeleton";
-
-export const instant = false;
 
 type HomeLayoutProps = {
   children: ReactNode;
@@ -14,6 +10,8 @@ type HomeLayoutProps = {
   "all-time-popular": ReactNode;
   "top-100": ReactNode;
 };
+
+export const instant = false;
 
 export default function HomeLayout({
   children,
@@ -27,12 +25,12 @@ export default function HomeLayout({
   return (
     <PageContainer className="flex flex-col gap-10 py-8 lg:gap-12 lg:py-10">
       {children}
-      <Suspense fallback={<SectionSkeleton />}>{trendingNow}</Suspense>
-      <Suspense fallback={<SectionSkeleton />}>{airingNow}</Suspense>
-      <Suspense fallback={<SectionSkeleton />}>{popularThisSeason}</Suspense>
-      <Suspense fallback={<SectionSkeleton />}>{upcomingNextSeason}</Suspense>
-      <Suspense fallback={<SectionSkeleton />}>{allTimePopular}</Suspense>
-      <Suspense fallback={<SectionSkeleton />}>{top100}</Suspense>
+      {trendingNow}
+      {airingNow}
+      {popularThisSeason}
+      {upcomingNextSeason}
+      {allTimePopular}
+      {top100}
     </PageContainer>
   );
 }

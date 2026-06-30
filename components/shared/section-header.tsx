@@ -1,21 +1,29 @@
 import Link from "next/link";
 import type { Route } from "next";
+import type { ReactNode } from "react";
 import { viewAllLinkClassName } from "@/lib/styles/nav-link-styles";
 
 type SectionHeaderProps = {
   title: string;
   subtitle?: string;
+  /** Streamed or deferred subtitle UI — takes precedence over `subtitle`. */
+  subtitleSlot?: ReactNode;
   href?: Route;
   viewAllLabel?: string;
 };
 
+export function getSectionHeadingId(title: string) {
+  return title.toLowerCase().replace(/\s+/g, "-");
+}
+
 export function SectionHeader({
   title,
   subtitle,
+  subtitleSlot,
   href,
   viewAllLabel = "View all",
 }: SectionHeaderProps) {
-  const headingId = title.toLowerCase().replace(/\s+/g, "-");
+  const headingId = getSectionHeadingId(title);
 
   return (
     <div className="flex items-end justify-between gap-4">
@@ -26,11 +34,11 @@ export function SectionHeader({
         >
           {title}
         </h2>
-        {subtitle ? (
+        {subtitleSlot ?? (subtitle ? (
           <p className="text-sm leading-relaxed text-muted-foreground">
             {subtitle}
           </p>
-        ) : null}
+        ) : null)}
       </div>
       {href ? (
         <Link href={href} prefetch className={viewAllLinkClassName}>

@@ -1,8 +1,4 @@
 import { HomeSectionPage } from "@/components/home/home-section-page";
-import {
-  formatSeasonLabel,
-  getCurrentAnimeSeason,
-} from "@/lib/anilist/domain/season";
 import { HOME_SECTION_BROWSE_HREFS } from "@/lib/browse/url";
 
 export default function PopularThisSeasonSlot() {
@@ -10,9 +6,8 @@ export default function PopularThisSeasonSlot() {
     <HomeSectionPage
       section="popularThisSeason"
       title="Popular This Season"
-      getSubtitle={() => formatSeasonLabel(getCurrentAnimeSeason())}
+      seasonSubtitle="current"
       href={HOME_SECTION_BROWSE_HREFS.popularThisSeason}
-      needsConnection
     />
   );
 }

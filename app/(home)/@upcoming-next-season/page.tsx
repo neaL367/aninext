@@ -1,8 +1,4 @@
 import { HomeSectionPage } from "@/components/home/home-section-page";
-import {
-  formatSeasonLabel,
-  getNextAnimeSeason,
-} from "@/lib/anilist/domain/season";
 import { HOME_SECTION_BROWSE_HREFS } from "@/lib/browse/url";
 
 export default function UpcomingNextSeasonSlot() {
@@ -10,9 +6,8 @@ export default function UpcomingNextSeasonSlot() {
     <HomeSectionPage
       section="upcomingNextSeason"
       title="Upcoming Next Season"
-      getSubtitle={() => formatSeasonLabel(getNextAnimeSeason())}
+      seasonSubtitle="next"
       href={HOME_SECTION_BROWSE_HREFS.upcomingNextSeason}
-      needsConnection
     />
   );
 }
