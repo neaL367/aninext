@@ -2,7 +2,7 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { AnimeBrowse } from "@/components/browse/anime-browse";
-import { BrowseSkeleton } from "@/components/browse/browse-skeleton";
+import { BrowseContentSkeleton } from "@/components/browse/browse-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
 import { getGenreCollection } from "@/lib/anilist/server/get-genre-collection";
@@ -43,34 +43,28 @@ async function AnimeListingContent({ searchParams }: AnimeListingPageProps) {
   ]);
 
   return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <AnimeBrowse
+        genres={genres}
+        currentSeason={currentSeason}
+        nextSeason={nextSeason}
+      />
+    </HydrationBoundary>
+  );
+}
+
+export default function AnimePage({ searchParams }: AnimeListingPageProps) {
+  return (
     <PageContainer className="py-8 lg:py-10">
       <div className="flex flex-col gap-6">
         <PageHeader
           title="Anime"
           description="Search and filter — use the navigation above to switch lists."
         />
-        <HydrationBoundary state={dehydrate(queryClient)}>
-          <AnimeBrowse
-            genres={genres}
-            currentSeason={currentSeason}
-            nextSeason={nextSeason}
-          />
-        </HydrationBoundary>
+        <Suspense fallback={<BrowseContentSkeleton />}>
+          <AnimeListingContent searchParams={searchParams} />
+        </Suspense>
       </div>
     </PageContainer>
-  );
-}
-
-export default function AnimePage({ searchParams }: AnimeListingPageProps) {
-  return (
-    <Suspense
-      fallback={
-        <PageContainer className="py-8 lg:py-10">
-          <BrowseSkeleton />
-        </PageContainer>
-      }
-    >
-      <AnimeListingContent searchParams={searchParams} />
-    </Suspense>
   );
 }
