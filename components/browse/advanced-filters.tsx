@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import { useBrowseFilters } from "@/components/browse/browse-filters-provider";
 import { FilterMoreOptions } from "@/components/browse/filter-more-options";
 import { FilterMinField, FilterRangeField } from "@/components/browse/filter-range-field";
 import { FilterSection } from "@/components/browse/filter-section";
@@ -28,16 +29,6 @@ import {
 import { getCurrentAnimeSeason } from "@/lib/anilist/utils/season";
 import { cn } from "@/lib/utils";
 
-type GenreOption = { id: number; name: string };
-
-type AdvancedFiltersProps = {
-  params: AnimeListParams;
-  genres: GenreOption[];
-  onApply: (params: AnimeListParams) => void;
-  onReset: () => void;
-  className?: string;
-};
-
 const ALL_FORMATS = [
   "TV",
   "TV_SHORT",
@@ -58,16 +49,19 @@ const ALL_STATUSES = [
 
 const ALL_SEASONS = ["WINTER", "SPRING", "SUMMER", "FALL"] as const satisfies readonly MediaSeason[];
 
-export function AdvancedFilters({
-  params,
-  genres,
-  onApply,
-  onReset,
-  className,
-}: AdvancedFiltersProps) {
+type AdvancedFiltersProps = {
+  className?: string;
+};
+
+export function AdvancedFilters({ className }: AdvancedFiltersProps) {
+  const { state, actions, meta } = useBrowseFilters();
+  const { params } = state;
+  const { applyFilters, resetFilters } = actions;
+  const { genres } = meta;
+
   const patch = useCallback(
-    (partial: Partial<AnimeListParams>) => onApply({ ...params, ...partial }),
-    [onApply, params]
+    (partial: Partial<AnimeListParams>) => applyFilters({ ...params, ...partial }),
+    [applyFilters, params]
   );
 
   const handleSeasonChange = (values: string[]) => {
@@ -166,7 +160,7 @@ export function AdvancedFilters({
       </FilterSection>
 
       <FilterSection title="Genres">
-        <GenrePicker params={params} genres={genres} onChange={onApply} />
+        <GenrePicker params={params} genres={genres} onChange={applyFilters} />
       </FilterSection>
 
       <div className="flex flex-col gap-4">
@@ -210,7 +204,7 @@ export function AdvancedFilters({
         variant="outline"
         size="sm"
         className="w-full"
-        onClick={onReset}
+        onClick={resetFilters}
       >
         Reset all filters
       </Button>

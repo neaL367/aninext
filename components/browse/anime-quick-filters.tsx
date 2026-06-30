@@ -1,13 +1,13 @@
 "use client";
 
 import type { MediaFormat, MediaStatus } from "@/lib/anilist/types";
+import { useBrowseFilters } from "@/components/browse/browse-filters-provider";
 import { formatMediaFormat, formatMediaStatus } from "@/lib/anilist/utils/labels";
 import { Button } from "@/components/ui/button";
 import {
   toggleFormat,
   toggleStatus,
 } from "@/lib/routes/filter-helpers";
-import type { AnimeListParams } from "@/lib/routes/search-params";
 import { cn } from "@/lib/utils";
 
 const QUICK_FORMATS = ["TV", "MOVIE", "OVA"] as const satisfies readonly MediaFormat[];
@@ -18,8 +18,6 @@ const QUICK_STATUSES = [
 ] as const satisfies readonly MediaStatus[];
 
 type AnimeQuickFiltersProps = {
-  params: AnimeListParams;
-  onChange: (params: AnimeListParams) => void;
   className?: string;
 };
 
@@ -46,11 +44,11 @@ function QuickChip({
   );
 }
 
-export function AnimeQuickFilters({
-  params,
-  onChange,
-  className,
-}: AnimeQuickFiltersProps) {
+export function AnimeQuickFilters({ className }: AnimeQuickFiltersProps) {
+  const { state, actions } = useBrowseFilters();
+  const { params } = state;
+  const { applyFilters } = actions;
+
   return (
     <div className={cn("flex flex-wrap items-center gap-1.5", className)}>
       {QUICK_FORMATS.map((format) => (
@@ -58,7 +56,7 @@ export function AnimeQuickFilters({
           key={format}
           active={params.formats.includes(format)}
           label={formatMediaFormat(format)}
-          onClick={() => onChange(toggleFormat(params, format))}
+          onClick={() => applyFilters(toggleFormat(params, format))}
         />
       ))}
       <span aria-hidden className="mx-0.5 h-4 w-px bg-border" />
@@ -67,7 +65,7 @@ export function AnimeQuickFilters({
           key={status}
           active={params.statuses.includes(status)}
           label={formatMediaStatus(status)}
-          onClick={() => onChange(toggleStatus(params, status))}
+          onClick={() => applyFilters(toggleStatus(params, status))}
         />
       ))}
     </div>

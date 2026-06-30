@@ -5,10 +5,9 @@ import { SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import type { GenreOption } from "@/lib/anilist/server/get-genre-collection";
 import { toggleGenre } from "@/lib/routes/filter-helpers";
 import type { AnimeListParams } from "@/lib/routes/search-params";
-
-type GenreOption = { id: number; name: string };
 
 type GenrePickerProps = {
   params: AnimeListParams;

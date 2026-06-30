@@ -2,7 +2,6 @@ import type { Route } from "next";
 import {
   animeListParamsToQuery,
   DEFAULT_ANIME_LIST_PARAMS,
-  parseAnimeListParams,
   type AnimeListParams,
   type AnimeSort,
 } from "@/lib/routes/search-params";
@@ -44,30 +43,3 @@ export const HOME_SECTION_BROWSE_HREFS = {
   allTimePopular: animeBrowseHref({ sort: "all-time-popular" }),
   top100: animeBrowseHref({ sort: "top-100" }),
 } as const satisfies Record<string, Route>;
-
-/** Update the URL without triggering a Next.js navigation / RSC refetch. */
-export function replaceAnimeBrowseUrl(params: AnimeListParams): void {
-  if (typeof window === "undefined") return;
-
-  const target = buildAnimeBrowseHref(params);
-  const current = `${window.location.pathname}${window.location.search}`;
-  if (current !== target) {
-    window.history.replaceState(window.history.state, "", target);
-  }
-}
-
-export function readAnimeBrowseParamsFromLocation(): AnimeListParams {
-  if (typeof window === "undefined") {
-    return parseAnimeListParams({});
-  }
-
-  const sp = new URLSearchParams(window.location.search);
-  const record: Record<string, string | string[]> = {};
-
-  for (const key of new Set(sp.keys())) {
-    const values = sp.getAll(key);
-    record[key] = values.length > 1 ? values : values[0] ?? "";
-  }
-
-  return parseAnimeListParams(record);
-}

@@ -45,17 +45,17 @@ function tagsEqual(a: readonly string[], b: readonly string[]): boolean {
   return a.length === b.length && a.every((tag, index) => tag === b[index]);
 }
 
-export function FilterMoreOptions({ params, onPatch }: FilterMoreOptionsProps) {
+function TagsInput({
+  tags,
+  onPatch,
+}: {
+  tags: string[];
+  onPatch: (partial: Partial<AnimeListParams>) => void;
+}) {
   const onPatchRef = useRef(onPatch);
-  const paramsTagsLabel = params.tags.join(", ");
-  const [tagInput, setTagInput] = useState(paramsTagsLabel);
-  const [prevParamsTagsLabel, setPrevParamsTagsLabel] = useState(paramsTagsLabel);
+  const tagsLabel = tags.join(", ");
+  const [tagInput, setTagInput] = useState(tagsLabel);
   const debouncedTagInput = useDebouncedValue(tagInput, 400);
-
-  if (paramsTagsLabel !== prevParamsTagsLabel) {
-    setPrevParamsTagsLabel(paramsTagsLabel);
-    setTagInput(paramsTagsLabel);
-  }
 
   useEffect(() => {
     onPatchRef.current = onPatch;
@@ -63,30 +63,38 @@ export function FilterMoreOptions({ params, onPatch }: FilterMoreOptionsProps) {
 
   useEffect(() => {
     const nextTags = parseTagsInput(debouncedTagInput);
-    if (!tagsEqual(nextTags, params.tags)) {
+    if (!tagsEqual(nextTags, tags)) {
       onPatchRef.current({ tags: nextTags });
     }
-  }, [debouncedTagInput, params.tags]);
+  }, [debouncedTagInput, tags]);
 
+  return (
+    <Input
+      id="filter-tags"
+      value={tagInput}
+      onChange={(e) => setTagInput(e.target.value)}
+      placeholder="Isekai, School"
+      className="h-8 text-xs"
+    />
+  );
+}
+
+export function FilterMoreOptions({ params, onPatch }: FilterMoreOptionsProps) {
   const hasMore =
     params.source != null ||
     params.country != null ||
     params.tags.length > 0;
 
-  const [openSections, setOpenSections] = useState<string[]>(() =>
+  const [userOpenSections, setUserOpenSections] = useState<string[]>(() =>
     hasMore ? ["more"] : []
   );
-
-  useEffect(() => {
-    if (hasMore) {
-      setOpenSections((current) =>
-        current.includes("more") ? current : ["more"]
-      );
-    }
-  }, [hasMore]);
+  const openSections =
+    hasMore && !userOpenSections.includes("more")
+      ? ["more", ...userOpenSections]
+      : userOpenSections;
 
   return (
-    <Accordion value={openSections} onValueChange={setOpenSections}>
+    <Accordion value={openSections} onValueChange={setUserOpenSections}>
       <AccordionItem value="more">
         <AccordionTrigger className="py-2 text-xs font-medium text-muted-foreground hover:no-underline">
           More options
@@ -143,13 +151,7 @@ export function FilterMoreOptions({ params, onPatch }: FilterMoreOptionsProps) {
             <Label htmlFor="filter-tags" className="text-xs text-muted-foreground">
               Tags
             </Label>
-            <Input
-              id="filter-tags"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              placeholder="Isekai, School"
-              className="h-8 text-xs"
-            />
+            <TagsInput key={params.tags.join(",")} tags={params.tags} onPatch={onPatch} />
           </div>
         </AccordionContent>
       </AccordionItem>

@@ -4,13 +4,13 @@ import { Suspense } from "react";
 import { AnimeBrowse } from "@/components/browse/anime-browse";
 import { BrowseSkeleton } from "@/components/browse/browse-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
+import { PageHeader } from "@/components/layout/page-header";
 import { getGenreCollection } from "@/lib/anilist/server/get-genre-collection";
 import { mediaPageInfiniteOptions } from "@/lib/anilist/query-options.server";
 import {
   getCurrentAnimeSeason,
   getNextAnimeSeason,
 } from "@/lib/anilist/utils/season";
-import { buildAnimeBrowseHref } from "@/lib/routes/browse-url";
 import { parseAnimeListParams } from "@/lib/routes/search-params";
 import { createPageMetadata } from "@/lib/seo/metadata";
 import { getQueryClient } from "@/lib/react-query/get-query-client";
@@ -35,20 +35,28 @@ async function AnimeListingContent({ searchParams }: AnimeListingPageProps) {
   const nextSeason = getNextAnimeSeason();
   const queryClient = getQueryClient();
 
-  const genres = await getGenreCollection();
-  void queryClient.prefetchInfiniteQuery(
-    mediaPageInfiniteOptions(params, currentSeason, nextSeason)
-  );
+  const [genres] = await Promise.all([
+    getGenreCollection(),
+    queryClient.prefetchInfiniteQuery(
+      mediaPageInfiniteOptions(params, currentSeason, nextSeason)
+    ),
+  ]);
 
   return (
     <PageContainer className="py-8 lg:py-10">
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <AnimeBrowse
-          key={buildAnimeBrowseHref(params)}
-          initialParams={params}
-          genres={genres}
+      <div className="flex flex-col gap-6">
+        <PageHeader
+          title="Anime"
+          description="Search and filter — use the navigation above to switch lists."
         />
-      </HydrationBoundary>
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <AnimeBrowse
+            genres={genres}
+            currentSeason={currentSeason}
+            nextSeason={nextSeason}
+          />
+        </HydrationBoundary>
+      </div>
     </PageContainer>
   );
 }

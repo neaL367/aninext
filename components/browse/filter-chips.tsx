@@ -1,7 +1,7 @@
 "use client";
 
 import { XIcon } from "lucide-react";
-import type { AnimeListParams } from "@/lib/routes/search-params";
+import { useBrowseFilters } from "@/components/browse/browse-filters-provider";
 import {
   getActiveFilterChips,
   removeFilterChip,
@@ -9,13 +9,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-type FilterChipsProps = {
-  params: AnimeListParams;
-  onChange: (params: AnimeListParams) => void;
-  onClearAll: () => void;
-};
-
-export function FilterChips({ params, onChange, onClearAll }: FilterChipsProps) {
+export function FilterChips() {
+  const { state, actions } = useBrowseFilters();
+  const { params } = state;
+  const { applyFilters, resetFilters } = actions;
   const chips = getActiveFilterChips(params);
 
   if (!chips.length) {
@@ -37,7 +34,7 @@ export function FilterChips({ params, onChange, onClearAll }: FilterChipsProps) 
             size="icon-xs"
             className="size-5"
             aria-label={`Remove ${chip.label}`}
-            onClick={() => onChange(removeFilterChip(params, chip.key))}
+            onClick={() => applyFilters(removeFilterChip(params, chip.key))}
           >
             <XIcon className="size-3" />
           </Button>
@@ -48,7 +45,7 @@ export function FilterChips({ params, onChange, onClearAll }: FilterChipsProps) 
         variant="ghost"
         size="xs"
         className="h-7 text-muted-foreground"
-        onClick={onClearAll}
+        onClick={resetFilters}
       >
         Clear all
       </Button>

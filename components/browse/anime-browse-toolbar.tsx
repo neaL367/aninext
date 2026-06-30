@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { SearchIcon, SlidersHorizontalIcon } from "lucide-react";
+import { useBrowseFilters } from "@/components/browse/browse-filters-provider";
 import { AnimeQuickFilters } from "@/components/browse/anime-quick-filters";
 import { FilterChips } from "@/components/browse/filter-chips";
 import { Badge } from "@/components/ui/badge";
@@ -16,11 +17,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { countBrowseFilters } from "@/lib/routes/search-params";
-import {
-  getActiveFilterChips,
-  type AnimeListParams,
-} from "@/lib/routes/search-params";
+import { countBrowseFilters, getActiveFilterChips } from "@/lib/routes/search-params";
 
 const AdvancedFilters = dynamic(
   () =>
@@ -30,30 +27,14 @@ const AdvancedFilters = dynamic(
   { ssr: false }
 );
 
-type GenreOption = { id: number; name: string };
-
-type AnimeBrowseToolbarProps = {
-  filterParams: AnimeListParams;
-  searchInput: string;
-  onSearchChange: (value: string) => void;
-  searchInputRef: React.RefObject<HTMLInputElement | null>;
-  genres: GenreOption[];
-  onApply: (params: AnimeListParams) => void;
-  onReset: () => void;
-};
-
-export function AnimeBrowseToolbar({
-  filterParams,
-  searchInput,
-  onSearchChange,
-  searchInputRef,
-  genres,
-  onApply,
-  onReset,
-}: AnimeBrowseToolbarProps) {
+export function AnimeBrowseToolbar() {
+  const { state, actions, meta } = useBrowseFilters();
+  const { params } = state;
+  const { setSearchInput } = actions;
+  const { searchRef } = meta;
   const [sheetOpen, setSheetOpen] = useState(false);
-  const filterCount = countBrowseFilters(filterParams);
-  const hasChips = getActiveFilterChips(filterParams).length > 0;
+  const filterCount = countBrowseFilters(params);
+  const hasChips = getActiveFilterChips(params).length > 0;
 
   return (
     <div className="flex flex-col gap-3">
@@ -61,11 +42,11 @@ export function AnimeBrowseToolbar({
         <div className="relative min-w-0 flex-1">
           <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            ref={searchInputRef}
+            ref={searchRef}
             id="anime-search"
             type="search"
-            value={searchInput}
-            onChange={(e) => onSearchChange(e.target.value)}
+            value={params.q}
+            onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search anime..."
             autoComplete="off"
             className="h-9 pl-9"
@@ -101,24 +82,15 @@ export function AnimeBrowseToolbar({
               data-lenis-prevent
               data-lenis-prevent-wheel
             >
-              {sheetOpen ? (
-                <AdvancedFilters
-                  params={filterParams}
-                  genres={genres}
-                  onApply={onApply}
-                  onReset={onReset}
-                />
-              ) : null}
+              {sheetOpen ? <AdvancedFilters /> : null}
             </div>
           </SheetContent>
         </Sheet>
       </div>
 
-      <AnimeQuickFilters params={filterParams} onChange={onApply} />
+      <AnimeQuickFilters />
 
-      {hasChips ? (
-        <FilterChips params={filterParams} onChange={onApply} onClearAll={onReset} />
-      ) : null}
+      {hasChips ? <FilterChips /> : null}
     </div>
   );
 }
