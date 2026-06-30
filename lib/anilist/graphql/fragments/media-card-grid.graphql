@@ -1,4 +1,4 @@
-fragment MediaCardCompactFields on Media {
+fragment MediaCardGridFields on Media {
   id
   title {
     romaji
@@ -10,7 +10,6 @@ fragment MediaCardCompactFields on Media {
     medium
     color
   }
-  bannerImage
   format
   season
   seasonYear
@@ -20,18 +19,6 @@ fragment MediaCardCompactFields on Media {
   popularity
   genres
   status
-  description(asHtml: false)
-  studios(isMain: true) {
-    nodes {
-      id
-      name
-    }
-  }
-  tags {
-    id
-    name
-    rank
-  }
   nextAiringEpisode {
     airingAt
     episode

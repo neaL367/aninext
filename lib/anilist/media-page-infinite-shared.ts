@@ -1,7 +1,6 @@
 import { LISTING_PAGE_SIZE, TOP_100_LIMIT } from "./constants";
 import type { MediaPageResult } from "./types";
-import { applyPopularityPercents } from "./utils/format";
-import { withTop100Ranks } from "./utils/rank";
+import { normalizeListedMedia } from "./utils/normalize-media-list";
 import type { AnimeListParams } from "@/lib/routes/search-params";
 import {
   getListingMaxPage,
@@ -48,12 +47,10 @@ export function buildMediaPageInfiniteConfig(
       return lastPageParam + 1;
     },
     select: (data: { pages: MediaPageResult[] }) => {
-      let media = data.pages.flatMap((page) => page.media);
-      media = applyPopularityPercents(media);
-
-      if (params.sort === "top-100") {
-        media = withTop100Ranks(media).slice(0, TOP_100_LIMIT);
-      }
+      const media = normalizeListedMedia(
+        data.pages.flatMap((page) => page.media),
+        { sort: params.sort }
+      );
 
       return { pages: data.pages, media };
     },

@@ -1,3 +1,5 @@
+import "server-only";
+
 import { cache } from "react";
 import { getCachedMediaDetail } from "@/lib/anilist/server/get-cached-media-detail";
 

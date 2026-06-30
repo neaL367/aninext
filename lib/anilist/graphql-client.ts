@@ -10,7 +10,6 @@ import {
 } from "./constants";
 import { AniListError } from "./errors";
 import { withConcurrencyLimit } from "./concurrency";
-import { buildRequestKey, dedupeRequest } from "./request-dedup";
 
 type GraphQLResponse<T> = {
   readonly data?: T;
@@ -58,22 +57,43 @@ function buildGraphQLHeaders(): HeadersInit {
   return headers;
 }
 
+function getErrorName(error: unknown): string | undefined {
+  return error instanceof Error ? error.name : undefined;
+}
+
+function isFetchNetworkError(error: unknown): boolean {
+  const name = getErrorName(error);
+  return name === "AbortError" || name === "TimeoutError" || error instanceof TypeError;
+}
+
 async function fetchGraphQLOnce<TData, TVariables extends Record<string, unknown>>(
   document: TypedDocumentNode<TData, TVariables>,
   variables?: TVariables
 ): Promise<TData> {
   const started = Date.now();
-  const response = await fetch(ANILIST_API_URL, {
-    method: "POST",
-    headers: buildGraphQLHeaders(),
-    body: JSON.stringify({
-      query: getPrintedQuery(
-        document as TypedDocumentNode<unknown, unknown>
-      ),
-      variables: variables ?? {},
-    }),
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-  });
+  let response: Response;
+  try {
+    response = await fetch(ANILIST_API_URL, {
+      method: "POST",
+      headers: buildGraphQLHeaders(),
+      body: JSON.stringify({
+        query: getPrintedQuery(
+          document as TypedDocumentNode<unknown, unknown>
+        ),
+        variables: variables ?? {},
+      }),
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    });
+  } catch (error) {
+    if (isFetchNetworkError(error)) {
+      throw new AniListError(
+        "network",
+        "AniList request failed before receiving a response",
+        error
+      );
+    }
+    throw error;
+  }
 
   const elapsed = Date.now() - started;
   if (
@@ -155,7 +175,9 @@ async function executeGraphQLWithRetry<
 
   while (attempt <= MAX_RETRIES) {
     try {
-      return await fetchGraphQLOnce(document, variables);
+      return await withConcurrencyLimit(() =>
+        fetchGraphQLOnce(document, variables)
+      );
     } catch (error) {
       lastError = error;
       const retryable =
@@ -191,12 +213,5 @@ export async function executeGraphQL<
   document: TypedDocumentNode<TData, TVariables>,
   variables?: TVariables
 ): Promise<TData> {
-  const key = buildRequestKey(
-    getPrintedQuery(document as TypedDocumentNode<unknown, unknown>),
-    variables
-  );
-
-  return dedupeRequest(key, () =>
-    withConcurrencyLimit(() => executeGraphQLWithRetry(document, variables))
-  );
+  return executeGraphQLWithRetry(document, variables);
 }

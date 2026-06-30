@@ -1,11 +1,10 @@
 #import "./media-card.graphql"
+#import "./media-card-grid.graphql"
 
 fragment MediaDetailFields on Media {
   ...MediaCardFields
-  bannerImage
   synonyms
   source
-  season
   startDate {
     year
     month
@@ -16,7 +15,6 @@ fragment MediaDetailFields on Media {
     month
     day
   }
-  duration
   countryOfOrigin
   trailer {
     id
@@ -65,7 +63,7 @@ fragment MediaDetailFields on Media {
   recommendations(perPage: 12, sort: RATING_DESC) {
     nodes {
       mediaRecommendation {
-        ...MediaCardFields
+        ...MediaCardGridFields
       }
     }
   }

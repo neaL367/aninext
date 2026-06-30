@@ -1,3 +1,5 @@
+import "server-only";
+
 import { cacheLife, cacheTag } from "next/cache";
 import { fetchAllAiringSchedules } from "@/lib/anilist/fetch-airing-schedules";
 import { anilistCacheTags } from "@/lib/anilist/server/cache-tags";

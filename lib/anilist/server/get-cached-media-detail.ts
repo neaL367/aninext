@@ -1,3 +1,5 @@
+import "server-only";
+
 import { cacheLife, cacheTag } from "next/cache";
 import { MediaDetailDocument } from "@/lib/anilist/generated/graphql";
 import { executeGraphQL } from "@/lib/anilist/graphql-client";

@@ -1,3 +1,5 @@
+import "server-only";
+
 import { cacheLife, cacheTag } from "next/cache";
 import { GenreCollectionDocument } from "@/lib/anilist/generated/graphql";
 import { anilistCacheTags } from "@/lib/anilist/server/cache-tags";

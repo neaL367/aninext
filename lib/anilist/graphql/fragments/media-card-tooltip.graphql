@@ -1,0 +1,15 @@
+fragment MediaCardTooltipFields on Media {
+  bannerImage
+  description(asHtml: false)
+  studios(isMain: true) {
+    nodes {
+      id
+      name
+    }
+  }
+  tags {
+    id
+    name
+    rank
+  }
+}

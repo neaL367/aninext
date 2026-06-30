@@ -1,40 +1,7 @@
+#import "./media-card-grid.graphql"
+#import "./media-card-tooltip.graphql"
+
 fragment MediaCardFields on Media {
-  id
-  title {
-    romaji
-    english
-    native
-  }
-  coverImage {
-    large
-    medium
-    color
-  }
-  bannerImage
-  format
-  season
-  seasonYear
-  episodes
-  duration
-  averageScore
-  popularity
-  genres
-  status
-  description(asHtml: false)
-  studios(isMain: true) {
-    nodes {
-      id
-      name
-    }
-  }
-  tags {
-    id
-    name
-    rank
-  }
-  nextAiringEpisode {
-    airingAt
-    episode
-    timeUntilAiring
-  }
+  ...MediaCardGridFields
+  ...MediaCardTooltipFields
 }

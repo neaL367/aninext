@@ -1,10 +1,26 @@
 import type {
   AiringMediaFieldsFragment,
   AiringSchedulesQuery,
-  MediaCardCompactFieldsFragment,
+  MediaCardGridFieldsFragment,
+  MediaCardTooltipFieldsFragment,
   MediaDetailFieldsFragment,
   MediaPageQuery,
 } from "./generated/graphql";
+
+const MEDIA_CARD_TOOLTIP_KEYS = [
+  "description",
+  "bannerImage",
+  "studios",
+  "tags",
+] as const satisfies readonly (keyof MediaCardTooltipFieldsFragment)[];
+
+export function hasMediaCardTooltipFields(
+  media: Partial<MediaCardTooltipFieldsFragment>
+): boolean {
+  return MEDIA_CARD_TOOLTIP_KEYS.every((key) =>
+    Object.hasOwn(media, key)
+  );
+}
 
 export type {
   MediaFormat,
@@ -14,10 +30,15 @@ export type {
   MediaStatus,
 } from "./generated/graphql";
 
-export type MediaCard = MediaCardCompactFieldsFragment & {
-  popularityPercent?: number | null;
-  rank?: number;
-};
+export type MediaCardGrid = MediaCardGridFieldsFragment;
+
+export type MediaCardTooltip = MediaCardTooltipFieldsFragment;
+
+export type MediaCard = MediaCardGrid &
+  Partial<MediaCardTooltip> & {
+    popularityPercent?: number | null;
+    rank?: number;
+  };
 
 export type MediaDetail = MediaDetailFieldsFragment;
 
