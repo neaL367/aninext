@@ -1,25 +1,22 @@
 import type { Route } from "next";
 import { HomeSection } from "@/components/home/home-section";
-import type { HomeSectionId } from "@/lib/anilist/server/get-home-sections";
-import { getHomeSectionMedia } from "@/lib/anilist/server/get-home-sections";
+import type { MediaCard } from "@/lib/anilist/domain/types";
 
 type HomeSectionSlotProps = {
   title: string;
   subtitle?: string;
   href?: Route;
-  section: HomeSectionId;
+  media: readonly MediaCard[];
   showCountdown?: boolean;
 };
 
-export async function HomeSectionSlot({
+export function HomeSectionSlot({
   title,
   subtitle,
   href,
-  section,
+  media,
   showCountdown = false,
 }: HomeSectionSlotProps) {
-  const media = await getHomeSectionMedia(section);
-
   return (
     <HomeSection
       title={title}

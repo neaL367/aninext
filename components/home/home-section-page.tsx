@@ -3,7 +3,8 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { HomeSectionSlot } from "@/components/home/home-section-slot";
 import { SectionSkeleton } from "@/components/shared/section-skeleton";
-import type { HomeSectionId } from "@/lib/anilist/server/get-home-sections";
+import type { HomeSectionId } from "@/lib/anilist/domain/home-sections";
+import { getHomeSectionMedia } from "@/lib/anilist/server/get-home-sections";
 
 type HomeSectionPageProps = {
   section: HomeSectionId;
@@ -28,12 +29,14 @@ async function HomeSectionPageContent({
     await connection();
   }
 
+  const media = await getHomeSectionMedia(section);
+
   return (
     <HomeSectionSlot
       title={title}
       subtitle={getSubtitle ? getSubtitle() : subtitle}
       href={href}
-      section={section}
+      media={media}
       showCountdown={showCountdown}
     />
   );
