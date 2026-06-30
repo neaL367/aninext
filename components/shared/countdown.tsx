@@ -54,6 +54,8 @@ export function useCountdownRemaining(
   airingAt: number,
   timeUntilAiring: number
 ) {
+  "use memo";
+
   const [remaining, setRemaining] = useState(timeUntilAiring);
 
   useEffect(() => {
@@ -80,6 +82,8 @@ export function AiringCountdown({
   timeUntilAiring,
   className,
 }: CountdownProps) {
+  "use memo";
+
   const remaining = useCountdownRemaining(airingAt, timeUntilAiring);
 
   return (
@@ -108,6 +112,8 @@ export function Countdown({
   timeUntilAiring,
   className,
 }: CountdownProps) {
+  "use memo";
+
   const remaining = useCountdownRemaining(airingAt, timeUntilAiring);
 
   return (

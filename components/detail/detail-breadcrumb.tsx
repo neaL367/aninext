@@ -32,6 +32,8 @@ type DetailBreadcrumbNavLinkProps = {
 };
 
 function DetailBreadcrumbNavLink({ crumb }: DetailBreadcrumbNavLinkProps) {
+  "use memo";
+
   const router = useRouter();
   const href = (crumb.href ?? "/") as Route;
 
@@ -70,6 +72,8 @@ function DetailBreadcrumbNavLink({ crumb }: DetailBreadcrumbNavLinkProps) {
 }
 
 export function DetailBreadcrumb({ title }: DetailBreadcrumbProps) {
+  "use memo";
+
   const params = useParams();
   const mediaId = params.id as string | undefined;
   const [detailReturn, setDetailReturn] = useState<DetailReturn | null>(null);

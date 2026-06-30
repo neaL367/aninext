@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { memo } from "react";
 import type { Route } from "next";
 import { Badge } from "@/components/ui/badge";
 import { ProgressiveImage } from "@/components/shared/progressive-image";
@@ -43,10 +42,12 @@ type DetailRelationCardProps = {
   className?: string;
 };
 
-export const DetailRelationCard = memo(function DetailRelationCard({
+export function DetailRelationCard({
   item,
   className,
 }: DetailRelationCardProps) {
+  "use memo";
+
   const { relationType, media } = item;
   const title = formatDisplayTitle(media.title);
   const coverUrl = coverCardImageUrl(media.coverImage);
@@ -129,4 +130,4 @@ export const DetailRelationCard = memo(function DetailRelationCard({
       )}
     </article>
   );
-});
+}
