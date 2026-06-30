@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { AnimeDetailView } from "@/components/detail/anime-detail-view";
-import { AnimeDetailSkeleton } from "@/components/detail/anime-detail-skeleton";
-import { getMediaDetail } from "@/lib/anilist/server/get-media-detail";
-import { createAnimeJsonLd } from "@/lib/seo/json-ld";
+import {
+  AnimeDetailBodyLoader,
+  DetailCoverBannerLoader,
+} from "@/components/detail/anime-detail-content";
+import { AnimeDetailPageFrame } from "@/components/detail/anime-detail-page-frame";
+import { AnimeDetailBodySkeleton } from "@/components/detail/anime-detail-body-skeleton";
+import { resolveAnimeDetailMedia } from "@/lib/anilist/server/resolve-anime-detail-media";
+import { formatDisplayTitle, stripHtml } from "@/lib/anilist/display/format";
+import { createDetailMetadata } from "@/lib/seo/metadata";
 
 export const instant = false;
-
-export const metadata: Metadata = {
-  title: "Anime",
-  description: "Anime details on AniNext.",
-};
 
 type AnimeDetailPageProps = {
   params: Promise<{ id: string }>;
@@ -22,35 +21,30 @@ export async function generateStaticParams() {
   return [{ id: "21" }];
 }
 
-async function AnimeDetailContent({ params }: AnimeDetailPageProps) {
-  const { id } = await params;
-  const mediaId = Number(id);
-  if (!Number.isFinite(mediaId)) {
-    notFound();
-  }
+export async function generateMetadata({
+  params,
+}: AnimeDetailPageProps): Promise<Metadata> {
+  const media = await resolveAnimeDetailMedia(params);
+  const title = formatDisplayTitle(media.title);
+  const description = media.description
+    ? stripHtml(media.description).slice(0, 160)
+    : `Anime details for ${title} on AniNext.`;
 
-  const media = await getMediaDetail(mediaId);
-  if (!media) {
-    notFound();
-  }
-
-  const jsonLd = createAnimeJsonLd(media);
-
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <AnimeDetailView media={media} />
-    </>
-  );
+  return createDetailMetadata(title, description, media.id);
 }
 
 export default function AnimeDetailPage({ params }: AnimeDetailPageProps) {
   return (
-    <Suspense fallback={<AnimeDetailSkeleton />}>
-      <AnimeDetailContent params={params} />
-    </Suspense>
+    <AnimeDetailPageFrame
+      cover={
+        <Suspense fallback={null}>
+          <DetailCoverBannerLoader params={params} />
+        </Suspense>
+      }
+    >
+      <Suspense fallback={<AnimeDetailBodySkeleton />}>
+        <AnimeDetailBodyLoader params={params} />
+      </Suspense>
+    </AnimeDetailPageFrame>
   );
 }

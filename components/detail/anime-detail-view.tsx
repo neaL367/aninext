@@ -13,7 +13,6 @@ import {
 } from "@/components/detail/detail-sections";
 import type { DetailRelationItem } from "@/components/detail/detail-relation-card";
 import { EmptyState } from "@/components/shared/empty-state";
-import { PageContainer } from "@/components/layout/page-container";
 import { DetailBreadcrumb } from "@/components/detail/detail-breadcrumb";
 import { DetailReturnAnchor } from "@/components/detail/detail-return-anchor";
 import type { MediaDetail, MediaRelation } from "@/lib/anilist/domain/types";
@@ -25,8 +24,9 @@ import {
 } from "@/lib/anilist/display/format";
 import { buildProgressiveImageSources } from "@/lib/anilist/display/image-urls";
 import { getStreamingLinks } from "@/lib/anilist/display/streaming";
+import { DETAIL_BODY_GRID_CLASS } from "@/lib/styles/detail-page-layout";
 
-type AnimeDetailViewProps = {
+type AnimeDetailMediaProps = {
   media: MediaDetail;
 };
 
@@ -62,7 +62,7 @@ function episodesEmptyMessage(media: MediaDetail): string {
   return "Episode details are not available for this title yet.";
 }
 
-export function AnimeDetailView({ media }: AnimeDetailViewProps) {
+function getDetailDerivedData(media: MediaDetail) {
   const title = formatDisplayTitle(media.title);
   const episodes = buildEpisodeCards(media);
   const streamingLinks = getStreamingLinks(media.externalLinks);
@@ -101,96 +101,118 @@ export function AnimeDetailView({ media }: AnimeDetailViewProps) {
       .map((node) => node!.mediaRecommendation)
       .filter((item): item is NonNullable<typeof item> => Boolean(item)) ?? [];
 
+  return {
+    title,
+    episodes,
+    streamingLinks,
+    showEpisodes,
+    characterEdges,
+    staffEdges,
+    relationItems,
+    recommendationMedia,
+  };
+}
+
+export function DetailCoverBanner({ media }: AnimeDetailMediaProps) {
   const bannerSources = buildProgressiveImageSources(media.bannerImage);
+
+  return (
+    <div className="absolute inset-0">
+      <div
+        className="absolute inset-0"
+        style={{ backgroundColor: media.coverImage?.color ?? "var(--muted)" }}
+      />
+      {bannerSources.length ? (
+        <ProgressiveImage
+          sources={bannerSources}
+          alt=""
+          fill
+          priority
+          className="object-cover object-top"
+          sizes="100vw"
+        />
+      ) : null}
+    </div>
+  );
+}
+
+export function AnimeDetailBody({ media }: AnimeDetailMediaProps) {
+  const {
+    title,
+    episodes,
+    streamingLinks,
+    showEpisodes,
+    characterEdges,
+    staffEdges,
+    relationItems,
+    recommendationMedia,
+  } = getDetailDerivedData(media);
 
   return (
     <>
       <DetailReturnAnchor mediaId={media.id} title={title} />
-      <div className="relative h-52 w-full overflow-hidden sm:h-64 lg:h-80 xl:h-96">
-        <div
-          className="absolute inset-0"
-          style={{ backgroundColor: media.coverImage?.color ?? "var(--muted)" }}
-        />
-        {bannerSources.length ? (
-          <ProgressiveImage
-            sources={bannerSources}
-            alt=""
-            fill
-            priority
-            className="object-cover object-top"
-            sizes="100vw"
-          />
-        ) : null}
-        <div
-          className="absolute inset-0 bg-linear-to-b from-background/5 via-background/25 to-background"
-          aria-hidden
-        />
-      </div>
+      <DetailBreadcrumb title={title} />
 
-      <PageContainer className="relative -mt-6 flex flex-col gap-6 pb-10 pt-4 sm:-mt-8 lg:gap-8 lg:pb-12 lg:pt-6">
-        <DetailBreadcrumb title={title} />
+      <div className={DETAIL_BODY_GRID_CLASS}>
+        <DetailSidebar media={media} />
 
-        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,240px)_minmax(0,1fr)] lg:gap-10 xl:grid-cols-[minmax(0,260px)_minmax(0,1fr)]">
-          <DetailSidebar media={media} />
+        <div className="flex min-w-0 flex-col gap-8 lg:gap-10">
+          <DetailMainHeader media={media} />
 
-          <div className="flex min-w-0 flex-col gap-8 lg:gap-10">
-            <DetailMainHeader media={media} />
+          <DetailTaxonomy media={media} streamingLinks={streamingLinks} />
 
-            <DetailTaxonomy media={media} streamingLinks={streamingLinks} />
+          <DetailTrailer media={media} />
 
-            <DetailTrailer media={media} />
+          {media.description ? (
+            <section className="rounded-xl border border-border bg-card/40 p-5 sm:p-6">
+              <h2 className="mb-3 text-lg font-medium tracking-tight">Synopsis</h2>
+              <p className="text-base leading-relaxed text-muted-foreground whitespace-pre-line">
+                {stripHtml(media.description)}
+              </p>
+            </section>
+          ) : null}
 
-            {media.description ? (
-              <section className="rounded-xl border border-border bg-card/40 p-5 sm:p-6">
-                <h2 className="mb-3 text-lg font-medium tracking-tight">Synopsis</h2>
-                <p className="text-base leading-relaxed text-muted-foreground whitespace-pre-line">
-                  {stripHtml(media.description)}
-                </p>
-              </section>
-            ) : null}
-
-            {showEpisodes ? (
-              <DetailSection title="Episodes" bordered={false}>
-                {episodes.length ? (
-                  <DetailEpisodesSection episodes={episodes} />
-                ) : (
-                  <EmptyState
-                    title="No episode list available"
-                    description={episodesEmptyMessage(media)}
-                  />
-                )}
-              </DetailSection>
-            ) : null}
-
-            {characterEdges.length ? (
-              <DetailSection title="Characters & voice actors" bordered={false}>
-                <DetailCharactersSection edges={characterEdges} />
-              </DetailSection>
-            ) : null}
-
-            {staffEdges.length ? (
-              <DetailSection title="Staff" bordered={false}>
-                <DetailStaffSection edges={staffEdges} />
-              </DetailSection>
-            ) : null}
-
-            {relationItems.length ? (
-              <DetailSection title="Relations" bordered={false}>
-                <DetailRelationsSection items={relationItems} />
-              </DetailSection>
-            ) : null}
-
-            {recommendationMedia.length ? (
-              <DetailSection title="Recommendations" bordered={false}>
-                <DetailMediaCardsSection
-                  media={recommendationMedia}
-                  loadMoreLabel="Load more recommendations"
+          {showEpisodes ? (
+            <DetailSection title="Episodes" bordered={false}>
+              {episodes.length ? (
+                <DetailEpisodesSection episodes={episodes} />
+              ) : (
+                <EmptyState
+                  title="No episode list available"
+                  description={episodesEmptyMessage(media)}
                 />
-              </DetailSection>
-            ) : null}
-          </div>
+              )}
+            </DetailSection>
+          ) : null}
+
+          {characterEdges.length ? (
+            <DetailSection title="Characters & voice actors" bordered={false}>
+              <DetailCharactersSection edges={characterEdges} />
+            </DetailSection>
+          ) : null}
+
+          {staffEdges.length ? (
+            <DetailSection title="Staff" bordered={false}>
+              <DetailStaffSection edges={staffEdges} />
+            </DetailSection>
+          ) : null}
+
+          {relationItems.length ? (
+            <DetailSection title="Relations" bordered={false}>
+              <DetailRelationsSection items={relationItems} />
+            </DetailSection>
+          ) : null}
+
+          {recommendationMedia.length ? (
+            <DetailSection title="Recommendations" bordered={false}>
+              <DetailMediaCardsSection
+                media={recommendationMedia}
+                loadMoreLabel="Load more recommendations"
+              />
+            </DetailSection>
+          ) : null}
         </div>
-      </PageContainer>
+      </div>
     </>
   );
 }
