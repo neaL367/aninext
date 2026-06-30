@@ -31,7 +31,7 @@ Read `node_modules/next/dist/docs/` before changing routing, caching, or data fe
 
 ## `lib/` layout
 
-- **`lib/anilist/`** — AniList data layer: `graphql/` + `generated/`, `infra/` (client, constants), `domain/` (types, errors, normalization), `display/` (formatters, labels, image URLs), `server/` (cached fetchers), `client/` (React Query options, server actions).
+- **`lib/anilist/`** — AniList data layer: `graphql/` + `generated/`, `infra/` (HTTP client, network constants), `domain/` (types, errors, genres, listing limits, season, normalization), `display/` (formatters, labels, image URLs), `server/` (cached fetchers, `cache-policy.ts`), `client/` (React Query options, `query-policy.ts`, server actions).
 - **`lib/browse/`** — Anime listing URL params (`params/`), browse href builders (`url.ts`), filter helpers, and `anilist-queries.ts` (maps browse/home filters → GraphQL variables).
 - **`lib/styles/`** — Tailwind class tokens for cards, grids, and nav (not React components; see `components/ui/` for shadcn).
 - **`lib/navigation/`** — Site nav config, detail back-links, scroll restoration.
