@@ -22,6 +22,8 @@ type AnimeBrowseProps = {
 };
 
 function AnimeBrowseResults() {
+  "use memo";
+
   const { state, meta } = useBrowseFilters();
   const { params } = state;
   const { currentSeason, nextSeason } = meta;
@@ -99,6 +101,8 @@ export function AnimeBrowse({
   currentSeason,
   nextSeason,
 }: AnimeBrowseProps) {
+  "use memo";
+
   return (
     <BrowseFiltersProvider
       genres={genres}

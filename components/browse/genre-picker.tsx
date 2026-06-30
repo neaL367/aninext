@@ -16,6 +16,8 @@ type GenrePickerProps = {
 };
 
 export function GenrePicker({ params, genres, onChange }: GenrePickerProps) {
+  "use memo";
+
   const [query, setQuery] = useState("");
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

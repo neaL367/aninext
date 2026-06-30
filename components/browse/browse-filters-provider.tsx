@@ -62,6 +62,8 @@ export function BrowseFiltersProvider({
   nextSeason,
   children,
 }: BrowseFiltersProviderProps) {
+  "use memo";
+
   const searchRef = useRef<HTMLInputElement>(null);
   const { params, applyFilters, resetFilters, setSearchInput } =
     useAnimeListParams();

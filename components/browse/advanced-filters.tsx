@@ -54,6 +54,8 @@ type AdvancedFiltersProps = {
 };
 
 export function AdvancedFilters({ className }: AdvancedFiltersProps) {
+  "use memo";
+
   const { state, actions, meta } = useBrowseFilters();
   const { params } = state;
   const { applyFilters, resetFilters } = actions;

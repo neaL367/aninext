@@ -148,6 +148,8 @@ export function paramsToNuqsState(params: AnimeListParams): NuqsState {
 const RESET_NUQS_STATE = paramsToNuqsState(DEFAULT_ANIME_LIST_PARAMS);
 
 export function useAnimeListParams() {
+  "use memo";
+
   const [state, setState] = useQueryStates(animeListNuqsParsers, {
     shallow: true,
   });

@@ -28,6 +28,8 @@ const AdvancedFilters = dynamic(
 );
 
 export function AnimeBrowseToolbar() {
+  "use memo";
+
   const { state, actions, meta } = useBrowseFilters();
   const { params } = state;
   const { setSearchInput } = actions;
