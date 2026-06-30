@@ -15,7 +15,7 @@ import {
   formatMediaSource,
   formatSeasonYear,
 } from "@/lib/anilist/utils/labels";
-import { getDetailStudios } from "@/components/detail/detail-info";
+import { getDetailStudios } from "@/lib/anilist/utils/detail-studios";
 
 type DetailSidebarProps = {
   media: MediaDetail;

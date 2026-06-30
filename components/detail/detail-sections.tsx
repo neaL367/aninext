@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimeCard } from "@/components/anime/anime-card";
+import { AnimeCompactCard } from "@/components/anime/anime-compact-card";
 import { DetailCharacterCard, DetailStaffCard } from "@/components/detail/detail-cards";
 import { DetailLoadMoreGrid } from "@/components/detail/detail-load-more-grid";
 import { EpisodeCard } from "@/components/detail/episode-card";
@@ -81,7 +81,7 @@ export function DetailMediaCardsSection({
       gridClassName="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6"
       loadMoreLabel={loadMoreLabel}
       renderItem={(item) => (
-        <AnimeCard key={item.id} media={item} showTooltip={false} compact />
+        <AnimeCompactCard key={item.id} media={item} />
       )}
     />
   );
