@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useCallback, useMemo, useState } from "react";
 import { CalendarClockIcon, StarIcon, UsersIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { MediaCardTooltipBodySkeleton } from "@/components/shared/media-card-tooltip-skeleton";
@@ -9,7 +10,9 @@ import {
   useCountdownRemaining,
 } from "@/components/shared/countdown";
 import { MediaCardTooltipHero } from "@/components/shared/media-card-tooltip-hero";
+import { mediaCardTooltipOptions } from "@/lib/anilist/tooltip-query-options";
 import type { MediaCard } from "@/lib/anilist/types";
+import { hasMediaCardTooltipFields } from "@/lib/anilist/types";
 import { formatDisplayTitle, formatScore } from "@/lib/anilist/utils/format";
 import {
   excerptSynopsis,
@@ -43,29 +46,35 @@ function NextAiringCountdown({
   );
 }
 
-export function AnimeCardTooltipContent({ media }: AnimeCardTooltipContentProps) {
-  const [contentReady, setContentReady] = useState(!media.bannerImage);
-  const handleBannerLoad = useCallback(() => setContentReady(true), []);
+function AnimeCardTooltipLoaded({
+  mergedMedia,
+  tooltipFailed,
+}: {
+  mergedMedia: MediaCard & { rank?: number };
+  tooltipFailed: boolean;
+}) {
+  const [bannerReady, setBannerReady] = useState(!mergedMedia.bannerImage);
+  const handleBannerLoad = useCallback(() => setBannerReady(true), []);
 
-  const title = formatDisplayTitle(media.title);
-  const score = formatScore(media.averageScore);
-  const synopsis = excerptSynopsis(media.description);
-  const studio = getMainStudioName(media.studios);
-  const popularity = formatPopularityCount(media.popularity);
-  const tags = getTopTags(media.tags);
-  const nextAiring = media.nextAiringEpisode;
+  const title = formatDisplayTitle(mergedMedia.title);
+  const score = formatScore(mergedMedia.averageScore);
+  const synopsis = excerptSynopsis(mergedMedia.description);
+  const studio = getMainStudioName(mergedMedia.studios);
+  const popularity = formatPopularityCount(mergedMedia.popularity);
+  const tags = getTopTags(mergedMedia.tags);
+  const nextAiring = mergedMedia.nextAiringEpisode;
 
   return (
     <div className="flex min-w-0 w-full flex-col overflow-hidden">
       <MediaCardTooltipHero
         title={title}
-        placeholderColor={media.coverImage?.color}
-        bannerImage={media.bannerImage}
+        placeholderColor={mergedMedia.coverImage?.color}
+        bannerImage={mergedMedia.bannerImage}
         sizes="448px"
         onBannerLoad={handleBannerLoad}
       />
 
-      {!contentReady ? (
+      {!bannerReady ? (
         <MediaCardTooltipBodySkeleton />
       ) : (
         <div className="flex min-w-0 flex-col gap-3 p-4">
@@ -75,7 +84,7 @@ export function AnimeCardTooltipContent({ media }: AnimeCardTooltipContentProps)
             </p>
           ) : (
             <p className="text-sm italic text-muted-foreground">
-              No synopsis available.
+              {tooltipFailed ? "Details unavailable." : "No synopsis available."}
             </p>
           )}
 
@@ -121,5 +130,54 @@ export function AnimeCardTooltipContent({ media }: AnimeCardTooltipContentProps)
         </div>
       )}
     </div>
+  );
+}
+
+export function AnimeCardTooltipContent({ media }: AnimeCardTooltipContentProps) {
+  const hasEmbeddedTooltipFields = hasMediaCardTooltipFields(media);
+
+  const {
+    data: tooltipOverlay,
+    isPending,
+    isError,
+  } = useQuery({
+    ...mediaCardTooltipOptions(media.id),
+    enabled: !hasEmbeddedTooltipFields,
+  });
+
+  const mergedMedia = useMemo(() => {
+    if (hasEmbeddedTooltipFields) {
+      return media;
+    }
+    if (tooltipOverlay) {
+      return { ...media, ...tooltipOverlay };
+    }
+    return media;
+  }, [hasEmbeddedTooltipFields, media, tooltipOverlay]);
+
+  const hasTooltipFields =
+    hasEmbeddedTooltipFields || hasMediaCardTooltipFields(mergedMedia);
+  const isLoading = !hasEmbeddedTooltipFields && isPending;
+
+  if (isLoading || !hasTooltipFields) {
+    return (
+      <div className="flex min-w-0 w-full flex-col overflow-hidden">
+        <MediaCardTooltipHero
+          title={formatDisplayTitle(mergedMedia.title)}
+          placeholderColor={mergedMedia.coverImage?.color}
+          bannerImage={mergedMedia.bannerImage}
+          sizes="448px"
+        />
+        <MediaCardTooltipBodySkeleton />
+      </div>
+    );
+  }
+
+  return (
+    <AnimeCardTooltipLoaded
+      key={`${media.id}-${mergedMedia.bannerImage ?? "none"}`}
+      mergedMedia={mergedMedia}
+      tooltipFailed={isError}
+    />
   );
 }
