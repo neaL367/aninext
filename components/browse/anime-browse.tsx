@@ -9,10 +9,10 @@ import {
 import { AnimeBrowseToolbar } from "@/components/browse/anime-browse-toolbar";
 import { BrowseFiltersProvider, useBrowseFilters } from "@/components/browse/browse-filters-provider";
 import { EmptyState } from "@/components/shared/empty-state";
-import { LISTING_PAGE_SIZE } from "@/lib/anilist/infra/constants";
+import { LISTING_PAGE_SIZE } from "@/lib/anilist/domain/listing";
 import { mediaPageInfiniteOptions } from "@/lib/anilist/client/query-options.client";
-import type { GenreOption } from "@/lib/anilist/server/get-genre-collection";
-import type { AnimeSeason } from "@/lib/anilist/display/season";
+import type { GenreOption } from "@/lib/anilist/domain/genres";
+import type { AnimeSeason } from "@/lib/anilist/domain/season";
 import { getListingMaxPage } from "@/lib/browse/params";
 
 type AnimeBrowseProps = {

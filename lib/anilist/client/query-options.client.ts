@@ -3,7 +3,7 @@ import { fetchMediaPageAction } from "@/lib/anilist/client/actions/fetch-media-p
 import { buildMediaPageInfiniteConfig } from "./media-page-infinite-shared";
 import type { MediaPageQueryVariables } from "@/lib/anilist/generated/graphql";
 import type { AnimeListParams } from "@/lib/browse/params";
-import type { AnimeSeason } from "@/lib/anilist/display/season";
+import type { AnimeSeason } from "@/lib/anilist/domain/season";
 
 export function mediaPageInfiniteOptions(
   params: AnimeListParams,

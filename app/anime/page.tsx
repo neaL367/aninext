@@ -10,7 +10,7 @@ import { mediaPageInfiniteOptions } from "@/lib/anilist/client/query-options.ser
 import {
   getCurrentAnimeSeason,
   getNextAnimeSeason,
-} from "@/lib/anilist/display/season";
+} from "@/lib/anilist/domain/season";
 import { parseAnimeListParams } from "@/lib/browse/params";
 import { createPageMetadata } from "@/lib/seo/metadata";
 import { getQueryClient } from "@/lib/react-query/get-query-client";

@@ -1,12 +1,12 @@
-import { CAROUSEL_PER_PAGE } from "@/lib/anilist/infra/constants";
+import { CAROUSEL_PER_PAGE } from "@/lib/anilist/domain/listing";
 import type { HomeSectionMediaQueryVariables } from "@/lib/anilist/generated/graphql";
-import type { HomeSectionId } from "@/lib/anilist/server/get-home-sections";
+import type { HomeSectionId } from "@/lib/anilist/domain/home-sections";
 import {
   DEFAULT_ANIME_LIST_PARAMS,
   paramsToMediaQuery,
   type AnimeListParams,
 } from "@/lib/browse/params";
-import type { AnimeSeason } from "@/lib/anilist/display/season";
+import type { AnimeSeason } from "@/lib/anilist/domain/season";
 
 /** Map home carousel slots to the same browse params used by "View all" links. */
 export function homeSectionToListParams(section: HomeSectionId): AnimeListParams {

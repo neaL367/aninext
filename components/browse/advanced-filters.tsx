@@ -26,7 +26,7 @@ import {
   formatMediaSeason,
   formatMediaStatus,
 } from "@/lib/anilist/display/labels";
-import { getCurrentAnimeSeason } from "@/lib/anilist/display/season";
+import { getCurrentAnimeSeason } from "@/lib/anilist/domain/season";
 import { cn } from "@/lib/utils";
 
 const ALL_FORMATS = [

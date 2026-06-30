@@ -5,7 +5,7 @@ import { SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { GenreOption } from "@/lib/anilist/server/get-genre-collection";
+import type { GenreOption } from "@/lib/anilist/domain/genres";
 import { toggleGenre } from "@/lib/browse/filter-helpers";
 import type { AnimeListParams } from "@/lib/browse/params";
 

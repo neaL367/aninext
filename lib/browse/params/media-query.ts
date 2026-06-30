@@ -1,4 +1,4 @@
-import { TOP_100_MAX_PAGES } from "@/lib/anilist/infra/constants";
+import { TOP_100_MAX_PAGES } from "@/lib/anilist/domain/listing";
 import type { MediaFormat, MediaSeason, MediaSort, MediaSource, MediaStatus } from "@/lib/anilist/domain/types";
 import type { AnimeListParams, AnimeSort } from "@/lib/browse/params/types";
 
