@@ -8,14 +8,14 @@ import { MediaTooltip, AIRING_TOOLTIP_WIDTH } from "@/components/shared/media-to
 import { ProgressiveImage } from "@/components/shared/progressive-image";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Badge } from "@/components/ui/badge";
-import type { AiringScheduleItem } from "@/lib/anilist/types";
-import { coverCardImageUrl } from "@/lib/anilist/utils/image-urls";
+import type { AiringScheduleItem } from "@/lib/anilist/domain/types";
+import { coverCardImageUrl } from "@/lib/anilist/display/image-urls";
 import {
   AIRING_ITEM_COVER_CLASS,
   AIRING_ITEM_COVER_IMAGE_CLASS,
-} from "@/lib/ui/airing-item-cover";
-import { formatDisplayTitle } from "@/lib/anilist/utils/format";
-import { formatMediaFormat } from "@/lib/anilist/utils/labels";
+} from "@/lib/styles/airing-item-cover";
+import { formatDisplayTitle } from "@/lib/anilist/display/format";
+import { formatMediaFormat } from "@/lib/anilist/display/labels";
 import { saveDetailReturnFromCurrentPage } from "@/lib/navigation/detail-return";
 import { cn } from "@/lib/utils";
 

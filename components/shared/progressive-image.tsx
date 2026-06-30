@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState, type ComponentProps } from "react";
-import { isAnilistCdnUrl } from "@/lib/anilist/utils/image-urls";
+import { isAnilistCdnUrl } from "@/lib/anilist/display/image-urls";
 import { cn } from "@/lib/utils";
 
 type ProgressiveImageProps = {

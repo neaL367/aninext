@@ -7,7 +7,7 @@ import {
   AiringDayShowCountSuspense,
 } from "@/components/airing/airing-day-chunks";
 import { Button } from "@/components/ui/button";
-import type { AiringScheduleItem } from "@/lib/anilist/types";
+import type { AiringScheduleItem } from "@/lib/anilist/domain/types";
 import {
   formatLocalDate,
   formatTimezoneLabel,
@@ -16,7 +16,7 @@ import {
   getWeekdayShortLabel,
   parseLocalDateKey,
   toLocalDateKeyFromDate,
-} from "@/lib/anilist/utils/datetime";
+} from "@/lib/anilist/display/datetime";
 import { cn } from "@/lib/utils";
 
 type AiringDayPromises = Record<string, Promise<AiringScheduleItem[]>>;

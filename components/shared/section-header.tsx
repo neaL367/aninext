@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Route } from "next";
-import { viewAllLinkClassName } from "@/lib/ui/nav-link-styles";
+import { viewAllLinkClassName } from "@/lib/styles/nav-link-styles";
 
 type SectionHeaderProps = {
   title: string;

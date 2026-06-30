@@ -5,17 +5,17 @@ import { connection } from "next/server";
 import {
   HomeSectionMediaDocument,
 } from "@/lib/anilist/generated/graphql";
-import { executeGraphQL } from "@/lib/anilist/graphql-client";
+import { executeGraphQL } from "@/lib/anilist/infra/graphql-client";
 import { anilistCacheTags } from "@/lib/anilist/server/cache-tags";
-import type { MediaCard } from "@/lib/anilist/types";
-import { buildHomeSectionVariables } from "@/lib/anilist/utils/media-list-query";
-import { normalizeListedMedia } from "@/lib/anilist/utils/normalize-media-list";
-import { sortMediaByNextAiring } from "@/lib/anilist/utils/sort-media-by-airing";
+import type { MediaCard } from "@/lib/anilist/domain/types";
+import { buildHomeSectionVariables } from "@/lib/browse/anilist-queries";
+import { normalizeListedMedia } from "@/lib/anilist/domain/normalize-media-list";
+import { sortMediaByNextAiring } from "@/lib/anilist/domain/sort-media-by-airing";
 import {
   getCurrentAnimeSeason,
   getNextAnimeSeason,
   type AnimeSeason,
-} from "@/lib/anilist/utils/season";
+} from "@/lib/anilist/display/season";
 
 export const HOME_SECTION_IDS = [
   "trending",

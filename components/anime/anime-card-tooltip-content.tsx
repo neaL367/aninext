@@ -10,17 +10,17 @@ import {
   useCountdownRemaining,
 } from "@/components/shared/countdown";
 import { MediaCardTooltipHero } from "@/components/shared/media-card-tooltip-hero";
-import { mediaCardTooltipOptions } from "@/lib/anilist/tooltip-query-options";
-import type { MediaCard } from "@/lib/anilist/types";
-import { hasMediaCardTooltipFields } from "@/lib/anilist/types";
+import { mediaCardTooltipOptions } from "@/lib/anilist/client/tooltip-query-options";
+import type { MediaCard } from "@/lib/anilist/domain/types";
+import { hasMediaCardTooltipFields } from "@/lib/anilist/domain/types";
 import { useMediaTooltipOpen } from "@/components/shared/media-tooltip";
-import { formatDisplayTitle, formatScore } from "@/lib/anilist/utils/format";
+import { formatDisplayTitle, formatScore } from "@/lib/anilist/display/format";
 import {
   excerptSynopsis,
   formatPopularityCount,
   getMainStudioName,
   getTopTags,
-} from "@/lib/anilist/utils/tooltip";
+} from "@/lib/anilist/display/tooltip";
 
 type AnimeCardTooltipContentProps = {
   media: MediaCard & { rank?: number };

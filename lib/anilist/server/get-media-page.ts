@@ -5,12 +5,12 @@ import {
   MediaPageDocument,
   type MediaPageQueryVariables,
 } from "@/lib/anilist/generated/graphql";
-import { executeGraphQL } from "@/lib/anilist/graphql-client";
+import { executeGraphQL } from "@/lib/anilist/infra/graphql-client";
 import {
   anilistCacheTags,
   mediaPageFilterKey,
 } from "@/lib/anilist/server/cache-tags";
-import { normalizeMediaPageResult, type MediaPageResult } from "@/lib/anilist/types";
+import { normalizeMediaPageResult, type MediaPageResult } from "@/lib/anilist/domain/types";
 
 /** Cross-request cached browse page — shared by all users with the same filters. */
 export async function getCachedMediaPage(

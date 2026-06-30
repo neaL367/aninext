@@ -12,7 +12,7 @@ import {
   getWeekdayShortLabel,
   parseLocalDateKey,
   toLocalDateKeyFromDate,
-} from "@/lib/anilist/utils/datetime";
+} from "@/lib/anilist/display/datetime";
 import { cn } from "@/lib/utils";
 
 /** Static shell shown while day promises are wired up; mirrors the interactive layout. */

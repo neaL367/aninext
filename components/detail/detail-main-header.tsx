@@ -1,8 +1,8 @@
-import type { MediaDetail } from "@/lib/anilist/types";
+import type { MediaDetail } from "@/lib/anilist/domain/types";
 import {
   formatAlternateTitles,
   formatDisplayTitle,
-} from "@/lib/anilist/utils/format";
+} from "@/lib/anilist/display/format";
 
 type DetailMainHeaderProps = {
   media: MediaDetail;

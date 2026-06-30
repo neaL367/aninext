@@ -6,12 +6,12 @@ import { BrowseSkeleton } from "@/components/browse/browse-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
 import { getGenreCollection } from "@/lib/anilist/server/get-genre-collection";
-import { mediaPageInfiniteOptions } from "@/lib/anilist/query-options.server";
+import { mediaPageInfiniteOptions } from "@/lib/anilist/client/query-options.server";
 import {
   getCurrentAnimeSeason,
   getNextAnimeSeason,
-} from "@/lib/anilist/utils/season";
-import { parseAnimeListParams } from "@/lib/routes/search-params";
+} from "@/lib/anilist/display/season";
+import { parseAnimeListParams } from "@/lib/browse/params";
 import { createPageMetadata } from "@/lib/seo/metadata";
 import { getQueryClient } from "@/lib/react-query/get-query-client";
 

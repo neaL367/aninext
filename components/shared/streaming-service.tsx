@@ -2,7 +2,7 @@ import Image from "next/image";
 import {
   getStreamingFaviconUrl,
   getStreamingSiteDomain,
-} from "@/lib/anilist/utils/streaming";
+} from "@/lib/anilist/display/streaming";
 import { cn } from "@/lib/utils";
 
 type StreamingServiceProps = {

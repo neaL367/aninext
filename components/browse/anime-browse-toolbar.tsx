@@ -17,7 +17,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { countBrowseFilters, getActiveFilterChips } from "@/lib/routes/search-params";
+import { countBrowseFilters, getActiveFilterChips } from "@/lib/browse/params";
 
 const AdvancedFilters = dynamic(
   () =>

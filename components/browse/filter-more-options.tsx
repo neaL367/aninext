@@ -17,14 +17,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useDebouncedValue } from "@/lib/hooks/use-debounced-value";
-import type { MediaSource } from "@/lib/anilist/types";
-import type { AnimeListParams } from "@/lib/routes/search-params";
+import type { MediaSource } from "@/lib/anilist/domain/types";
+import type { AnimeListParams } from "@/lib/browse/params";
 import {
   COUNTRY_LABELS,
   formatCountry,
   formatMediaSource,
   MEDIA_SOURCE_LABELS,
-} from "@/lib/anilist/utils/labels";
+} from "@/lib/anilist/display/labels";
 
 const ALL_SOURCES = Object.keys(MEDIA_SOURCE_LABELS) as MediaSource[];
 const ALL_COUNTRIES = Object.keys(COUNTRY_LABELS);

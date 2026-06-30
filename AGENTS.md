@@ -24,7 +24,15 @@ Read `node_modules/next/dist/docs/` before changing routing, caching, or data fe
 - **Suspense + `connection()`**: wrap runtime/uncached data in `<Suspense>`; call `await connection()` before request-time fetches (search params, parallel slots, season-based keys).
 - **`instant` route config**: static shells use `export const instant = true`; dynamic routes use `instant = false`. Home hero (`app/(home)/page.tsx`) is `instant = true` while `app/(home)/layout.tsx` is `instant = false` so carousels stream without blocking the hero.
 - **Dedupe fetches**: use React `cache()` for data shared by `page` and `generateMetadata` (see `lib/anilist/server/get-media-detail.ts`).
-- **AniList fetch stack**: all GraphQL goes through `lib/anilist/graphql-client.ts` (keep-alive agent, in-flight dedup, concurrency limit). Home sections fetch via `get-home-sections.ts` with per-section `"use cache"`. Genres use `"use cache"` in `get-genre-collection.ts`.
+- **AniList fetch stack**: all GraphQL goes through `lib/anilist/infra/graphql-client.ts` (concurrency limit). Home sections fetch via `lib/anilist/server/get-home-sections.ts` with per-section `"use cache"`. Genres use `"use cache"` in `lib/anilist/server/get-genre-collection.ts`.
 - **Prefetch**: use `<Link prefetch>` for primary nav targets.
 - **Images**: use `next/image` with `sizes`; remote patterns in `next.config.ts`.
 - **Codegen**: run `bun run codegen` after `.graphql` changes; never edit `lib/anilist/generated/`.
+
+## `lib/` layout
+
+- **`lib/anilist/`** — AniList data layer: `graphql/` + `generated/`, `infra/` (client, constants), `domain/` (types, errors, normalization), `display/` (formatters, labels, image URLs), `server/` (cached fetchers), `client/` (React Query options, server actions).
+- **`lib/browse/`** — Anime listing URL params (`params/`), browse href builders (`url.ts`), filter helpers, and `anilist-queries.ts` (maps browse/home filters → GraphQL variables).
+- **`lib/styles/`** — Tailwind class tokens for cards, grids, and nav (not React components; see `components/ui/` for shadcn).
+- **`lib/navigation/`** — Site nav config, detail back-links, scroll restoration.
+- **`lib/hooks/`**, **`lib/seo/`**, **`lib/react-query/`** — Shared hooks, metadata/JSON-LD, QueryClient factory.

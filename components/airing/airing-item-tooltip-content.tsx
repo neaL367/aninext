@@ -9,10 +9,10 @@ import {
 } from "@/components/shared/countdown";
 import { MediaCardTooltipBodySkeleton } from "@/components/shared/media-card-tooltip-skeleton";
 import { MediaCardTooltipHero } from "@/components/shared/media-card-tooltip-hero";
-import type { AiringScheduleItem } from "@/lib/anilist/types";
-import { formatDisplayTitle } from "@/lib/anilist/utils/format";
-import { excerptSynopsis } from "@/lib/anilist/utils/tooltip";
-import { getStreamingLinks } from "@/lib/anilist/utils/streaming";
+import type { AiringScheduleItem } from "@/lib/anilist/domain/types";
+import { formatDisplayTitle } from "@/lib/anilist/display/format";
+import { excerptSynopsis } from "@/lib/anilist/display/tooltip";
+import { getStreamingLinks } from "@/lib/anilist/display/streaming";
 import { cn } from "@/lib/utils";
 
 type AiringItemTooltipContentProps = {

@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   ANIME_GRID_CELL_CLASS,
   ANIME_GRID_CLASS,
-} from "@/lib/ui/anime-grid-layout";
+} from "@/lib/styles/anime-grid-layout";
 
 export function SectionSkeleton() {
   return (

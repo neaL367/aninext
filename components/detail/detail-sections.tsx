@@ -5,8 +5,8 @@ import { DetailRelationCard, type DetailRelationItem } from "@/components/detail
 import { DetailCharacterCard, DetailStaffCard } from "@/components/detail/detail-cards";
 import { DetailLoadMoreGrid } from "@/components/detail/detail-load-more-grid";
 import { EpisodeCard } from "@/components/detail/episode-card";
-import type { MediaCard } from "@/lib/anilist/types";
-import type { EpisodeCardData } from "@/lib/anilist/utils/episodes";
+import type { MediaCard } from "@/lib/anilist/domain/types";
+import type { EpisodeCardData } from "@/lib/anilist/display/episodes";
 import type { CharacterEdge, StaffEdge } from "@/components/detail/detail-cards";
 
 export function DetailEpisodesSection({

@@ -2,8 +2,8 @@
 
 import { Separator } from "@/components/ui/separator";
 import { ProgressiveImage } from "@/components/shared/progressive-image";
-import type { MediaDetail } from "@/lib/anilist/types";
-import { buildProgressiveImageSources } from "@/lib/anilist/utils/image-urls";
+import type { MediaDetail } from "@/lib/anilist/domain/types";
+import { buildProgressiveImageSources } from "@/lib/anilist/display/image-urls";
 
 type CharacterEdge = NonNullable<
   NonNullable<MediaDetail["characters"]>["edges"]

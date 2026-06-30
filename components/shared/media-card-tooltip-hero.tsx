@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { buildProgressiveImageSources } from "@/lib/anilist/utils/image-urls";
+import { buildProgressiveImageSources } from "@/lib/anilist/display/image-urls";
 import { cn } from "@/lib/utils";
 
 type MediaCardTooltipHeroProps = {

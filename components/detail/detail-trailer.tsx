@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { MediaDetail } from "@/lib/anilist/types";
+import type { MediaDetail } from "@/lib/anilist/domain/types";
 import {
   getTrailerEmbedUrl,
   getTrailerSiteLabel,
   getTrailerWatchUrl,
-} from "@/lib/anilist/utils/trailer";
+} from "@/lib/anilist/display/trailer";
 import { cn } from "@/lib/utils";
 
 type DetailTrailerProps = {

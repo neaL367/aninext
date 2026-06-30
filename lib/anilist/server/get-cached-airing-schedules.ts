@@ -1,9 +1,9 @@
 import "server-only";
 
 import { cacheLife, cacheTag } from "next/cache";
-import { fetchAllAiringSchedules } from "@/lib/anilist/fetch-airing-schedules";
+import { fetchAllAiringSchedules } from "@/lib/anilist/server/fetch-airing-schedules";
 import { anilistCacheTags } from "@/lib/anilist/server/cache-tags";
-import type { AiringScheduleItem } from "@/lib/anilist/types";
+import type { AiringScheduleItem } from "@/lib/anilist/domain/types";
 
 /** Cross-request cached airing week — short TTL for schedule freshness. */
 export async function getCachedAiringSchedules(

@@ -1,5 +1,5 @@
-import type { MediaStatus } from "@/lib/anilist/types";
-import { formatMediaStatus } from "@/lib/anilist/utils/labels";
+import type { MediaStatus } from "@/lib/anilist/domain/types";
+import { formatMediaStatus } from "@/lib/anilist/display/labels";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 

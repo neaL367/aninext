@@ -9,7 +9,7 @@ import { GenrePicker } from "@/components/browse/genre-picker";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import type { MediaFormat, MediaSeason, MediaStatus } from "@/lib/anilist/types";
+import type { MediaFormat, MediaSeason, MediaStatus } from "@/lib/anilist/domain/types";
 import {
   FILTER_DURATION_MAX,
   FILTER_DURATION_MIN,
@@ -19,14 +19,14 @@ import {
   FILTER_SCORE_MIN,
   FILTER_YEAR_MAX,
   FILTER_YEAR_MIN,
-} from "@/lib/routes/filter-bounds";
-import type { AnimeListParams } from "@/lib/routes/search-params";
+} from "@/lib/browse/filter-bounds";
+import type { AnimeListParams } from "@/lib/browse/params";
 import {
   formatMediaFormat,
   formatMediaSeason,
   formatMediaStatus,
-} from "@/lib/anilist/utils/labels";
-import { getCurrentAnimeSeason } from "@/lib/anilist/utils/season";
+} from "@/lib/anilist/display/labels";
+import { getCurrentAnimeSeason } from "@/lib/anilist/display/season";
 import { cn } from "@/lib/utils";
 
 const ALL_FORMATS = [

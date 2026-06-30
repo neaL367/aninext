@@ -3,7 +3,7 @@ import {
   QueryClient,
   defaultShouldDehydrateQuery,
 } from "@tanstack/react-query";
-import { isAniListError } from "@/lib/anilist/errors";
+import { isAniListError } from "@/lib/anilist/domain/errors";
 
 function makeQueryClient() {
   return new QueryClient({

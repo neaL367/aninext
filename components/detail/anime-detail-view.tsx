@@ -16,15 +16,15 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { PageContainer } from "@/components/layout/page-container";
 import { DetailBreadcrumb } from "@/components/detail/detail-breadcrumb";
 import { DetailReturnAnchor } from "@/components/detail/detail-return-anchor";
-import type { MediaDetail, MediaRelation } from "@/lib/anilist/types";
-import { buildEpisodeCards } from "@/lib/anilist/utils/episodes";
+import type { MediaDetail, MediaRelation } from "@/lib/anilist/domain/types";
+import { buildEpisodeCards } from "@/lib/anilist/display/episodes";
 import {
   formatDisplayTitle,
   formatEpisodeCount,
   stripHtml,
-} from "@/lib/anilist/utils/format";
-import { buildProgressiveImageSources } from "@/lib/anilist/utils/image-urls";
-import { getStreamingLinks } from "@/lib/anilist/utils/streaming";
+} from "@/lib/anilist/display/format";
+import { buildProgressiveImageSources } from "@/lib/anilist/display/image-urls";
+import { getStreamingLinks } from "@/lib/anilist/display/streaming";
 
 type AnimeDetailViewProps = {
   media: MediaDetail;

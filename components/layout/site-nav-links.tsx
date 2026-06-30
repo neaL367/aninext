@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, type ComponentProps } from "react";
-import { navLinkClassName } from "@/lib/ui/nav-link-styles";
-import { parseAnimeListParams } from "@/lib/routes/search-params";
-import { SITE_NAV_ITEMS, type NavItem } from "@/lib/routes/nav-items";
+import { navLinkClassName } from "@/lib/styles/nav-link-styles";
+import { parseAnimeListParams } from "@/lib/browse/params";
+import { SITE_NAV_ITEMS, type NavItem } from "@/lib/navigation/nav-items";
 import { cn } from "@/lib/utils";
 
 const EMPTY_SEARCH_PARAMS = new URLSearchParams();

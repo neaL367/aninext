@@ -2,9 +2,9 @@ import "server-only";
 
 import { cacheLife, cacheTag } from "next/cache";
 import { MediaCardTooltipDocument } from "@/lib/anilist/generated/graphql";
-import { executeGraphQL } from "@/lib/anilist/graphql-client";
+import { executeGraphQL } from "@/lib/anilist/infra/graphql-client";
 import { anilistCacheTags } from "@/lib/anilist/server/cache-tags";
-import type { MediaCardTooltip } from "@/lib/anilist/types";
+import type { MediaCardTooltip } from "@/lib/anilist/domain/types";
 
 /** Cross-request cached tooltip fields — fetched on card hover only. */
 export async function getCachedMediaCardTooltip(

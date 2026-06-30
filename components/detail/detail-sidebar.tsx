@@ -1,21 +1,21 @@
 import { StarIcon } from "lucide-react";
 import { ProgressiveImage } from "@/components/shared/progressive-image";
-import type { MediaDetail } from "@/lib/anilist/types";
-import { coverProgressiveSources } from "@/lib/anilist/utils/image-urls";
+import type { MediaDetail } from "@/lib/anilist/domain/types";
+import { coverProgressiveSources } from "@/lib/anilist/display/image-urls";
 import {
   formatDisplayTitle,
   formatEpisodeCount,
   formatFuzzyDate,
   formatScore,
-} from "@/lib/anilist/utils/format";
+} from "@/lib/anilist/display/format";
 import {
   formatCountry,
   formatDuration,
   formatMediaFormat,
   formatMediaSource,
   formatSeasonYear,
-} from "@/lib/anilist/utils/labels";
-import { getDetailStudios } from "@/lib/anilist/utils/detail-studios";
+} from "@/lib/anilist/display/labels";
+import { getDetailStudios } from "@/lib/anilist/display/detail-studios";
 
 type DetailSidebarProps = {
   media: MediaDetail;

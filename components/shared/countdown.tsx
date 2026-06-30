@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { formatLocalTime } from "@/lib/anilist/utils/datetime";
-import { formatAiringTime } from "@/lib/anilist/utils/format";
+import { formatLocalTime } from "@/lib/anilist/display/datetime";
+import { formatAiringTime } from "@/lib/anilist/display/format";
 import { cn } from "@/lib/utils";
 
 type CountdownProps = {

@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { GenreOption } from "@/lib/anilist/server/get-genre-collection";
-import { toggleGenre } from "@/lib/routes/filter-helpers";
-import type { AnimeListParams } from "@/lib/routes/search-params";
+import { toggleGenre } from "@/lib/browse/filter-helpers";
+import type { AnimeListParams } from "@/lib/browse/params";
 
 type GenrePickerProps = {
   params: AnimeListParams;

@@ -3,7 +3,7 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { GenreCollectionDocument } from "@/lib/anilist/generated/graphql";
 import { anilistCacheTags } from "@/lib/anilist/server/cache-tags";
-import { executeGraphQL } from "@/lib/anilist/graphql-client";
+import { executeGraphQL } from "@/lib/anilist/infra/graphql-client";
 
 export type GenreOption = { id: number; name: string };
 

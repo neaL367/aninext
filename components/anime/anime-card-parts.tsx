@@ -7,18 +7,18 @@ import { Countdown } from "@/components/shared/countdown";
 import { ProgressiveImage } from "@/components/shared/progressive-image";
 import { RankingBadge } from "@/components/shared/ranking-badge";
 import { StatusBadge } from "@/components/shared/status-badge";
-import type { MediaCard } from "@/lib/anilist/types";
-import { coverCardImageUrl } from "@/lib/anilist/utils/image-urls";
+import type { MediaCard } from "@/lib/anilist/domain/types";
+import { coverCardImageUrl } from "@/lib/anilist/display/image-urls";
 import {
   formatDisplayTitle,
   formatEpisodeCount,
   formatScore,
-} from "@/lib/anilist/utils/format";
+} from "@/lib/anilist/display/format";
 import {
   formatDuration,
   formatMediaFormat,
   formatSeasonYear,
-} from "@/lib/anilist/utils/labels";
+} from "@/lib/anilist/display/labels";
 import {
   ANIME_BROWSE_CARD_COVER_CLASS,
   ANIME_CARD_COMPACT_COVER_CLASS,
@@ -26,7 +26,7 @@ import {
   ANIME_CARD_COVER_GRADIENT_BOTTOM_CLASS,
   ANIME_CARD_COVER_GRADIENT_TOP_CLASS,
   ANIME_CARD_COVER_IMAGE_CLASS,
-} from "@/lib/ui/anime-card-cover";
+} from "@/lib/styles/anime-card-cover";
 import {
   ANIME_BROWSE_CARD_BODY_CLASS,
   ANIME_CARD_BODY_CLASS,
@@ -36,7 +36,7 @@ import {
   ANIME_CARD_ROOT_CLASS,
   ANIME_CARD_STATS_CLASS,
   ANIME_CARD_TITLE_CLASS,
-} from "@/lib/ui/anime-grid-layout";
+} from "@/lib/styles/anime-grid-layout";
 import { saveDetailReturnFromCurrentPage } from "@/lib/navigation/detail-return";
 import { cn } from "@/lib/utils";
 

@@ -1,5 +1,5 @@
-import type { MediaDetail } from "@/lib/anilist/types";
-import { formatDisplayTitle, stripHtml } from "@/lib/anilist/utils/format";
+import type { MediaDetail } from "@/lib/anilist/domain/types";
+import { formatDisplayTitle, stripHtml } from "@/lib/anilist/display/format";
 
 export function createAnimeJsonLd(media: MediaDetail) {
   const title = formatDisplayTitle(media.title);

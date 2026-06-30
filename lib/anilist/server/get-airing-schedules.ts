@@ -6,8 +6,8 @@ import { getCachedAiringSchedulesForDay } from "@/lib/anilist/server/get-cached-
 import {
   getDayRangeFromDateKey,
   getWeekDateKeys,
-} from "@/lib/anilist/utils/datetime";
-import type { AiringScheduleItem } from "@/lib/anilist/types";
+} from "@/lib/anilist/display/datetime";
+import type { AiringScheduleItem } from "@/lib/anilist/domain/types";
 
 /** One in-flight airing day fetch per request (deduped by date key). */
 export const getAiringSchedulesForDay = cache(

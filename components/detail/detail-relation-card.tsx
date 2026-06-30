@@ -5,24 +5,24 @@ import { usePathname, useSearchParams } from "next/navigation";
 import type { Route } from "next";
 import { Badge } from "@/components/ui/badge";
 import { ProgressiveImage } from "@/components/shared/progressive-image";
-import type { MediaCardGrid, MediaRelation, MediaType } from "@/lib/anilist/types";
-import { coverCardImageUrl } from "@/lib/anilist/utils/image-urls";
-import { formatDisplayTitle } from "@/lib/anilist/utils/format";
-import { formatMediaFormat } from "@/lib/anilist/utils/labels";
-import { getMediaDetailHref } from "@/lib/anilist/utils/media-links";
-import { formatMediaRelationType } from "@/lib/anilist/utils/relation-labels";
+import type { MediaCardGrid, MediaRelation, MediaType } from "@/lib/anilist/domain/types";
+import { coverCardImageUrl } from "@/lib/anilist/display/image-urls";
+import { formatDisplayTitle } from "@/lib/anilist/display/format";
+import { formatMediaFormat } from "@/lib/anilist/display/labels";
+import { getMediaDetailHref } from "@/lib/anilist/display/media-links";
+import { formatMediaRelationType } from "@/lib/anilist/display/relation-labels";
 import { saveDetailReturnFromCurrentPage } from "@/lib/navigation/detail-return";
 import {
   ANIME_CARD_COMPACT_COVER_CLASS,
   ANIME_CARD_COVER_GRADIENT_BOTTOM_CLASS,
   ANIME_CARD_COVER_GRADIENT_TOP_CLASS,
   ANIME_CARD_COVER_IMAGE_CLASS,
-} from "@/lib/ui/anime-card-cover";
+} from "@/lib/styles/anime-card-cover";
 import {
   ANIME_CARD_LINK_CLASS,
   ANIME_CARD_ROOT_CLASS,
   ANIME_CARD_TITLE_CLASS,
-} from "@/lib/ui/anime-grid-layout";
+} from "@/lib/styles/anime-grid-layout";
 import { cn } from "@/lib/utils";
 
 const RELATION_BADGE_CLASS =

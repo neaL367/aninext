@@ -5,7 +5,7 @@ import { useBrowseFilters } from "@/components/browse/browse-filters-provider";
 import {
   getActiveFilterChips,
   removeFilterChip,
-} from "@/lib/routes/search-params";
+} from "@/lib/browse/params";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 

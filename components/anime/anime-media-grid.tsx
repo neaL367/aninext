@@ -6,7 +6,7 @@ import {
   ANIME_BROWSE_GRID_CLASS,
   ANIME_GRID_CELL_CLASS,
   ANIME_GRID_CLASS,
-} from "@/lib/ui/anime-grid-layout";
+} from "@/lib/styles/anime-grid-layout";
 import { cn } from "@/lib/utils";
 
 type AnimeMediaGridLayout = "carousel" | "browse";

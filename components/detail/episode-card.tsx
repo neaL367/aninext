@@ -1,7 +1,7 @@
 import { ProgressiveImage } from "@/components/shared/progressive-image";
-import type { EpisodeCardData } from "@/lib/anilist/utils/episodes";
-import { buildProgressiveImageSources, isAnilistCdnUrl } from "@/lib/anilist/utils/image-urls";
-import { formatEpisodeAirDate } from "@/lib/anilist/utils/episodes";
+import type { EpisodeCardData } from "@/lib/anilist/display/episodes";
+import { buildProgressiveImageSources, isAnilistCdnUrl } from "@/lib/anilist/display/image-urls";
+import { formatEpisodeAirDate } from "@/lib/anilist/display/episodes";
 import { Badge } from "@/components/ui/badge";
 import { StreamingService } from "@/components/shared/streaming-service";
 import { cn } from "@/lib/utils";

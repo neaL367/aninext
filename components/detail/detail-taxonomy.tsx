@@ -4,7 +4,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import type { ReactNode } from "react";
-import type { MediaDetail } from "@/lib/anilist/types";
+import type { MediaDetail } from "@/lib/anilist/domain/types";
 
 type DetailTaxonomyProps = {
   media: MediaDetail;

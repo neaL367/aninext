@@ -5,7 +5,7 @@ import { AiringItemCard } from "@/components/airing/airing-item-card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useClientMounted } from "@/lib/hooks/use-client-mounted";
-import type { AiringScheduleItem } from "@/lib/anilist/types";
+import type { AiringScheduleItem } from "@/lib/anilist/domain/types";
 
 type AiringDayCountProps = {
   promise: Promise<AiringScheduleItem[]>;

@@ -9,11 +9,11 @@ import {
 import { AnimeBrowseToolbar } from "@/components/browse/anime-browse-toolbar";
 import { BrowseFiltersProvider, useBrowseFilters } from "@/components/browse/browse-filters-provider";
 import { EmptyState } from "@/components/shared/empty-state";
-import { LISTING_PAGE_SIZE } from "@/lib/anilist/constants";
-import { mediaPageInfiniteOptions } from "@/lib/anilist/query-options.client";
+import { LISTING_PAGE_SIZE } from "@/lib/anilist/infra/constants";
+import { mediaPageInfiniteOptions } from "@/lib/anilist/client/query-options.client";
 import type { GenreOption } from "@/lib/anilist/server/get-genre-collection";
-import type { AnimeSeason } from "@/lib/anilist/utils/season";
-import { getListingMaxPage } from "@/lib/routes/search-params";
+import type { AnimeSeason } from "@/lib/anilist/display/season";
+import { getListingMaxPage } from "@/lib/browse/params";
 
 type AnimeBrowseProps = {
   genres: GenreOption[];
