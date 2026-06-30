@@ -9,9 +9,9 @@ import {
   type ReactNode,
   type RefObject,
 } from "react";
-import { useAnimeListParams } from "@/lib/browse/nuqs";
-import type { GenreOption } from "@/lib/anilist/server/get-genre-collection";
-import type { AnimeSeason } from "@/lib/anilist/display/season";
+import { useAnimeListParams } from "@/lib/hooks/use-anime-list-params";
+import type { GenreOption } from "@/lib/anilist/domain/genres";
+import type { AnimeSeason } from "@/lib/anilist/domain/season";
 import type { AnimeListParams } from "@/lib/browse/params";
 
 type BrowseFiltersState = {
