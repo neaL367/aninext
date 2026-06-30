@@ -1,6 +1,5 @@
 "use client";
 
-import { memo } from "react";
 import { AnimeCardTooltipContent } from "@/components/anime/anime-card-tooltip-content";
 import {
   AnimeCardArticle,
@@ -16,13 +15,15 @@ type AnimeTooltipCardProps = {
   className?: string;
 };
 
-export const AnimeTooltipCard = memo(function AnimeTooltipCard({
+export function AnimeTooltipCard({
   media,
   layout,
   showCountdown = false,
   priority = false,
   className,
 }: AnimeTooltipCardProps) {
+  "use memo";
+
   return (
     <MediaTooltip>
       <MediaTooltip.Trigger>
@@ -41,4 +42,4 @@ export const AnimeTooltipCard = memo(function AnimeTooltipCard({
       </MediaTooltip.Content>
     </MediaTooltip>
   );
-});
+}

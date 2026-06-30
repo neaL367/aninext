@@ -35,6 +35,8 @@ function NextAiringCountdown({
   timeUntilAiring: number;
   episode: number;
 }) {
+  "use memo";
+
   const remaining = useCountdownRemaining(airingAt, timeUntilAiring);
 
   return (
@@ -54,6 +56,8 @@ function AnimeCardTooltipLoaded({
   mergedMedia: MediaCard & { rank?: number };
   tooltipFailed: boolean;
 }) {
+  "use memo";
+
   const [bannerReady, setBannerReady] = useState(!mergedMedia.bannerImage);
   const handleBannerLoad = useCallback(() => setBannerReady(true), []);
 
@@ -135,6 +139,8 @@ function AnimeCardTooltipLoaded({
 }
 
 export function AnimeCardTooltipContent({ media }: AnimeCardTooltipContentProps) {
+  "use memo";
+
   const tooltipOpen = useMediaTooltipOpen();
   const hasEmbeddedTooltipFields = hasMediaCardTooltipFields(media);
 

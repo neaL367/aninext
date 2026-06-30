@@ -1,6 +1,5 @@
 "use client";
 
-import { memo } from "react";
 import {
   AnimeCardArticle,
   type AnimeCardMedia,
@@ -11,11 +10,13 @@ type AnimeCompactCardProps = {
   className?: string;
 };
 
-export const AnimeCompactCard = memo(function AnimeCompactCard({
+export function AnimeCompactCard({
   media,
   className,
 }: AnimeCompactCardProps) {
+  "use memo";
+
   return (
     <AnimeCardArticle media={media} layout="compact" className={className} />
   );
-});
+}

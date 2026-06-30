@@ -83,6 +83,8 @@ export function AnimeCardArticle({
   showCountdown = false,
   className,
 }: AnimeCardArticleProps) {
+  "use memo";
+
   const title = formatDisplayTitle(media.title);
   const coverUrl = coverCardImageUrl(media.coverImage);
   const score = formatScore(media.averageScore);
