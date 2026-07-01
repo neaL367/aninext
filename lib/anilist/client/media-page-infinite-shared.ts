@@ -1,10 +1,39 @@
 import { LISTING_PAGE_SIZE, TOP_100_LIMIT } from "@/lib/anilist/domain/listing";
-import type { MediaPageResult } from "@/lib/anilist/domain/types";
+import type { MediaCard, MediaPageResult } from "@/lib/anilist/domain/types";
 import { normalizeListedMedia } from "@/lib/anilist/domain/normalize-media-list";
 import { anilistQueryGcTime, anilistQueryStaleTime } from "@/lib/anilist/client/query-policy";
 import type { AnimeListParams } from "@/lib/browse/params";
 import { getListingMaxPage, paramsToMediaQuery } from "@/lib/browse/params";
 import type { AnimeSeason } from "@/lib/anilist/domain/season";
+
+/** Merge paginated browse results without re-normalizing earlier pages on each append. */
+export function mergeInfiniteMediaPages(
+  pages: MediaPageResult[],
+  rankTop100: boolean,
+): MediaCard[] {
+  if (rankTop100) {
+    return normalizeListedMedia(
+      pages.flatMap((page) => page.media),
+      { rankMode: "top100" },
+    );
+  }
+
+  const seen = new Set<number>();
+  const media: MediaCard[] = [];
+
+  for (const page of pages) {
+    for (const item of page.media) {
+      if (seen.has(item.id)) {
+        continue;
+      }
+
+      seen.add(item.id);
+      media.push(item);
+    }
+  }
+
+  return media;
+}
 
 export function buildMediaPageInfiniteConfig(
   params: AnimeListParams,
@@ -46,14 +75,10 @@ export function buildMediaPageInfiniteConfig(
 
       return lastPageParam + 1;
     },
-    select: (data: { pages: MediaPageResult[] }) => {
-      const media = normalizeListedMedia(
-        data.pages.flatMap((page) => page.media),
-        rankTop100 ? { rankMode: "top100" } : {},
-      );
-
-      return { pages: data.pages, media };
-    },
+    select: (data: { pages: MediaPageResult[] }) => ({
+      pages: data.pages,
+      media: mergeInfiniteMediaPages(data.pages, rankTop100),
+    }),
     perPage: LISTING_PAGE_SIZE,
   };
 }

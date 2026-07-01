@@ -1,6 +1,6 @@
 "use client";
 
-import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { AnimeMediaGrid, AnimeMediaGridSkeleton } from "@/components/anime/anime-media-grid";
 import { AnimeBrowseToolbar } from "@/components/browse/anime-browse-toolbar";
@@ -28,6 +28,11 @@ function AnimeBrowseResults() {
   const { params } = state;
   const { currentSeason, nextSeason } = meta;
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const isFetchingNextPageRef = useRef(false);
+  const prefetchedUpToRef = useRef(0);
+  const queryClient = useQueryClient();
+  const infiniteQueryOptions = mediaPageInfiniteOptions(params, currentSeason, nextSeason);
+  const queryKeyJson = JSON.stringify(infiniteQueryOptions.queryKey);
 
   const {
     data,
@@ -38,26 +43,57 @@ function AnimeBrowseResults() {
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
-    ...mediaPageInfiniteOptions(params, currentSeason, nextSeason),
+    ...infiniteQueryOptions,
     placeholderData: keepPreviousData,
   });
 
+  isFetchingNextPageRef.current = isFetchingNextPage;
+
   const maxPage = getListingMaxPage(params.sort);
   const media = data?.media ?? [];
+  const loadedPageCount = data?.pages.length ?? 0;
+
+  useEffect(() => {
+    prefetchedUpToRef.current = 0;
+  }, [queryKeyJson]);
+
+  useEffect(() => {
+    if (isPlaceholderData || !hasNextPage || loadedPageCount === 0) return;
+
+    const targetPages = loadedPageCount + 1;
+    if (prefetchedUpToRef.current >= targetPages) return;
+
+    prefetchedUpToRef.current = targetPages;
+    void queryClient.prefetchInfiniteQuery({
+      ...mediaPageInfiniteOptions(params, currentSeason, nextSeason),
+      pages: targetPages,
+    });
+  }, [
+    queryClient,
+    queryKeyJson,
+    params,
+    currentSeason,
+    nextSeason,
+    hasNextPage,
+    isPlaceholderData,
+    loadedPageCount,
+  ]);
 
   useEffect(() => {
     const element = loadMoreRef.current;
-    if (!element || !hasNextPage || isFetchingNextPage || isPlaceholderData) return;
+    if (!element || !hasNextPage || isPlaceholderData) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0]?.isIntersecting) fetchNextPage();
+        if (entries[0]?.isIntersecting && !isFetchingNextPageRef.current) {
+          fetchNextPage();
+        }
       },
-      { rootMargin: "200px" },
+      { rootMargin: "600px" },
     );
     observer.observe(element);
     return () => observer.disconnect();
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage, isPlaceholderData]);
+  }, [fetchNextPage, hasNextPage, isPlaceholderData]);
 
   const showLoadMore =
     !isPlaceholderData &&
