@@ -1,10 +1,10 @@
 export const anilistCacheLife = {
-  airingSchedules: "minutes",
+  airingSchedules: "hours",
   genreCollection: "days",
   homeSection: "hours",
   mediaDetail: "hours",
   characterDetail: "hours",
   staffDetail: "hours",
-  mediaPage: "minutes",
+  mediaPage: "hours",
   tooltip: "hours",
 } as const;

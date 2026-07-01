@@ -17,3 +17,7 @@ export class AniListError extends Error {
 export function isAniListError(error: unknown): error is AniListError {
   return error instanceof AniListError;
 }
+
+export function isAniListRateLimitError(error: unknown): error is AniListError {
+  return isAniListError(error) && error.code === "rate_limit";
+}

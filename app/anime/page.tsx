@@ -5,8 +5,10 @@ import { AnimeBrowse } from "@/components/browse/anime-browse";
 import { BrowseContentSkeleton } from "@/components/browse/browse-skeleton";
 import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
-import { getGenreCollection } from "@/lib/anilist/server/get-genre-collection";
+import { AniListRateLimitNotice } from "@/components/shared/anilist-rate-limit-notice";
+import { isAniListRateLimitError } from "@/lib/anilist/domain/errors";
 import { mediaPageInfiniteOptions } from "@/lib/anilist/client/query-options.server";
+import { getGenreCollection } from "@/lib/anilist/server/get-genre-collection";
 import { getCurrentAnimeSeason, getNextAnimeSeason } from "@/lib/anilist/domain/season";
 import { parseAnimeListParams } from "@/lib/browse/params";
 import { createPageMetadata } from "@/lib/seo/metadata";
@@ -32,16 +34,23 @@ async function AnimeListingContent({ searchParams }: AnimeListingPageProps) {
   const nextSeason = getNextAnimeSeason();
   const queryClient = getQueryClient();
 
-  const [genres] = await Promise.all([
-    getGenreCollection(),
-    queryClient.prefetchInfiniteQuery(mediaPageInfiniteOptions(params, currentSeason, nextSeason)),
-  ]);
+  try {
+    const [genres] = await Promise.all([
+      getGenreCollection(),
+      queryClient.prefetchInfiniteQuery(mediaPageInfiniteOptions(params, currentSeason, nextSeason)),
+    ]);
 
-  return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <AnimeBrowse genres={genres} currentSeason={currentSeason} nextSeason={nextSeason} />
-    </HydrationBoundary>
-  );
+    return (
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <AnimeBrowse genres={genres} currentSeason={currentSeason} nextSeason={nextSeason} />
+      </HydrationBoundary>
+    );
+  } catch (error) {
+    if (isAniListRateLimitError(error)) {
+      return <AniListRateLimitNotice title="Unable to load anime list" />;
+    }
+    throw error;
+  }
 }
 
 export default function AnimePage({ searchParams }: AnimeListingPageProps) {
