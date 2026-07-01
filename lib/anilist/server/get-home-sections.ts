@@ -52,24 +52,3 @@ export async function getHomeSectionMedia(section: HomeSectionId): Promise<Media
   const next = getNextAnimeSeason();
   return getCachedHomeSectionMedia(section, current, next);
 }
-
-/**
- * Build-time trending anime fetch for `generateStaticParams` — no `connection()`,
- * so it can run during the static build instead of only at request time.
- */
-export async function getTrendingAnimeForStaticGeneration(limit: number): Promise<MediaCard[]> {
-  "use cache";
-
-  cacheLife(anilistCacheLife.homeSection);
-  cacheTag(anilistCacheTags.media);
-
-  const current = getCurrentAnimeSeason();
-  const next = getNextAnimeSeason();
-  const variables = {
-    ...buildHomeSectionVariables("trending", current, next),
-    perPage: limit,
-  };
-
-  const data = await executeGraphQL(HomeSectionMediaDocument, variables);
-  return normalizeListedMedia(data.Page?.media);
-}
