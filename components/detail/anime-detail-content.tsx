@@ -4,7 +4,7 @@ import {
 } from "@/components/detail/anime-detail-view";
 import type { SlugDetailParams } from "@/lib/anilist/domain/detail-route-params";
 import { resolveAnimeDetailMedia } from "@/lib/anilist/server/resolve-anime-detail-media";
-import { createAnimeJsonLd } from "@/lib/seo/json-ld";
+import { createMediaJsonLd } from "@/lib/seo/json-ld";
 
 type AnimeDetailLoaderProps = {
   params: SlugDetailParams;
@@ -19,7 +19,7 @@ export async function DetailCoverBannerLoader({
 
 export async function AnimeDetailBodyLoader({ params }: AnimeDetailLoaderProps) {
   const media = await resolveAnimeDetailMedia(params);
-  const jsonLd = createAnimeJsonLd(media);
+  const jsonLd = createMediaJsonLd(media);
 
   return (
     <>
