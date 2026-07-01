@@ -17,7 +17,7 @@ import { DetailBreadcrumb } from "@/components/detail/detail-breadcrumb";
 import { DetailReturnAnchor } from "@/components/detail/detail-return-anchor";
 import type { MediaDetail, MediaRelation } from "@/lib/anilist/domain/types";
 import { buildEpisodeCards } from "@/lib/anilist/display/episodes";
-import { AniListDescription } from "@/components/shared/anilist-description";
+import { DetailSynopsisSection } from "@/components/detail/detail-synopsis-section";
 import {
   formatDisplayTitle,
   formatEpisodeCount,
@@ -164,10 +164,7 @@ export function AnimeDetailBody({ media }: AnimeDetailMediaProps) {
           <DetailTrailer media={media} />
 
           {media.description ? (
-            <section className="rounded-xl border border-border bg-card/40 p-5 sm:p-6">
-              <h2 className="mb-3 text-lg font-medium tracking-tight">Synopsis</h2>
-              <AniListDescription text={media.description} />
-            </section>
+            <DetailSynopsisSection title="Synopsis" text={media.description} />
           ) : null}
 
           {showEpisodes ? (
