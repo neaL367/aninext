@@ -146,7 +146,7 @@ export async function reserveAniListRequest(): Promise<void> {
 
     const sleepMs = Math.min(waitMs, remainingBudget);
 
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === "development" || process.env.ANILIST_LOG_RATE_LIMIT === "1") {
       console.warn(`[anilist] rate limit bucket empty; waiting ${sleepMs}ms`);
     }
 

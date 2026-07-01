@@ -1,36 +1,63 @@
-import { MAX_CONCURRENT_GRAPHQL_REQUESTS } from "./constants";
+import {
+  MAX_CONCURRENT_BACKGROUND_REQUESTS,
+  MAX_CONCURRENT_INTERACTIVE_REQUESTS,
+} from "./constants";
 
-let active = 0;
-const waiting: Array<() => void> = [];
+export type ConcurrencyLane = "interactive" | "background";
 
-async function acquire(): Promise<void> {
-  if (active < MAX_CONCURRENT_GRAPHQL_REQUESTS) {
-    active++;
+type LaneState = {
+  active: number;
+  waiting: Array<() => void>;
+  max: number;
+};
+
+const lanes: Record<ConcurrencyLane, LaneState> = {
+  interactive: {
+    active: 0,
+    waiting: [],
+    max: MAX_CONCURRENT_INTERACTIVE_REQUESTS,
+  },
+  background: {
+    active: 0,
+    waiting: [],
+    max: MAX_CONCURRENT_BACKGROUND_REQUESTS,
+  },
+};
+
+async function acquire(lane: ConcurrencyLane): Promise<void> {
+  const state = lanes[lane];
+
+  if (state.active < state.max) {
+    state.active++;
     return;
   }
 
   await new Promise<void>((resolve) => {
-    waiting.push(() => {
-      active++;
+    state.waiting.push(() => {
+      state.active++;
       resolve();
     });
   });
 }
 
-function release(): void {
-  active--;
-  const next = waiting.shift();
+function release(lane: ConcurrencyLane): void {
+  const state = lanes[lane];
+  state.active--;
+  const next = state.waiting.shift();
   if (next) {
     next();
   }
 }
 
-/** Limits in-flight AniList HTTP requests to avoid Node gzip listener warnings. */
-export async function withConcurrencyLimit<T>(fn: () => Promise<T>): Promise<T> {
-  await acquire();
+/** Limits in-flight AniList HTTP requests per lane to avoid starving browse/search. */
+export async function withConcurrencyLimit<T>(
+  fn: () => Promise<T>,
+  lane: ConcurrencyLane = "background",
+): Promise<T> {
+  await acquire(lane);
   try {
     return await fn();
   } finally {
-    release();
+    release(lane);
   }
 }

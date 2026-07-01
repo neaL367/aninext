@@ -13,10 +13,13 @@ export const MIN_RATE_LIMIT_RETRY_MS = 2_000;
 export const RATE_LIMIT_RESET_BUFFER_MS = 500;
 
 /** Proactive gate cap — never block longer than this before attempting the request. */
-export const MAX_RATE_LIMIT_WAIT_MS = 8_000;
+export const MAX_RATE_LIMIT_WAIT_MS = 3_000;
 
-/** Cap parallel AniList requests — airing pagination + home slots share this queue. */
-export const MAX_CONCURRENT_GRAPHQL_REQUESTS = 4;
+/** Interactive lane (browse, tooltips, detail) — reserved so search is not starved by home/airing. */
+export const MAX_CONCURRENT_INTERACTIVE_REQUESTS = 2;
+
+/** Background lane (home carousels, airing pagination, genres). */
+export const MAX_CONCURRENT_BACKGROUND_REQUESTS = 2;
 
 export const DETAIL_RELATIONS_PER_PAGE = 36;
 

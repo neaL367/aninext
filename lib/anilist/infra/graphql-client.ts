@@ -10,7 +10,7 @@ import {
   SLOW_REQUEST_MS,
 } from "./constants";
 import { AniListError } from "@/lib/anilist/domain/errors";
-import { withConcurrencyLimit } from "./concurrency";
+import { withConcurrencyLimit, type ConcurrencyLane } from "./concurrency";
 import {
   getAniListRateLimitWaitMs,
   markAniListRateLimitExceeded,
@@ -39,18 +39,42 @@ function getOperationName(document: TypedDocumentNode<unknown, unknown>): string
   return match?.[1] ?? "anonymous";
 }
 
+/** Browse, tooltips, and detail pages use the interactive lane so home/airing cannot starve search. */
+const INTERACTIVE_OPERATIONS = new Set([
+  "MediaPage",
+  "MediaCardTooltip",
+  "MediaDetail",
+  "CharacterDetail",
+  "StaffDetail",
+]);
+
+function getConcurrencyLane(operationName: string): ConcurrencyLane {
+  return INTERACTIVE_OPERATIONS.has(operationName) ? "interactive" : "background";
+}
+
+function formatGraphQLLogLine(
+  operationName: string,
+  elapsedMs: number,
+  variables?: Record<string, unknown>,
+): string {
+  const variableKeys = variables ? Object.keys(variables).sort().join(",") : "";
+  const suffix = variableKeys ? ` vars={${variableKeys}}` : "";
+  return `[anilist] ${operationName} ${elapsedMs}ms${suffix}`;
+}
+
 function logGraphQLRequest(
   operationName: string,
   elapsedMs: number,
   variables?: Record<string, unknown>,
 ): void {
-  if (process.env.NODE_ENV !== "development") {
+  const line = formatGraphQLLogLine(operationName, elapsedMs, variables);
+
+  if (process.env.NODE_ENV === "development") {
+    console.log(line);
     return;
   }
 
-  const variableKeys = variables ? Object.keys(variables).sort().join(",") : "";
-  const suffix = variableKeys ? ` vars={${variableKeys}}` : "";
-  console.log(`[anilist] ${operationName} ${elapsedMs}ms${suffix}`);
+  console.info(line);
 }
 
 async function sleep(ms: number): Promise<void> {
@@ -127,8 +151,10 @@ async function fetchGraphQLOnce<TData, TVariables extends Record<string, unknown
   logGraphQLRequest(operationName, elapsed, variables);
   updateAniListRateLimitFromHeaders(response.headers);
 
-  if (process.env.NODE_ENV === "development" && elapsed > SLOW_REQUEST_MS) {
-    console.warn(`[anilist] slow request ${operationName} ${elapsed}ms`);
+  if (elapsed > SLOW_REQUEST_MS) {
+    console.warn(
+      `[anilist] slow request ${formatGraphQLLogLine(operationName, elapsed, variables)}`,
+    );
   }
 
   const rateLimitWaitMs = getAniListRateLimitWaitMs();
@@ -197,7 +223,9 @@ async function executeGraphQLWithRetry<TData, TVariables extends Record<string, 
   while (attempt <= MAX_RETRIES) {
     try {
       await reserveAniListRequest();
-      return await withConcurrencyLimit(() => fetchGraphQLOnce(document, variables));
+      const operationName = getOperationName(document as TypedDocumentNode<unknown, unknown>);
+      const lane = getConcurrencyLane(operationName);
+      return await withConcurrencyLimit(() => fetchGraphQLOnce(document, variables), lane);
     } catch (error) {
       lastError = error;
       const retryable =
