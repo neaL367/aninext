@@ -2,7 +2,13 @@ import "server-only";
 
 import type { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { print } from "graphql";
-import { ANILIST_API_URL, MAX_RETRIES, REQUEST_TIMEOUT_MS, SLOW_REQUEST_MS } from "./constants";
+import {
+  ANILIST_API_URL,
+  MAX_RETRIES,
+  MIN_RATE_LIMIT_RETRY_MS,
+  REQUEST_TIMEOUT_MS,
+  SLOW_REQUEST_MS,
+} from "./constants";
 import { AniListError } from "@/lib/anilist/domain/errors";
 import { withConcurrencyLimit } from "./concurrency";
 
@@ -81,6 +87,22 @@ function isFetchNetworkError(error: unknown): boolean {
   return name === "AbortError" || name === "TimeoutError" || error instanceof TypeError;
 }
 
+function isRateLimitMessage(message: string): boolean {
+  return /rate limit|too many requests/i.test(message);
+}
+
+function getRetryDelayMs(error: AniListError, attempt: number): number {
+  if (error.code === "rate_limit") {
+    const fromHeader = error.retryAfterMs;
+    if (fromHeader != null && fromHeader > 0) {
+      return fromHeader;
+    }
+    return Math.min(30_000, MIN_RATE_LIMIT_RETRY_MS * 2 ** attempt);
+  }
+
+  return 2 ** attempt * 250;
+}
+
 async function fetchGraphQLOnce<TData, TVariables extends Record<string, unknown>>(
   document: TypedDocumentNode<TData, TVariables>,
   variables?: TVariables,
@@ -155,7 +177,11 @@ async function fetchGraphQLOnce<TData, TVariables extends Record<string, unknown
   }
 
   if (payload.errors?.length) {
-    throw new AniListError("graphql", payload.errors.map((error) => error.message).join("; "));
+    const message = payload.errors.map((error) => error.message).join("; ");
+    if (payload.errors.some((error) => isRateLimitMessage(error.message))) {
+      throw new AniListError("rate_limit", message);
+    }
+    throw new AniListError("graphql", message);
   }
 
   if (!payload.data) {
@@ -183,9 +209,7 @@ async function executeGraphQLWithRetry<TData, TVariables extends Record<string, 
         break;
       }
       const delay =
-        error instanceof AniListError && error.retryAfterMs
-          ? error.retryAfterMs
-          : 2 ** attempt * 250;
+        error instanceof AniListError ? getRetryDelayMs(error, attempt) : 2 ** attempt * 250;
       await sleep(delay);
       attempt += 1;
     }

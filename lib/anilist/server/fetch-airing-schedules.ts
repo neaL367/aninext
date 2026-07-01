@@ -30,13 +30,10 @@ export async function fetchAllAiringSchedules(
   }
 
   const lastPage = Math.min(pageInfo.lastPage ?? 1, MAX_AIRING_PAGES);
-  const remainingPages = Array.from({ length: lastPage - 1 }, (_, index) => index + 2);
 
-  const results = await Promise.all(
-    remainingPages.map((page) => fetchAiringPage(start, end, page)),
-  );
-
-  for (const data of results) {
+  // Paginate sequentially — parallel page fetches per day burst past AniList rate limits.
+  for (let page = 2; page <= lastPage; page += 1) {
+    const data = await fetchAiringPage(start, end, page);
     for (const item of normalizeAiringSchedules(data)) {
       byId.set(item.id, item);
     }
