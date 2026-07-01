@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import type { Route } from "next";
 import { Separator } from "@/components/ui/separator";
@@ -13,6 +11,8 @@ type CharacterEdge = NonNullable<
 >[number];
 
 export function DetailCharacterCard({ edge }: { edge: NonNullable<CharacterEdge> }) {
+  "use memo";
+
   const character = edge.node;
   const voiceActor = edge.voiceActors?.[0];
   const characterName = character?.name?.full ?? "—";
@@ -127,6 +127,8 @@ export function DetailStaffCard({
   role: string | null;
   image: string | null;
 }) {
+  "use memo";
+
   const cardBody = (
     <>
       <div className="relative size-16 shrink-0 overflow-hidden rounded-lg border border-border bg-muted sm:size-[4.5rem]">

@@ -12,6 +12,8 @@ type EpisodeCardProps = {
 };
 
 export function EpisodeCard({ episode, className }: EpisodeCardProps) {
+  "use memo";
+
   const isExternalLink = Boolean(episode.url);
   const thumbnail = episode.thumbnail;
 

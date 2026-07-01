@@ -21,20 +21,15 @@ export function PersonCreditsSection({
 }: PersonCreditsSectionProps) {
   return (
     <DetailLoadMoreGrid
-      items={credits}
+      items={credits.map((item) => (
+        <PersonMediaCard key={item.key} media={item.media} role={item.role} />
+      ))}
       initialCount={8}
       step={8}
       gridClassName="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6"
       loadMoreLabel={
         kind === "character" ? "Load more roles" : "Load more works"
       }
-      renderItem={(item) => (
-        <PersonMediaCard
-          key={item.key}
-          media={item.media}
-          role={item.role}
-        />
-      )}
     />
   );
 }
