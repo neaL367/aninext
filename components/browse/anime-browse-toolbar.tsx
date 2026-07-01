@@ -1,7 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useDebounce } from "use-debounce";
 import { SearchIcon, SlidersHorizontalIcon } from "lucide-react";
 import { useBrowseFilters } from "@/components/browse/browse-filters-provider";
 import { AnimeQuickFilters } from "@/components/browse/anime-quick-filters";
@@ -33,30 +34,19 @@ export function AnimeBrowseToolbar() {
   const { searchRef } = meta;
   const [sheetOpen, setSheetOpen] = useState(false);
   const [searchDraft, setSearchDraft] = useState(params.q);
-  const lastCommittedSearchRef = useRef(params.q);
+  const [debouncedSearch, { flush: flushSearch }] = useDebounce(searchDraft, 350);
   const filterCount = countBrowseFilters(params);
   const hasChips = getActiveFilterChips(params).length > 0;
 
   useEffect(() => {
-    lastCommittedSearchRef.current = params.q;
     setSearchDraft(params.q);
   }, [params.q]);
 
   useEffect(() => {
-    if (searchDraft === lastCommittedSearchRef.current) {
-      return;
+    if (debouncedSearch !== params.q && debouncedSearch === searchDraft) {
+      setSearchInput(debouncedSearch);
     }
-
-    const timer = window.setTimeout(() => {
-      if (searchDraft === lastCommittedSearchRef.current) {
-        return;
-      }
-      lastCommittedSearchRef.current = searchDraft;
-      setSearchInput(searchDraft);
-    }, 350);
-
-    return () => window.clearTimeout(timer);
-  }, [searchDraft, setSearchInput]);
+  }, [debouncedSearch, searchDraft, params.q, setSearchInput]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -69,12 +59,7 @@ export function AnimeBrowseToolbar() {
             type="search"
             value={searchDraft}
             onChange={(e) => setSearchDraft(e.target.value)}
-            onBlur={() => {
-              if (searchDraft !== lastCommittedSearchRef.current) {
-                lastCommittedSearchRef.current = searchDraft;
-                setSearchInput(searchDraft);
-              }
-            }}
+            onBlur={() => flushSearch()}
             placeholder="Search anime..."
             autoComplete="off"
             className="h-9 pl-9"

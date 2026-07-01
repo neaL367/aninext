@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useDebouncedValue } from "@/lib/hooks/use-debounced-value";
+import { useDebounce } from "use-debounce";
 import type { MediaSource } from "@/lib/anilist/domain/types";
 import type { AnimeListParams } from "@/lib/browse/params";
 import {
@@ -55,7 +55,7 @@ function TagsInput({
   const onPatchRef = useRef(onPatch);
   const tagsLabel = tags.join(", ");
   const [tagInput, setTagInput] = useState(tagsLabel);
-  const debouncedTagInput = useDebouncedValue(tagInput, 400);
+  const [debouncedTagInput] = useDebounce(tagInput, 400);
 
   useEffect(() => {
     onPatchRef.current = onPatch;
