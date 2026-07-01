@@ -1,5 +1,8 @@
 import { AnimeTooltipCard } from "@/components/anime/anime-tooltip-card";
-import { DetailRelationCard, type DetailRelationItem } from "@/components/detail/detail-relation-card";
+import {
+  DetailRelationCard,
+  type DetailRelationItem,
+} from "@/components/detail/detail-relation-card";
 import { DetailCharacterCard, DetailStaffCard } from "@/components/detail/detail-cards";
 import { DetailLoadMoreGrid } from "@/components/detail/detail-load-more-grid";
 import { EpisodeCard } from "@/components/detail/episode-card";
@@ -7,11 +10,7 @@ import type { MediaCard } from "@/lib/anilist/domain/types";
 import type { EpisodeCardData } from "@/lib/anilist/display/episodes";
 import type { CharacterEdge, StaffEdge } from "@/components/detail/detail-cards";
 
-export function DetailEpisodesSection({
-  episodes,
-}: {
-  episodes: EpisodeCardData[];
-}) {
+export function DetailEpisodesSection({ episodes }: { episodes: EpisodeCardData[] }) {
   return (
     <DetailLoadMoreGrid
       items={episodes.map((ep) => (
@@ -25,11 +24,7 @@ export function DetailEpisodesSection({
   );
 }
 
-export function DetailCharactersSection({
-  edges,
-}: {
-  edges: NonNullable<CharacterEdge>[];
-}) {
+export function DetailCharactersSection({ edges }: { edges: NonNullable<CharacterEdge>[] }) {
   return (
     <DetailLoadMoreGrid
       items={edges.map((edge) => (
@@ -43,11 +38,7 @@ export function DetailCharactersSection({
   );
 }
 
-export function DetailStaffSection({
-  edges,
-}: {
-  edges: NonNullable<StaffEdge>[];
-}) {
+export function DetailStaffSection({ edges }: { edges: NonNullable<StaffEdge>[] }) {
   return (
     <DetailLoadMoreGrid
       items={edges.map((edge, index) => (
@@ -67,18 +58,11 @@ export function DetailStaffSection({
   );
 }
 
-export function DetailRelationsSection({
-  items,
-}: {
-  items: DetailRelationItem[];
-}) {
+export function DetailRelationsSection({ items }: { items: DetailRelationItem[] }) {
   return (
     <DetailLoadMoreGrid
       items={items.map((item) => (
-        <DetailRelationCard
-          key={`${item.media.id}-${item.relationType}`}
-          item={item}
-        />
+        <DetailRelationCard key={`${item.media.id}-${item.relationType}`} item={item} />
       ))}
       initialCount={8}
       step={8}

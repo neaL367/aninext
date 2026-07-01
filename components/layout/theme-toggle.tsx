@@ -4,12 +4,7 @@ import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 
 function subscribeToMount(callback: () => void) {
   const timeoutId = window.setTimeout(callback, 0);
@@ -29,7 +24,7 @@ export function ThemeToggle() {
   const mounted = useSyncExternalStore(
     subscribeToMount,
     getMountedSnapshot,
-    getServerMountedSnapshot
+    getServerMountedSnapshot,
   );
 
   const activeTheme = mounted ? (theme ?? "system") : "system";

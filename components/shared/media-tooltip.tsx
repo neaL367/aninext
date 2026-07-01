@@ -1,16 +1,7 @@
 "use client";
 
-import {
-  createContext,
-  use,
-  useState,
-  type ReactNode,
-} from "react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { createContext, use, useState, type ReactNode } from "react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 const DEFAULT_TOOLTIP_WIDTH =
@@ -50,18 +41,12 @@ function MediaTooltipRoot({ children }: { children: ReactNode }) {
   );
 }
 
-function MediaTooltipTrigger({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
+function MediaTooltipTrigger({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <TooltipTrigger
       className={cn(
         "block w-full rounded-lg text-left outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-        className
+        className,
       )}
     >
       {children}
@@ -69,13 +54,7 @@ function MediaTooltipTrigger({
   );
 }
 
-function MediaTooltipContent({
-  children,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
+function MediaTooltipContent({ children, className }: { children: ReactNode; className?: string }) {
   const { open } = useMediaTooltipContext();
 
   return (

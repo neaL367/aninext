@@ -5,10 +5,7 @@ type DetailFactsPanelProps = {
   children: ReactNode;
 };
 
-export function DetailFactsPanel({
-  title = "Information",
-  children,
-}: DetailFactsPanelProps) {
+export function DetailFactsPanel({ title = "Information", children }: DetailFactsPanelProps) {
   return (
     <div className="flex flex-col gap-2.5 rounded-xl border border-border bg-card/50 p-4">
       <p className="text-sm font-medium">{title}</p>

@@ -23,14 +23,10 @@ export function DetailTaxonomyTags({ tags }: DetailTaxonomyTagsProps) {
       <div className="flex flex-wrap gap-2">
         {visible.map((tag) =>
           tag.name ? (
-            <Badge
-              key={tag.id}
-              variant="outline"
-              className={TAXONOMY_CHIP_CLASS}
-            >
+            <Badge key={tag.id} variant="outline" className={TAXONOMY_CHIP_CLASS}>
               {tag.name}
             </Badge>
-          ) : null
+          ) : null,
         )}
       </div>
       {hasMore ? (

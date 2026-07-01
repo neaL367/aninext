@@ -1,0 +1,5 @@
+.next/
+node_modules/
+lib/anilist/generated/
+out/
+build/

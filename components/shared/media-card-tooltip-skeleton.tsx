@@ -16,10 +16,7 @@ export function MediaCardTooltipBodySkeleton({
     <div className={cn("flex flex-col gap-3 p-4", className)}>
       <div className="flex flex-col gap-2">
         {Array.from({ length: lines }).map((_, index) => (
-          <Skeleton
-            key={index}
-            className={cn("h-3.5", index === lines - 1 ? "w-4/5" : "w-full")}
-          />
+          <Skeleton key={index} className={cn("h-3.5", index === lines - 1 ? "w-4/5" : "w-full")} />
         ))}
       </div>
       <Skeleton className="h-8 w-full" />

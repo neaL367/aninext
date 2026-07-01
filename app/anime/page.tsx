@@ -7,10 +7,7 @@ import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
 import { getGenreCollection } from "@/lib/anilist/server/get-genre-collection";
 import { mediaPageInfiniteOptions } from "@/lib/anilist/client/query-options.server";
-import {
-  getCurrentAnimeSeason,
-  getNextAnimeSeason,
-} from "@/lib/anilist/domain/season";
+import { getCurrentAnimeSeason, getNextAnimeSeason } from "@/lib/anilist/domain/season";
 import { parseAnimeListParams } from "@/lib/browse/params";
 import { createPageMetadata } from "@/lib/seo/metadata";
 import { getQueryClient } from "@/lib/react-query/get-query-client";
@@ -37,18 +34,12 @@ async function AnimeListingContent({ searchParams }: AnimeListingPageProps) {
 
   const [genres] = await Promise.all([
     getGenreCollection(),
-    queryClient.prefetchInfiniteQuery(
-      mediaPageInfiniteOptions(params, currentSeason, nextSeason)
-    ),
+    queryClient.prefetchInfiniteQuery(mediaPageInfiniteOptions(params, currentSeason, nextSeason)),
   ]);
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <AnimeBrowse
-        genres={genres}
-        currentSeason={currentSeason}
-        nextSeason={nextSeason}
-      />
+      <AnimeBrowse genres={genres} currentSeason={currentSeason} nextSeason={nextSeason} />
     </HydrationBoundary>
   );
 }

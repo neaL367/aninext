@@ -42,15 +42,13 @@ export function DetailTrailer({ media }: DetailTrailerProps) {
       </div>
       <div className="overflow-hidden rounded-xl border border-border bg-black shadow-sm">
         <div className="relative aspect-video w-full">
-          {!isLoaded ? (
-            <Skeleton className="absolute inset-0 size-full rounded-none" />
-          ) : null}
+          {!isLoaded ? <Skeleton className="absolute inset-0 size-full rounded-none" /> : null}
           <iframe
             src={embedUrl}
             title={`${siteLabel} trailer`}
             className={cn(
               "absolute inset-0 size-full transition-opacity duration-300",
-              isLoaded ? "opacity-100" : "opacity-0"
+              isLoaded ? "opacity-100" : "opacity-0",
             )}
             onLoad={() => setIsLoaded(true)}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

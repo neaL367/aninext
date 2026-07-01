@@ -14,11 +14,7 @@ function isBrowseListingPath(pathname: string): boolean {
   return pathname === "/anime";
 }
 
-function isNavItemActive(
-  pathname: string,
-  searchParams: URLSearchParams,
-  item: NavItem
-): boolean {
+function isNavItemActive(pathname: string, searchParams: URLSearchParams, item: NavItem): boolean {
   if (item.href === "/airing") {
     return pathname === "/airing" || pathname.startsWith("/airing/");
   }
@@ -27,9 +23,7 @@ function isNavItemActive(
     if (!isBrowseListingPath(pathname)) {
       return false;
     }
-    const params = parseAnimeListParams(
-      Object.fromEntries(searchParams.entries())
-    );
+    const params = parseAnimeListParams(Object.fromEntries(searchParams.entries()));
     return params.sort === item.sortKey;
   }
 
@@ -54,10 +48,8 @@ export function NavLinks({
   return (
     <ul
       className={cn(
-        orientation === "vertical"
-          ? "flex flex-col gap-1"
-          : "flex items-center gap-0.5",
-        className
+        orientation === "vertical" ? "flex flex-col gap-1" : "flex items-center gap-0.5",
+        className,
       )}
     >
       {SITE_NAV_ITEMS.map((item) => {
@@ -97,13 +89,7 @@ export function NavLinksSuspense({
 }: Omit<ComponentProps<typeof NavLinks>, "searchParams">) {
   return (
     <Suspense
-      fallback={
-        <NavLinks
-          pathname={pathname}
-          searchParams={EMPTY_SEARCH_PARAMS}
-          {...rest}
-        />
-      }
+      fallback={<NavLinks pathname={pathname} searchParams={EMPTY_SEARCH_PARAMS} {...rest} />}
     >
       <NavLinksWithSearchParams pathname={pathname} {...rest} />
     </Suspense>

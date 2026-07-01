@@ -3,5 +3,4 @@ export {
   DETAIL_PAGE_CONTAINER_CLASS,
 } from "@/lib/styles/detail-page-layout";
 
-export const PERSON_PAGE_CONTAINER_CLASS =
-  "flex flex-col gap-6 py-8 lg:gap-8 lg:py-10";
+export const PERSON_PAGE_CONTAINER_CLASS = "flex flex-col gap-6 py-8 lg:gap-8 lg:py-10";

@@ -1,8 +1,5 @@
 import { fetchMediaCardTooltipAction } from "@/lib/anilist/client/actions/fetch-media-card-tooltip";
-import {
-  anilistQueryGcTime,
-  anilistQueryStaleTime,
-} from "@/lib/anilist/client/query-policy";
+import { anilistQueryGcTime, anilistQueryStaleTime } from "@/lib/anilist/client/query-policy";
 
 export function mediaCardTooltipOptions(mediaId: number) {
   return {

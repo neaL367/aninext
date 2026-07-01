@@ -6,7 +6,7 @@ import type { MediaPageResult } from "@/lib/anilist/domain/types";
 
 /** Browse infinite scroll — hits Cache Components layer, not AniList directly per user. */
 export async function fetchMediaPageAction(
-  variables: MediaPageQueryVariables
+  variables: MediaPageQueryVariables,
 ): Promise<MediaPageResult> {
   return getCachedMediaPage(variables);
 }

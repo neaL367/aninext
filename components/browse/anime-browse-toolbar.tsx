@@ -20,11 +20,8 @@ import {
 import { countBrowseFilters, getActiveFilterChips } from "@/lib/browse/params";
 
 const AdvancedFilters = dynamic(
-  () =>
-    import("@/components/browse/advanced-filters").then(
-      (module) => module.AdvancedFilters
-    ),
-  { ssr: false }
+  () => import("@/components/browse/advanced-filters").then((module) => module.AdvancedFilters),
+  { ssr: false },
 );
 
 export function AnimeBrowseToolbar() {
@@ -69,10 +66,7 @@ export function AnimeBrowseToolbar() {
               </Button>
             }
           />
-          <SheetContent
-            side="right"
-            className="flex h-full w-full flex-col gap-0 p-0 sm:max-w-md"
-          >
+          <SheetContent side="right" className="flex h-full w-full flex-col gap-0 p-0 sm:max-w-md">
             <SheetHeader className="shrink-0 border-b border-border">
               <SheetTitle>Filters</SheetTitle>
               <SheetDescription>

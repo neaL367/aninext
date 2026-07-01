@@ -8,8 +8,8 @@ export default function HomePage() {
         Find your next anime
       </h1>
       <p className="text-sm leading-relaxed text-muted-foreground">
-        Browse trending, seasonal, and airing titles from AniList — with filters,
-        schedules, and detail pages that stay out of the way.
+        Browse trending, seasonal, and airing titles from AniList — with filters, schedules, and
+        detail pages that stay out of the way.
       </p>
     </header>
   );

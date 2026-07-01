@@ -12,11 +12,7 @@ export function buildDetailSlug(name: string): string {
   return slug || "unknown";
 }
 
-export function entityDetailPath(
-  category: DetailCategory,
-  id: number,
-  name: string
-): Route {
+export function entityDetailPath(category: DetailCategory, id: number, name: string): Route {
   return `/${category}/${id}/${buildDetailSlug(name)}` as Route;
 }
 

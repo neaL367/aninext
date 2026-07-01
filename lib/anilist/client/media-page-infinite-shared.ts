@@ -1,21 +1,15 @@
-import {
-  LISTING_PAGE_SIZE,
-  TOP_100_LIMIT,
-} from "@/lib/anilist/domain/listing";
+import { LISTING_PAGE_SIZE, TOP_100_LIMIT } from "@/lib/anilist/domain/listing";
 import type { MediaPageResult } from "@/lib/anilist/domain/types";
 import { normalizeListedMedia } from "@/lib/anilist/domain/normalize-media-list";
 import { anilistQueryStaleTime } from "@/lib/anilist/client/query-policy";
 import type { AnimeListParams } from "@/lib/browse/params";
-import {
-  getListingMaxPage,
-  paramsToMediaQuery,
-} from "@/lib/browse/params";
+import { getListingMaxPage, paramsToMediaQuery } from "@/lib/browse/params";
 import type { AnimeSeason } from "@/lib/anilist/domain/season";
 
 export function buildMediaPageInfiniteConfig(
   params: AnimeListParams,
   currentSeason: AnimeSeason,
-  nextSeason: AnimeSeason
+  nextSeason: AnimeSeason,
 ) {
   const filter = paramsToMediaQuery(params, currentSeason, nextSeason);
   const maxPage = getListingMaxPage(params.sort);
@@ -32,7 +26,7 @@ export function buildMediaPageInfiniteConfig(
     getNextPageParam: (
       lastPage: MediaPageResult,
       allPages: MediaPageResult[],
-      lastPageParam: number
+      lastPageParam: number,
     ) => {
       const loadedCount = allPages.flatMap((page) => page.media).length;
 
@@ -54,7 +48,7 @@ export function buildMediaPageInfiniteConfig(
     select: (data: { pages: MediaPageResult[] }) => {
       const media = normalizeListedMedia(
         data.pages.flatMap((page) => page.media),
-        rankTop100 ? { rankMode: "top100" } : {}
+        rankTop100 ? { rankMode: "top100" } : {},
       );
 
       return { pages: data.pages, media };

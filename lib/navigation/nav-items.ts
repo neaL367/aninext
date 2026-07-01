@@ -31,7 +31,4 @@ export const BROWSE_SORT_NAV_ITEMS: NavItem[] = ANIME_SORTS.map((sort) => ({
   sortKey: sort,
 }));
 
-export const SITE_NAV_ITEMS: NavItem[] = [
-  ...PRIMARY_NAV_ITEMS,
-  ...BROWSE_SORT_NAV_ITEMS,
-];
+export const SITE_NAV_ITEMS: NavItem[] = [...PRIMARY_NAV_ITEMS, ...BROWSE_SORT_NAV_ITEMS];

@@ -80,13 +80,10 @@ function TagsInput({
 }
 
 export function FilterMoreOptions({ params, onPatch }: FilterMoreOptionsProps) {
-  const hasMore =
-    params.source != null ||
-    params.country != null ||
-    params.tags.length > 0;
+  const hasMore = params.source != null || params.country != null || params.tags.length > 0;
 
   const [userOpenSections, setUserOpenSections] = useState<string[]>(() =>
-    hasMore ? ["more"] : []
+    hasMore ? ["more"] : [],
   );
   const openSections =
     hasMore && !userOpenSections.includes("more")
@@ -107,9 +104,7 @@ export function FilterMoreOptions({ params, onPatch }: FilterMoreOptionsProps) {
               </Label>
               <Select
                 value={params.source ?? "any"}
-                onValueChange={(v) =>
-                  onPatch({ source: v === "any" ? null : (v as MediaSource) })
-                }
+                onValueChange={(v) => onPatch({ source: v === "any" ? null : (v as MediaSource) })}
               >
                 <SelectTrigger id="filter-source" className="h-8 w-full text-xs">
                   <SelectValue placeholder="Any" />

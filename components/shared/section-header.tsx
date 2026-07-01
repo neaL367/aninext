@@ -34,11 +34,10 @@ export function SectionHeader({
         >
           {title}
         </h2>
-        {subtitleSlot ?? (subtitle ? (
-          <p className="text-sm leading-relaxed text-muted-foreground">
-            {subtitle}
-          </p>
-        ) : null)}
+        {subtitleSlot ??
+          (subtitle ? (
+            <p className="text-sm leading-relaxed text-muted-foreground">{subtitle}</p>
+          ) : null)}
       </div>
       {href ? (
         <Link href={href} prefetch className={viewAllLinkClassName}>

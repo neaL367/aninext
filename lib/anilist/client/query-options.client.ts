@@ -8,7 +8,7 @@ import type { AnimeSeason } from "@/lib/anilist/domain/season";
 export function mediaPageInfiniteOptions(
   params: AnimeListParams,
   currentSeason: AnimeSeason,
-  nextSeason: AnimeSeason
+  nextSeason: AnimeSeason,
 ) {
   const config = buildMediaPageInfiniteConfig(params, currentSeason, nextSeason);
 

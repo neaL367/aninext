@@ -1,11 +1,6 @@
 import { notFound } from "next/navigation";
 
-export const DETAIL_CATEGORIES = [
-  "anime",
-  "manga",
-  "character",
-  "staff",
-] as const;
+export const DETAIL_CATEGORIES = ["anime", "manga", "character", "staff"] as const;
 
 export type DetailCategory = (typeof DETAIL_CATEGORIES)[number];
 

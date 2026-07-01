@@ -15,17 +15,13 @@ export async function generateStaticParams() {
   return getEntityDetailStaticParams();
 }
 
-export async function generateMetadata({
-  params,
-}: EntityDetailRouteProps): Promise<Metadata> {
+export async function generateMetadata({ params }: EntityDetailRouteProps): Promise<Metadata> {
   const { category: categoryParam } = await params;
   const category = parseDetailCategory(categoryParam);
   return createEntityDetailMetadata(category, params);
 }
 
-export default async function EntityDetailRoute({
-  params,
-}: EntityDetailRouteProps) {
+export default async function EntityDetailRoute({ params }: EntityDetailRouteProps) {
   const { category: categoryParam } = await params;
   const category = parseDetailCategory(categoryParam);
   return <EntityDetailPage category={category} params={params} />;

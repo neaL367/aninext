@@ -19,18 +19,12 @@ import {
 } from "@/lib/browse/params/types";
 
 export const animeListNuqsParsers = {
-  sort: parseAsStringLiteral(ANIME_SORTS).withDefault(
-    DEFAULT_ANIME_LIST_PARAMS.sort
-  ),
+  sort: parseAsStringLiteral(ANIME_SORTS).withDefault(DEFAULT_ANIME_LIST_PARAMS.sort),
   q: parseAsString.withDefault("").withOptions({ throttleMs: 300, shallow: true }),
   genres: parseAsNativeArrayOf(parseAsString).withDefault([]),
   tags: parseAsNativeArrayOf(parseAsString).withDefault([]),
-  formats: parseAsNativeArrayOf(parseAsStringLiteral(MEDIA_FORMATS)).withDefault(
-    []
-  ),
-  statuses: parseAsNativeArrayOf(parseAsStringLiteral(MEDIA_STATUSES)).withDefault(
-    []
-  ),
+  formats: parseAsNativeArrayOf(parseAsStringLiteral(MEDIA_FORMATS)).withDefault([]),
+  statuses: parseAsNativeArrayOf(parseAsStringLiteral(MEDIA_STATUSES)).withDefault([]),
   season: parseAsStringLiteral(MEDIA_SEASONS),
   source: parseAsStringLiteral(MEDIA_SOURCES),
   country: parseAsString,
@@ -83,7 +77,7 @@ export function useAnimeListParams() {
     (next: AnimeListParams) => {
       void setState(paramsToNuqsState(next));
     },
-    [setState]
+    [setState],
   );
 
   const resetFilters = useCallback(() => {
@@ -94,7 +88,7 @@ export function useAnimeListParams() {
     (value: string) => {
       void setState({ q: value });
     },
-    [setState]
+    [setState],
   );
 
   return {

@@ -1,7 +1,4 @@
-import {
-  AnimeDetailBody,
-  DetailCoverBanner,
-} from "@/components/detail/anime-detail-view";
+import { AnimeDetailBody, DetailCoverBanner } from "@/components/detail/anime-detail-view";
 import type { SlugDetailParams } from "@/lib/anilist/domain/detail-route-params";
 import { resolveAnimeDetailMedia } from "@/lib/anilist/server/resolve-anime-detail-media";
 import { createMediaJsonLd } from "@/lib/seo/json-ld";
@@ -10,9 +7,7 @@ type AnimeDetailLoaderProps = {
   params: SlugDetailParams;
 };
 
-export async function DetailCoverBannerLoader({
-  params,
-}: AnimeDetailLoaderProps) {
+export async function DetailCoverBannerLoader({ params }: AnimeDetailLoaderProps) {
   const media = await resolveAnimeDetailMedia(params);
   return <DetailCoverBanner media={media} />;
 }

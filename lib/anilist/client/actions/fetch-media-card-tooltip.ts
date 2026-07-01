@@ -4,7 +4,7 @@ import { getCachedMediaCardTooltip } from "@/lib/anilist/server/get-cached-media
 import type { MediaCardTooltip } from "@/lib/anilist/domain/types";
 
 export async function fetchMediaCardTooltipAction(
-  mediaId: number
+  mediaId: number,
 ): Promise<MediaCardTooltip | null> {
   return getCachedMediaCardTooltip(mediaId);
 }

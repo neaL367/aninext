@@ -8,9 +8,7 @@ import { anilistCacheTags } from "@/lib/anilist/server/cache-tags";
 import { normalizeMediaDetail, type MediaDetail } from "@/lib/anilist/domain/types";
 
 /** Cross-request cached media detail — one AniList call per id per cache window. */
-export async function getCachedMediaDetail(
-  mediaId: number
-): Promise<MediaDetail | null> {
+export async function getCachedMediaDetail(mediaId: number): Promise<MediaDetail | null> {
   "use cache";
 
   cacheLife(anilistCacheLife.mediaDetail);

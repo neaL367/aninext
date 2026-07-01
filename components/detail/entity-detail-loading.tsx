@@ -8,8 +8,7 @@ import { PERSON_PAGE_CONTAINER_CLASS } from "@/lib/styles/person-page-layout";
 
 export function EntityDetailLoading() {
   const pathname = usePathname() ?? "";
-  const isPersonRoute =
-    pathname.startsWith("/character/") || pathname.startsWith("/staff/");
+  const isPersonRoute = pathname.startsWith("/character/") || pathname.startsWith("/staff/");
 
   if (isPersonRoute) {
     return (

@@ -2,7 +2,7 @@ import { MISSING_VALUE, stripHtml } from "@/lib/anilist/display/format";
 
 export function excerptSynopsis(
   description: string | null | undefined,
-  maxLength = 160
+  maxLength = 160,
 ): string | null {
   const text = stripHtml(description);
   if (!text || text === MISSING_VALUE) {
@@ -14,9 +14,7 @@ export function excerptSynopsis(
   return `${text.slice(0, maxLength).trimEnd()}…`;
 }
 
-export function formatPopularityCount(
-  popularity: number | null | undefined
-): string | null {
+export function formatPopularityCount(popularity: number | null | undefined): string | null {
   if (popularity === null || popularity === undefined) {
     return null;
   }
@@ -29,27 +27,22 @@ export function getMainStudioName(
         nodes: ReadonlyArray<{ name: string | null } | null> | null;
       }
     | null
-    | undefined
+    | undefined,
 ): string | null {
   const name = studios?.nodes?.find((node) => node?.name)?.name;
   return name ?? null;
 }
 
 export function getTopTags(
-  tags:
-    | ReadonlyArray<{ name: string | null; rank: number | null } | null>
-    | null
-    | undefined,
-  limit = 3
+  tags: ReadonlyArray<{ name: string | null; rank: number | null } | null> | null | undefined,
+  limit = 3,
 ): string[] {
   if (!tags?.length) {
     return [];
   }
 
   return [...tags]
-    .filter((tag): tag is { name: string; rank: number | null } =>
-      Boolean(tag?.name)
-    )
+    .filter((tag): tag is { name: string; rank: number | null } => Boolean(tag?.name))
     .sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99))
     .slice(0, limit)
     .map((tag) => tag.name);
@@ -57,10 +50,7 @@ export function getTopTags(
 
 export function getDisplayGenres(
   genres: readonly (string | null)[] | null | undefined,
-  limit = 6
+  limit = 6,
 ): string[] {
-  return (genres?.filter((genre): genre is string => Boolean(genre)) ?? []).slice(
-    0,
-    limit
-  );
+  return (genres?.filter((genre): genre is string => Boolean(genre)) ?? []).slice(0, limit);
 }

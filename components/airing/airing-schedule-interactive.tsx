@@ -91,7 +91,7 @@ export function AiringScheduleInteractive({
               size="sm"
               className={cn(
                 "h-auto min-w-0 flex-col gap-0.5 px-1 py-2 text-center",
-                isToday && !isSelected && "ring-1 ring-primary/30"
+                isToday && !isSelected && "ring-1 ring-primary/30",
               )}
               onClick={() => setSelectedDay(dateKey)}
             >
@@ -101,9 +101,7 @@ export function AiringScheduleInteractive({
               {promise ? (
                 <AiringDayCountSuspense promise={promise} />
               ) : (
-                <span className="text-[11px] font-medium tabular-nums opacity-40">
-                  —
-                </span>
+                <span className="text-[11px] font-medium tabular-nums opacity-40">—</span>
               )}
             </Button>
           );
@@ -113,10 +111,7 @@ export function AiringScheduleInteractive({
       <section className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 sm:p-5">
         <header className="flex flex-wrap items-end justify-between gap-2 border-b border-border pb-4">
           <div>
-            <h2
-              suppressHydrationWarning
-              className="text-lg font-medium tracking-tight"
-            >
+            <h2 suppressHydrationWarning className="text-lg font-medium tracking-tight">
               {getRelativeDayLabel(activeDay)}
             </h2>
             <p className="text-sm text-muted-foreground">
@@ -128,17 +123,11 @@ export function AiringScheduleInteractive({
             </p>
           </div>
           <div className="text-sm font-medium tabular-nums text-muted-foreground">
-            {activePromise ? (
-              <AiringDayShowCountSuspense promise={activePromise} />
-            ) : (
-              "—"
-            )}
+            {activePromise ? <AiringDayShowCountSuspense promise={activePromise} /> : "—"}
           </div>
         </header>
 
-        {activePromise ? (
-          <AiringDayListSuspense key={activeDay} promise={activePromise} />
-        ) : null}
+        {activePromise ? <AiringDayListSuspense key={activeDay} promise={activePromise} /> : null}
       </section>
     </div>
   );

@@ -1,17 +1,10 @@
 import { AiringSchedulesDocument } from "@/lib/anilist/generated/graphql";
 import { executeGraphQL } from "@/lib/anilist/infra/graphql-client";
-import {
-  normalizeAiringSchedules,
-  type AiringScheduleItem,
-} from "@/lib/anilist/domain/types";
+import { normalizeAiringSchedules, type AiringScheduleItem } from "@/lib/anilist/domain/types";
 
 const MAX_AIRING_PAGES = 20;
 
-async function fetchAiringPage(
-  start: number,
-  end: number,
-  page: number
-) {
+async function fetchAiringPage(start: number, end: number, page: number) {
   return executeGraphQL(AiringSchedulesDocument, {
     airingAt_greater: start,
     airingAt_lesser: end,
@@ -22,7 +15,7 @@ async function fetchAiringPage(
 /** Fetch every airing schedule page for the week window (AniList caps at 50 per page). */
 export async function fetchAllAiringSchedules(
   start: number,
-  end: number
+  end: number,
 ): Promise<AiringScheduleItem[]> {
   const byId = new Map<number, AiringScheduleItem>();
 
@@ -37,13 +30,10 @@ export async function fetchAllAiringSchedules(
   }
 
   const lastPage = Math.min(pageInfo.lastPage ?? 1, MAX_AIRING_PAGES);
-  const remainingPages = Array.from(
-    { length: lastPage - 1 },
-    (_, index) => index + 2
-  );
+  const remainingPages = Array.from({ length: lastPage - 1 }, (_, index) => index + 2);
 
   const results = await Promise.all(
-    remainingPages.map((page) => fetchAiringPage(start, end, page))
+    remainingPages.map((page) => fetchAiringPage(start, end, page)),
   );
 
   for (const data of results) {

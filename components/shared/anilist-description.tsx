@@ -64,9 +64,7 @@ export function AniListDescription({ text, className }: AniListDescriptionProps)
                   key={item.label}
                   className="grid grid-cols-1 gap-0.5 sm:grid-cols-[minmax(7rem,auto)_1fr] sm:items-baseline sm:gap-x-6"
                 >
-                  <dt className="text-sm font-medium text-foreground">
-                    {item.label}
-                  </dt>
+                  <dt className="text-sm font-medium text-foreground">{item.label}</dt>
                   <dd className="text-sm text-muted-foreground sm:text-base">
                     <AniListInlineText text={item.value} />
                   </dd>
@@ -77,10 +75,7 @@ export function AniListDescription({ text, className }: AniListDescriptionProps)
         }
 
         return (
-          <p
-            key={`paragraph-${index}`}
-            className="whitespace-pre-line text-muted-foreground"
-          >
+          <p key={`paragraph-${index}`} className="whitespace-pre-line text-muted-foreground">
             <AniListInlineText text={block.text} />
           </p>
         );

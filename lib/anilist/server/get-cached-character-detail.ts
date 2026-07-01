@@ -5,13 +5,10 @@ import { CharacterDetailDocument } from "@/lib/anilist/generated/graphql";
 import { executeGraphQL } from "@/lib/anilist/infra/graphql-client";
 import { anilistCacheLife } from "@/lib/anilist/server/cache-policy";
 import { anilistCacheTags } from "@/lib/anilist/server/cache-tags";
-import {
-  normalizeCharacterDetail,
-  type CharacterDetail,
-} from "@/lib/anilist/domain/types";
+import { normalizeCharacterDetail, type CharacterDetail } from "@/lib/anilist/domain/types";
 
 export async function getCachedCharacterDetail(
-  characterId: number
+  characterId: number,
 ): Promise<CharacterDetail | null> {
   "use cache";
 

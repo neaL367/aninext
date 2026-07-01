@@ -34,13 +34,10 @@ export function DetailTaxonomy({ media, streamingLinks }: DetailTaxonomyProps) {
   const genres = media.genres?.filter(Boolean) ?? [];
   const tags =
     media.tags
-      ?.filter((tag): tag is NonNullable<typeof tag> & { name: string } =>
-        Boolean(tag?.name)
-      )
+      ?.filter((tag): tag is NonNullable<typeof tag> & { name: string } => Boolean(tag?.name))
       .sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99)) ?? [];
 
-  const hasClassification =
-    Boolean(media.status) || genres.length > 0 || tags.length > 0;
+  const hasClassification = Boolean(media.status) || genres.length > 0 || tags.length > 0;
 
   if (!hasClassification && streamingLinks.length === 0) {
     return null;
@@ -54,10 +51,7 @@ export function DetailTaxonomy({ media, streamingLinks }: DetailTaxonomyProps) {
       {media.status ? (
         <TaxonomySection label="Status">
           <div className={TAXONOMY_CHIP_ROW_CLASS}>
-            <StatusBadge
-              status={media.status}
-              className={TAXONOMY_CHIP_CLASS}
-            />
+            <StatusBadge status={media.status} className={TAXONOMY_CHIP_CLASS} />
           </div>
         </TaxonomySection>
       ) : null}
@@ -66,11 +60,7 @@ export function DetailTaxonomy({ media, streamingLinks }: DetailTaxonomyProps) {
         <TaxonomySection label="Genres">
           <div className={TAXONOMY_CHIP_ROW_CLASS}>
             {genres.map((genre) => (
-              <Badge
-                key={genre}
-                variant="secondary"
-                className={TAXONOMY_CHIP_CLASS}
-              >
+              <Badge key={genre} variant="secondary" className={TAXONOMY_CHIP_CLASS}>
                 {genre}
               </Badge>
             ))}

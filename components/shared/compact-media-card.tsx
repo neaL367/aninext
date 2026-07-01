@@ -39,11 +39,7 @@ export type CompactMediaCardProps = {
 };
 
 /** Shared small cover-card primitive for relation, recommendation, and credit grids. */
-export function CompactMediaCard({
-  media,
-  badgeLabel,
-  className,
-}: CompactMediaCardProps) {
+export function CompactMediaCard({ media, badgeLabel, className }: CompactMediaCardProps) {
   "use memo";
 
   const title = formatDisplayTitle(media.title);
@@ -65,11 +61,7 @@ export function CompactMediaCard({
     <>
       <div
         className={ANIME_CARD_COMPACT_COVER_CLASS}
-        style={
-          media.coverImage?.color
-            ? { backgroundColor: media.coverImage.color }
-            : undefined
-        }
+        style={media.coverImage?.color ? { backgroundColor: media.coverImage.color } : undefined}
       >
         {coverUrl ? (
           <ProgressiveImage
@@ -84,20 +76,14 @@ export function CompactMediaCard({
         <div className={ANIME_CARD_COVER_GRADIENT_TOP_CLASS} aria-hidden />
         <div className={ANIME_CARD_COVER_GRADIENT_BOTTOM_CLASS} aria-hidden />
         <div className="pointer-events-none absolute inset-x-1.5 bottom-1.5 z-10">
-          <Badge
-            variant="secondary"
-            className={COMPACT_MEDIA_CARD_BADGE_CLASS}
-            title={label}
-          >
+          <Badge variant="secondary" className={COMPACT_MEDIA_CARD_BADGE_CLASS} title={label}>
             {label}
           </Badge>
         </div>
       </div>
 
       <div className="flex flex-col gap-1 p-2.5">
-        <h3 className={cn(ANIME_CARD_TITLE_CLASS, "min-h-0 text-xs leading-snug")}>
-          {title}
-        </h3>
+        <h3 className={cn(ANIME_CARD_TITLE_CLASS, "min-h-0 text-xs leading-snug")}>{title}</h3>
         {format !== "—" ? (
           <p className="line-clamp-1 text-[11px] text-muted-foreground">{format}</p>
         ) : null}
@@ -118,12 +104,7 @@ export function CompactMediaCard({
           {cardBody}
         </a>
       ) : (
-        <Link
-          href={href as Route}
-          prefetch
-          className={linkClassName}
-          onClick={handleNavigate}
-        >
+        <Link href={href as Route} prefetch className={linkClassName} onClick={handleNavigate}>
           {cardBody}
         </Link>
       )}

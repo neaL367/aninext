@@ -12,7 +12,7 @@ export function RankingBadge({ rank, className }: RankingBadgeProps) {
       variant="secondary"
       className={cn(
         "border border-border/60 bg-background/95 font-semibold tabular-nums",
-        className
+        className,
       )}
     >
       #{rank}

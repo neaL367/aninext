@@ -7,6 +7,10 @@
     "build": "bun run codegen && next build",
     "start": "next start",
     "lint": "eslint",
+    "lint:ox": "oxlint",
+    "lint:all": "bun run lint:ox && bun run lint",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check .",
     "codegen": "graphql-codegen --config codegen.ts"
   },
   "dependencies": {
@@ -36,6 +40,8 @@
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^9",
     "eslint-config-next": "^16.3.0-preview.5",
+    "oxfmt": "^0.57.0",
+    "oxlint": "^1.72.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   },

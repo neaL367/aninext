@@ -19,7 +19,7 @@ import { createDetailMetadata } from "@/lib/seo/metadata";
 
 export async function createEntityDetailMetadata(
   category: DetailCategory,
-  params: EntityDetailRouteParams
+  params: EntityDetailRouteParams,
 ): Promise<Metadata> {
   const slugParams = toSlugDetailParams(params);
 
@@ -31,11 +31,7 @@ export async function createEntityDetailMetadata(
         ? stripHtml(media.description).slice(0, 160)
         : `Anime details for ${title} on AniNext.`;
 
-      return createDetailMetadata(
-        title,
-        description,
-        animeDetailPath(media.id, title)
-      );
+      return createDetailMetadata(title, description, animeDetailPath(media.id, title));
     }
     case "manga": {
       const media = await resolveMangaDetailMedia(slugParams);
@@ -44,11 +40,7 @@ export async function createEntityDetailMetadata(
         ? stripHtml(media.description).slice(0, 160)
         : `Manga details for ${title} on AniNext.`;
 
-      return createDetailMetadata(
-        title,
-        description,
-        mangaDetailPath(media.id, title)
-      );
+      return createDetailMetadata(title, description, mangaDetailPath(media.id, title));
     }
     case "character": {
       const character = await resolveCharacterDetail(slugParams);
@@ -57,11 +49,7 @@ export async function createEntityDetailMetadata(
         ? stripHtml(character.description).slice(0, 160)
         : `Character profile for ${name} on AniNext.`;
 
-      return createDetailMetadata(
-        name,
-        description,
-        characterDetailPath(character.id, name)
-      );
+      return createDetailMetadata(name, description, characterDetailPath(character.id, name));
     }
     case "staff": {
       const staff = await resolveStaffDetail(slugParams);

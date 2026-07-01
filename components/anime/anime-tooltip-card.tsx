@@ -1,10 +1,7 @@
 "use client";
 
 import { AnimeCardTooltipContent } from "@/components/anime/anime-card-tooltip-content";
-import {
-  AnimeCardArticle,
-  type AnimeCardMedia,
-} from "@/components/anime/anime-card-parts";
+import { AnimeCardArticle, type AnimeCardMedia } from "@/components/anime/anime-card-parts";
 import { MediaTooltip } from "@/components/shared/media-tooltip";
 
 type AnimeTooltipCardProps = {

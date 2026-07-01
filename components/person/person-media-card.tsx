@@ -9,10 +9,6 @@ type PersonMediaCardProps = {
 
 export function PersonMediaCard({ media, role, className }: PersonMediaCardProps) {
   return (
-    <CompactMediaTooltipCard
-      media={media}
-      badgeLabel={role?.trim() || "—"}
-      className={className}
-    />
+    <CompactMediaTooltipCard media={media} badgeLabel={role?.trim() || "—"} className={className} />
   );
 }

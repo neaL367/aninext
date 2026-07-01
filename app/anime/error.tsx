@@ -2,12 +2,7 @@
 
 import { RouteError } from "@/components/layout/route-error";
 
-export default function AnimeError({
-  reset,
-}: {
-  error: Error;
-  reset: () => void;
-}) {
+export default function AnimeError({ reset }: { error: Error; reset: () => void }) {
   return (
     <RouteError
       title="Unable to load anime list"

@@ -34,14 +34,11 @@ export function normalizeAniListDescription(raw: string): string {
       .replace(/<br\s*\/?>/gi, "\n")
       .replace(/<\/p>\s*<p[^>]*>/gi, "\n\n")
       .replace(/<\/p>/gi, "\n")
-      .replace(
-        /<a\s+[^>]*href=["'](https?:\/\/[^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi,
-        "[$2]($1)"
-      )
+      .replace(/<a\s+[^>]*href=["'](https?:\/\/[^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, "[$2]($1)")
       .replace(/<(?:b|strong)>([\s\S]*?)<\/(?:b|strong)>/gi, "__$1__")
       .replace(/<(?:i|em)>([\s\S]*?)<\/(?:i|em)>/gi, "_$1_")
       .replace(/<[^>]+>/g, "")
-      .replace(/~!([\s\S]*?)!~/g, "$1")
+      .replace(/~!([\s\S]*?)!~/g, "$1"),
   )
     .replace(/\n{3,}/g, "\n\n")
     .trim();
@@ -95,7 +92,7 @@ export function parseAniListInline(text: string): AniListInlinePart[] {
 }
 
 export function parseAniListDescriptionBlocks(
-  raw: string | null | undefined
+  raw: string | null | undefined,
 ): AniListDescriptionBlock[] {
   if (!raw?.trim()) {
     return [];

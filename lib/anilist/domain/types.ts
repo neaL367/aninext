@@ -17,12 +17,8 @@ const MEDIA_CARD_TOOLTIP_KEYS = [
   "tags",
 ] as const satisfies readonly (keyof MediaCardTooltipFieldsFragment)[];
 
-export function hasMediaCardTooltipFields(
-  media: Partial<MediaCardTooltipFieldsFragment>
-): boolean {
-  return MEDIA_CARD_TOOLTIP_KEYS.every((key) =>
-    Object.hasOwn(media, key)
-  );
+export function hasMediaCardTooltipFields(media: Partial<MediaCardTooltipFieldsFragment>): boolean {
+  return MEDIA_CARD_TOOLTIP_KEYS.every((key) => Object.hasOwn(media, key));
 }
 
 export type {
@@ -85,9 +81,7 @@ export function normalizeMediaPageResult(data: MediaPageQuery): MediaPageResult 
     throw new Error("Invalid AniList page info");
   }
 
-  const media = filterNonNullMedia(
-    data.Page?.media as Array<MediaCard | null> | null | undefined
-  );
+  const media = filterNonNullMedia(data.Page?.media as Array<MediaCard | null> | null | undefined);
 
   return {
     media,
@@ -101,9 +95,7 @@ export function normalizeMediaPageResult(data: MediaPageQuery): MediaPageResult 
   };
 }
 
-export function normalizeAiringSchedules(
-  data: AiringSchedulesQuery
-): AiringScheduleItem[] {
+export function normalizeAiringSchedules(data: AiringSchedulesQuery): AiringScheduleItem[] {
   return (data.Page?.airingSchedules ?? [])
     .filter((item): item is NonNullable<typeof item> => item !== null)
     .map((item) => ({
@@ -115,20 +107,20 @@ export function normalizeAiringSchedules(
     }));
 }
 
-export function normalizeMediaDetail(
-  data: { Media: MediaDetailFieldsFragment | null }
-): MediaDetail | null {
+export function normalizeMediaDetail(data: {
+  Media: MediaDetailFieldsFragment | null;
+}): MediaDetail | null {
   return data.Media;
 }
 
-export function normalizeCharacterDetail(
-  data: { Character: CharacterDetailFieldsFragment | null }
-): CharacterDetail | null {
+export function normalizeCharacterDetail(data: {
+  Character: CharacterDetailFieldsFragment | null;
+}): CharacterDetail | null {
   return data.Character;
 }
 
-export function normalizeStaffDetail(
-  data: { Staff: StaffDetailFieldsFragment | null }
-): StaffDetail | null {
+export function normalizeStaffDetail(data: {
+  Staff: StaffDetailFieldsFragment | null;
+}): StaffDetail | null {
   return data.Staff;
 }

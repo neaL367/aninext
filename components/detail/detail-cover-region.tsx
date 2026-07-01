@@ -1,8 +1,6 @@
 import type { ReactNode } from "react";
 import { DetailCoverShell } from "@/components/detail/detail-cover-shell";
-import {
-  DETAIL_COVER_CLASS,
-} from "@/lib/styles/detail-page-layout";
+import { DETAIL_COVER_CLASS } from "@/lib/styles/detail-page-layout";
 import { cn } from "@/lib/utils";
 
 type DetailCoverRegionProps = {

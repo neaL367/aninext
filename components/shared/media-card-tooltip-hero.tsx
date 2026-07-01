@@ -23,9 +23,7 @@ export function MediaCardTooltipHero({
   className,
   onBannerLoad,
 }: MediaCardTooltipHeroProps) {
-  const bannerSrc = bannerImage
-    ? (buildProgressiveImageSources(bannerImage)[0] ?? null)
-    : null;
+  const bannerSrc = bannerImage ? (buildProgressiveImageSources(bannerImage)[0] ?? null) : null;
   const [bannerLoaded, setBannerLoaded] = useState(!bannerSrc);
 
   useEffect(() => {
@@ -47,9 +45,7 @@ export function MediaCardTooltipHero({
           backgroundColor: placeholderColor ?? "var(--muted)",
         }}
       >
-        {!bannerLoaded ? (
-          <Skeleton className="absolute inset-0 rounded-none bg-muted/60" />
-        ) : null}
+        {!bannerLoaded ? <Skeleton className="absolute inset-0 rounded-none bg-muted/60" /> : null}
 
         {bannerSrc ? (
           <Image
@@ -58,7 +54,7 @@ export function MediaCardTooltipHero({
             fill
             className={cn(
               "object-cover object-top transition-opacity duration-200",
-              bannerLoaded ? "opacity-100" : "opacity-0"
+              bannerLoaded ? "opacity-100" : "opacity-0",
             )}
             sizes={sizes}
             loading="eager"

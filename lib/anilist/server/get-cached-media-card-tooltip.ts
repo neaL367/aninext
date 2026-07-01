@@ -8,9 +8,7 @@ import { anilistCacheTags } from "@/lib/anilist/server/cache-tags";
 import type { MediaCardTooltip } from "@/lib/anilist/domain/types";
 
 /** Cross-request cached tooltip fields — fetched on card hover only. */
-export async function getCachedMediaCardTooltip(
-  mediaId: number
-): Promise<MediaCardTooltip | null> {
+export async function getCachedMediaCardTooltip(mediaId: number): Promise<MediaCardTooltip | null> {
   "use cache";
 
   cacheLife(anilistCacheLife.tooltip);

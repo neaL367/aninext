@@ -6,7 +6,7 @@ export function navLinkClassName(active: boolean) {
     "underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
     active
       ? "text-foreground underline"
-      : "text-muted-foreground hover:text-foreground hover:underline"
+      : "text-muted-foreground hover:text-foreground hover:underline",
   );
 }
 

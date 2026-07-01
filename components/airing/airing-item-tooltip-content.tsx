@@ -3,10 +3,7 @@
 import { useCallback, useState } from "react";
 import { PlayCircleIcon } from "lucide-react";
 import { StreamingLinksGrid } from "@/components/shared/streaming-links-grid";
-import {
-  formatCountdownRemaining,
-  useCountdownRemaining,
-} from "@/components/shared/countdown";
+import { formatCountdownRemaining, useCountdownRemaining } from "@/components/shared/countdown";
 import { MediaCardTooltipBodySkeleton } from "@/components/shared/media-card-tooltip-skeleton";
 import { MediaTooltipGenreChips } from "@/components/shared/media-tooltip-genre-chips";
 import { MediaCardTooltipHero } from "@/components/shared/media-card-tooltip-hero";
@@ -42,10 +39,7 @@ function AiringEpisodeBlock({
           <span className="min-w-0 truncate">
             Episode {item.episode}
             {totalEpisodes && totalEpisodes > 0 ? (
-              <span className="font-normal text-muted-foreground">
-                {" "}
-                of {totalEpisodes}
-              </span>
+              <span className="font-normal text-muted-foreground"> of {totalEpisodes}</span>
             ) : null}
           </span>
         </div>
@@ -116,11 +110,7 @@ function AiringItemTooltipBody({
                 links={streaming}
                 limit={5}
                 size="sm"
-                className={
-                  hasContentAboveStreaming
-                    ? "border-t border-border pt-3"
-                    : undefined
-                }
+                className={hasContentAboveStreaming ? "border-t border-border pt-3" : undefined}
               />
             ) : null}
           </>

@@ -1,7 +1,4 @@
-import {
-  normalizeHrefForScrollRestore,
-  readScrollY,
-} from "@/lib/navigation/scroll-restore";
+import { normalizeHrefForScrollRestore, readScrollY } from "@/lib/navigation/scroll-restore";
 import { animeDetailPath } from "@/lib/navigation/detail-paths";
 
 const DETAIL_RETURN_KEY = "aninext:detail-return";
@@ -29,31 +26,27 @@ export function isHomeReturn(detailReturn: DetailReturn): boolean {
 /** True when a breadcrumb target is the page the user came from (history pop is safe). */
 export function isDetailReturnOrigin(
   targetHref: string,
-  detailReturn: DetailReturn | null
+  detailReturn: DetailReturn | null,
 ): detailReturn is DetailReturn {
   if (!detailReturn) {
     return false;
   }
 
   return (
-    normalizeHrefForScrollRestore(targetHref) ===
-    normalizeHrefForScrollRestore(detailReturn.href)
+    normalizeHrefForScrollRestore(targetHref) === normalizeHrefForScrollRestore(detailReturn.href)
   );
 }
 
 /** Builds Home → parent → current crumbs without duplicate Home segments. */
 export function buildDetailBreadcrumbs(
   title: string,
-  detailReturn: DetailReturn | null
+  detailReturn: DetailReturn | null,
 ): DetailBreadcrumbCrumb[] {
   const crumbs: DetailBreadcrumbCrumb[] = [
     {
       href: "/",
       label: "Home",
-      scrollY:
-        detailReturn && isHomeReturn(detailReturn)
-          ? detailReturn.scrollY
-          : undefined,
+      scrollY: detailReturn && isHomeReturn(detailReturn) ? detailReturn.scrollY : undefined,
     },
   ];
 
@@ -86,13 +79,11 @@ export function getDetailReturnLabel(pathname: string): string {
 export function saveDetailReturn(
   pathname: string,
   search: string,
-  options?: { label?: string }
+  options?: { label?: string },
 ): void {
   if (typeof window === "undefined") return;
 
-  const href = normalizeHrefForScrollRestore(
-    search ? `${pathname}?${search}` : pathname
-  );
+  const href = normalizeHrefForScrollRestore(search ? `${pathname}?${search}` : pathname);
   const payload: DetailReturn = {
     href,
     label: options?.label ?? getDetailReturnLabel(pathname),
@@ -138,10 +129,7 @@ export function readDetailCurrent(): DetailReturn | null {
 }
 
 /** Call before navigating to another title from a detail page. */
-export function saveDetailReturnFromCurrentPage(
-  pathname: string,
-  search: string
-): void {
+export function saveDetailReturnFromCurrentPage(pathname: string, search: string): void {
   if (isDetailPath(pathname)) {
     const current = readDetailCurrent();
     if (current) {

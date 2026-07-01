@@ -1,5 +1,11 @@
 import { TOP_100_MAX_PAGES } from "@/lib/anilist/domain/listing";
-import type { MediaFormat, MediaSeason, MediaSort, MediaSource, MediaStatus } from "@/lib/anilist/domain/types";
+import type {
+  MediaFormat,
+  MediaSeason,
+  MediaSort,
+  MediaSource,
+  MediaStatus,
+} from "@/lib/anilist/domain/types";
 import type { AnimeListParams, AnimeSort } from "@/lib/browse/params/types";
 
 export function getListingMaxPage(sort: AnimeSort): number | null {
@@ -9,7 +15,7 @@ export function getListingMaxPage(sort: AnimeSort): number | null {
 export function paramsToMediaQuery(
   params: AnimeListParams,
   currentSeason?: { season: MediaSeason; year: number },
-  nextSeason?: { season: MediaSeason; year: number }
+  nextSeason?: { season: MediaSeason; year: number },
 ): {
   sort: MediaSort[];
   season?: MediaSeason;

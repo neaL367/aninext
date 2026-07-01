@@ -44,15 +44,13 @@ export function AiringItemCard({ item, className }: AiringItemCardProps) {
     saveDetailReturnFromCurrentPage(pathname, searchParams.toString());
   };
 
-  const detailHref = animeId
-    ? (animeDetailPath(animeId, title) as Route)
-    : ("/anime" as Route);
+  const detailHref = animeId ? (animeDetailPath(animeId, title) as Route) : ("/anime" as Route);
 
   const card = (
     <article
       className={cn(
         "flex items-start gap-3 rounded-md border border-border bg-card p-3",
-        className
+        className,
       )}
     >
       <Link
@@ -76,10 +74,7 @@ export function AiringItemCard({ item, className }: AiringItemCardProps) {
       <div className="flex min-w-0 flex-1 items-start justify-between gap-2">
         <div className="flex min-w-0 flex-1 flex-col gap-1.5">
           <div className="flex flex-wrap items-center gap-1">
-            <Badge
-              variant="outline"
-              className={cn(AIRING_BADGE_CLASS, "tabular-nums")}
-            >
+            <Badge variant="outline" className={cn(AIRING_BADGE_CLASS, "tabular-nums")}>
               Ep {item.episode}
             </Badge>
             {media?.format ? (
@@ -103,10 +98,7 @@ export function AiringItemCard({ item, className }: AiringItemCardProps) {
           </Link>
         </div>
 
-        <AiringCountdown
-          airingAt={item.airingAt}
-          timeUntilAiring={item.timeUntilAiring}
-        />
+        <AiringCountdown airingAt={item.airingAt} timeUntilAiring={item.timeUntilAiring} />
       </div>
     </article>
   );

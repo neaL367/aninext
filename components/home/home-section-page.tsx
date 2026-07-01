@@ -4,10 +4,7 @@ import { AnimeMediaGrid } from "@/components/anime/anime-media-grid";
 import { AnimeMediaGridSkeleton } from "@/components/anime/anime-media-grid";
 import { HomeSectionSeasonSubtitle } from "@/components/home/home-section-season-subtitle";
 import { EmptyState } from "@/components/shared/empty-state";
-import {
-  getSectionHeadingId,
-  SectionHeader,
-} from "@/components/shared/section-header";
+import { getSectionHeadingId, SectionHeader } from "@/components/shared/section-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { HomeSectionId } from "@/lib/anilist/domain/home-sections";
 import { getHomeSectionMedia } from "@/lib/anilist/server/get-home-sections";
@@ -54,11 +51,7 @@ export function HomeSectionPage({
         href={href}
         subtitleSlot={
           seasonSubtitle ? (
-            <Suspense
-              fallback={
-                <Skeleton className="h-4 w-44 max-w-full" aria-hidden />
-              }
-            >
+            <Suspense fallback={<Skeleton className="h-4 w-44 max-w-full" aria-hidden />}>
               <HomeSectionSeasonSubtitle season={seasonSubtitle} />
             </Suspense>
           ) : undefined
@@ -71,10 +64,7 @@ export function HomeSectionPage({
           </div>
         }
       >
-        <HomeSectionMediaGrid
-          section={section}
-          showCountdown={showCountdown}
-        />
+        <HomeSectionMediaGrid section={section} showCountdown={showCountdown} />
       </Suspense>
     </section>
   );

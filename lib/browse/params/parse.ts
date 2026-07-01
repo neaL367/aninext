@@ -15,10 +15,7 @@ import {
   type AnimeSort,
 } from "@/lib/browse/params/types";
 
-function readParam(
-  params: Record<string, string | string[] | undefined>,
-  key: string
-): string {
+function readParam(params: Record<string, string | string[] | undefined>, key: string): string {
   const value = params[key];
   if (Array.isArray(value)) {
     return value[0] ?? "";
@@ -34,10 +31,7 @@ function readNumber(value: string): number | null {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-function readList(
-  params: Record<string, string | string[] | undefined>,
-  key: string
-): string[] {
+function readList(params: Record<string, string | string[] | undefined>, key: string): string[] {
   const value = params[key];
   if (!value) {
     return [];
@@ -65,9 +59,7 @@ function isMediaSource(value: string): value is MediaSource {
   return (MEDIA_SOURCES as readonly string[]).includes(value);
 }
 
-function readFormats(
-  searchParams: Record<string, string | string[] | undefined>
-): MediaFormat[] {
+function readFormats(searchParams: Record<string, string | string[] | undefined>): MediaFormat[] {
   const list = readList(searchParams, "formats");
   if (list.length) {
     return list.filter(isMediaFormat);
@@ -76,9 +68,7 @@ function readFormats(
   return isMediaFormat(legacy) ? [legacy] : [];
 }
 
-function readStatuses(
-  searchParams: Record<string, string | string[] | undefined>
-): MediaStatus[] {
+function readStatuses(searchParams: Record<string, string | string[] | undefined>): MediaStatus[] {
   const list = readList(searchParams, "statuses");
   if (list.length) {
     return list.filter(isMediaStatus);
@@ -88,7 +78,7 @@ function readStatuses(
 }
 
 export function parseAnimeListParams(
-  searchParams: Record<string, string | string[] | undefined>
+  searchParams: Record<string, string | string[] | undefined>,
 ): AnimeListParams {
   const sortValue = readParam(searchParams, "sort");
   const sort = isAnimeSort(sortValue) ? sortValue : DEFAULT_ANIME_LIST_PARAMS.sort;
@@ -119,9 +109,7 @@ export function parseAnimeListParams(
   };
 }
 
-export function animeListParamsToQuery(
-  params: AnimeListParams
-): Record<string, string | string[]> {
+export function animeListParamsToQuery(params: AnimeListParams): Record<string, string | string[]> {
   const query: Record<string, string | string[]> = {
     sort: params.sort,
   };

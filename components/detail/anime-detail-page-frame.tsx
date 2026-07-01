@@ -9,16 +9,11 @@ type AnimeDetailPageFrameProps = {
 };
 
 /** Shared static shell for the anime detail route (page, loading, and fallbacks). */
-export function AnimeDetailPageFrame({
-  cover,
-  children,
-}: AnimeDetailPageFrameProps) {
+export function AnimeDetailPageFrame({ cover, children }: AnimeDetailPageFrameProps) {
   return (
     <>
       <DetailCoverRegion>{cover}</DetailCoverRegion>
-      <PageContainer className={DETAIL_PAGE_CONTAINER_CLASS}>
-        {children}
-      </PageContainer>
+      <PageContainer className={DETAIL_PAGE_CONTAINER_CLASS}>{children}</PageContainer>
     </>
   );
 }

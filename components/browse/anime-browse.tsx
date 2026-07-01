@@ -2,12 +2,12 @@
 
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
-import {
-  AnimeMediaGrid,
-  AnimeMediaGridSkeleton,
-} from "@/components/anime/anime-media-grid";
+import { AnimeMediaGrid, AnimeMediaGridSkeleton } from "@/components/anime/anime-media-grid";
 import { AnimeBrowseToolbar } from "@/components/browse/anime-browse-toolbar";
-import { BrowseFiltersProvider, useBrowseFilters } from "@/components/browse/browse-filters-provider";
+import {
+  BrowseFiltersProvider,
+  useBrowseFilters,
+} from "@/components/browse/browse-filters-provider";
 import { EmptyState } from "@/components/shared/empty-state";
 import { LISTING_PAGE_SIZE } from "@/lib/anilist/domain/listing";
 import { mediaPageInfiniteOptions } from "@/lib/anilist/client/query-options.client";
@@ -53,19 +53,17 @@ function AnimeBrowseResults() {
       (entries) => {
         if (entries[0]?.isIntersecting) fetchNextPage();
       },
-      { rootMargin: "200px" }
+      { rootMargin: "200px" },
     );
     observer.observe(element);
     return () => observer.disconnect();
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   const showLoadMore =
-    hasNextPage &&
-    (maxPage === null || media.length < maxPage * LISTING_PAGE_SIZE);
+    hasNextPage && (maxPage === null || media.length < maxPage * LISTING_PAGE_SIZE);
 
   const showInitialSkeleton = isPending && !data;
-  const showSearchOverlay =
-    isFetching && !isPending && !isFetchingNextPage && isPlaceholderData;
+  const showSearchOverlay = isFetching && !isPending && !isFetchingNextPage && isPlaceholderData;
 
   return (
     <div className="relative flex flex-col gap-4">
@@ -77,38 +75,25 @@ function AnimeBrowseResults() {
           description="Try different keywords or clear some filters."
         />
       ) : (
-        <div
-          className={showSearchOverlay ? "opacity-60" : ""}
-          aria-busy={showSearchOverlay}
-        >
+        <div className={showSearchOverlay ? "opacity-60" : ""} aria-busy={showSearchOverlay}>
           <AnimeMediaGrid layout="browse" media={media} />
         </div>
       )}
 
       {showLoadMore ? (
         <div ref={loadMoreRef} className="py-6" aria-busy={isFetchingNextPage}>
-          {isFetchingNextPage ? (
-            <AnimeMediaGridSkeleton layout="browse" count={4} />
-          ) : null}
+          {isFetchingNextPage ? <AnimeMediaGridSkeleton layout="browse" count={4} /> : null}
         </div>
       ) : null}
     </div>
   );
 }
 
-export function AnimeBrowse({
-  genres,
-  currentSeason,
-  nextSeason,
-}: AnimeBrowseProps) {
+export function AnimeBrowse({ genres, currentSeason, nextSeason }: AnimeBrowseProps) {
   "use memo";
 
   return (
-    <BrowseFiltersProvider
-      genres={genres}
-      currentSeason={currentSeason}
-      nextSeason={nextSeason}
-    >
+    <BrowseFiltersProvider genres={genres} currentSeason={currentSeason} nextSeason={nextSeason}>
       <AnimeBrowseToolbar />
       <AnimeBrowseResults />
     </BrowseFiltersProvider>

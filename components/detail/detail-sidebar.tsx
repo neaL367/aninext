@@ -51,31 +51,16 @@ export function DetailSidebar({ media }: DetailSidebarProps) {
         <DetailFactRow label="Format" value={formatMediaFormat(media.format)} />
         {isManga ? (
           <>
-            <DetailFactRow
-              label="Chapters"
-              value={formatChapterCount(media.chapters)}
-            />
-            <DetailFactRow
-              label="Volumes"
-              value={formatVolumeCount(media.volumes)}
-            />
+            <DetailFactRow label="Chapters" value={formatChapterCount(media.chapters)} />
+            <DetailFactRow label="Volumes" value={formatVolumeCount(media.volumes)} />
           </>
         ) : (
           <>
-            <DetailFactRow
-              label="Episodes"
-              value={formatEpisodeCount(media.episodes)}
-            />
-            <DetailFactRow
-              label="Duration"
-              value={formatDuration(media.duration)}
-            />
+            <DetailFactRow label="Episodes" value={formatEpisodeCount(media.episodes)} />
+            <DetailFactRow label="Duration" value={formatDuration(media.duration)} />
             <DetailFactRow
               label="Season"
-              value={formatSeasonYear(
-                media.season ?? null,
-                media.seasonYear ?? null
-              )}
+              value={formatSeasonYear(media.season ?? null, media.seasonYear ?? null)}
             />
           </>
         )}
@@ -85,9 +70,7 @@ export function DetailSidebar({ media }: DetailSidebarProps) {
         <DetailFactRow
           label="Country"
           value={formatCountry(
-            typeof media.countryOfOrigin === "string"
-              ? media.countryOfOrigin
-              : null
+            typeof media.countryOfOrigin === "string" ? media.countryOfOrigin : null,
           )}
         />
         <DetailFactRow label="Studios" value={getDetailStudios(media)} />

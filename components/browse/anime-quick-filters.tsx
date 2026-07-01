@@ -4,10 +4,7 @@ import type { MediaFormat, MediaStatus } from "@/lib/anilist/domain/types";
 import { useBrowseFilters } from "@/components/browse/browse-filters-provider";
 import { formatMediaFormat, formatMediaStatus } from "@/lib/anilist/display/labels";
 import { Button } from "@/components/ui/button";
-import {
-  toggleFormat,
-  toggleStatus,
-} from "@/lib/browse/filter-helpers";
+import { toggleFormat, toggleStatus } from "@/lib/browse/filter-helpers";
 import { cn } from "@/lib/utils";
 
 const QUICK_FORMATS = ["TV", "MOVIE", "OVA"] as const satisfies readonly MediaFormat[];

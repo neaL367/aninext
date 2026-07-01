@@ -15,10 +15,7 @@ type PersonCreditsSectionProps = {
   kind: "character" | "staff";
 };
 
-export function PersonCreditsSection({
-  credits,
-  kind,
-}: PersonCreditsSectionProps) {
+export function PersonCreditsSection({ credits, kind }: PersonCreditsSectionProps) {
   return (
     <DetailLoadMoreGrid
       items={credits.map((item) => (
@@ -27,9 +24,7 @@ export function PersonCreditsSection({
       initialCount={8}
       step={8}
       gridClassName="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6"
-      loadMoreLabel={
-        kind === "character" ? "Load more roles" : "Load more works"
-      }
+      loadMoreLabel={kind === "character" ? "Load more roles" : "Load more works"}
     />
   );
 }

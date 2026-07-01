@@ -5,12 +5,7 @@ export type AnimeSeason = {
   year: number;
 };
 
-const SEASONS: readonly MediaSeason[] = [
-  "WINTER",
-  "SPRING",
-  "SUMMER",
-  "FALL",
-];
+const SEASONS: readonly MediaSeason[] = ["WINTER", "SPRING", "SUMMER", "FALL"];
 
 export function getSeasonFromMonth(month: number): MediaSeason {
   if (month <= 3) return "WINTER";
@@ -19,18 +14,14 @@ export function getSeasonFromMonth(month: number): MediaSeason {
   return "FALL";
 }
 
-export function getCurrentAnimeSeason(
-  date: Date = new Date()
-): AnimeSeason {
+export function getCurrentAnimeSeason(date: Date = new Date()): AnimeSeason {
   return {
     season: getSeasonFromMonth(date.getMonth() + 1),
     year: date.getFullYear(),
   };
 }
 
-export function getNextAnimeSeason(
-  date: Date = new Date()
-): AnimeSeason {
+export function getNextAnimeSeason(date: Date = new Date()): AnimeSeason {
   const current = getCurrentAnimeSeason(date);
   const index = SEASONS.indexOf(current.season);
   const nextIndex = (index + 1) % SEASONS.length;

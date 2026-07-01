@@ -10,7 +10,7 @@ import type { MediaType } from "@/lib/anilist/domain/types";
 
 export function getAnilistMediaSiteUrl(
   mediaId: number,
-  type: MediaType | null | undefined
+  type: MediaType | null | undefined,
 ): string {
   const segment = type === "MANGA" ? "manga" : "anime";
   return `https://anilist.co/${segment}/${mediaId}`;
@@ -19,7 +19,7 @@ export function getAnilistMediaSiteUrl(
 export function getMediaDetailHref(
   mediaId: number,
   type: MediaType | null | undefined,
-  title?: string | null
+  title?: string | null,
 ): { href: Route | string; external: boolean } {
   const displayTitle = title?.trim() || "unknown";
 
@@ -43,10 +43,7 @@ export function getMediaDetailHref(
   };
 }
 
-export function getCharacterDetailHref(
-  characterId: number,
-  name: string
-): Route {
+export function getCharacterDetailHref(characterId: number, name: string): Route {
   return characterDetailPath(characterId, name);
 }
 

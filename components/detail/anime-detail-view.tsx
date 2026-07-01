@@ -18,10 +18,7 @@ import { DetailReturnAnchor } from "@/components/detail/detail-return-anchor";
 import type { MediaDetail, MediaRelation } from "@/lib/anilist/domain/types";
 import { buildEpisodeCards } from "@/lib/anilist/display/episodes";
 import { DetailSynopsisSection } from "@/components/detail/detail-synopsis-section";
-import {
-  formatDisplayTitle,
-  formatEpisodeCount,
-} from "@/lib/anilist/display/format";
+import { formatDisplayTitle, formatEpisodeCount } from "@/lib/anilist/display/format";
 import { buildProgressiveImageSources } from "@/lib/anilist/display/image-urls";
 import { getStreamingLinks } from "@/lib/anilist/display/streaming";
 import { DETAIL_BODY_GRID_CLASS } from "@/lib/styles/detail-page-layout";
@@ -30,13 +27,7 @@ type AnimeDetailMediaProps = {
   media: MediaDetail;
 };
 
-const EPISODIC_FORMATS = new Set([
-  "TV",
-  "TV_SHORT",
-  "ONA",
-  "OVA",
-  "SPECIAL",
-]);
+const EPISODIC_FORMATS = new Set(["TV", "TV_SHORT", "ONA", "OVA", "SPECIAL"]);
 
 function shouldShowEpisodesSection(media: MediaDetail): boolean {
   if (media.format && EPISODIC_FORMATS.has(media.format)) {
@@ -70,25 +61,31 @@ function getDetailDerivedData(media: MediaDetail) {
 
   const characterEdges =
     media.characters?.edges?.filter(
-      (edge): edge is NonNullable<typeof edge> & { node: NonNullable<NonNullable<typeof edge>["node"]> } =>
-        Boolean(edge?.node)
+      (
+        edge,
+      ): edge is NonNullable<typeof edge> & {
+        node: NonNullable<NonNullable<typeof edge>["node"]>;
+      } => Boolean(edge?.node),
     ) ?? [];
 
   const staffEdges =
     media.staff?.edges?.filter(
-      (edge): edge is NonNullable<typeof edge> & { node: NonNullable<NonNullable<typeof edge>["node"]> } =>
-        Boolean(edge?.node)
+      (
+        edge,
+      ): edge is NonNullable<typeof edge> & {
+        node: NonNullable<NonNullable<typeof edge>["node"]>;
+      } => Boolean(edge?.node),
     ) ?? [];
 
   const relationItems: DetailRelationItem[] =
     media.relations?.edges
       ?.filter(
         (
-          edge
+          edge,
         ): edge is NonNullable<typeof edge> & {
           relationType: MediaRelation;
           node: NonNullable<NonNullable<typeof edge>["node"]>;
-        } => Boolean(edge?.node?.id && edge.relationType)
+        } => Boolean(edge?.node?.id && edge.relationType),
       )
       .map((edge) => ({
         relationType: edge.relationType,

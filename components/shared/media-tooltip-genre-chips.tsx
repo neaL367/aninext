@@ -6,10 +6,7 @@ type MediaTooltipGenreChipsProps = {
   limit?: number;
 };
 
-export function MediaTooltipGenreChips({
-  genres,
-  limit = 6,
-}: MediaTooltipGenreChipsProps) {
+export function MediaTooltipGenreChips({ genres, limit = 6 }: MediaTooltipGenreChipsProps) {
   const visible = getDisplayGenres(genres, limit);
 
   if (!visible.length) {
@@ -19,11 +16,7 @@ export function MediaTooltipGenreChips({
   return (
     <div className="flex flex-wrap gap-1.5">
       {visible.map((genre) => (
-        <Badge
-          key={genre}
-          variant="secondary"
-          className="px-2 py-0 text-xs font-normal"
-        >
+        <Badge key={genre} variant="secondary" className="px-2 py-0 text-xs font-normal">
           {genre}
         </Badge>
       ))}

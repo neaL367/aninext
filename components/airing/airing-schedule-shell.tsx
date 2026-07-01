@@ -75,16 +75,14 @@ export function AiringScheduleShell() {
               size="sm"
               className={cn(
                 "h-auto min-w-0 flex-col gap-0.5 px-1 py-2 text-center",
-                isToday && !isSelected && "ring-1 ring-primary/30"
+                isToday && !isSelected && "ring-1 ring-primary/30",
               )}
               onClick={() => setSelectedDay(dateKey)}
             >
               <span className="text-[10px] font-semibold uppercase tracking-wide">
                 {getWeekdayShortLabel(dateKey)}
               </span>
-              <span className="text-[11px] font-medium tabular-nums opacity-40">
-                —
-              </span>
+              <span className="text-[11px] font-medium tabular-nums opacity-40">—</span>
             </Button>
           );
         })}
@@ -93,10 +91,7 @@ export function AiringScheduleShell() {
       <section className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 sm:p-5">
         <header className="flex flex-wrap items-end justify-between gap-2 border-b border-border pb-4">
           <div>
-            <h2
-              suppressHydrationWarning
-              className="text-lg font-medium tracking-tight"
-            >
+            <h2 suppressHydrationWarning className="text-lg font-medium tracking-tight">
               {getRelativeDayLabel(activeDay)}
             </h2>
             <p className="text-sm text-muted-foreground">
@@ -107,10 +102,7 @@ export function AiringScheduleShell() {
               })}
             </p>
           </div>
-          <span
-            aria-hidden
-            className="inline-block h-4 w-16 animate-pulse rounded-md bg-muted"
-          />
+          <span aria-hidden className="inline-block h-4 w-16 animate-pulse rounded-md bg-muted" />
         </header>
 
         <AiringDayListSkeleton />

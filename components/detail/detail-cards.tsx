@@ -6,9 +6,7 @@ import type { MediaDetail } from "@/lib/anilist/domain/types";
 import { buildProgressiveImageSources } from "@/lib/anilist/display/image-urls";
 import { getCharacterDetailHref, getStaffDetailHref } from "@/lib/anilist/display/media-links";
 
-type CharacterEdge = NonNullable<
-  NonNullable<MediaDetail["characters"]>["edges"]
->[number];
+type CharacterEdge = NonNullable<NonNullable<MediaDetail["characters"]>["edges"]>[number];
 
 export function DetailCharacterCard({ edge }: { edge: NonNullable<CharacterEdge> }) {
   "use memo";
@@ -21,11 +19,7 @@ export function DetailCharacterCard({ edge }: { edge: NonNullable<CharacterEdge>
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-card">
       <Link
-        href={
-          character?.id
-            ? getCharacterDetailHref(character.id, characterName)
-            : ("#" as Route)
-        }
+        href={character?.id ? getCharacterDetailHref(character.id, characterName) : ("#" as Route)}
         prefetch
         className="flex items-center gap-4 p-4 transition-colors hover:bg-muted/40"
       >
@@ -43,9 +37,7 @@ export function DetailCharacterCard({ edge }: { edge: NonNullable<CharacterEdge>
         </div>
         <div className="min-w-0 flex-1">
           <p className="truncate text-base font-medium sm:text-lg">{characterName}</p>
-          {edge.role ? (
-            <p className="truncate text-sm text-muted-foreground">{edge.role}</p>
-          ) : null}
+          {edge.role ? <p className="truncate text-sm text-muted-foreground">{edge.role}</p> : null}
         </div>
       </Link>
 
@@ -55,10 +47,7 @@ export function DetailCharacterCard({ edge }: { edge: NonNullable<CharacterEdge>
           <div className="flex items-center gap-3.5 bg-muted/40 px-4 py-3.5">
             {voiceActor.id ? (
               <Link
-                href={getStaffDetailHref(
-                  voiceActor.id,
-                  voiceActor.name?.full ?? "—"
-                )}
+                href={getStaffDetailHref(voiceActor.id, voiceActor.name?.full ?? "—")}
                 prefetch
                 className="flex min-w-0 flex-1 items-center gap-3.5 transition-opacity hover:opacity-90"
               >
@@ -78,9 +67,7 @@ export function DetailCharacterCard({ edge }: { edge: NonNullable<CharacterEdge>
                   <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                     Voice · {voiceActor.languageV2 ?? "Japanese"}
                   </p>
-                  <p className="truncate text-base font-medium">
-                    {voiceActor.name?.full ?? "—"}
-                  </p>
+                  <p className="truncate text-base font-medium">{voiceActor.name?.full ?? "—"}</p>
                 </div>
               </Link>
             ) : (
@@ -101,9 +88,7 @@ export function DetailCharacterCard({ edge }: { edge: NonNullable<CharacterEdge>
                   <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                     Voice · {voiceActor.languageV2 ?? "Japanese"}
                   </p>
-                  <p className="truncate text-base font-medium">
-                    {voiceActor.name?.full ?? "—"}
-                  </p>
+                  <p className="truncate text-base font-medium">{voiceActor.name?.full ?? "—"}</p>
                 </div>
               </>
             )}
@@ -145,9 +130,7 @@ export function DetailStaffCard({
       </div>
       <div className="min-w-0">
         <p className="truncate text-base font-medium">{name}</p>
-        {role ? (
-          <p className="truncate text-sm text-muted-foreground">{role}</p>
-        ) : null}
+        {role ? <p className="truncate text-sm text-muted-foreground">{role}</p> : null}
       </div>
     </>
   );

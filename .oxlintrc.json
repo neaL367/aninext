@@ -1,0 +1,18 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "unicorn", "oxc", "react"],
+  "categories": {
+    "correctness": "error"
+  },
+  "ignorePatterns": [
+    ".next/**",
+    "node_modules/**",
+    "lib/anilist/generated/**",
+    "out/**",
+    "build/**"
+  ],
+  "rules": {},
+  "env": {
+    "builtin": true
+  }
+}

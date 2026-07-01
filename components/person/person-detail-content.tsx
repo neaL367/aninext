@@ -7,9 +7,7 @@ type PersonDetailLoaderProps = {
   params: SlugDetailParams;
 };
 
-export async function CharacterDetailBodyLoader({
-  params,
-}: PersonDetailLoaderProps) {
+export async function CharacterDetailBodyLoader({ params }: PersonDetailLoaderProps) {
   const character = await resolveCharacterDetail(params);
   return <PersonDetailView kind="character" person={character} />;
 }

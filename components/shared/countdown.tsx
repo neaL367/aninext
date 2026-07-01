@@ -50,10 +50,7 @@ function releaseTicker() {
   tickerId = undefined;
 }
 
-export function useCountdownRemaining(
-  airingAt: number,
-  timeUntilAiring: number
-) {
+export function useCountdownRemaining(airingAt: number, timeUntilAiring: number) {
   "use memo";
 
   const [remaining, setRemaining] = useState(timeUntilAiring);
@@ -77,22 +74,13 @@ export function useCountdownRemaining(
 }
 
 /** Compact live countdown for airing schedule rows — countdown + local time only. */
-export function AiringCountdown({
-  airingAt,
-  timeUntilAiring,
-  className,
-}: CountdownProps) {
+export function AiringCountdown({ airingAt, timeUntilAiring, className }: CountdownProps) {
   "use memo";
 
   const remaining = useCountdownRemaining(airingAt, timeUntilAiring);
 
   return (
-    <div
-      className={cn(
-        "flex shrink-0 flex-col items-end gap-0.5 text-right",
-        className
-      )}
-    >
+    <div className={cn("flex shrink-0 flex-col items-end gap-0.5 text-right", className)}>
       <span className="text-sm font-medium tabular-nums text-foreground">
         {formatCountdownRemaining(remaining)}
       </span>
@@ -107,22 +95,13 @@ export function AiringCountdown({
 }
 
 /** Home carousel card — weekday time + live countdown. */
-export function Countdown({
-  airingAt,
-  timeUntilAiring,
-  className,
-}: CountdownProps) {
+export function Countdown({ airingAt, timeUntilAiring, className }: CountdownProps) {
   "use memo";
 
   const remaining = useCountdownRemaining(airingAt, timeUntilAiring);
 
   return (
-    <div
-      className={cn(
-        "flex flex-col gap-0.5 text-xs text-muted-foreground",
-        className
-      )}
-    >
+    <div className={cn("flex flex-col gap-0.5 text-xs text-muted-foreground", className)}>
       <span className="tabular-nums">{formatAiringTime(airingAt)}</span>
       <span className="font-medium tabular-nums text-foreground">
         {formatCountdownRemaining(remaining)}

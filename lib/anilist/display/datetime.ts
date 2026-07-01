@@ -22,7 +22,7 @@ export function formatLocalDate(
     month: "long",
     day: "numeric",
     year: "numeric",
-  }
+  },
 ): string {
   return new Intl.DateTimeFormat("en-US", options).format(date);
 }
@@ -79,10 +79,7 @@ export function getWeekdayShortLabel(dateKey: string): string {
   return new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(date);
 }
 
-export function formatAiringContextLabel(
-  timestampSeconds: number,
-  now = new Date()
-): string {
+export function formatAiringContextLabel(timestampSeconds: number, now = new Date()): string {
   const nowMs = now.getTime();
   const targetMs = timestampSeconds * 1000;
   const diffMs = targetMs - nowMs;
@@ -106,10 +103,7 @@ export function formatAiringContextLabel(
   return dayLabel;
 }
 
-export function formatRelativeAiringTime(
-  timestampSeconds: number,
-  now = new Date()
-): string {
+export function formatRelativeAiringTime(timestampSeconds: number, now = new Date()): string {
   const context = formatAiringContextLabel(timestampSeconds, now);
   if (context.startsWith("In ")) {
     return context;
@@ -134,7 +128,7 @@ export function getDayRangeFromDateKey(dateKey: string): {
 }
 
 export function groupByLocalDate<T extends { airingAt: number }>(
-  items: readonly T[]
+  items: readonly T[],
 ): Map<string, T[]> {
   const grouped = new Map<string, T[]>();
   const sorted = [...items].sort((a, b) => a.airingAt - b.airingAt);

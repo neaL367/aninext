@@ -8,13 +8,7 @@ import { PageContainer } from "@/components/layout/page-container";
 import { NavLinksSuspense } from "@/components/layout/site-nav-links";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 export function SiteHeader() {
@@ -30,9 +24,7 @@ export function SiteHeader() {
           aria-current={isHome ? "page" : undefined}
           className={cn(
             "min-w-0 shrink truncate text-base font-semibold tracking-tight underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-            isHome
-              ? "text-foreground"
-              : "text-foreground hover:underline"
+            isHome ? "text-foreground" : "text-foreground hover:underline",
           )}
         >
           AniNext

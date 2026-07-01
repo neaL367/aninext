@@ -6,8 +6,6 @@ export type EntityDetailRouteParams = Promise<{
   slug: string;
 }>;
 
-export function toSlugDetailParams(
-  params: EntityDetailRouteParams
-): SlugDetailParams {
+export function toSlugDetailParams(params: EntityDetailRouteParams): SlugDetailParams {
   return params.then(({ id, slug }) => ({ id, slug }));
 }

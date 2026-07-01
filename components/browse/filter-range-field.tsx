@@ -21,7 +21,7 @@ function formatRangeLabel(
   high: number,
   min: number,
   max: number,
-  formatValue?: (value: number) => string
+  formatValue?: (value: number) => string,
 ): string {
   const fmt = formatValue ?? String;
   const atMin = low <= min;
@@ -36,14 +36,11 @@ function formatRangeLabel(
 function toCommittedRange(
   values: readonly number[],
   min: number,
-  max: number
+  max: number,
 ): [number | null, number | null] {
   const nextLow = values[0] ?? min;
   const nextHigh = values[1] ?? max;
-  return [
-    nextLow <= min ? null : nextLow,
-    nextHigh >= max ? null : nextHigh,
-  ];
+  return [nextLow <= min ? null : nextLow, nextHigh >= max ? null : nextHigh];
 }
 
 export function FilterRangeField({

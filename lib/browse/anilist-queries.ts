@@ -33,7 +33,7 @@ export function homeSectionToListParams(section: HomeSectionId): AnimeListParams
 export function buildHomeSectionVariables(
   section: HomeSectionId,
   current: AnimeSeason,
-  next: AnimeSeason
+  next: AnimeSeason,
 ): HomeSectionMediaQueryVariables {
   const params = homeSectionToListParams(section);
   const query = paramsToMediaQuery(params, current, next);

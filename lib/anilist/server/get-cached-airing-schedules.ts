@@ -10,7 +10,7 @@ import type { AiringScheduleItem } from "@/lib/anilist/domain/types";
 export async function getCachedAiringSchedulesForDay(
   dateKey: string,
   start: number,
-  end: number
+  end: number,
 ): Promise<AiringScheduleItem[]> {
   "use cache";
 

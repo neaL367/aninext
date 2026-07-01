@@ -11,14 +11,10 @@ type HomeSectionSeasonSubtitleProps = {
 };
 
 function resolveSeason(season: HomeSectionSeasonSubtitleProps["season"]): AnimeSeason {
-  return season === "current"
-    ? getCurrentAnimeSeason()
-    : getNextAnimeSeason();
+  return season === "current" ? getCurrentAnimeSeason() : getNextAnimeSeason();
 }
 
-export async function HomeSectionSeasonSubtitle({
-  season,
-}: HomeSectionSeasonSubtitleProps) {
+export async function HomeSectionSeasonSubtitle({ season }: HomeSectionSeasonSubtitleProps) {
   await connection();
 
   return (

@@ -34,9 +34,7 @@ function mediaToStaticParam(media: {
   };
 }
 
-function dedupeStaticParams(
-  params: EntityDetailStaticParam[]
-): EntityDetailStaticParam[] {
+function dedupeStaticParams(params: EntityDetailStaticParam[]): EntityDetailStaticParam[] {
   const seen = new Set<string>();
 
   return params.filter((param) => {
@@ -59,9 +57,7 @@ function dedupeStaticParams(
  *
  * @see https://nextjs.org/docs/app/api-reference/functions/generate-static-params
  */
-export async function getEntityDetailStaticParams(): Promise<
-  EntityDetailStaticParam[]
-> {
+export async function getEntityDetailStaticParams(): Promise<EntityDetailStaticParam[]> {
   const trending = await getHomeSectionMediaForStaticGeneration("trending");
   const fromTrending = trending.map(mediaToStaticParam);
 
@@ -69,8 +65,5 @@ export async function getEntityDetailStaticParams(): Promise<
     return CATEGORY_VALIDATION_SAMPLES;
   }
 
-  return dedupeStaticParams([
-    ...fromTrending,
-    ...CATEGORY_VALIDATION_SAMPLES,
-  ]);
+  return dedupeStaticParams([...fromTrending, ...CATEGORY_VALIDATION_SAMPLES]);
 }

@@ -20,8 +20,7 @@ export default function RootError({
     <PageContainer className="flex flex-col items-start gap-4 py-16">
       <h1 className="text-2xl font-semibold">Something went wrong</h1>
       <p className="max-w-prose text-muted-foreground">
-        An unexpected error occurred. You can try again or return to the
-        homepage.
+        An unexpected error occurred. You can try again or return to the homepage.
       </p>
       <div className="flex gap-2">
         <Button onClick={reset} className="min-h-11">

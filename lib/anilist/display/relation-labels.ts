@@ -16,9 +16,7 @@ export const MEDIA_RELATION_LABELS: Record<MediaRelation, string> = {
   CONTAINS: "Contains",
 };
 
-export function formatMediaRelationType(
-  relation: MediaRelation | null | undefined
-): string {
+export function formatMediaRelationType(relation: MediaRelation | null | undefined): string {
   if (!relation) {
     return "—";
   }

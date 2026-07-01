@@ -35,9 +35,7 @@ export function DetailLoadMoreGrid({
           type="button"
           variant="outline"
           className="mx-auto w-full max-w-xs"
-          onClick={() =>
-            setVisibleCount((count) => Math.min(count + step, items.length))
-          }
+          onClick={() => setVisibleCount((count) => Math.min(count + step, items.length))}
         >
           {loadMoreLabel}
           <span className="text-muted-foreground">({remaining} left)</span>

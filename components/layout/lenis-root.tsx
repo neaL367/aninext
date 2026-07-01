@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  useEffect,
-  useState,
-  type ComponentType,
-  type ReactNode,
-} from "react";
+import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 
 const lenisOptions = {
   autoRaf: true,
@@ -31,9 +26,7 @@ type LenisRootProps = {
  * and instant-route validation are never blocked by a client-only wrapper.
  */
 export function LenisRoot({ children }: LenisRootProps) {
-  const [ReactLenis, setReactLenis] = useState<ComponentType<ReactLenisProps> | null>(
-    null
-  );
+  const [ReactLenis, setReactLenis] = useState<ComponentType<ReactLenisProps> | null>(null);
 
   useEffect(() => {
     void import("lenis/react").then((mod) => {

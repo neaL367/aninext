@@ -8,7 +8,5 @@ type AppQueryProviderProps = {
 };
 
 export function AppQueryProvider({ children }: AppQueryProviderProps) {
-  return (
-    <QueryClientProvider client={getQueryClient()}>{children}</QueryClientProvider>
-  );
+  return <QueryClientProvider client={getQueryClient()}>{children}</QueryClientProvider>;
 }

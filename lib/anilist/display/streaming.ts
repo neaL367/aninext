@@ -94,15 +94,10 @@ function getDomainFromUrl(url: string | null | undefined): string | null {
 
 function hostnameIsStreaming(hostname: string): boolean {
   const host = hostname.toLowerCase();
-  return STREAMING_HOST_SUFFIXES.some(
-    (suffix) => host === suffix || host.endsWith(`.${suffix}`)
-  );
+  return STREAMING_HOST_SUFFIXES.some((suffix) => host === suffix || host.endsWith(`.${suffix}`));
 }
 
-export function getStreamingSiteDomain(
-  site: string,
-  url?: string | null
-): string | null {
+export function getStreamingSiteDomain(site: string, url?: string | null): string | null {
   if (STREAMING_DOMAINS[site]) {
     return STREAMING_DOMAINS[site];
   }
@@ -116,22 +111,19 @@ export function getStreamingSiteDomain(
   if (!normalized) return fromUrl;
 
   const match = Object.entries(STREAMING_DOMAINS).find(([name]) =>
-    normalizeSiteKey(name).includes(normalized)
+    normalizeSiteKey(name).includes(normalized),
   );
   if (match) return match[1];
 
   const reverseMatch = Object.entries(STREAMING_DOMAINS).find(([name]) =>
-    normalized.includes(normalizeSiteKey(name))
+    normalized.includes(normalizeSiteKey(name)),
   );
   if (reverseMatch) return reverseMatch[1];
 
   return fromUrl;
 }
 
-export function getStreamingFaviconUrl(
-  site: string,
-  url?: string | null
-): string | null {
+export function getStreamingFaviconUrl(site: string, url?: string | null): string | null {
   const domain = getStreamingSiteDomain(site, url);
   if (!domain) return null;
   return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=32`;
@@ -140,7 +132,7 @@ export function getStreamingFaviconUrl(
 export function isStreamingLink(
   type: string | null | undefined,
   site: string | null | undefined,
-  url?: string | null
+  url?: string | null,
 ): boolean {
   if (type === "STREAMING") return true;
   if (!site && !url) return false;
@@ -163,7 +155,7 @@ export function getStreamingLinks(
         type?: string | null;
       } | null)[]
     | null
-    | undefined
+    | undefined,
 ): { site: string; url: string }[] {
   if (!externalLinks?.length) return [];
 

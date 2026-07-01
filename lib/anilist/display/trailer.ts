@@ -1,7 +1,10 @@
-type MediaTrailer = {
-  id: string | null;
-  site: string | null;
-} | null | undefined;
+type MediaTrailer =
+  | {
+      id: string | null;
+      site: string | null;
+    }
+  | null
+  | undefined;
 
 export function getTrailerEmbedUrl(trailer: MediaTrailer): string | null {
   if (!trailer?.id) {

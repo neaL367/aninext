@@ -6,10 +6,7 @@ import { CalendarClockIcon, StarIcon, UsersIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { MediaCardTooltipBodySkeleton } from "@/components/shared/media-card-tooltip-skeleton";
 import { MediaTooltipGenreChips } from "@/components/shared/media-tooltip-genre-chips";
-import {
-  formatCountdownRemaining,
-  useCountdownRemaining,
-} from "@/components/shared/countdown";
+import { formatCountdownRemaining, useCountdownRemaining } from "@/components/shared/countdown";
 import { MediaCardTooltipHero } from "@/components/shared/media-card-tooltip-hero";
 import { mediaCardTooltipOptions } from "@/lib/anilist/client/tooltip-query-options";
 import type { MediaCard } from "@/lib/anilist/domain/types";
@@ -85,9 +82,7 @@ function AnimeCardTooltipLoaded({
       ) : (
         <div className="flex min-w-0 flex-col gap-3 p-4">
           {synopsis ? (
-            <p className="line-clamp-6 text-sm leading-relaxed text-muted-foreground">
-              {synopsis}
-            </p>
+            <p className="line-clamp-6 text-sm leading-relaxed text-muted-foreground">{synopsis}</p>
           ) : (
             <p className="text-sm italic text-muted-foreground">
               {tooltipFailed ? "Details unavailable." : "No synopsis available."}
@@ -109,19 +104,13 @@ function AnimeCardTooltipLoaded({
                 {score}
               </span>
             ) : null}
-            {popularity ? (
-              <span className="tabular-nums">{popularity} users</span>
-            ) : null}
+            {popularity ? <span className="tabular-nums">{popularity} users</span> : null}
           </div>
 
           {tags.length > 0 ? (
             <div className="flex flex-wrap gap-1.5">
               {tags.map((tag) => (
-                <Badge
-                  key={tag}
-                  variant="outline"
-                  className="px-2 py-0 text-xs font-normal"
-                >
+                <Badge key={tag} variant="outline" className="px-2 py-0 text-xs font-normal">
                   {tag}
                 </Badge>
               ))}
@@ -166,8 +155,7 @@ export function AnimeCardTooltipContent({ media }: AnimeCardTooltipContentProps)
     return media;
   }, [hasEmbeddedTooltipFields, media, tooltipOverlay]);
 
-  const hasTooltipFields =
-    hasEmbeddedTooltipFields || hasMediaCardTooltipFields(mergedMedia);
+  const hasTooltipFields = hasEmbeddedTooltipFields || hasMediaCardTooltipFields(mergedMedia);
   const isLoading = !hasEmbeddedTooltipFields && isPending;
 
   if (isLoading || !hasTooltipFields) {

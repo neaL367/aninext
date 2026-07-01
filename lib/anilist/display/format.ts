@@ -45,7 +45,7 @@ export function formatPersonName(
         userPreferred?: string | null;
       }
     | null
-    | undefined
+    | undefined,
 ): string {
   if (!name) {
     return MISSING_VALUE;
@@ -54,11 +54,14 @@ export function formatPersonName(
 }
 
 export function formatDisplayTitle(
-  title: {
-    english: string | null;
-    romaji: string | null;
-    native: string | null;
-  } | null | undefined
+  title:
+    | {
+        english: string | null;
+        romaji: string | null;
+        native: string | null;
+      }
+    | null
+    | undefined,
 ): string {
   if (!title) {
     return MISSING_VALUE;
@@ -68,12 +71,15 @@ export function formatDisplayTitle(
 
 /** Romaji / native line for detail headers — skips values that duplicate the primary title. */
 export function formatAlternateTitles(
-  title: {
-    english: string | null;
-    romaji: string | null;
-    native: string | null;
-  } | null | undefined,
-  primary: string
+  title:
+    | {
+        english: string | null;
+        romaji: string | null;
+        native: string | null;
+      }
+    | null
+    | undefined,
+  primary: string,
 ): string | null {
   if (!title) return null;
 
@@ -117,7 +123,7 @@ export function formatFuzzyDate(
     year: number | null;
     month: number | null;
     day: number | null;
-  } | null
+  } | null,
 ): string {
   if (!date?.year) {
     return MISSING_VALUE;
@@ -133,17 +139,12 @@ export function formatFuzzyDate(
 }
 
 export function applyPopularityPercents<T extends { popularity: number | null }>(
-  items: readonly T[]
+  items: readonly T[],
 ): (T & { popularityPercent: number | null })[] {
-  const max = Math.max(
-    0,
-    ...items.map((item) => item.popularity ?? 0)
-  );
+  const max = Math.max(0, ...items.map((item) => item.popularity ?? 0));
   return items.map((item) => ({
     ...item,
     popularityPercent:
-      item.popularity !== null && max > 0
-        ? Math.round((item.popularity / max) * 100)
-        : null,
+      item.popularity !== null && max > 0 ? Math.round((item.popularity / max) * 100) : null,
   }));
 }

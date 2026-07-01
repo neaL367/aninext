@@ -2,10 +2,7 @@
 
 import { XIcon } from "lucide-react";
 import { useBrowseFilters } from "@/components/browse/browse-filters-provider";
-import {
-  getActiveFilterChips,
-  removeFilterChip,
-} from "@/lib/browse/params";
+import { getActiveFilterChips, removeFilterChip } from "@/lib/browse/params";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -22,11 +19,7 @@ export function FilterChips() {
   return (
     <div className="flex flex-wrap items-center gap-1.5">
       {chips.map((chip) => (
-        <Badge
-          key={chip.key}
-          variant="secondary"
-          className="h-7 gap-1 pr-1 font-normal"
-        >
+        <Badge key={chip.key} variant="secondary" className="h-7 gap-1 pr-1 font-normal">
           {chip.label}
           <Button
             type="button"

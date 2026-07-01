@@ -37,9 +37,7 @@ type BrowseFiltersContextValue = {
   meta: BrowseFiltersMeta;
 };
 
-const BrowseFiltersContext = createContext<BrowseFiltersContextValue | null>(
-  null
-);
+const BrowseFiltersContext = createContext<BrowseFiltersContextValue | null>(null);
 
 export function useBrowseFilters() {
   const context = use(BrowseFiltersContext);
@@ -65,8 +63,7 @@ export function BrowseFiltersProvider({
   "use memo";
 
   const searchRef = useRef<HTMLInputElement>(null);
-  const { params, applyFilters, resetFilters, setSearchInput } =
-    useAnimeListParams();
+  const { params, applyFilters, resetFilters, setSearchInput } = useAnimeListParams();
 
   const resetFiltersWithFocus = useCallback(() => {
     resetFilters();
@@ -88,10 +85,16 @@ export function BrowseFiltersProvider({
         nextSeason,
       },
     }),
-    [applyFilters, currentSeason, genres, nextSeason, params, resetFiltersWithFocus, setSearchInput]
+    [
+      applyFilters,
+      currentSeason,
+      genres,
+      nextSeason,
+      params,
+      resetFiltersWithFocus,
+      setSearchInput,
+    ],
   );
 
-  return (
-    <BrowseFiltersContext value={value}>{children}</BrowseFiltersContext>
-  );
+  return <BrowseFiltersContext value={value}>{children}</BrowseFiltersContext>;
 }

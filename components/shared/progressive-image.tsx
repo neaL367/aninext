@@ -20,7 +20,7 @@ type ProgressiveImageProps = {
 
 function getLoadProps(
   isLcp: boolean,
-  loading: "lazy" | "eager"
+  loading: "lazy" | "eager",
 ): Pick<ComponentProps<typeof Image>, "loading" | "fetchPriority"> {
   if (isLcp) {
     return { loading: "eager", fetchPriority: "high" };
@@ -43,8 +43,7 @@ export function ProgressiveImage({
   const validSources = sources.filter(Boolean);
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const canProgress =
-    validSources.length > 1 && isAnilistCdnUrl(validSources[0] ?? null);
+  const canProgress = validSources.length > 1 && isAnilistCdnUrl(validSources[0] ?? null);
 
   useEffect(() => {
     if (!canProgress || activeIndex >= validSources.length - 1) {
@@ -98,7 +97,7 @@ export function ProgressiveImage({
           className={cn(
             className,
             "transition-opacity duration-300",
-            index < activeIndex && "pointer-events-none opacity-0"
+            index < activeIndex && "pointer-events-none opacity-0",
           )}
           {...getLoadProps(priority && index === 0, loading)}
         />

@@ -4,8 +4,7 @@ const SITE_NAME = "AniNext";
 const SITE_DESCRIPTION =
   "A premium anime discovery platform powered by AniList. Browse trending, seasonal, and airing anime with a fast server-driven experience.";
 
-const METADATA_BASE =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const METADATA_BASE = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 type PageMetadataInput = {
   title: string;
@@ -66,10 +65,6 @@ export function createPageMetadata({
   };
 }
 
-export function createDetailMetadata(
-  title: string,
-  description: string,
-  path: string
-): Metadata {
+export function createDetailMetadata(title: string, description: string, path: string): Metadata {
   return createPageMetadata({ title, description, path });
 }

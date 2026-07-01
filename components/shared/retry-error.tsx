@@ -11,12 +11,7 @@ type RetryErrorProps = {
   variant?: "page" | "section";
 };
 
-export function RetryError({
-  title,
-  message,
-  reset,
-  variant = "section",
-}: RetryErrorProps) {
+export function RetryError({ title, message, reset, variant = "section" }: RetryErrorProps) {
   const content = (
     <>
       <SectionError title={title} message={message} />
@@ -37,9 +32,7 @@ export function RetryError({
   );
 
   if (variant === "page") {
-    return (
-      <PageContainer className="flex flex-col gap-4 py-16">{content}</PageContainer>
-    );
+    return <PageContainer className="flex flex-col gap-4 py-16">{content}</PageContainer>;
   }
 
   return <div className="flex flex-col gap-3">{content}</div>;

@@ -1,10 +1,5 @@
 /** AniList CDN path size tiers (low → high). */
-export const ANILIST_IMAGE_SIZE_ORDER = [
-  "small",
-  "medium",
-  "large",
-  "extraLarge",
-] as const;
+export const ANILIST_IMAGE_SIZE_ORDER = ["small", "medium", "large", "extraLarge"] as const;
 
 export type AnilistImageSize = (typeof ANILIST_IMAGE_SIZE_ORDER)[number];
 
@@ -19,10 +14,7 @@ export function isAnilistCdnUrl(url: string | null | undefined): boolean {
   }
 }
 
-export function resizeAnilistImageUrl(
-  url: string,
-  size: AnilistImageSize
-): string {
+export function resizeAnilistImageUrl(url: string, size: AnilistImageSize): string {
   if (!isAnilistCdnUrl(url)) return url;
   if (SIZE_SEGMENT.test(url)) {
     return url.replace(SIZE_SEGMENT, `/${size}`);
@@ -49,14 +41,12 @@ type CoverLike = {
 
 /** Build low → medium → high → large source list for progressive loading. */
 export function buildProgressiveImageSources(
-  input: string | CoverLike | null | undefined
+  input: string | CoverLike | null | undefined,
 ): string[] {
   if (!input) return [];
 
   const base =
-    typeof input === "string"
-      ? input
-      : (input.large ?? input.extraLarge ?? input.medium);
+    typeof input === "string" ? input : (input.large ?? input.extraLarge ?? input.medium);
 
   if (!base) return [];
 
@@ -74,17 +64,13 @@ export function buildProgressiveImageSources(
   ]);
 }
 
-export function coverProgressiveSources(
-  cover: CoverLike | null | undefined
-): string[] {
+export function coverProgressiveSources(cover: CoverLike | null | undefined): string[] {
   if (!cover) return [];
   return buildProgressiveImageSources(cover);
 }
 
 /** Single medium cover for dense grids — avoids progressive swaps during scroll. */
-export function coverCardImageUrl(
-  cover: CoverLike | null | undefined
-): string | null {
+export function coverCardImageUrl(cover: CoverLike | null | undefined): string | null {
   if (!cover) return null;
 
   const base = cover.large ?? cover.extraLarge ?? cover.medium;

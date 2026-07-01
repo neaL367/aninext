@@ -25,7 +25,7 @@ function detectFillerRecap(title: string): { isFiller: boolean; isRecap: boolean
 function normalizeEpisodeTitle(
   rawTitle: string | undefined,
   episodeNum: number,
-  mediaTitle: string
+  mediaTitle: string,
 ): string {
   const title = rawTitle?.trim();
   if (!title) return `Episode ${episodeNum}`;
@@ -40,12 +40,7 @@ function normalizeEpisodeTitle(
 }
 
 function getEpisodeThumbnailFallback(media: MediaDetail): string | null {
-  return (
-    media.bannerImage ??
-    media.coverImage?.large ??
-    media.coverImage?.medium ??
-    null
-  );
+  return media.bannerImage ?? media.coverImage?.large ?? media.coverImage?.medium ?? null;
 }
 
 export function buildEpisodeCards(media: MediaDetail): EpisodeCardData[] {

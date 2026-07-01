@@ -47,7 +47,12 @@ const ALL_STATUSES = [
   "HIATUS",
 ] as const satisfies readonly MediaStatus[];
 
-const ALL_SEASONS = ["WINTER", "SPRING", "SUMMER", "FALL"] as const satisfies readonly MediaSeason[];
+const ALL_SEASONS = [
+  "WINTER",
+  "SPRING",
+  "SUMMER",
+  "FALL",
+] as const satisfies readonly MediaSeason[];
 
 type AdvancedFiltersProps = {
   className?: string;
@@ -63,7 +68,7 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
 
   const patch = useCallback(
     (partial: Partial<AnimeListParams>) => applyFilters({ ...params, ...partial }),
-    [applyFilters, params]
+    [applyFilters, params],
   );
 
   const handleSeasonChange = (values: string[]) => {
@@ -201,13 +206,7 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
 
       <FilterMoreOptions params={params} onPatch={patch} />
 
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="w-full"
-        onClick={resetFilters}
-      >
+      <Button type="button" variant="outline" size="sm" className="w-full" onClick={resetFilters}>
         Reset all filters
       </Button>
     </div>

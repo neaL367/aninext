@@ -13,17 +13,11 @@ type AiringDayCountProps = {
 
 export function AiringDayCount({ promise }: AiringDayCountProps) {
   const items = use(promise);
-  return (
-    <span className="text-[11px] font-medium tabular-nums opacity-80">
-      {items.length}
-    </span>
-  );
+  return <span className="text-[11px] font-medium tabular-nums opacity-80">{items.length}</span>;
 }
 
 export function AiringDayCountFallback() {
-  return (
-    <span className="text-[11px] font-medium tabular-nums opacity-40">—</span>
-  );
+  return <span className="text-[11px] font-medium tabular-nums opacity-40">—</span>;
 }
 
 type AiringDayListProps = {
@@ -77,21 +71,10 @@ export function AiringDayShowCount({ promise }: AiringDayShowCountProps) {
 }
 
 export function AiringDayShowCountFallback() {
-  return (
-    <span
-      aria-hidden
-      className="inline-block h-4 w-16 animate-pulse rounded-md bg-muted"
-    />
-  );
+  return <span aria-hidden className="inline-block h-4 w-16 animate-pulse rounded-md bg-muted" />;
 }
 
-function ClientSuspense({
-  fallback,
-  children,
-}: {
-  fallback: ReactNode;
-  children: ReactNode;
-}) {
+function ClientSuspense({ fallback, children }: { fallback: ReactNode; children: ReactNode }) {
   const mounted = useClientMounted();
   if (!mounted) {
     return fallback;
@@ -99,11 +82,7 @@ function ClientSuspense({
   return <Suspense fallback={fallback}>{children}</Suspense>;
 }
 
-export function AiringDayCountSuspense({
-  promise,
-}: {
-  promise: Promise<AiringScheduleItem[]>;
-}) {
+export function AiringDayCountSuspense({ promise }: { promise: Promise<AiringScheduleItem[]> }) {
   return (
     <ClientSuspense fallback={<AiringDayCountFallback />}>
       <AiringDayCount promise={promise} />
@@ -111,11 +90,7 @@ export function AiringDayCountSuspense({
   );
 }
 
-export function AiringDayListSuspense({
-  promise,
-}: {
-  promise: Promise<AiringScheduleItem[]>;
-}) {
+export function AiringDayListSuspense({ promise }: { promise: Promise<AiringScheduleItem[]> }) {
   return (
     <ClientSuspense fallback={<AiringDayListSkeleton />}>
       <AiringDayList promise={promise} />

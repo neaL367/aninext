@@ -24,7 +24,7 @@ export async function register() {
         keepAliveTimeout: 30_000,
         keepAliveMaxTimeout: 60_000,
         connections: 12,
-      })
+      }),
     );
   }
 }

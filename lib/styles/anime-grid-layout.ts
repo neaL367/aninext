@@ -20,18 +20,15 @@ export const ANIME_CARD_LINK_CLASS = "flex h-full flex-col";
 export const ANIME_CARD_BODY_CLASS = "flex flex-col gap-1 px-2.5 pb-2.5 pt-1.5";
 
 /** Slightly roomier text block for browse grids. */
-export const ANIME_BROWSE_CARD_BODY_CLASS =
-  "flex flex-col gap-1.5 px-3 pb-3 pt-2";
+export const ANIME_BROWSE_CARD_BODY_CLASS = "flex flex-col gap-1.5 px-3 pb-3 pt-2";
 
 export const ANIME_CARD_TITLE_CLASS =
   "line-clamp-2 min-h-10 text-sm font-medium leading-5 text-foreground";
 
-export const ANIME_CARD_META_CLASS =
-  "line-clamp-1 text-xs leading-4 text-muted-foreground";
+export const ANIME_CARD_META_CLASS = "line-clamp-1 text-xs leading-4 text-muted-foreground";
 
 export const ANIME_CARD_STATS_CLASS =
   "line-clamp-1 text-xs leading-4 tabular-nums text-muted-foreground";
 
 /** Extra row for home airing countdown. */
-export const ANIME_CARD_BODY_WITH_COUNTDOWN_CLASS =
-  "flex flex-col gap-1 px-2.5 pb-2.5 pt-1.5";
+export const ANIME_CARD_BODY_WITH_COUNTDOWN_CLASS = "flex flex-col gap-1 px-2.5 pb-2.5 pt-1.5";

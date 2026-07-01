@@ -92,10 +92,7 @@ export function countBrowseFilters(params: AnimeListParams): number {
   return count;
 }
 
-export function removeFilterChip(
-  params: AnimeListParams,
-  chipKey: string
-): AnimeListParams {
+export function removeFilterChip(params: AnimeListParams, chipKey: string): AnimeListParams {
   if (chipKey === "q") return { ...params, q: "" };
   if (chipKey === "sort") return { ...params, sort: "trending" };
   if (chipKey === "season") return { ...params, season: null };

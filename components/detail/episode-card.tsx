@@ -18,12 +18,7 @@ export function EpisodeCard({ episode, className }: EpisodeCardProps) {
   const thumbnail = episode.thumbnail;
 
   const content = (
-    <article
-      className={cn(
-        "flex gap-3 rounded-lg border border-border bg-card p-3",
-        className
-      )}
-    >
+    <article className={cn("flex gap-3 rounded-lg border border-border bg-card p-3", className)}>
       <div className="relative aspect-video w-28 shrink-0 overflow-hidden rounded-md border border-border bg-muted sm:w-32">
         {thumbnail ? (
           isAnilistCdnUrl(thumbnail) ? (
@@ -68,9 +63,7 @@ export function EpisodeCard({ episode, className }: EpisodeCardProps) {
             </Badge>
           ) : null}
         </div>
-        <h3 className="line-clamp-2 text-sm font-medium leading-snug">
-          {episode.title}
-        </h3>
+        <h3 className="line-clamp-2 text-sm font-medium leading-snug">{episode.title}</h3>
         <dl className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
           <div>
             <dt className="sr-only">Air date</dt>

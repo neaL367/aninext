@@ -33,9 +33,7 @@ export function StreamingLinksGrid({
 
   return (
     <div className={cn("flex flex-col gap-2.5", className)}>
-      {showLabel ? (
-        <p className={TAXONOMY_SECTION_LABEL_CLASS}>{label}</p>
-      ) : null}
+      {showLabel ? <p className={TAXONOMY_SECTION_LABEL_CLASS}>{label}</p> : null}
       <div className="flex flex-wrap gap-2">
         {visible.map((link) => (
           <StreamingService

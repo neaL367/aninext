@@ -1,8 +1,5 @@
 import Image from "next/image";
-import {
-  getStreamingFaviconUrl,
-  getStreamingSiteDomain,
-} from "@/lib/anilist/display/streaming";
+import { getStreamingFaviconUrl, getStreamingSiteDomain } from "@/lib/anilist/display/streaming";
 import { cn } from "@/lib/utils";
 
 type StreamingServiceProps = {
@@ -38,7 +35,7 @@ export function StreamingService({
             ? "text-xs"
             : "text-sm",
         url && "hover:text-foreground",
-        className
+        className,
       )}
     >
       {favicon ? (
@@ -66,12 +63,7 @@ export function StreamingService({
 
   if (url && linked) {
     return (
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="min-w-0 max-w-full"
-      >
+      <a href={url} target="_blank" rel="noopener noreferrer" className="min-w-0 max-w-full">
         {inner}
       </a>
     );

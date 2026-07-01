@@ -8,6 +8,5 @@ import { characterDetailPath } from "@/lib/navigation/detail-paths";
 export const resolveCharacterDetail = createSlugDetailResolver({
   fetch: getCharacterDetail,
   getSlugName: (character) => formatPersonName(character.name),
-  getCanonicalPath: (character, slugName) =>
-    characterDetailPath(character.id, slugName),
+  getCanonicalPath: (character, slugName) => characterDetailPath(character.id, slugName),
 });

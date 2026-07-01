@@ -1,8 +1,5 @@
 import type { Route } from "next";
-import {
-  HOME_SECTION_IDS,
-  type HomeSectionId,
-} from "@/lib/anilist/domain/home-sections";
+import { HOME_SECTION_IDS, type HomeSectionId } from "@/lib/anilist/domain/home-sections";
 import { homeSectionToListParams } from "@/lib/browse/anilist-queries";
 import {
   animeListParamsToQuery,
@@ -27,9 +24,7 @@ export function buildAnimeBrowseHref(params: AnimeListParams): string {
   return search ? `/anime?${search}` : "/anime";
 }
 
-export function animeBrowseHref(
-  overrides: Partial<AnimeListParams> & { sort: AnimeSort }
-): Route {
+export function animeBrowseHref(overrides: Partial<AnimeListParams> & { sort: AnimeSort }): Route {
   return buildAnimeBrowseHref({
     ...DEFAULT_ANIME_LIST_PARAMS,
     ...overrides,
@@ -41,5 +36,5 @@ export const HOME_SECTION_BROWSE_HREFS = Object.fromEntries(
   HOME_SECTION_IDS.map((section) => [
     section,
     buildAnimeBrowseHref(homeSectionToListParams(section)),
-  ])
+  ]),
 ) as Record<HomeSectionId, Route>;

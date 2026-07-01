@@ -1,4 +1,9 @@
-import type { MediaFormat, MediaSeason, MediaSource, MediaStatus } from "@/lib/anilist/domain/types";
+import type {
+  MediaFormat,
+  MediaSeason,
+  MediaSource,
+  MediaStatus,
+} from "@/lib/anilist/domain/types";
 
 export const MEDIA_FORMAT_LABELS: Record<MediaFormat, string> = {
   TV: "TV",
@@ -89,7 +94,7 @@ export function formatCountry(code: string | null | undefined): string {
 
 export function formatSeasonYear(
   season: MediaSeason | null | undefined,
-  year: number | null | undefined
+  year: number | null | undefined,
 ): string {
   if (!season && !year) return "—";
   if (season && year) return `${formatMediaSeason(season)} ${year}`;

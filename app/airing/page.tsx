@@ -17,9 +17,7 @@ export const metadata = createPageMetadata({
 async function AiringPageContent() {
   const { dateKeys, dayPromises } = await getAiringDayPromisesForRequest();
 
-  return (
-    <AiringScheduleInteractive dateKeys={dateKeys} dayPromises={dayPromises} />
-  );
+  return <AiringScheduleInteractive dateKeys={dateKeys} dayPromises={dayPromises} />;
 }
 
 export default function AiringPage() {

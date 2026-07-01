@@ -58,14 +58,12 @@ function DetailBreadcrumbNavLink({ crumb }: DetailBreadcrumbNavLinkProps) {
         router.push(href, { scroll: false });
       }
     },
-    [crumb.href, crumb.scrollY, href, router]
+    [crumb.href, crumb.scrollY, href, router],
   );
 
   return (
     <BreadcrumbLink
-      render={
-        <Link href={href} prefetch scroll={false} onClick={handleClick} />
-      }
+      render={<Link href={href} prefetch scroll={false} onClick={handleClick} />}
       className={CRUMB_LABEL_CLASS}
       title={crumb.label}
     >
@@ -101,7 +99,7 @@ export function DetailBreadcrumb({ title }: DetailBreadcrumbProps) {
                   <BreadcrumbPage
                     className={cn(
                       CRUMB_LABEL_CLASS,
-                      "max-w-[min(100%,18rem)] sm:max-w-[min(100%,24rem)]"
+                      "max-w-[min(100%,18rem)] sm:max-w-[min(100%,24rem)]",
                     )}
                     title={crumb.label}
                   >
