@@ -1,5 +1,5 @@
 import { infiniteQueryOptions } from "@tanstack/react-query";
-import { fetchMediaPageAction } from "@/lib/anilist/client/actions/fetch-media-page";
+import { fetchMediaPageFromApi } from "@/lib/anilist/client/media-api";
 import { buildMediaPageInfiniteConfig } from "./media-page-infinite-shared";
 import type { MediaPageQueryVariables } from "@/lib/anilist/generated/graphql";
 import type { AnimeListParams } from "@/lib/browse/params";
@@ -15,7 +15,7 @@ export function mediaPageInfiniteOptions(
   return infiniteQueryOptions({
     queryKey: config.queryKey,
     queryFn: async ({ pageParam }) => {
-      return fetchMediaPageAction({
+      return fetchMediaPageFromApi({
         ...config.filter,
         page: pageParam,
         perPage: config.perPage,
