@@ -1,25 +1,35 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useLayoutEffect } from "react";
 import {
   consumePendingScrollRestore,
+  hasPendingScrollRestore,
   readCurrentHref,
+  reconcileScrollPosition,
   restoreScrollWithRetry,
 } from "@/lib/navigation/scroll-restore";
 
 /** Applies queued scroll position after breadcrumb return navigation. */
 export function DetailScrollRestore() {
-  const pathname = usePathname();
+  const pathname = usePathname() || "/";
+  const searchParams = useSearchParams();
+  const search = searchParams.toString();
 
   useLayoutEffect(() => {
     const href = readCurrentHref();
     const scrollY = consumePendingScrollRestore(href);
-    if (scrollY == null) {
+    if (scrollY != null) {
+      restoreScrollWithRetry(scrollY);
       return;
     }
-    restoreScrollWithRetry(scrollY);
-  }, [pathname]);
+
+    // Wait for search params to settle before reconciling — avoids clobbering a
+    // pending restore to `/anime?sort=…` when pathname updates first.
+    if (!hasPendingScrollRestore()) {
+      reconcileScrollPosition();
+    }
+  }, [pathname, search]);
 
   return null;
 }

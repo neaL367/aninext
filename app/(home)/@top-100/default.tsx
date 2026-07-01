@@ -1,3 +1,1 @@
-export default function Top100Default() {
-  return null;
-}
+export { default } from "./page";

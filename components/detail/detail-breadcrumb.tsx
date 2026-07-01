@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import {
   buildDetailBreadcrumbs,
+  isDetailReturnOrigin,
   readDetailReturn,
   type DetailBreadcrumbCrumb,
   type DetailReturn,
@@ -39,11 +40,13 @@ function DetailBreadcrumbNavLink({ crumb }: DetailBreadcrumbNavLinkProps) {
 
   const handleClick = useCallback(
     (event: MouseEvent<HTMLAnchorElement>) => {
-      if (
-        crumb.preferHistoryBack &&
-        typeof window !== "undefined" &&
-        window.history.length > 1
-      ) {
+      const targetHref = crumb.href ?? "/";
+      const detailReturn = readDetailReturn();
+
+      // Pop history when returning to the page we came from — same path as browser
+      // back, which restores scroll and infinite-list state. router.push remounts the
+      // browse page from page 1 so queued scrollY cannot reach the saved position.
+      if (isDetailReturnOrigin(targetHref, detailReturn)) {
         event.preventDefault();
         router.back();
         return;
@@ -51,11 +54,11 @@ function DetailBreadcrumbNavLink({ crumb }: DetailBreadcrumbNavLinkProps) {
 
       if (crumb.scrollY != null && crumb.scrollY > 0) {
         event.preventDefault();
-        queueScrollRestore(crumb.href ?? "/", crumb.scrollY);
+        queueScrollRestore(targetHref, crumb.scrollY);
         router.push(href, { scroll: false });
       }
     },
-    [crumb.href, crumb.preferHistoryBack, crumb.scrollY, href, router]
+    [crumb.href, crumb.scrollY, href, router]
   );
 
   return (

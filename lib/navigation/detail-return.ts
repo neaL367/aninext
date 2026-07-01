@@ -1,4 +1,7 @@
-import { readScrollY } from "@/lib/navigation/scroll-restore";
+import {
+  normalizeHrefForScrollRestore,
+  readScrollY,
+} from "@/lib/navigation/scroll-restore";
 import { animeDetailPath } from "@/lib/navigation/detail-paths";
 
 const DETAIL_RETURN_KEY = "aninext:detail-return";
@@ -14,8 +17,6 @@ export type DetailBreadcrumbCrumb = {
   href?: string;
   label: string;
   scrollY?: number;
-  /** Use browser back when returning one step (preserves scroll via history). */
-  preferHistoryBack?: boolean;
 };
 
 const DETAIL_PATH = /^\/(anime|manga|character|staff)\/\d+\/[^/]+$/;
@@ -23,6 +24,21 @@ const DETAIL_PATH = /^\/(anime|manga|character|staff)\/\d+\/[^/]+$/;
 export function isHomeReturn(detailReturn: DetailReturn): boolean {
   const pathname = detailReturn.href.split("?")[0];
   return pathname === "/" || detailReturn.label === "Home";
+}
+
+/** True when a breadcrumb target is the page the user came from (history pop is safe). */
+export function isDetailReturnOrigin(
+  targetHref: string,
+  detailReturn: DetailReturn | null
+): detailReturn is DetailReturn {
+  if (!detailReturn) {
+    return false;
+  }
+
+  return (
+    normalizeHrefForScrollRestore(targetHref) ===
+    normalizeHrefForScrollRestore(detailReturn.href)
+  );
 }
 
 /** Builds Home → parent → current crumbs without duplicate Home segments. */
@@ -46,7 +62,6 @@ export function buildDetailBreadcrumbs(
       href: detailReturn.href,
       label: detailReturn.label,
       scrollY: detailReturn.scrollY,
-      preferHistoryBack: true,
     });
   } else if (!detailReturn) {
     crumbs.push({ href: "/anime", label: "Anime" });
@@ -75,7 +90,9 @@ export function saveDetailReturn(
 ): void {
   if (typeof window === "undefined") return;
 
-  const href = search ? `${pathname}?${search}` : pathname;
+  const href = normalizeHrefForScrollRestore(
+    search ? `${pathname}?${search}` : pathname
+  );
   const payload: DetailReturn = {
     href,
     label: options?.label ?? getDetailReturnLabel(pathname),

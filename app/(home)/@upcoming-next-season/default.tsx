@@ -1,3 +1,1 @@
-export default function UpcomingNextSeasonDefault() {
-  return null;
-}
+export { default } from "./page";

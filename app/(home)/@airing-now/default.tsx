@@ -1,3 +1,1 @@
-export default function AiringNowDefault() {
-  return null;
-}
+export { default } from "./page";

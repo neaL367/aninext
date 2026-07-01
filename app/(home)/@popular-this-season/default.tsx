@@ -1,3 +1,1 @@
-export default function PopularThisSeasonDefault() {
-  return null;
-}
+export { default } from "./page";
