@@ -158,3 +158,18 @@ export function getWeekDateKeys(date: Date = new Date()): string[] {
     return toLocalDateKeyFromDate(day);
   });
 }
+
+/** Stable cache key for a Monday–Sunday week. */
+export function getWeekCacheKey(dateKeys: readonly string[]): string {
+  return `${dateKeys[0]!}_${dateKeys[dateKeys.length - 1]!}`;
+}
+
+/** Unix range covering an entire week from its date keys (end exclusive). */
+export function getWeekRangeFromDateKeys(dateKeys: readonly string[]): {
+  start: number;
+  end: number;
+} {
+  const start = getDayRangeFromDateKey(dateKeys[0]!).start;
+  const end = getDayRangeFromDateKey(dateKeys[dateKeys.length - 1]!).end;
+  return { start, end };
+}

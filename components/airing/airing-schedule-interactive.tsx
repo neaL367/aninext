@@ -66,7 +66,7 @@ export function AiringScheduleInteractive({
             Week of {weekRangeLabel.start} – {weekRangeLabel.end}
           </p>
           <p className="text-xs text-muted-foreground">
-            Episodes load by day — counts appear as each weekday finishes
+            One weekly schedule fetch — switch days to browse episodes
           </p>
         </div>
         <span

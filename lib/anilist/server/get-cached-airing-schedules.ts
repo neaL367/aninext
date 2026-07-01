@@ -6,9 +6,9 @@ import { anilistCacheLife } from "@/lib/anilist/server/cache-policy";
 import { anilistCacheTags } from "@/lib/anilist/server/cache-tags";
 import type { AiringScheduleItem } from "@/lib/anilist/domain/types";
 
-/** Cross-request cached single-day airing slice. */
-export async function getCachedAiringSchedulesForDay(
-  dateKey: string,
+/** Cross-request cached airing slice for a full week (one paginated query stream). */
+export async function getCachedAiringSchedulesForWeek(
+  weekKey: string,
   start: number,
   end: number,
 ): Promise<AiringScheduleItem[]> {
@@ -16,7 +16,7 @@ export async function getCachedAiringSchedulesForDay(
 
   cacheLife(anilistCacheLife.airingSchedules);
   cacheTag(anilistCacheTags.airing);
-  cacheTag(anilistCacheTags.airingDay(dateKey));
+  cacheTag(anilistCacheTags.airingWeek(weekKey));
   cacheTag(anilistCacheTags.airingRange(start, end));
 
   return fetchAllAiringSchedules(start, end);
