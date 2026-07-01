@@ -52,12 +52,3 @@ export async function getHomeSectionMedia(section: HomeSectionId): Promise<Media
   const next = getNextAnimeSeason();
   return getCachedHomeSectionMedia(section, current, next);
 }
-
-/** Build-time home section fetch (no `connection()` — safe for `generateStaticParams`). */
-export async function getHomeSectionMediaForStaticGeneration(
-  section: HomeSectionId,
-): Promise<MediaCard[]> {
-  const current = getCurrentAnimeSeason();
-  const next = getNextAnimeSeason();
-  return getCachedHomeSectionMedia(section, current, next);
-}
