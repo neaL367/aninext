@@ -16,14 +16,6 @@ export function getAnilistMediaSiteUrl(
   return `https://anilist.co/${segment}/${mediaId}`;
 }
 
-export function getAnilistCharacterSiteUrl(characterId: number): string {
-  return `https://anilist.co/character/${characterId}`;
-}
-
-export function getAnilistStaffSiteUrl(staffId: number): string {
-  return `https://anilist.co/staff/${staffId}`;
-}
-
 export function getMediaDetailHref(
   mediaId: number,
   type: MediaType | null | undefined,

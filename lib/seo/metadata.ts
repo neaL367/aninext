@@ -71,26 +71,5 @@ export function createDetailMetadata(
   description: string,
   path: string
 ): Metadata {
-  const canonicalPath = path.startsWith("/") ? path : `/${path}`;
-
-  return {
-    title,
-    description,
-    alternates: {
-      canonical: canonicalPath,
-    },
-    openGraph: {
-      title,
-      description,
-      type: "website",
-      url: canonicalPath,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-    },
-  };
+  return createPageMetadata({ title, description, path });
 }
-
-export { SITE_NAME, SITE_DESCRIPTION };

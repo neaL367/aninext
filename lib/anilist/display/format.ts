@@ -16,20 +16,6 @@ export function formatScore(score: number | null | undefined): string {
   return `${score}%`;
 }
 
-export function formatPopularityPercent(
-  popularity: number | null | undefined,
-  maxPopularity: number
-): string {
-  if (
-    popularity === null ||
-    popularity === undefined ||
-    maxPopularity <= 0
-  ) {
-    return MISSING_VALUE;
-  }
-  return `${Math.round((popularity / maxPopularity) * 100)}%`;
-}
-
 export function formatEpisodeCount(episodes: number | null | undefined): string {
   if (episodes === null || episodes === undefined) {
     return MISSING_VALUE;

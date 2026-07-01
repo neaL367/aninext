@@ -21,7 +21,7 @@ export function EntityNotFound({
     <PageContainer className="flex flex-col gap-4 py-16">
       <h1 className="text-2xl font-semibold">{title}</h1>
       <p className="text-muted-foreground">{description}</p>
-      <Link href={browseHref} className={cn(buttonVariants(), "min-h-11 w-fit")}>
+      <Link href={browseHref} prefetch className={cn(buttonVariants(), "min-h-11 w-fit")}>
         {browseLabel}
       </Link>
     </PageContainer>

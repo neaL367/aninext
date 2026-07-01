@@ -61,7 +61,7 @@ function DetailBreadcrumbNavLink({ crumb }: DetailBreadcrumbNavLinkProps) {
   return (
     <BreadcrumbLink
       render={
-        <Link href={href} scroll={false} onClick={handleClick} />
+        <Link href={href} prefetch scroll={false} onClick={handleClick} />
       }
       className={CRUMB_LABEL_CLASS}
       title={crumb.label}

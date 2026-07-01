@@ -10,7 +10,7 @@ export default function NotFound() {
       <p className="text-muted-foreground">
         The page you are looking for does not exist.
       </p>
-      <Link href="/" className={cn(buttonVariants(), "min-h-11")}>
+      <Link href="/" prefetch className={cn(buttonVariants(), "min-h-11")}>
         Back to home
       </Link>
     </PageContainer>
