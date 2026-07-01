@@ -13,9 +13,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Use lowercase kebab-case for all folders, files, routes, and components.
 - Split files before they exceed ~300 lines.
 - Data source is AniList GraphQL only — never fabricate data; display `—` for missing values.
-- Server-first architecture with TanStack React Query and GraphQL Code Generator typed documents.
+- Server-first architecture with GraphQL Code Generator typed documents; browse pagination and tooltips use cached Server Actions.
 - AniList data via codegen operations in `lib/anilist/graphql/`; run `bun run codegen` after `.graphql` changes. Never edit `lib/anilist/generated/` by hand (gitignored; auto-runs on dev and build).
-- SSR prefetch with `fetchQuery` / `prefetchQuery` and `HydrationBoundary` on data routes.
+- SSR renders initial browse data in Server Components; client interactions call `loadMediaPage` / `getMediaCardTooltipAction`.
 - Package runner: `bun` / `bunx --bun`.
 
 ## Next.js 16 practices (Cache Components)
@@ -35,8 +35,8 @@ Read `node_modules/next/dist/docs/` before changing routing, caching, or data fe
 
 ## `lib/` layout
 
-- **`lib/anilist/`** — AniList data layer: `graphql/` + `generated/`, `infra/` (HTTP client, network constants), `domain/` (types, errors, genres, listing limits, season, normalization), `display/` (formatters, labels, image URLs), `server/` (cached fetchers, `cache-policy.ts`), `client/` (React Query options, `query-policy.ts`, server actions).
+- **`lib/anilist/`** — AniList data layer: `graphql/` + `generated/`, `infra/` (HTTP client, network constants), `domain/` (types, errors, genres, listing limits, season, normalization), `display/` (formatters, labels, image URLs), `server/` (cached fetchers, `actions.ts`, `cache-policy.ts`), `client/` (`media-page-list.ts` browse helpers).
 - **`lib/browse/`** — Anime listing URL params (`params/`), browse href builders (`url.ts`), filter helpers, and `anilist-queries.ts` (maps browse/home filters → GraphQL variables).
 - **`lib/styles/`** — Tailwind class tokens for cards, grids, and nav (not React components; see `components/ui/` for shadcn).
 - **`lib/navigation/`** — Site nav config, detail back-links, scroll restoration.
-- **`lib/hooks/`**, **`lib/seo/`**, **`lib/react-query/`** — Shared hooks, metadata/JSON-LD, QueryClient factory.
+- **`lib/hooks/`**, **`lib/seo/`** — Shared hooks, metadata/JSON-LD.

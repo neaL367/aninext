@@ -1,6 +1,5 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
 import { CalendarClockIcon, StarIcon, UsersIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -8,10 +7,10 @@ import { MediaCardTooltipBodySkeleton } from "@/components/shared/media-card-too
 import { MediaTooltipGenreChips } from "@/components/shared/media-tooltip-genre-chips";
 import { formatCountdownRemaining, useCountdownRemaining } from "@/components/shared/countdown";
 import { MediaCardTooltipHero } from "@/components/shared/media-card-tooltip-hero";
-import { mediaCardTooltipOptions } from "@/lib/anilist/client/tooltip-query-options";
 import type { MediaCard } from "@/lib/anilist/domain/types";
 import { hasMediaCardTooltipFields } from "@/lib/anilist/domain/types";
 import { useMediaTooltipOpen } from "@/components/shared/media-tooltip";
+import { useMediaCardTooltip } from "@/lib/hooks/use-media-card-tooltip";
 import { formatDisplayTitle, formatScore } from "@/lib/anilist/display/format";
 import {
   excerptSynopsis,
@@ -140,10 +139,7 @@ export function AnimeCardTooltipContent({ media }: AnimeCardTooltipContentProps)
     data: tooltipOverlay,
     isPending,
     isError,
-  } = useQuery({
-    ...mediaCardTooltipOptions(media.id),
-    enabled: tooltipOpen && !hasEmbeddedTooltipFields,
-  });
+  } = useMediaCardTooltip(media.id, tooltipOpen && !hasEmbeddedTooltipFields);
 
   const mergedMedia = useMemo(() => {
     if (hasEmbeddedTooltipFields) {

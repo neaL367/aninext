@@ -1,4 +1,3 @@
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { AnimeBrowse } from "@/components/browse/anime-browse";
@@ -7,12 +6,13 @@ import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
 import { AniListRateLimitNotice } from "@/components/shared/anilist-rate-limit-notice";
 import { isAniListRateLimitError } from "@/lib/anilist/domain/errors";
-import { mediaPageInfiniteOptions } from "@/lib/anilist/client/query-options.server";
-import { getGenreCollection } from "@/lib/anilist/server/get-genre-collection";
+import { LISTING_PAGE_SIZE } from "@/lib/anilist/domain/listing";
 import { getCurrentAnimeSeason, getNextAnimeSeason } from "@/lib/anilist/domain/season";
-import { parseAnimeListParams } from "@/lib/browse/params";
+import type { MediaPageQueryVariables } from "@/lib/anilist/generated/graphql";
+import { getGenreCollection } from "@/lib/anilist/server/get-genre-collection";
+import { getCachedMediaPage } from "@/lib/anilist/server/get-media-page";
+import { parseAnimeListParams, paramsToMediaQuery } from "@/lib/browse/params";
 import { createPageMetadata } from "@/lib/seo/metadata";
-import { getQueryClient } from "@/lib/react-query/get-query-client";
 
 export const instant = false;
 
@@ -32,20 +32,28 @@ async function AnimeListingContent({ searchParams }: AnimeListingPageProps) {
   const params = parseAnimeListParams(resolved);
   const currentSeason = getCurrentAnimeSeason();
   const nextSeason = getNextAnimeSeason();
-  const queryClient = getQueryClient();
 
   try {
-    const [genres] = await Promise.all([
+    const filter = paramsToMediaQuery(params, currentSeason, nextSeason);
+    const variables = {
+      ...filter,
+      page: 1,
+      perPage: LISTING_PAGE_SIZE,
+    } as MediaPageQueryVariables;
+
+    const [genres, initialResult] = await Promise.all([
       getGenreCollection(),
-      queryClient.prefetchInfiniteQuery(
-        mediaPageInfiniteOptions(params, currentSeason, nextSeason),
-      ),
+      getCachedMediaPage(variables),
     ]);
 
     return (
-      <HydrationBoundary state={dehydrate(queryClient)}>
-        <AnimeBrowse genres={genres} currentSeason={currentSeason} nextSeason={nextSeason} />
-      </HydrationBoundary>
+      <AnimeBrowse
+        genres={genres}
+        currentSeason={currentSeason}
+        nextSeason={nextSeason}
+        initialParams={params}
+        initialResult={initialResult}
+      />
     );
   } catch (error) {
     if (isAniListRateLimitError(error)) {
