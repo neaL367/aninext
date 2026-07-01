@@ -66,7 +66,7 @@ export function AiringScheduleInteractive({
             Week of {weekRangeLabel.start} – {weekRangeLabel.end}
           </p>
           <p className="text-xs text-muted-foreground">
-            One weekly schedule fetch — switch days to browse episodes
+            Today loads first — switch days to browse the rest of the week
           </p>
         </div>
         <span

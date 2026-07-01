@@ -15,7 +15,6 @@ export const anilistCacheTags = {
   mediaPages: "anilist-media-pages",
   mediaPage: (page: number, filterKey: string) => `anilist-media-page-${filterKey}-p${page}`,
   airing: "anilist-airing",
-  airingWeek: (weekKey: string) => `anilist-airing-week-${weekKey}`,
   airingDay: (dateKey: string) => `anilist-airing-day-${dateKey}`,
   airingRange: (start: number, end: number) => `anilist-airing-${start}-${end}`,
 } as const;

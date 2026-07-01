@@ -127,22 +127,6 @@ export function getDayRangeFromDateKey(dateKey: string): {
   };
 }
 
-export function groupByLocalDate<T extends { airingAt: number }>(
-  items: readonly T[],
-): Map<string, T[]> {
-  const grouped = new Map<string, T[]>();
-  const sorted = [...items].sort((a, b) => a.airingAt - b.airingAt);
-
-  for (const item of sorted) {
-    const key = toLocalDateKey(item.airingAt);
-    const list = grouped.get(key) ?? [];
-    list.push(item);
-    grouped.set(key, list);
-  }
-
-  return grouped;
-}
-
 /** Local date keys (YYYY-MM-DD) for Monday through Sunday of the given week. */
 export function getWeekDateKeys(date: Date = new Date()): string[] {
   const anchor = new Date(date);
@@ -157,19 +141,4 @@ export function getWeekDateKeys(date: Date = new Date()): string[] {
     day.setDate(monday.getDate() + index);
     return toLocalDateKeyFromDate(day);
   });
-}
-
-/** Stable cache key for a Monday–Sunday week. */
-export function getWeekCacheKey(dateKeys: readonly string[]): string {
-  return `${dateKeys[0]!}_${dateKeys[dateKeys.length - 1]!}`;
-}
-
-/** Unix range covering an entire week from its date keys (end exclusive). */
-export function getWeekRangeFromDateKeys(dateKeys: readonly string[]): {
-  start: number;
-  end: number;
-} {
-  const start = getDayRangeFromDateKey(dateKeys[0]!).start;
-  const end = getDayRangeFromDateKey(dateKeys[dateKeys.length - 1]!).end;
-  return { start, end };
 }
