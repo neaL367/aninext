@@ -33,8 +33,6 @@ export function fetchMediaPageFromApi(
 }
 
 /** Card tooltip reads — GET Route Handler, fired on hover. */
-export function fetchMediaCardTooltipFromApi(
-  mediaId: number,
-): Promise<MediaCardTooltip | null> {
+export function fetchMediaCardTooltipFromApi(mediaId: number): Promise<MediaCardTooltip | null> {
   return getJson<MediaCardTooltip | null>(`${MEDIA_TOOLTIP_ENDPOINT}?id=${mediaId}`, "tooltip");
 }

@@ -37,7 +37,9 @@ async function AnimeListingContent({ searchParams }: AnimeListingPageProps) {
   try {
     const [genres] = await Promise.all([
       getGenreCollection(),
-      queryClient.prefetchInfiniteQuery(mediaPageInfiniteOptions(params, currentSeason, nextSeason)),
+      queryClient.prefetchInfiniteQuery(
+        mediaPageInfiniteOptions(params, currentSeason, nextSeason),
+      ),
     ]);
 
     return (
