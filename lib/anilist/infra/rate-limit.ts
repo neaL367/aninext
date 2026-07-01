@@ -1,6 +1,10 @@
 import "server-only";
 
-import { MIN_RATE_LIMIT_RETRY_MS, RATE_LIMIT_RESET_BUFFER_MS } from "./constants";
+import {
+  MAX_RATE_LIMIT_WAIT_MS,
+  MIN_RATE_LIMIT_RETRY_MS,
+  RATE_LIMIT_RESET_BUFFER_MS,
+} from "./constants";
 
 type AniListRateLimitState = {
   limit: number | null;
@@ -117,21 +121,36 @@ export function markAniListRateLimitExceeded(headers: Headers): number {
   return MIN_RATE_LIMIT_RETRY_MS;
 }
 
+/**
+ * Wait only when AniList headers already reported an empty bucket (429 or
+ * x-ratelimit-remaining: 0). Do not decrement locally — concurrent serverless
+ * invocations on a warm instance were falsely exhausting the bucket and
+ * blocking for ~60s without sending any HTTP requests.
+ */
 export async function reserveAniListRequest(): Promise<void> {
+  let waitedMs = 0;
+
   while (true) {
     const waitMs = getAniListRateLimitWaitMs();
-
     if (waitMs <= 0) {
-      if (state.remaining !== null) {
-        state.remaining = Math.max(0, state.remaining - 1);
-      }
       return;
     }
 
-    if (process.env.NODE_ENV === "development") {
-      console.warn(`[anilist] rate limit bucket empty; waiting ${waitMs}ms`);
+    const remainingBudget = MAX_RATE_LIMIT_WAIT_MS - waitedMs;
+    if (remainingBudget <= 0) {
+      console.warn(
+        `[anilist] rate limit wait cap (${MAX_RATE_LIMIT_WAIT_MS}ms) reached; proceeding`,
+      );
+      return;
     }
 
-    await sleep(waitMs);
+    const sleepMs = Math.min(waitMs, remainingBudget);
+
+    if (process.env.NODE_ENV === "development") {
+      console.warn(`[anilist] rate limit bucket empty; waiting ${sleepMs}ms`);
+    }
+
+    await sleep(sleepMs);
+    waitedMs += sleepMs;
   }
 }

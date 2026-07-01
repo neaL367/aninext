@@ -12,6 +12,9 @@ export const MIN_RATE_LIMIT_RETRY_MS = 2_000;
 /** Small cushion after AniList's reset timestamp before resuming requests. */
 export const RATE_LIMIT_RESET_BUFFER_MS = 500;
 
+/** Proactive gate cap — never block longer than this before attempting the request. */
+export const MAX_RATE_LIMIT_WAIT_MS = 8_000;
+
 /** Cap parallel AniList requests — airing pagination + home slots share this queue. */
 export const MAX_CONCURRENT_GRAPHQL_REQUESTS = 4;
 
