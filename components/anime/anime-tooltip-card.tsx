@@ -9,7 +9,7 @@ import { MediaTooltip } from "@/components/shared/media-tooltip";
 
 type AnimeTooltipCardProps = {
   media: AnimeCardMedia;
-  layout: "carousel" | "browse";
+  layout: "carousel" | "browse" | "compact";
   showCountdown?: boolean;
   priority?: boolean;
   className?: string;
