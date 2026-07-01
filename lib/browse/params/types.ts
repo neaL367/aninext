@@ -15,6 +15,49 @@ export const ANIME_SORTS = [
 
 export type AnimeSort = (typeof ANIME_SORTS)[number];
 
+export const MEDIA_SEASONS = [
+  "WINTER",
+  "SPRING",
+  "SUMMER",
+  "FALL",
+] as const satisfies readonly MediaSeason[];
+
+export const MEDIA_FORMATS = [
+  "TV",
+  "TV_SHORT",
+  "MOVIE",
+  "SPECIAL",
+  "OVA",
+  "ONA",
+  "MUSIC",
+] as const satisfies readonly MediaFormat[];
+
+export const MEDIA_STATUSES = [
+  "FINISHED",
+  "RELEASING",
+  "NOT_YET_RELEASED",
+  "CANCELLED",
+  "HIATUS",
+] as const satisfies readonly MediaStatus[];
+
+export const MEDIA_SOURCES = [
+  "ORIGINAL",
+  "MANGA",
+  "LIGHT_NOVEL",
+  "VISUAL_NOVEL",
+  "VIDEO_GAME",
+  "OTHER",
+  "NOVEL",
+  "DOUJINSHI",
+  "ANIME",
+  "WEB_NOVEL",
+  "LIVE_ACTION",
+  "GAME",
+  "COMIC",
+  "MULTIMEDIA_PROJECT",
+  "PICTURE_BOOK",
+] as const satisfies readonly MediaSource[];
+
 export type AnimeListParams = {
   sort: AnimeSort;
   q: string;

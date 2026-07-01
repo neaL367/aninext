@@ -7,6 +7,10 @@ import type {
 import {
   ANIME_SORTS,
   DEFAULT_ANIME_LIST_PARAMS,
+  MEDIA_FORMATS,
+  MEDIA_SEASONS,
+  MEDIA_SOURCES,
+  MEDIA_STATUSES,
   type AnimeListParams,
   type AnimeSort,
 } from "@/lib/browse/params/types";
@@ -46,49 +50,19 @@ function isAnimeSort(value: string): value is AnimeSort {
 }
 
 function isMediaSeason(value: string): value is MediaSeason {
-  return ["WINTER", "SPRING", "SUMMER", "FALL"].includes(value);
+  return (MEDIA_SEASONS as readonly string[]).includes(value);
 }
 
 function isMediaFormat(value: string): value is MediaFormat {
-  return [
-    "TV",
-    "TV_SHORT",
-    "MOVIE",
-    "SPECIAL",
-    "OVA",
-    "ONA",
-    "MUSIC",
-  ].includes(value);
+  return (MEDIA_FORMATS as readonly string[]).includes(value);
 }
 
 function isMediaStatus(value: string): value is MediaStatus {
-  return [
-    "FINISHED",
-    "RELEASING",
-    "NOT_YET_RELEASED",
-    "CANCELLED",
-    "HIATUS",
-  ].includes(value);
+  return (MEDIA_STATUSES as readonly string[]).includes(value);
 }
 
 function isMediaSource(value: string): value is MediaSource {
-  return [
-    "ORIGINAL",
-    "MANGA",
-    "LIGHT_NOVEL",
-    "VISUAL_NOVEL",
-    "VIDEO_GAME",
-    "OTHER",
-    "NOVEL",
-    "DOUJINSHI",
-    "ANIME",
-    "WEB_NOVEL",
-    "LIVE_ACTION",
-    "GAME",
-    "COMIC",
-    "MULTIMEDIA_PROJECT",
-    "PICTURE_BOOK",
-  ].includes(value);
+  return (MEDIA_SOURCES as readonly string[]).includes(value);
 }
 
 function readFormats(

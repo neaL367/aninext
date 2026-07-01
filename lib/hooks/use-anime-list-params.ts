@@ -8,52 +8,15 @@ import {
   useQueryStates,
 } from "nuqs";
 import { useCallback, useMemo } from "react";
-import type {
-  MediaFormat,
-  MediaSeason,
-  MediaSource,
-  MediaStatus,
-} from "@/lib/anilist/domain/types";
 import {
   ANIME_SORTS,
   DEFAULT_ANIME_LIST_PARAMS,
+  MEDIA_FORMATS,
+  MEDIA_SEASONS,
+  MEDIA_SOURCES,
+  MEDIA_STATUSES,
   type AnimeListParams,
 } from "@/lib/browse/params/types";
-
-const MEDIA_SEASONS = ["WINTER", "SPRING", "SUMMER", "FALL"] as const;
-const MEDIA_FORMATS = [
-  "TV",
-  "TV_SHORT",
-  "MOVIE",
-  "SPECIAL",
-  "OVA",
-  "ONA",
-  "MUSIC",
-] as const;
-const MEDIA_STATUSES = [
-  "FINISHED",
-  "RELEASING",
-  "NOT_YET_RELEASED",
-  "CANCELLED",
-  "HIATUS",
-] as const;
-const MEDIA_SOURCES = [
-  "ORIGINAL",
-  "MANGA",
-  "LIGHT_NOVEL",
-  "VISUAL_NOVEL",
-  "VIDEO_GAME",
-  "OTHER",
-  "NOVEL",
-  "DOUJINSHI",
-  "ANIME",
-  "WEB_NOVEL",
-  "LIVE_ACTION",
-  "GAME",
-  "COMIC",
-  "MULTIMEDIA_PROJECT",
-  "PICTURE_BOOK",
-] as const;
 
 export const animeListNuqsParsers = {
   sort: parseAsStringLiteral(ANIME_SORTS).withDefault(
@@ -81,67 +44,27 @@ export const animeListNuqsParsers = {
   scoreMin: parseAsInteger,
 };
 
-type NuqsState = {
-  sort: (typeof ANIME_SORTS)[number];
-  q: string;
-  genres: string[];
-  tags: string[];
+type NuqsState = Omit<AnimeListParams, "formats" | "statuses" | "season" | "source"> & {
   formats: (typeof MEDIA_FORMATS)[number][];
   statuses: (typeof MEDIA_STATUSES)[number][];
   season: (typeof MEDIA_SEASONS)[number] | null;
   source: (typeof MEDIA_SOURCES)[number] | null;
-  country: string | null;
-  year: number | null;
-  yearMin: number | null;
-  yearMax: number | null;
-  durationMin: number | null;
-  durationMax: number | null;
-  episodesMin: number | null;
-  episodesMax: number | null;
-  scoreMin: number | null;
 };
 
 export function nuqsStateToParams(state: NuqsState): AnimeListParams {
   return {
-    sort: state.sort,
-    q: state.q,
-    genres: state.genres,
-    tags: state.tags,
-    formats: state.formats as MediaFormat[],
-    statuses: state.statuses as MediaStatus[],
-    season: state.season as MediaSeason | null,
-    source: state.source as MediaSource | null,
+    ...state,
     country: state.country || null,
-    year: state.year,
-    yearMin: state.yearMin,
-    yearMax: state.yearMax,
-    durationMin: state.durationMin,
-    durationMax: state.durationMax,
-    episodesMin: state.episodesMin,
-    episodesMax: state.episodesMax,
-    scoreMin: state.scoreMin,
   };
 }
 
 export function paramsToNuqsState(params: AnimeListParams): NuqsState {
   return {
-    sort: params.sort,
-    q: params.q,
-    genres: params.genres,
-    tags: params.tags,
+    ...params,
     formats: params.formats as NuqsState["formats"],
     statuses: params.statuses as NuqsState["statuses"],
     season: params.season as NuqsState["season"],
     source: params.source as NuqsState["source"],
-    country: params.country,
-    year: params.year,
-    yearMin: params.yearMin,
-    yearMax: params.yearMax,
-    durationMin: params.durationMin,
-    durationMax: params.durationMax,
-    episodesMin: params.episodesMin,
-    episodesMax: params.episodesMax,
-    scoreMin: params.scoreMin,
   };
 }
 
