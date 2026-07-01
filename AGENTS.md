@@ -31,7 +31,7 @@ Read `node_modules/next/dist/docs/` before changing routing, caching, or data fe
 - **Images**: use `next/image` with `sizes`; remote patterns in `next.config.ts`.
 - **Codegen**: run `bun run codegen` after `.graphql` changes; never edit `lib/anilist/generated/`.
 - **Dev fetch logging**: `next.config.ts` enables `logging.fetches.fullUrl`; AniList GraphQL requests log operation name and duration in development via `lib/anilist/infra/graphql-client.ts`.
-- **Tooling**: run `bun run lint:all` (Oxlint + ESLint) and `bun run format:check` / `bun run format` (Oxfmt). Keep ESLint for Next.js-specific rules; Oxlint is the fast lint pass.
+- **Tooling**: run `bun run lint` (Oxlint) and `bun run format:check` / `bun run format` (Oxfmt). Use `bun run lint:fix` for auto-fixable Oxlint issues.
 
 ## `lib/` layout
 

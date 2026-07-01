@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["typescript", "unicorn", "oxc", "react"],
+  "plugins": ["typescript", "unicorn", "oxc", "react", "nextjs", "jsx-a11y", "import"],
   "categories": {
     "correctness": "error"
   },
@@ -9,9 +9,13 @@
     "node_modules/**",
     "lib/anilist/generated/**",
     "out/**",
-    "build/**"
+    "build/**",
+    "next-env.d.ts"
   ],
-  "rules": {},
+  "rules": {
+    "jsx-a11y/label-has-associated-control": "off",
+    "jsx-a11y/prefer-tag-over-role": "off"
+  },
   "env": {
     "builtin": true
   }

@@ -31,7 +31,7 @@ export function EpisodeCard({ episode, className }: EpisodeCardProps) {
               loading="lazy"
             />
           ) : (
-            // eslint-disable-next-line @next/next/no-img-element
+            // oxlint-disable-next-line nextjs/no-img-element -- external thumbnails are not on AniList CDN
             <img
               src={thumbnail}
               alt=""
