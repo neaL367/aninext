@@ -1,6 +1,7 @@
 "use client";
 
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Suspense } from "react";
 import { AppQueryProvider } from "@/components/layout/app-query-provider";
 import { DetailScrollRestore } from "@/components/navigation/detail-scroll-restore";
 import { ThemeProvider } from "@/components/layout/theme-provider";
@@ -15,7 +16,9 @@ export function Providers({ children }: ProvidersProps) {
     <NuqsAdapter>
       <AppQueryProvider>
         <ThemeProvider>
-          <DetailScrollRestore />
+          <Suspense fallback={null}>
+            <DetailScrollRestore />
+          </Suspense>
           <LenisRoot>{children}</LenisRoot>
         </ThemeProvider>
       </AppQueryProvider>

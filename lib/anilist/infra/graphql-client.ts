@@ -2,12 +2,7 @@ import "server-only";
 
 import type { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { print } from "graphql";
-import {
-  ANILIST_API_URL,
-  MAX_RETRIES,
-  REQUEST_TIMEOUT_MS,
-  SLOW_REQUEST_MS,
-} from "./constants";
+import { ANILIST_API_URL, MAX_RETRIES, REQUEST_TIMEOUT_MS, SLOW_REQUEST_MS } from "./constants";
 import { AniListError } from "@/lib/anilist/domain/errors";
 import { withConcurrencyLimit } from "./concurrency";
 
@@ -24,6 +19,26 @@ function getPrintedQuery(document: TypedDocumentNode<unknown, unknown>): string 
   const printed = print(document);
   printedQueries.set(document, printed);
   return printed;
+}
+
+function getOperationName(document: TypedDocumentNode<unknown, unknown>): string {
+  const query = getPrintedQuery(document);
+  const match = /(?:query|mutation)\s+(\w+)/.exec(query);
+  return match?.[1] ?? "anonymous";
+}
+
+function logGraphQLRequest(
+  operationName: string,
+  elapsedMs: number,
+  variables?: Record<string, unknown>,
+): void {
+  if (process.env.NODE_ENV !== "development") {
+    return;
+  }
+
+  const variableKeys = variables ? Object.keys(variables).sort().join(",") : "";
+  const suffix = variableKeys ? ` vars={${variableKeys}}` : "";
+  console.log(`[anilist] ${operationName} ${elapsedMs}ms${suffix}`);
 }
 
 async function sleep(ms: number): Promise<void> {
@@ -68,7 +83,7 @@ function isFetchNetworkError(error: unknown): boolean {
 
 async function fetchGraphQLOnce<TData, TVariables extends Record<string, unknown>>(
   document: TypedDocumentNode<TData, TVariables>,
-  variables?: TVariables
+  variables?: TVariables,
 ): Promise<TData> {
   const started = Date.now();
   let response: Response;
@@ -77,9 +92,7 @@ async function fetchGraphQLOnce<TData, TVariables extends Record<string, unknown
       method: "POST",
       headers: buildGraphQLHeaders(),
       body: JSON.stringify({
-        query: getPrintedQuery(
-          document as TypedDocumentNode<unknown, unknown>
-        ),
+        query: getPrintedQuery(document as TypedDocumentNode<unknown, unknown>),
         variables: variables ?? {},
       }),
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
@@ -89,18 +102,18 @@ async function fetchGraphQLOnce<TData, TVariables extends Record<string, unknown
       throw new AniListError(
         "network",
         "AniList request failed before receiving a response",
-        error
+        error,
       );
     }
     throw error;
   }
 
   const elapsed = Date.now() - started;
-  if (
-    process.env.NODE_ENV === "development" &&
-    elapsed > SLOW_REQUEST_MS
-  ) {
-    console.warn(`[anilist] slow request ${elapsed}ms`);
+  const operationName = getOperationName(document as TypedDocumentNode<unknown, unknown>);
+  logGraphQLRequest(operationName, elapsed, variables);
+
+  if (process.env.NODE_ENV === "development" && elapsed > SLOW_REQUEST_MS) {
+    console.warn(`[anilist] slow request ${operationName} ${elapsed}ms`);
   }
 
   if (response.status === 429) {
@@ -108,7 +121,7 @@ async function fetchGraphQLOnce<TData, TVariables extends Record<string, unknown
       "rate_limit",
       "AniList rate limit exceeded. Please try again shortly.",
       undefined,
-      parseRetryAfterMs(response)
+      parseRetryAfterMs(response),
     );
   }
 
@@ -120,14 +133,10 @@ async function fetchGraphQLOnce<TData, TVariables extends Record<string, unknown
       throw new AniListError(
         "network",
         `AniList request failed with status ${response.status}`,
-        error
+        error,
       );
     }
-    throw new AniListError(
-      "validation",
-      "AniList response was not valid JSON",
-      error
-    );
+    throw new AniListError("validation", "AniList response was not valid JSON", error);
   }
 
   // AniList returns HTTP 404 with `{ data: { Media: null }, errors: [...] }` for missing records.
@@ -137,23 +146,16 @@ async function fetchGraphQLOnce<TData, TVariables extends Record<string, unknown
     }
     throw new AniListError(
       "not_found",
-      payload.errors?.map((error) => error.message).join("; ") ??
-        "AniList resource not found"
+      payload.errors?.map((error) => error.message).join("; ") ?? "AniList resource not found",
     );
   }
 
   if (!response.ok) {
-    throw new AniListError(
-      "network",
-      `AniList request failed with status ${response.status}`
-    );
+    throw new AniListError("network", `AniList request failed with status ${response.status}`);
   }
 
   if (payload.errors?.length) {
-    throw new AniListError(
-      "graphql",
-      payload.errors.map((error) => error.message).join("; ")
-    );
+    throw new AniListError("graphql", payload.errors.map((error) => error.message).join("; "));
   }
 
   if (!payload.data) {
@@ -163,26 +165,20 @@ async function fetchGraphQLOnce<TData, TVariables extends Record<string, unknown
   return payload.data;
 }
 
-async function executeGraphQLWithRetry<
-  TData,
-  TVariables extends Record<string, unknown>,
->(
+async function executeGraphQLWithRetry<TData, TVariables extends Record<string, unknown>>(
   document: TypedDocumentNode<TData, TVariables>,
-  variables?: TVariables
+  variables?: TVariables,
 ): Promise<TData> {
   let attempt = 0;
   let lastError: unknown;
 
   while (attempt <= MAX_RETRIES) {
     try {
-      return await withConcurrencyLimit(() =>
-        fetchGraphQLOnce(document, variables)
-      );
+      return await withConcurrencyLimit(() => fetchGraphQLOnce(document, variables));
     } catch (error) {
       lastError = error;
       const retryable =
-        error instanceof AniListError &&
-        (error.code === "rate_limit" || error.code === "network");
+        error instanceof AniListError && (error.code === "rate_limit" || error.code === "network");
       if (!retryable || attempt === MAX_RETRIES) {
         break;
       }
@@ -199,19 +195,12 @@ async function executeGraphQLWithRetry<
     throw lastError;
   }
 
-  throw new AniListError(
-    "network",
-    "AniList request failed after retries",
-    lastError
-  );
+  throw new AniListError("network", "AniList request failed after retries", lastError);
 }
 
-export async function executeGraphQL<
-  TData,
-  TVariables extends Record<string, unknown>,
->(
+export async function executeGraphQL<TData, TVariables extends Record<string, unknown>>(
   document: TypedDocumentNode<TData, TVariables>,
-  variables?: TVariables
+  variables?: TVariables,
 ): Promise<TData> {
   return executeGraphQLWithRetry(document, variables);
 }
