@@ -1,8 +1,8 @@
-#import "./media-card.graphql"
+#import "./media-detail-core.graphql"
 #import "./media-card-grid.graphql"
 
 fragment MediaDetailFields on Media {
-  ...MediaCardFields
+  ...MediaDetailCoreFields
   synonyms
   source
   chapters
