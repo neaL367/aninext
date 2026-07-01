@@ -11,6 +11,12 @@ import {
 } from "./constants";
 import { AniListError } from "@/lib/anilist/domain/errors";
 import { withConcurrencyLimit } from "./concurrency";
+import {
+  getAniListRateLimitWaitMs,
+  markAniListRateLimitExceeded,
+  reserveAniListRequest,
+  updateAniListRateLimitFromHeaders,
+} from "./rate-limit";
 
 type GraphQLResponse<T> = {
   readonly data?: T;
@@ -49,20 +55,6 @@ function logGraphQLRequest(
 
 async function sleep(ms: number): Promise<void> {
   await new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function parseRetryAfterMs(response: Response): number | undefined {
-  const header = response.headers.get("retry-after");
-  if (!header) return undefined;
-  const seconds = Number(header);
-  if (Number.isFinite(seconds)) {
-    return seconds * 1000;
-  }
-  const date = Date.parse(header);
-  if (Number.isFinite(date)) {
-    return Math.max(0, date - Date.now());
-  }
-  return undefined;
 }
 
 function buildGraphQLHeaders(): HeadersInit {
@@ -133,17 +125,21 @@ async function fetchGraphQLOnce<TData, TVariables extends Record<string, unknown
   const elapsed = Date.now() - started;
   const operationName = getOperationName(document as TypedDocumentNode<unknown, unknown>);
   logGraphQLRequest(operationName, elapsed, variables);
+  updateAniListRateLimitFromHeaders(response.headers);
 
   if (process.env.NODE_ENV === "development" && elapsed > SLOW_REQUEST_MS) {
     console.warn(`[anilist] slow request ${operationName} ${elapsed}ms`);
   }
 
+  const rateLimitWaitMs = getAniListRateLimitWaitMs();
+
   if (response.status === 429) {
+    const retryAfterMs = markAniListRateLimitExceeded(response.headers);
     throw new AniListError(
       "rate_limit",
       "AniList rate limit exceeded. Please try again shortly.",
       undefined,
-      parseRetryAfterMs(response),
+      retryAfterMs,
     );
   }
 
@@ -179,7 +175,7 @@ async function fetchGraphQLOnce<TData, TVariables extends Record<string, unknown
   if (payload.errors?.length) {
     const message = payload.errors.map((error) => error.message).join("; ");
     if (payload.errors.some((error) => isRateLimitMessage(error.message))) {
-      throw new AniListError("rate_limit", message);
+      throw new AniListError("rate_limit", message, undefined, rateLimitWaitMs);
     }
     throw new AniListError("graphql", message);
   }
@@ -200,6 +196,7 @@ async function executeGraphQLWithRetry<TData, TVariables extends Record<string, 
 
   while (attempt <= MAX_RETRIES) {
     try {
+      await reserveAniListRequest();
       return await withConcurrencyLimit(() => fetchGraphQLOnce(document, variables));
     } catch (error) {
       lastError = error;
