@@ -1,36 +1,21 @@
 import "server-only";
 
-import { permanentRedirect } from "next/navigation";
-import { notFound } from "next/navigation";
-import { cache } from "react";
+import { notFound, permanentRedirect } from "next/navigation";
 import { formatDisplayTitle } from "@/lib/anilist/display/format";
-import { matchesDetailSlug } from "@/lib/anilist/display/media-links";
-import type { SlugDetailParams } from "@/lib/anilist/domain/detail-route-params";
+import { createSlugDetailResolver } from "@/lib/anilist/server/create-slug-detail-resolver";
 import { getMediaDetail } from "@/lib/anilist/server/get-media-detail";
-import { parseDetailId } from "@/lib/anilist/server/parse-detail-id";
 import { animeDetailPath, mangaDetailPath } from "@/lib/navigation/detail-paths";
 
 /** Per-request dedupe for parallel detail Suspense boundaries (cover + body). */
-export const resolveAnimeDetailMedia = cache(async (params: SlugDetailParams) => {
-  const { id, slug } = await params;
-  const mediaId = parseDetailId(id);
-  const media = await getMediaDetail(mediaId);
-
-  if (!media) {
-    notFound();
-  }
-
-  const title = formatDisplayTitle(media.title);
-
-  if (media.type === "MANGA") {
-    permanentRedirect(mangaDetailPath(media.id, title));
-  }
-
-  const canonicalPath = animeDetailPath(media.id, title);
-
-  if (!matchesDetailSlug(title, slug)) {
-    permanentRedirect(canonicalPath);
-  }
-
-  return media;
+export const resolveAnimeDetailMedia = createSlugDetailResolver({
+  fetch: getMediaDetail,
+  getSlugName: (media) => formatDisplayTitle(media.title),
+  getCanonicalPath: (media, slugName) => animeDetailPath(media.id, slugName),
+  beforeCanonicalRedirect: (media) => {
+    if (media.type === "MANGA") {
+      permanentRedirect(
+        mangaDetailPath(media.id, formatDisplayTitle(media.title))
+      );
+    }
+  },
 });
