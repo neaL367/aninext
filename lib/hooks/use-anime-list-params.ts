@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import {
   parseAsInteger,
   parseAsNativeArrayOf,
@@ -20,7 +21,7 @@ import {
 
 export const animeListNuqsParsers = {
   sort: parseAsStringLiteral(ANIME_SORTS).withDefault(DEFAULT_ANIME_LIST_PARAMS.sort),
-  q: parseAsString.withDefault("").withOptions({ throttleMs: 300, shallow: true }),
+  q: parseAsString.withDefault(""),
   genres: parseAsNativeArrayOf(parseAsString).withDefault([]),
   tags: parseAsNativeArrayOf(parseAsString).withDefault([]),
   formats: parseAsNativeArrayOf(parseAsStringLiteral(MEDIA_FORMATS)).withDefault([]),
@@ -67,28 +68,35 @@ const RESET_NUQS_STATE = paramsToNuqsState(DEFAULT_ANIME_LIST_PARAMS);
 export function useAnimeListParams() {
   "use memo";
 
+  const queryClient = useQueryClient();
   const [state, setState] = useQueryStates(animeListNuqsParsers, {
     shallow: true,
   });
 
   const params = useMemo(() => nuqsStateToParams(state as NuqsState), [state]);
+  const cancelBrowseQueries = useCallback(() => {
+    void queryClient.cancelQueries({ queryKey: ["anilist", "media", "infinite"] });
+  }, [queryClient]);
 
   const applyFilters = useCallback(
     (next: AnimeListParams) => {
+      cancelBrowseQueries();
       void setState(paramsToNuqsState(next));
     },
-    [setState],
+    [cancelBrowseQueries, setState],
   );
 
   const resetFilters = useCallback(() => {
+    cancelBrowseQueries();
     void setState(RESET_NUQS_STATE);
-  }, [setState]);
+  }, [cancelBrowseQueries, setState]);
 
   const setSearchInput = useCallback(
     (value: string) => {
+      cancelBrowseQueries();
       void setState({ q: value });
     },
-    [setState],
+    [cancelBrowseQueries, setState],
   );
 
   return {

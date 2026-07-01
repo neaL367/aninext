@@ -25,6 +25,7 @@ export function mediaPageInfiniteOptions(
     },
     initialPageParam: config.initialPageParam,
     staleTime: config.staleTime,
+    gcTime: config.gcTime,
     refetchOnMount: config.refetchOnMount,
     refetchOnWindowFocus: config.refetchOnWindowFocus,
     getNextPageParam: config.getNextPageParam,

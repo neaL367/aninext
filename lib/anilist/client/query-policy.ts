@@ -5,5 +5,6 @@ export const anilistQueryStaleTime = {
 } as const;
 
 export const anilistQueryGcTime = {
+  mediaPage: 15 * 60 * 1000,
   tooltip: 30 * 60 * 1000,
 } as const;

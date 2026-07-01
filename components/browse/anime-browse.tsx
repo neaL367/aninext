@@ -47,7 +47,7 @@ function AnimeBrowseResults() {
 
   useEffect(() => {
     const element = loadMoreRef.current;
-    if (!element || !hasNextPage || isFetchingNextPage) return;
+    if (!element || !hasNextPage || isFetchingNextPage || isPlaceholderData) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -57,10 +57,12 @@ function AnimeBrowseResults() {
     );
     observer.observe(element);
     return () => observer.disconnect();
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage, isPlaceholderData]);
 
   const showLoadMore =
-    hasNextPage && (maxPage === null || media.length < maxPage * LISTING_PAGE_SIZE);
+    !isPlaceholderData &&
+    hasNextPage &&
+    (maxPage === null || media.length < maxPage * LISTING_PAGE_SIZE);
 
   const showInitialSkeleton = isPending && !data;
   const showSearchOverlay = isFetching && !isPending && !isFetchingNextPage && isPlaceholderData;

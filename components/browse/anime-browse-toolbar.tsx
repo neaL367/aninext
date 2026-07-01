@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SearchIcon, SlidersHorizontalIcon } from "lucide-react";
 import { useBrowseFilters } from "@/components/browse/browse-filters-provider";
 import { AnimeQuickFilters } from "@/components/browse/anime-quick-filters";
@@ -32,8 +32,31 @@ export function AnimeBrowseToolbar() {
   const { setSearchInput } = actions;
   const { searchRef } = meta;
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [searchDraft, setSearchDraft] = useState(params.q);
+  const lastCommittedSearchRef = useRef(params.q);
   const filterCount = countBrowseFilters(params);
   const hasChips = getActiveFilterChips(params).length > 0;
+
+  useEffect(() => {
+    lastCommittedSearchRef.current = params.q;
+    setSearchDraft(params.q);
+  }, [params.q]);
+
+  useEffect(() => {
+    if (searchDraft === lastCommittedSearchRef.current) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      if (searchDraft === lastCommittedSearchRef.current) {
+        return;
+      }
+      lastCommittedSearchRef.current = searchDraft;
+      setSearchInput(searchDraft);
+    }, 350);
+
+    return () => window.clearTimeout(timer);
+  }, [searchDraft, setSearchInput]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -44,8 +67,14 @@ export function AnimeBrowseToolbar() {
             ref={searchRef}
             id="anime-search"
             type="search"
-            value={params.q}
-            onChange={(e) => setSearchInput(e.target.value)}
+            value={searchDraft}
+            onChange={(e) => setSearchDraft(e.target.value)}
+            onBlur={() => {
+              if (searchDraft !== lastCommittedSearchRef.current) {
+                lastCommittedSearchRef.current = searchDraft;
+                setSearchInput(searchDraft);
+              }
+            }}
             placeholder="Search anime..."
             autoComplete="off"
             className="h-9 pl-9"
