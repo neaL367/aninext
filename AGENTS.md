@@ -18,15 +18,22 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - SSR renders initial browse data in Server Components; client interactions call `loadMediaPage` / `getMediaCardTooltipAction`.
 - Package runner: `bun` / `bunx --bun`.
 
-## Next.js 16 practices (Cache Components)
+## AniList caching (dynamic routes)
 
-Read `node_modules/next/dist/docs/` before changing routing, caching, or data fetching. This project has `cacheComponents: true`.
+Read `node_modules/next/dist/docs/` before changing routing, caching, or data fetching. AniList data uses a three-layer cache model (no `cacheComponents`).
+
+- **L1 — React `cache()`**: per-request dedupe, applied automatically by `defineGraphQLFetcher` / `defineRuntimeFetcher` / `defineDataFetcher` in `lib/anilist/server/cache/define-fetcher.ts`.
+- **L2 — `unstable_cache`**: cross-request cache via `lib/anilist/server/cache/engine.ts` + profiles in `cache/policy.ts` + tags in `cache/tags.ts`.
+- **L3 — route `revalidate`**: ISR on detail pages; see `cache/route-config.ts` (literal required in page export).
+
+**Adding a cached operation:** register one entry in `lib/anilist/server/cache/registry.ts` using `defineGraphQLFetcher`, `defineRuntimeFetcher` (season/week keys), or `defineDataFetcher` (non-GraphQL). Export from `lib/anilist/server/fetchers/index.ts` as `anilist.yourOperation`. Pick a profile from `anilistCacheProfiles` or extend `profilesByOperation` for compile-time coverage.
 
 - **Server-first**: fetch in Server Components; add `"use client"` only for state, events, browser APIs, or hooks.
-- **Suspense + `connection()`**: wrap runtime/uncached data in `<Suspense>`; call `await connection()` before request-time fetches (search params, parallel slots, season-based keys).
-- **`instant` route config**: static shells use `export const instant = true`; dynamic routes use `instant = false`. Home hero (`app/(home)/page.tsx`) is `instant = true` while `app/(home)/layout.tsx` is `instant = false` so carousels stream without blocking the hero.
-- **Dedupe fetches**: use React `cache()` for data shared by `page` and `generateMetadata` (see `lib/anilist/server/get-media-detail.ts`).
-- **AniList fetch stack**: all GraphQL goes through `lib/anilist/infra/graphql-client.ts` (concurrency limit). Home sections fetch via `lib/anilist/server/get-home-sections.ts` with per-section `"use cache"`. Genres use `"use cache"` in `lib/anilist/server/get-genre-collection.ts`.
+- **Suspense + `connection()`**: wrap runtime data in `<Suspense>`; `defineRuntimeFetcher` calls `connection()` for home sections; airing week uses `connection()` in `get-airing-schedules.ts`.
+- **AniList fetch stack**: all GraphQL goes through `lib/anilist/infra/graphql-client.ts`. Bump `ANILIST_CACHE_VERSION` in `cache/policy.ts` when normalization shapes change; optional per-operation `schemaVersion` in registry entries.
+- **On-demand invalidation**: `lib/anilist/server/cache/revalidate.ts`.
+- **Dev cache logging**: `[anilist-cache] MISS` in development when L2 fetches run.
+- **Vercel cache warmer**: `vercel.json` cron hits `/api/cache-warm` once daily (`0 8 * * *` — Hobby limit); set `CRON_SECRET` in Vercel (quote values containing `#` in `.env`). Vercel sends `Authorization: Bearer <CRON_SECRET>` automatically. Local test: `curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cache-warm` (export `CRON_SECRET` in shell or paste quoted value; restart `bun dev` after `.env` changes).
 - **Prefetch**: use `<Link prefetch>` for primary nav targets.
 - **Images**: use `next/image` with `sizes`; remote patterns in `next.config.ts`.
 - **Codegen**: run `bun run codegen` after `.graphql` changes; never edit `lib/anilist/generated/`.
@@ -35,7 +42,7 @@ Read `node_modules/next/dist/docs/` before changing routing, caching, or data fe
 
 ## `lib/` layout
 
-- **`lib/anilist/`** — AniList data layer: `graphql/` + `generated/`, `infra/` (HTTP client, network constants), `domain/` (types, errors, genres, listing limits, season, normalization), `display/` (formatters, labels, image URLs), `server/` (cached fetchers, `actions.ts`, `cache-policy.ts`), `client/` (`media-page-list.ts` browse helpers).
+- **`lib/anilist/`** — AniList data layer: `graphql/` + `generated/`, `infra/` (HTTP client, network constants), `domain/` (types, errors, genres, listing limits, season, normalization), `display/` (formatters, labels, image URLs), `server/cache/` (engine, policy, registry, revalidate), `server/fetchers/` (`anilist` registry exports), `server/actions.ts`, `client/` (`media-page-list.ts` browse helpers).
 - **`lib/browse/`** — Anime listing URL params (`params/`), browse href builders (`url.ts`), filter helpers, and `anilist-queries.ts` (maps browse/home filters → GraphQL variables).
 - **`lib/styles/`** — Tailwind class tokens for cards, grids, and nav (not React components; see `components/ui/` for shadcn).
 - **`lib/navigation/`** — Site nav config, detail back-links, scroll restoration.
