@@ -1,4 +1,4 @@
-/** Shared cache tag namespaces for AniList data (use with cacheTag). */
+/** Shared cache tag namespaces for AniList data (use with unstable_cache tags). */
 export const anilistCacheTags = {
   genres: "anilist-genres",
   homeSection: (

@@ -1,20 +1,9 @@
 import "server-only";
 
-import { cache } from "react";
 import { connection } from "next/server";
-import {
-  getDayRangeFromDateKey,
-  getWeekDateKeys,
-  toLocalDateKeyFromDate,
-} from "@/lib/anilist/display/datetime";
-import { getCachedAiringSchedulesForDay } from "@/lib/anilist/server/get-cached-airing-schedules";
+import { getWeekDateKeys, toLocalDateKeyFromDate } from "@/lib/anilist/display/datetime";
+import { anilist } from "@/lib/anilist/server/cache/registry";
 import type { AiringScheduleItem } from "@/lib/anilist/domain/types";
-
-/** Per-request dedupe for repeated day promises. */
-const getAiringSchedulesForDateKey = cache(async (dateKey: string) => {
-  const { start, end } = getDayRangeFromDateKey(dateKey);
-  return getCachedAiringSchedulesForDay(dateKey, start, end);
-});
 
 export type AiringDayPromises = Record<string, Promise<AiringScheduleItem[]>>;
 
@@ -31,14 +20,14 @@ export async function getAiringDayPromisesForRequest(): Promise<{
   const dateKeys = getWeekDateKeys();
   const todayKey = toLocalDateKeyFromDate(new Date());
   const priorityDateKey = dateKeys.includes(todayKey) ? todayKey : dateKeys[0]!;
-  const priorityPromise = getAiringSchedulesForDateKey(priorityDateKey);
+  const priorityPromise = anilist.airingSchedulesForDay(priorityDateKey);
 
   const dayPromises = Object.fromEntries(
     dateKeys.map((dateKey) => [
       dateKey,
       dateKey === priorityDateKey
         ? priorityPromise
-        : priorityPromise.then(() => getAiringSchedulesForDateKey(dateKey)),
+        : priorityPromise.then(() => anilist.airingSchedulesForDay(dateKey)),
     ]),
   ) as AiringDayPromises;
 

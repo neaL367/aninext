@@ -7,8 +7,7 @@ import type { AnimeSeason } from "@/lib/anilist/domain/season";
 import type { MediaPageQueryVariables } from "@/lib/anilist/generated/graphql";
 import type { AnimeListParams } from "@/lib/browse/params/types";
 import { paramsToMediaQuery } from "@/lib/browse/params";
-import { getCachedMediaCardTooltip } from "@/lib/anilist/server/get-cached-media-card-tooltip";
-import { getCachedMediaPage } from "@/lib/anilist/server/get-media-page";
+import { anilist } from "@/lib/anilist/server/fetchers";
 
 export type MediaPageActionResult =
   | { ok: true; data: MediaPageResult }
@@ -29,7 +28,7 @@ function toActionError(error: unknown): Extract<MediaPageActionResult, { ok: fal
   return { ok: false, code: "error", message };
 }
 
-/** Browse infinite scroll — hits the same `"use cache"` layer as SSR. */
+/** Browse infinite scroll — hits the same L2 cache layer as SSR. */
 export async function loadMediaPage(
   params: AnimeListParams,
   page: number,
@@ -44,17 +43,17 @@ export async function loadMediaPage(
       perPage: LISTING_PAGE_SIZE,
     } as MediaPageQueryVariables;
 
-    const data = await getCachedMediaPage(variables);
+    const data = await anilist.mediaPage(variables);
     return { ok: true, data };
   } catch (error) {
     return toActionError(error);
   }
 }
 
-/** Card hover tooltip — hits the same `"use cache"` layer as the former route handler. */
+/** Card hover tooltip — hits the same L2 cache layer as the former route handler. */
 export async function getMediaCardTooltipAction(mediaId: number): Promise<TooltipActionResult> {
   try {
-    const data = await getCachedMediaCardTooltip(mediaId);
+    const data = await anilist.mediaCardTooltip(mediaId);
     return { ok: true, data };
   } catch (error) {
     return toActionError(error);
