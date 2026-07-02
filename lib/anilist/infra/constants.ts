@@ -12,14 +12,18 @@ export const MIN_RATE_LIMIT_RETRY_MS = 2_000;
 /** Small cushion after AniList's reset timestamp before resuming requests. */
 export const RATE_LIMIT_RESET_BUFFER_MS = 500;
 
-/** Proactive gate cap — never block longer than this before attempting the request. */
-export const MAX_RATE_LIMIT_WAIT_MS = 3_000;
+/** Proactive gate cap in development — keep local feedback snappy. */
+export const MAX_RATE_LIMIT_WAIT_MS_DEV = 3_000;
+
+/** Proactive gate cap in production — wait longer before failing into backup cache. */
+export const MAX_RATE_LIMIT_WAIT_MS_PROD = 30_000;
 
 /** Interactive lane (browse, tooltips, detail) — reserved so search is not starved by home/airing. */
 export const MAX_CONCURRENT_INTERACTIVE_REQUESTS = 2;
 
 /** Background lane (home carousels, airing pagination, genres). */
-export const MAX_CONCURRENT_BACKGROUND_REQUESTS = 2;
+export const MAX_CONCURRENT_BACKGROUND_REQUESTS =
+  process.env.NODE_ENV === "development" ? 2 : 1;
 
 export const DETAIL_RELATIONS_PER_PAGE = 36;
 

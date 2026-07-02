@@ -229,7 +229,9 @@ async function executeGraphQLWithRetry<TData, TVariables extends Record<string, 
     } catch (error) {
       lastError = error;
       const retryable =
-        error instanceof AniListError && (error.code === "rate_limit" || error.code === "network");
+        error instanceof AniListError &&
+        !error.proactiveGate &&
+        (error.code === "rate_limit" || error.code === "network");
       if (!retryable || attempt === MAX_RETRIES) {
         break;
       }

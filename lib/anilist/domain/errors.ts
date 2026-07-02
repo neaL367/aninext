@@ -4,13 +4,22 @@ export class AniListError extends Error {
   readonly code: AniListErrorCode;
   readonly cause?: unknown;
   readonly retryAfterMs?: number;
+  /** True when the proactive rate-limit gate refused to send (no HTTP round-trip). */
+  readonly proactiveGate?: boolean;
 
-  constructor(code: AniListErrorCode, message: string, cause?: unknown, retryAfterMs?: number) {
+  constructor(
+    code: AniListErrorCode,
+    message: string,
+    cause?: unknown,
+    retryAfterMs?: number,
+    proactiveGate?: boolean,
+  ) {
     super(message);
     this.name = "AniListError";
     this.code = code;
     this.cause = cause;
     this.retryAfterMs = retryAfterMs;
+    this.proactiveGate = proactiveGate;
   }
 }
 
