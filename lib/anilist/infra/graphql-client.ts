@@ -4,9 +4,11 @@ import type { TypedDocumentNode } from "@graphql-typed-document-node/core";
 import { print } from "graphql";
 import {
   ANILIST_API_URL,
+  MAX_RATE_LIMIT_RETRIES_WITH_RETRY_AFTER,
   MAX_RETRIES,
   MIN_RATE_LIMIT_RETRY_MS,
   REQUEST_TIMEOUT_MS,
+  RETRY_JITTER_RATIO,
   SLOW_REQUEST_MS,
 } from "./constants";
 import { AniListError } from "@/lib/anilist/domain/errors";
@@ -42,7 +44,7 @@ function getOperationName(document: TypedDocumentNode<unknown, unknown>): string
 /** Browse, tooltips, and detail pages use the interactive lane so home/airing cannot starve search. */
 const INTERACTIVE_OPERATIONS = new Set([
   "MediaPage",
-  "MediaCardTooltip",
+  "MediaCardTooltipBatch",
   "MediaDetail",
   "CharacterDetail",
   "StaffDetail",
@@ -107,16 +109,33 @@ function isRateLimitMessage(message: string): boolean {
   return /rate limit|too many requests/i.test(message);
 }
 
+function applyJitter(ms: number): number {
+  const jitter = ms * RETRY_JITTER_RATIO * (Math.random() * 2 - 1);
+  return Math.max(0, Math.round(ms + jitter));
+}
+
 function getRetryDelayMs(error: AniListError, attempt: number): number {
   if (error.code === "rate_limit") {
     const fromHeader = error.retryAfterMs;
     if (fromHeader != null && fromHeader > 0) {
-      return fromHeader;
+      return applyJitter(fromHeader);
     }
-    return Math.min(30_000, MIN_RATE_LIMIT_RETRY_MS * 2 ** attempt);
+    return applyJitter(Math.min(30_000, MIN_RATE_LIMIT_RETRY_MS * 2 ** attempt));
   }
 
-  return 2 ** attempt * 250;
+  return applyJitter(2 ** attempt * 250);
+}
+
+function getMaxAttempts(error: AniListError | undefined): number {
+  if (
+    error instanceof AniListError &&
+    error.code === "rate_limit" &&
+    error.retryAfterMs != null &&
+    error.retryAfterMs > 0
+  ) {
+    return MAX_RATE_LIMIT_RETRIES_WITH_RETRY_AFTER;
+  }
+  return MAX_RETRIES;
 }
 
 async function fetchGraphQLOnce<TData, TVariables extends Record<string, unknown>>(
@@ -220,7 +239,7 @@ async function executeGraphQLWithRetry<TData, TVariables extends Record<string, 
   let attempt = 0;
   let lastError: unknown;
 
-  while (attempt <= MAX_RETRIES) {
+  while (true) {
     try {
       await reserveAniListRequest();
       const operationName = getOperationName(document as TypedDocumentNode<unknown, unknown>);
@@ -232,11 +251,23 @@ async function executeGraphQLWithRetry<TData, TVariables extends Record<string, 
         error instanceof AniListError &&
         !error.proactiveGate &&
         (error.code === "rate_limit" || error.code === "network");
-      if (!retryable || attempt === MAX_RETRIES) {
+      const maxAttempts = getMaxAttempts(error instanceof AniListError ? error : undefined);
+      if (!retryable || attempt >= maxAttempts) {
         break;
       }
       const delay =
-        error instanceof AniListError ? getRetryDelayMs(error, attempt) : 2 ** attempt * 250;
+        error instanceof AniListError
+          ? getRetryDelayMs(error, attempt)
+          : applyJitter(2 ** attempt * 250);
+
+      if (
+        error instanceof AniListError &&
+        error.code === "rate_limit" &&
+        (process.env.NODE_ENV === "development" || process.env.ANILIST_LOG_RATE_LIMIT === "1")
+      ) {
+        console.warn(`[anilist-rate] 429 retry-after ${delay}ms (attempt ${attempt + 1})`);
+      }
+
       await sleep(delay);
       attempt += 1;
     }

@@ -11,6 +11,13 @@ type CacheEngineMeta = {
   schemaVersion?: string;
 };
 
+class BackupCacheMissError extends Error {
+  constructor() {
+    super("AniList backup cache miss");
+    this.name = "BackupCacheMissError";
+  }
+}
+
 function logCacheMiss(namespace: string, keyParts: string[]): void {
   if (process.env.NODE_ENV !== "development") return;
   const suffix = keyParts.length ? `/${keyParts.join("/")}` : "";
@@ -52,27 +59,40 @@ export function cachedAnilistData<TVars extends Record<string, unknown>, TResult
     meta,
   );
 
+  const backupKey = [...key, "backup"];
+  const backupRevalidate = backupRevalidateSeconds(profile.revalidate);
+
+  const seedBackup = (result: TResult): Promise<TResult> =>
+    unstable_cache(async () => result, backupKey, {
+      tags,
+      revalidate: backupRevalidate,
+    })();
+
+  const readBackup = (): Promise<TResult> =>
+    unstable_cache(
+      async () => {
+        throw new BackupCacheMissError();
+      },
+      backupKey,
+      { tags, revalidate: backupRevalidate },
+    )();
+
   const primary = unstable_cache(
     async () => {
       logCacheMiss(profile.namespace, keyParts);
-      return fn();
+      const result = await fn();
+      await seedBackup(result);
+      return result;
     },
     key,
     { tags, revalidate: profile.revalidate },
   );
 
-  // Backup cache: same keyParts/tags, but longer revalidate window.
-  // Used only when AniList rate limits and we have a previously cached value.
-  const backup = unstable_cache(async () => fn(), [...key, "backup"], {
-    tags,
-    revalidate: backupRevalidateSeconds(profile.revalidate),
-  });
-
   return primary().catch(async (error: unknown) => {
     if (!isAniListRateLimitError(error)) throw error;
 
     try {
-      return await backup();
+      return await readBackup();
     } catch {
       throw error;
     }
