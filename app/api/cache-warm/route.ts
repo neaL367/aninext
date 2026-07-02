@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { toLocalDateKeyFromDate } from "@/lib/anilist/display/datetime";
+import { getWeekDateKeys, toLocalDateKeyFromDate } from "@/lib/anilist/display/datetime";
 import { anilist } from "@/lib/anilist/server/fetchers";
 
 /**
@@ -10,26 +10,26 @@ import { anilist } from "@/lib/anilist/server/fetchers";
 
 export const maxDuration = 60;
 
-const WARM_TASKS = [
-  () => anilist.genreCollection(),
-  () => anilist.homeSection("trending"),
-  () => anilist.homeSection("airingNow"),
-  () => anilist.homeSection("popularThisSeason"),
-  () => anilist.homeSection("upcomingNextSeason"),
-  () => anilist.homeSection("allTimePopular"),
-  () => anilist.homeSection("top100"),
-  () => {
-    const todayKey = toLocalDateKeyFromDate(new Date());
-    return anilist.airingSchedulesForDay(todayKey);
-  },
-] as const;
+function buildWarmTasks() {
+  const weekDateKeys = getWeekDateKeys();
+
+  return [
+    () => anilist.genreCollection(),
+    () => anilist.homePageSections(),
+    ...weekDateKeys.map((dateKey) => () => anilist.airingSchedulesForDay(dateKey)),
+  ] as const;
+}
 
 export async function GET(request: NextRequest) {
   const cronSecret = process.env.CRON_SECRET;
 
   if (!cronSecret) {
     return NextResponse.json(
-      { ok: false, error: "missing_cron_secret", hint: "Set CRON_SECRET in .env (quote values containing #)" },
+      {
+        ok: false,
+        error: "missing_cron_secret",
+        hint: "Set CRON_SECRET in .env (quote values containing #)",
+      },
       { status: 503 },
     );
   }
@@ -51,14 +51,17 @@ export async function GET(request: NextRequest) {
 
   const schedule = request.headers.get("x-vercel-cron-schedule");
   const startedAt = Date.now();
+  const warmTasks = buildWarmTasks();
   const results: PromiseSettledResult<unknown>[] = [];
 
   // Sequential warming avoids bursting AniList when the bucket is nearly empty.
-  for (const warmTask of WARM_TASKS) {
-    results.push(await Promise.resolve(warmTask()).then(
-      (value) => ({ status: "fulfilled", value }) as const,
-      (reason) => ({ status: "rejected", reason }) as const,
-    ));
+  for (const warmTask of warmTasks) {
+    results.push(
+      await Promise.resolve(warmTask()).then(
+        (value) => ({ status: "fulfilled", value }) as const,
+        (reason) => ({ status: "rejected", reason }) as const,
+      ),
+    );
   }
 
   const okCount = results.filter((result) => result.status === "fulfilled").length;
@@ -69,5 +72,6 @@ export async function GET(request: NextRequest) {
     warmed: results.length,
     succeeded: okCount,
     elapsedMs: Date.now() - startedAt,
+    todayKey: toLocalDateKeyFromDate(new Date()),
   });
 }

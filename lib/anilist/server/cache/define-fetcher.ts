@@ -25,6 +25,8 @@ export function defineGraphQLFetcher<
   schemaVersion?: string;
   document: TypedDocumentNode<TData, TVars>;
   profile: AnilistCacheProfile<TCacheVars>;
+  /** Pick L2 profile per request (e.g. longer TTL for text search). */
+  resolveProfile?: (cacheVars: TCacheVars) => AnilistCacheProfile<TCacheVars>;
   variables: (...args: TArgs) => TVars;
   cacheVars: (...args: TArgs) => TCacheVars;
   normalize: (data: TData) => TResult;
@@ -34,15 +36,18 @@ export function defineGraphQLFetcher<
     schemaVersion: config.schemaVersion,
   };
 
-  const fetchL2 = (...args: TArgs) =>
-    cachedAnilistQuery(
+  const fetchL2 = (...args: TArgs) => {
+    const cacheVars = config.cacheVars(...args);
+    const profile = config.resolveProfile?.(cacheVars) ?? config.profile;
+    return cachedAnilistQuery(
       config.document,
       config.variables(...args),
-      config.cacheVars(...args),
-      config.profile,
+      cacheVars,
+      profile,
       meta,
       config.normalize,
     );
+  };
 
   return cache(fetchL2);
 }

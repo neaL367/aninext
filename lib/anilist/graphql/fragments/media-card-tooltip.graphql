@@ -2,6 +2,12 @@ fragment MediaCardTooltipFields on Media {
   isAdult
   bannerImage
   description(asHtml: false)
+  popularity
+  nextAiringEpisode {
+    airingAt
+    episode
+    timeUntilAiring
+  }
   studios(isMain: true) {
     nodes {
       id

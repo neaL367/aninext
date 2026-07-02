@@ -4,25 +4,20 @@ import { connection } from "next/server";
 import {
   CharacterDetailDocument,
   GenreCollectionDocument,
-  HomeSectionMediaDocument,
-  MediaCardTooltipDocument,
+  HomePageSectionsDocument,
+  MediaCardTooltipBatchDocument,
   MediaDetailDocument,
   MediaPageDocument,
   StaffDetailDocument,
   type MediaPageQueryVariables,
 } from "@/lib/anilist/generated/graphql";
 import type { GenreOption } from "@/lib/anilist/domain/genres";
-import type { HomeSectionId } from "@/lib/anilist/domain/home-sections";
-import {
-  normalizeHomeTop100Media,
-  normalizeListedMedia,
-} from "@/lib/anilist/domain/normalize-media-list";
-import { sortMediaByNextAiring } from "@/lib/anilist/domain/sort-media-by-airing";
+import type { HomePageSections } from "@/lib/anilist/domain/home-page-sections";
+import { normalizeHomePageSections } from "@/lib/anilist/domain/normalize-home-page-sections";
 import { getCurrentAnimeSeason, getNextAnimeSeason } from "@/lib/anilist/domain/season";
 import type {
   AiringScheduleItem,
   CharacterDetail,
-  MediaCard,
   MediaCardTooltip,
   MediaDetail,
   MediaPageResult,
@@ -35,15 +30,25 @@ import {
   normalizeStaffDetail,
 } from "@/lib/anilist/domain/types";
 import { getDayRangeFromDateKey } from "@/lib/anilist/display/datetime";
+import {
+  buildMediaCardTooltipBatchVariables,
+  normalizeMediaCardTooltipBatch,
+  tooltipBatchIdsKey,
+} from "@/lib/anilist/domain/tooltip-batch";
 import { executeGraphQL } from "@/lib/anilist/infra/graphql-client";
 import {
   defineDataFetcher,
   defineGraphQLFetcher,
   defineRuntimeFetcher,
 } from "@/lib/anilist/server/cache/define-fetcher";
-import { anilistCacheProfiles, mediaPageCacheVars } from "@/lib/anilist/server/cache/policy";
-import { buildHomeSectionVariables } from "@/lib/browse/anilist-queries";
+import {
+  anilistCacheProfiles,
+  mediaPageCacheVars,
+  mediaPageProfileFor,
+} from "@/lib/anilist/server/cache/policy";
+import { buildHomePageSectionVariables } from "@/lib/browse/anilist-queries";
 import { fetchAllAiringSchedules } from "@/lib/anilist/server/fetch-airing-schedules";
+import { fetchAiringScheduleCount } from "@/lib/anilist/server/fetch-airing-schedule-count";
 
 function normalizeGenreCollection(data: {
   GenreCollection?: (string | null)[] | null;
@@ -52,20 +57,6 @@ function normalizeGenreCollection(data: {
     .filter((name): name is string => Boolean(name))
     .map((name, index) => ({ id: index, name }))
     .sort((a, b) => a.name.localeCompare(b.name));
-}
-
-function normalizeHomeSectionMedia(
-  section: HomeSectionId,
-  data: {
-    Page?: { media?: Parameters<typeof normalizeListedMedia>[0] } | null;
-  },
-): MediaCard[] {
-  const media =
-    section === "top100"
-      ? normalizeHomeTop100Media(data.Page?.media)
-      : normalizeListedMedia(data.Page?.media);
-
-  return section === "airingNow" ? sortMediaByNextAiring(media) : media;
 }
 
 export const anilist = {
@@ -78,23 +69,22 @@ export const anilist = {
     normalize: normalizeGenreCollection,
   }),
 
-  homeSection: defineRuntimeFetcher({
-    operationId: "HomeSectionMedia",
-    profile: anilistCacheProfiles.homeSection,
-    runtime: async (section: HomeSectionId) => {
+  homePageSections: defineRuntimeFetcher({
+    operationId: "HomePageSections",
+    profile: anilistCacheProfiles.homePageSections,
+    runtime: async () => {
       await connection();
       return {
-        section,
         current: getCurrentAnimeSeason(),
         next: getNextAnimeSeason(),
       };
     },
-    fetch: async ({ section, current, next }) => {
+    fetch: async ({ current, next }) => {
       const data = await executeGraphQL(
-        HomeSectionMediaDocument,
-        buildHomeSectionVariables(section, current, next),
+        HomePageSectionsDocument,
+        buildHomePageSectionVariables(current, next),
       );
-      return normalizeHomeSectionMedia(section, data);
+      return normalizeHomePageSections(data);
     },
   }),
 
@@ -102,6 +92,7 @@ export const anilist = {
     operationId: "MediaPage",
     document: MediaPageDocument,
     profile: anilistCacheProfiles.mediaPage,
+    resolveProfile: mediaPageProfileFor,
     variables: (variables: MediaPageQueryVariables) => variables,
     cacheVars: (variables: MediaPageQueryVariables) => mediaPageCacheVars(variables),
     normalize: normalizeMediaPageResult,
@@ -134,13 +125,17 @@ export const anilist = {
     normalize: normalizeStaffDetail,
   }),
 
-  mediaCardTooltip: defineGraphQLFetcher({
-    operationId: "MediaCardTooltip",
-    document: MediaCardTooltipDocument,
-    profile: anilistCacheProfiles.tooltip,
-    variables: (mediaId: number) => ({ id: mediaId }),
-    cacheVars: (mediaId: number) => ({ mediaId }),
-    normalize: (data) => (data.Media?.isAdult ? null : data.Media ?? null),
+  mediaCardTooltipBatch: defineDataFetcher({
+    operationId: "MediaCardTooltipBatch",
+    profile: anilistCacheProfiles.tooltipBatch,
+    cacheVars: (mediaIds: number[]) => ({ idsKey: tooltipBatchIdsKey(mediaIds) }),
+    fetch: async (mediaIds: number[]) => {
+      const data = await executeGraphQL(
+        MediaCardTooltipBatchDocument,
+        buildMediaCardTooltipBatchVariables(mediaIds),
+      );
+      return normalizeMediaCardTooltipBatch(mediaIds, data);
+    },
   }),
 
   airingSchedulesForDay: defineDataFetcher({
@@ -155,14 +150,28 @@ export const anilist = {
       return fetchAllAiringSchedules(start, end);
     },
   }),
+
+  airingScheduleCountForDay: defineDataFetcher({
+    operationId: "AiringScheduleCount",
+    profile: anilistCacheProfiles.airingScheduleCount,
+    cacheVars: (dateKey: string) => {
+      const { start, end } = getDayRangeFromDateKey(dateKey);
+      return { dateKey, start, end };
+    },
+    fetch: async (dateKey: string) => {
+      const { start, end } = getDayRangeFromDateKey(dateKey);
+      return fetchAiringScheduleCount(start, end);
+    },
+  }),
 } as const satisfies Record<
   string,
   | (() => Promise<GenreOption[]>)
-  | ((section: HomeSectionId) => Promise<MediaCard[]>)
+  | (() => Promise<HomePageSections>)
   | ((variables: MediaPageQueryVariables) => Promise<MediaPageResult>)
   | ((mediaId: number) => Promise<MediaDetail | null>)
   | ((characterId: number) => Promise<CharacterDetail | null>)
   | ((staffId: number) => Promise<StaffDetail | null>)
-  | ((mediaId: number) => Promise<MediaCardTooltip | null>)
+  | ((mediaIds: number[]) => Promise<Map<number, MediaCardTooltip | null>>)
   | ((dateKey: string) => Promise<AiringScheduleItem[]>)
+  | ((dateKey: string) => Promise<number>)
 >;

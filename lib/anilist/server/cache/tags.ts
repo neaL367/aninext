@@ -1,13 +1,8 @@
 /** Shared cache tag namespaces for AniList data (use with unstable_cache tags). */
 export const anilistCacheTags = {
   genres: "anilist-genres",
-  homeSection: (
-    section: string,
-    currentSeason: string,
-    currentYear: number,
-    nextSeason: string,
-    nextYear: number,
-  ) => `anilist-home-${section}-${currentSeason}-${currentYear}-${nextSeason}-${nextYear}`,
+  homePage: (currentSeason: string, currentYear: number, nextSeason: string, nextYear: number) =>
+    `anilist-home-page-${currentSeason}-${currentYear}-${nextSeason}-${nextYear}`,
   media: "anilist-media",
   mediaDetail: (id: number) => `anilist-media-${id}`,
   characterDetail: (id: number) => `anilist-character-${id}`,

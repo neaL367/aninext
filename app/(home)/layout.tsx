@@ -5,9 +5,7 @@ type HomeLayoutProps = {
   children: ReactNode;
 };
 
-export default function HomeLayout({
-  children,
-}: HomeLayoutProps) {
+export default function HomeLayout({ children }: HomeLayoutProps) {
   return (
     <PageContainer className="flex flex-col gap-10 py-8 lg:gap-12 lg:py-10">
       {children}

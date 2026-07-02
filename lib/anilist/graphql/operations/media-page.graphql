@@ -1,4 +1,4 @@
-#import "../fragments/media-card.graphql"
+#import "../fragments/media-card-browse.graphql"
 #import "../fragments/page-info.graphql"
 
 query MediaPage(
@@ -49,7 +49,7 @@ query MediaPage(
       countryOfOrigin: $countryOfOrigin
       source_in: $source_in
     ) {
-      ...MediaCardFields
+      ...MediaCardBrowseFields
     }
   }
 }

@@ -1,8 +1,0 @@
-#import "../fragments/media-card-tooltip.graphql"
-
-query MediaCardTooltip($id: Int) {
-  Media(id: $id) {
-    id
-    ...MediaCardTooltipFields
-  }
-}

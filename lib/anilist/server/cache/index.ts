@@ -4,6 +4,7 @@ export {
   ANILIST_CACHE_VERSION,
   anilistCacheProfiles,
   mediaPageCacheVars,
+  mediaPageProfileFor,
   profilesByOperation,
   type AnilistCacheProfile,
   type AnilistCacheProfileId,

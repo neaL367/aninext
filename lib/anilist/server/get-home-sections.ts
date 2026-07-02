@@ -1,1 +1,8 @@
-export { getHomeSectionMedia } from "@/lib/anilist/server/fetchers";
+import "server-only";
+
+import type { HomePageSections } from "@/lib/anilist/domain/home-page-sections";
+import { anilist } from "@/lib/anilist/server/fetchers";
+
+export async function getHomePageSections(): Promise<HomePageSections> {
+  return anilist.homePageSections();
+}

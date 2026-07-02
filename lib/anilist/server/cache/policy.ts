@@ -1,20 +1,22 @@
-import type { HomeSectionId } from "@/lib/anilist/domain/home-sections";
 import type { AnimeSeason } from "@/lib/anilist/domain/season";
+import type { TooltipBatchCacheVars } from "@/lib/anilist/domain/tooltip-batch";
 import { anilistCacheTags, mediaPageFilterKey } from "@/lib/anilist/server/cache/tags";
 import type { MediaPageQueryVariables } from "@/lib/anilist/generated/graphql";
 
 /** Bump when normalization shapes change to bust all L2 cache entries. */
-export const ANILIST_CACHE_VERSION = "1" as const;
+export const ANILIST_CACHE_VERSION = "4" as const;
 
 export type AnilistCacheProfileId =
   | "genreCollection"
-  | "homeSection"
+  | "homePageSections"
   | "mediaPage"
+  | "mediaPageSearch"
   | "mediaDetail"
   | "characterDetail"
   | "staffDetail"
-  | "tooltip"
-  | "airingSchedules";
+  | "tooltipBatch"
+  | "airingSchedules"
+  | "airingScheduleCount";
 
 export type AnilistCacheProfile<TVars> = {
   revalidate: number;
@@ -32,8 +34,7 @@ const SECONDS = {
   sevenDays: 60 * 60 * 24 * 7,
 } as const;
 
-export type HomeSectionCacheVars = {
-  section: HomeSectionId;
+export type HomePageSectionsCacheVars = {
   current: AnimeSeason;
   next: AnimeSeason;
 };
@@ -62,30 +63,38 @@ export const anilistCacheProfiles = {
     tags: () => [anilistCacheTags.genres],
   } satisfies AnilistCacheProfile<Record<string, never>>,
 
-  homeSection: {
-    revalidate: SECONDS.fiveMinutes,
-    namespace: "home-section",
+  homePageSections: {
+    revalidate: SECONDS.tenMinutes,
+    namespace: "home-page-sections",
     keyParts: (vars) => [
-      vars.section,
       vars.current.season,
       String(vars.current.year),
       vars.next.season,
       String(vars.next.year),
     ],
     tags: (vars) => [
-      anilistCacheTags.homeSection(
-        vars.section,
+      anilistCacheTags.homePage(
         vars.current.season,
         vars.current.year,
         vars.next.season,
         vars.next.year,
       ),
     ],
-  } satisfies AnilistCacheProfile<HomeSectionCacheVars>,
+  } satisfies AnilistCacheProfile<HomePageSectionsCacheVars>,
 
   mediaPage: {
     revalidate: SECONDS.fiveMinutes,
     namespace: "media-page",
+    keyParts: (vars) => [String(vars.page ?? 1), vars.filterKey],
+    tags: (vars) => [
+      anilistCacheTags.mediaPages,
+      anilistCacheTags.mediaPage(vars.page ?? 1, vars.filterKey),
+    ],
+  } satisfies AnilistCacheProfile<MediaPageCacheVars>,
+
+  mediaPageSearch: {
+    revalidate: SECONDS.tenMinutes,
+    namespace: "media-page-search",
     keyParts: (vars) => [String(vars.page ?? 1), vars.filterKey],
     tags: (vars) => [
       anilistCacheTags.mediaPages,
@@ -114,16 +123,37 @@ export const anilistCacheProfiles = {
     tags: (vars) => [anilistCacheTags.staffDetail(vars.staffId)],
   } satisfies AnilistCacheProfile<StaffIdCacheVars>,
 
-  tooltip: {
+  tooltipBatch: {
     revalidate: SECONDS.fiveMinutes,
-    namespace: "media-tooltip",
-    keyParts: (vars) => [String(vars.mediaId)],
-    tags: (vars) => [anilistCacheTags.media, anilistCacheTags.mediaDetail(vars.mediaId)],
-  } satisfies AnilistCacheProfile<MediaIdCacheVars>,
+    namespace: "media-tooltip-batch",
+    keyParts: (vars) => [vars.idsKey],
+    tags: (vars) => {
+      const mediaIds = vars.idsKey
+        .split(",")
+        .filter(Boolean)
+        .map((id) => Number(id));
+
+      return [
+        anilistCacheTags.media,
+        ...mediaIds.map((mediaId) => anilistCacheTags.mediaDetail(mediaId)),
+      ];
+    },
+  } satisfies AnilistCacheProfile<TooltipBatchCacheVars>,
 
   airingSchedules: {
     revalidate: SECONDS.fifteenMinutes,
     namespace: "airing-schedules",
+    keyParts: (vars) => [vars.dateKey, String(vars.start), String(vars.end)],
+    tags: (vars) => [
+      anilistCacheTags.airing,
+      anilistCacheTags.airingDay(vars.dateKey),
+      anilistCacheTags.airingRange(vars.start, vars.end),
+    ],
+  } satisfies AnilistCacheProfile<AiringSchedulesCacheVars>,
+
+  airingScheduleCount: {
+    revalidate: SECONDS.fifteenMinutes,
+    namespace: "airing-schedule-count",
     keyParts: (vars) => [vars.dateKey, String(vars.start), String(vars.end)],
     tags: (vars) => [
       anilistCacheTags.airing,
@@ -136,12 +166,12 @@ export const anilistCacheProfiles = {
 /** GraphQL operation name → cache profile (compile-time guard for new operations). */
 export const profilesByOperation = {
   GenreCollection: anilistCacheProfiles.genreCollection,
-  HomeSectionMedia: anilistCacheProfiles.homeSection,
+  HomePageSections: anilistCacheProfiles.homePageSections,
   MediaPage: anilistCacheProfiles.mediaPage,
   MediaDetail: anilistCacheProfiles.mediaDetail,
   CharacterDetail: anilistCacheProfiles.characterDetail,
   StaffDetail: anilistCacheProfiles.staffDetail,
-  MediaCardTooltip: anilistCacheProfiles.tooltip,
+  MediaCardTooltipBatch: anilistCacheProfiles.tooltipBatch,
 } as const;
 
 export type AnilistGraphQLOperationName = keyof typeof profilesByOperation;
@@ -151,4 +181,12 @@ export function mediaPageCacheVars(variables: MediaPageQueryVariables): MediaPag
     ...variables,
     filterKey: mediaPageFilterKey(variables as Record<string, unknown>),
   };
+}
+
+export function mediaPageProfileFor(
+  cacheVars: MediaPageCacheVars,
+): AnilistCacheProfile<MediaPageCacheVars> {
+  return cacheVars.search?.trim()
+    ? anilistCacheProfiles.mediaPageSearch
+    : anilistCacheProfiles.mediaPage;
 }

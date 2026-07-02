@@ -19,14 +19,11 @@ export const getCachedCharacterDetail = anilist.characterDetail;
 /** @deprecated Use `anilist.staffDetail` */
 export const getCachedStaffDetail = anilist.staffDetail;
 
-/** @deprecated Use `anilist.mediaCardTooltip` */
-export const getCachedMediaCardTooltip = anilist.mediaCardTooltip;
-
 /** @deprecated Use `anilist.airingSchedulesForDay` */
 export const getCachedAiringSchedulesForDay = anilist.airingSchedulesForDay;
 
 export const getGenreCollection = anilist.genreCollection;
+export const getHomePageSections = anilist.homePageSections;
 export const getMediaDetail = anilist.mediaDetail;
 export const getCharacterDetail = anilist.characterDetail;
 export const getStaffDetail = anilist.staffDetail;
-export const getHomeSectionMedia = anilist.homeSection;

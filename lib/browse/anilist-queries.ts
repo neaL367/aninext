@@ -1,12 +1,8 @@
 import { CAROUSEL_PER_PAGE } from "@/lib/anilist/domain/listing";
-import type { HomeSectionMediaQueryVariables } from "@/lib/anilist/generated/graphql";
+import type { HomePageSectionsQueryVariables } from "@/lib/anilist/generated/graphql";
 import type { HomeSectionId } from "@/lib/anilist/domain/home-sections";
-import {
-  DEFAULT_ANIME_LIST_PARAMS,
-  paramsToMediaQuery,
-  type AnimeListParams,
-} from "@/lib/browse/params";
 import type { AnimeSeason } from "@/lib/anilist/domain/season";
+import { DEFAULT_ANIME_LIST_PARAMS, type AnimeListParams } from "@/lib/browse/params";
 
 /** Map home carousel slots to the same browse params used by "View all" links. */
 export function homeSectionToListParams(section: HomeSectionId): AnimeListParams {
@@ -30,16 +26,16 @@ export function homeSectionToListParams(section: HomeSectionId): AnimeListParams
   }
 }
 
-export function buildHomeSectionVariables(
-  section: HomeSectionId,
+/** Variables for the batched home page query (one HTTP request for all carousels). */
+export function buildHomePageSectionVariables(
   current: AnimeSeason,
   next: AnimeSeason,
-): HomeSectionMediaQueryVariables {
-  const params = homeSectionToListParams(section);
-  const query = paramsToMediaQuery(params, current, next);
-
+): HomePageSectionsQueryVariables {
   return {
     perPage: CAROUSEL_PER_PAGE,
-    ...query,
+    currentSeason: current.season,
+    currentSeasonYear: current.year,
+    nextSeason: next.season,
+    nextSeasonYear: next.year,
   };
 }
