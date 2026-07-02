@@ -8,6 +8,22 @@ import { anilist } from "@/lib/anilist/server/fetchers";
  * @see https://vercel.com/docs/cron-jobs/manage-cron-jobs#securing-cron-jobs
  */
 
+export const maxDuration = 60;
+
+const WARM_TASKS = [
+  () => anilist.genreCollection(),
+  () => anilist.homeSection("trending"),
+  () => anilist.homeSection("airingNow"),
+  () => anilist.homeSection("popularThisSeason"),
+  () => anilist.homeSection("upcomingNextSeason"),
+  () => anilist.homeSection("allTimePopular"),
+  () => anilist.homeSection("top100"),
+  () => {
+    const todayKey = toLocalDateKeyFromDate(new Date());
+    return anilist.airingSchedulesForDay(todayKey);
+  },
+] as const;
+
 export async function GET(request: NextRequest) {
   const cronSecret = process.env.CRON_SECRET;
 
@@ -34,22 +50,17 @@ export async function GET(request: NextRequest) {
   }
 
   const schedule = request.headers.get("x-vercel-cron-schedule");
-  const todayKey = toLocalDateKeyFromDate(new Date());
-
-  // Keep this list small and high-value: it runs on a schedule.
-  const warmTasks: Promise<unknown>[] = [
-    anilist.genreCollection(),
-    anilist.homeSection("trending"),
-    anilist.homeSection("airingNow"),
-    anilist.homeSection("popularThisSeason"),
-    anilist.homeSection("upcomingNextSeason"),
-    anilist.homeSection("allTimePopular"),
-    anilist.homeSection("top100"),
-    anilist.airingSchedulesForDay(todayKey),
-  ];
-
   const startedAt = Date.now();
-  const results = await Promise.allSettled(warmTasks);
+  const results: PromiseSettledResult<unknown>[] = [];
+
+  // Sequential warming avoids bursting AniList when the bucket is nearly empty.
+  for (const warmTask of WARM_TASKS) {
+    results.push(await Promise.resolve(warmTask()).then(
+      (value) => ({ status: "fulfilled", value }) as const,
+      (reason) => ({ status: "rejected", reason }) as const,
+    ));
+  }
+
   const okCount = results.filter((result) => result.status === "fulfilled").length;
 
   return NextResponse.json({
