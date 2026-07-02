@@ -1,21 +1,35 @@
 "use server";
 
+import { chunkTooltipBatchIds } from "@/lib/anilist/domain/tooltip-batch";
 import { LISTING_PAGE_SIZE } from "@/lib/anilist/domain/listing";
 import { AniListError } from "@/lib/anilist/domain/errors";
-import type { MediaCardTooltip, MediaPageResult } from "@/lib/anilist/domain/types";
+import type {
+  AiringScheduleItem,
+  MediaCardTooltip,
+  MediaPageResult,
+} from "@/lib/anilist/domain/types";
 import type { AnimeSeason } from "@/lib/anilist/domain/season";
 import type { MediaPageQueryVariables } from "@/lib/anilist/generated/graphql";
 import type { AnimeListParams } from "@/lib/browse/params/types";
 import { paramsToMediaQuery } from "@/lib/browse/params";
 import { anilist } from "@/lib/anilist/server/fetchers";
+import {
+  getAiringScheduleCountForDay,
+  getAiringSchedulesForDay,
+} from "@/lib/anilist/server/get-airing-schedules";
 
 export type MediaPageActionResult =
   | { ok: true; data: MediaPageResult }
   | { ok: false; code: "rate_limit"; message: string }
   | { ok: false; code: "error"; message: string };
 
-export type TooltipActionResult =
-  | { ok: true; data: MediaCardTooltip | null }
+export type TooltipBatchActionResult =
+  | { ok: true; data: Record<number, MediaCardTooltip | null> }
+  | { ok: false; code: "rate_limit"; message: string }
+  | { ok: false; code: "error"; message: string };
+
+export type AiringDayActionResult =
+  | { ok: true; data: AiringScheduleItem[] }
   | { ok: false; code: "rate_limit"; message: string }
   | { ok: false; code: "error"; message: string };
 
@@ -50,10 +64,46 @@ export async function loadMediaPage(
   }
 }
 
-/** Card hover tooltip — hits the same L2 cache layer as the former route handler. */
-export async function getMediaCardTooltipAction(mediaId: number): Promise<TooltipActionResult> {
+/** Batched card hover tooltips — up to 8 IDs per AniList HTTP request. */
+export async function getMediaCardTooltipsBatchAction(
+  mediaIds: number[],
+): Promise<TooltipBatchActionResult> {
   try {
-    const data = await anilist.mediaCardTooltip(mediaId);
+    const merged: Record<number, MediaCardTooltip | null> = {};
+
+    for (const chunk of chunkTooltipBatchIds(mediaIds)) {
+      const batch = await anilist.mediaCardTooltipBatch(chunk);
+      for (const [mediaId, tooltip] of batch) {
+        merged[mediaId] = tooltip;
+      }
+    }
+
+    return { ok: true, data: merged };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+/** Airing weekday tab count — lightweight id-only query; same L2 as `airingScheduleCountForDay`. */
+export async function loadAiringDayCount(
+  dateKey: string,
+): Promise<
+  | { ok: true; data: number }
+  | { ok: false; code: "rate_limit"; message: string }
+  | { ok: false; code: "error"; message: string }
+> {
+  try {
+    const data = await getAiringScheduleCountForDay(dateKey);
+    return { ok: true, data };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+/** Airing weekday tab — lazy after SSR priority day; same L2 as `airingSchedulesForDay`. */
+export async function loadAiringDay(dateKey: string): Promise<AiringDayActionResult> {
+  try {
+    const data = await getAiringSchedulesForDay(dateKey);
     return { ok: true, data };
   } catch (error) {
     return toActionError(error);

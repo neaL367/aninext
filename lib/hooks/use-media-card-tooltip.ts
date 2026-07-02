@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getMediaCardTooltipAction } from "@/lib/anilist/server/actions";
+import { enqueueTooltipBatch } from "@/lib/anilist/client/tooltip-batch-queue";
 import type { MediaCardTooltip } from "@/lib/anilist/domain/types";
 
 const tooltipCache = new Map<number, MediaCardTooltip | null>();
@@ -28,21 +28,25 @@ export function useMediaCardTooltip(mediaId: number, enabled: boolean) {
     setIsPending(true);
     setIsError(false);
 
-    void getMediaCardTooltipAction(mediaId).then((result) => {
-      if (cancelled) {
-        return;
-      }
+    void enqueueTooltipBatch(mediaId).then(
+      (tooltip) => {
+        if (cancelled) {
+          return;
+        }
 
-      setIsPending(false);
+        setIsPending(false);
+        tooltipCache.set(mediaId, tooltip);
+        setData(tooltip);
+      },
+      () => {
+        if (cancelled) {
+          return;
+        }
 
-      if (!result.ok) {
+        setIsPending(false);
         setIsError(true);
-        return;
-      }
-
-      tooltipCache.set(mediaId, result.data);
-      setData(result.data);
-    });
+      },
+    );
 
     return () => {
       cancelled = true;

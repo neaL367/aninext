@@ -1,0 +1,45 @@
+#import "../fragments/media-card-tooltip.graphql"
+
+query MediaCardTooltipBatch(
+  $id0: Int
+  $id1: Int
+  $id2: Int
+  $id3: Int
+  $id4: Int
+  $id5: Int
+  $id6: Int
+  $id7: Int
+) {
+  t0: Media(id: $id0) {
+    id
+    ...MediaCardTooltipFields
+  }
+  t1: Media(id: $id1) {
+    id
+    ...MediaCardTooltipFields
+  }
+  t2: Media(id: $id2) {
+    id
+    ...MediaCardTooltipFields
+  }
+  t3: Media(id: $id3) {
+    id
+    ...MediaCardTooltipFields
+  }
+  t4: Media(id: $id4) {
+    id
+    ...MediaCardTooltipFields
+  }
+  t5: Media(id: $id5) {
+    id
+    ...MediaCardTooltipFields
+  }
+  t6: Media(id: $id6) {
+    id
+    ...MediaCardTooltipFields
+  }
+  t7: Media(id: $id7) {
+    id
+    ...MediaCardTooltipFields
+  }
+}

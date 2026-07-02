@@ -1,11 +1,14 @@
 "use client";
 
 import { createContext, use, useState, type ReactNode } from "react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 const DEFAULT_TOOLTIP_WIDTH =
   "min-w-0 max-w-[min(100vw-1.5rem,24rem)] w-80 sm:max-w-[min(100vw-1.5rem,28rem)] sm:w-96";
+
+/** Ignore drive-by hovers when scanning grids — reduces tooltip origin pressure. */
+const MEDIA_TOOLTIP_OPEN_DELAY_MS = 450;
 
 export const AIRING_TOOLTIP_WIDTH =
   "min-w-0 max-w-[min(100vw-1.5rem,28rem)] w-96 sm:max-w-[min(100vw-1.5rem,32rem)] sm:w-[28rem]";
@@ -33,11 +36,13 @@ function MediaTooltipRoot({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <MediaTooltipContext value={{ open }}>
-      <Tooltip open={open} onOpenChange={setOpen}>
-        {children}
-      </Tooltip>
-    </MediaTooltipContext>
+    <TooltipProvider delay={MEDIA_TOOLTIP_OPEN_DELAY_MS}>
+      <MediaTooltipContext value={{ open }}>
+        <Tooltip open={open} onOpenChange={setOpen}>
+          {children}
+        </Tooltip>
+      </MediaTooltipContext>
+    </TooltipProvider>
   );
 }
 
