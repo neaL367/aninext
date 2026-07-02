@@ -17,6 +17,7 @@ import {
   MEDIA_STATUSES,
   type AnimeListParams,
 } from "@/lib/browse/params/types";
+import { normalizeSearchQuery } from "@/lib/browse/params/search";
 
 export const animeListNuqsParsers = {
   sort: parseAsStringLiteral(ANIME_SORTS).withDefault(DEFAULT_ANIME_LIST_PARAMS.sort),
@@ -48,6 +49,7 @@ type NuqsState = Omit<AnimeListParams, "formats" | "statuses" | "season" | "sour
 export function nuqsStateToParams(state: NuqsState): AnimeListParams {
   return {
     ...state,
+    q: normalizeSearchQuery(state.q),
     country: state.country || null,
   };
 }
@@ -86,7 +88,7 @@ export function useAnimeListParams() {
 
   const setSearchInput = useCallback(
     (value: string) => {
-      void setState({ q: value });
+      void setState({ q: normalizeSearchQuery(value) });
     },
     [setState],
   );

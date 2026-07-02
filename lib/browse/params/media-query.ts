@@ -6,6 +6,7 @@ import type {
   MediaSource,
   MediaStatus,
 } from "@/lib/anilist/domain/types";
+import { normalizeSearchQuery } from "@/lib/browse/params/search";
 import type { AnimeListParams, AnimeSort } from "@/lib/browse/params/types";
 
 export function getListingMaxPage(sort: AnimeSort): number | null {
@@ -53,7 +54,10 @@ export function paramsToMediaQuery(
 
   const base = {
     sort: sortMap[params.sort],
-    search: params.q || undefined,
+    search: (() => {
+      const normalized = normalizeSearchQuery(params.q);
+      return normalized || undefined;
+    })(),
     genre_in: params.genres.length ? params.genres : undefined,
     tag_in: params.tags.length ? params.tags : undefined,
     format_in: params.formats.length ? params.formats : undefined,

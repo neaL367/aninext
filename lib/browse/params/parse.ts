@@ -4,6 +4,7 @@ import type {
   MediaSource,
   MediaStatus,
 } from "@/lib/anilist/domain/types";
+import { normalizeSearchQuery } from "@/lib/browse/params/search";
 import {
   ANIME_SORTS,
   DEFAULT_ANIME_LIST_PARAMS,
@@ -87,7 +88,7 @@ export function parseAnimeListParams(
   return {
     ...DEFAULT_ANIME_LIST_PARAMS,
     sort,
-    q: readParam(searchParams, "q"),
+    q: normalizeSearchQuery(readParam(searchParams, "q")),
     genres: readList(searchParams, "genres"),
     tags: readList(searchParams, "tags"),
     year: readNumber(readParam(searchParams, "year")),

@@ -10,6 +10,12 @@ export { parseAnimeListParams, animeListParamsToQuery } from "@/lib/browse/param
 export { getListingMaxPage, paramsToMediaQuery } from "@/lib/browse/params/media-query";
 
 export {
+  MIN_BROWSE_SEARCH_LENGTH,
+  normalizeSearchQuery,
+  shouldPrefetchBrowseSearch,
+} from "@/lib/browse/params/search";
+
+export {
   countBrowseFilters,
   getActiveFilterChips,
   removeFilterChip,

@@ -85,10 +85,9 @@ export function BrowseFiltersProvider({
 
   const setSearchInputWithPrefetch = useCallback(
     (value: string) => {
-      prefetchFilters({ ...params, q: value });
       setSearchInput(value);
     },
-    [params, prefetchFilters, setSearchInput],
+    [setSearchInput],
   );
 
   const resetFiltersWithFocus = useCallback(() => {

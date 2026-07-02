@@ -7,7 +7,6 @@ import { SearchIcon, SlidersHorizontalIcon } from "lucide-react";
 import { useBrowseFilters } from "@/components/browse/browse-filters-provider";
 import { AnimeQuickFilters } from "@/components/browse/anime-quick-filters";
 import { FilterChips } from "@/components/browse/filter-chips";
-import { serializeBrowseFilterKey } from "@/lib/anilist/client/media-page-list";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,8 +30,8 @@ export function AnimeBrowseToolbar() {
 
   const { state, actions, meta } = useBrowseFilters();
   const { params } = state;
-  const { setSearchInput, prefetchFilters } = actions;
-  const { searchRef, currentSeason, nextSeason } = meta;
+  const { setSearchInput } = actions;
+  const { searchRef } = meta;
   const [sheetOpen, setSheetOpen] = useState(false);
   const [searchDraft, setSearchDraft] = useState(params.q);
   const [debouncedSearch, { flush: flushSearch }] = useDebounce(searchDraft, 350);
@@ -42,30 +41,6 @@ export function AnimeBrowseToolbar() {
   useEffect(() => {
     setSearchDraft(params.q);
   }, [params.q]);
-
-  useEffect(() => {
-    const nextParams = { ...params, q: searchDraft };
-    const nextKey = serializeBrowseFilterKey(nextParams, currentSeason, nextSeason);
-    const currentKey = serializeBrowseFilterKey(params, currentSeason, nextSeason);
-    if (nextKey === currentKey) {
-      return;
-    }
-
-    const timer = window.setTimeout(() => {
-      prefetchFilters(nextParams);
-    }, 150);
-
-    return () => window.clearTimeout(timer);
-  }, [currentSeason, nextSeason, params, prefetchFilters, searchDraft]);
-
-  useEffect(() => {
-    const nextParams = { ...params, q: debouncedSearch };
-    const nextKey = serializeBrowseFilterKey(nextParams, currentSeason, nextSeason);
-    const currentKey = serializeBrowseFilterKey(params, currentSeason, nextSeason);
-    if (nextKey !== currentKey) {
-      prefetchFilters(nextParams);
-    }
-  }, [currentSeason, debouncedSearch, nextSeason, params, prefetchFilters]);
 
   useEffect(() => {
     if (debouncedSearch !== params.q && debouncedSearch === searchDraft) {
