@@ -2,6 +2,7 @@
 
 import { usePathname, useSearchParams } from "next/navigation";
 import { useLayoutEffect } from "react";
+import { hasBrowseRestorePending } from "@/lib/navigation/browse-restore";
 import {
   consumePendingScrollRestore,
   hasPendingScrollRestore,
@@ -18,6 +19,12 @@ export function DetailScrollRestore() {
 
   useLayoutEffect(() => {
     const href = readCurrentHref();
+
+    // Browse restores pages + scroll together in AnimeBrowseResults.
+    if (pathname === "/anime" && hasBrowseRestorePending(href)) {
+      return;
+    }
+
     const scrollY = consumePendingScrollRestore(href);
     if (scrollY != null) {
       restoreScrollWithRetry(scrollY);

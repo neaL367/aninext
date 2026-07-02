@@ -1,5 +1,7 @@
-import { normalizeHrefForScrollRestore, readScrollY } from "@/lib/navigation/scroll-restore";
+import { normalizeBrowseHrefForRestore } from "@/lib/navigation/browse-href";
+import { readAppliedScrollY } from "@/lib/navigation/scroll-apply";
 import { animeDetailPath } from "@/lib/navigation/detail-paths";
+import { normalizeHrefForScrollRestore } from "@/lib/navigation/scroll-restore";
 
 const DETAIL_RETURN_KEY = "aninext:detail-return";
 const DETAIL_CURRENT_KEY = "aninext:detail-current";
@@ -33,7 +35,7 @@ export function isDetailReturnOrigin(
   }
 
   return (
-    normalizeHrefForScrollRestore(targetHref) === normalizeHrefForScrollRestore(detailReturn.href)
+    normalizeBrowseHrefForRestore(targetHref) === normalizeBrowseHrefForRestore(detailReturn.href)
   );
 }
 
@@ -83,11 +85,15 @@ export function saveDetailReturn(
 ): void {
   if (typeof window === "undefined") return;
 
-  const href = normalizeHrefForScrollRestore(search ? `${pathname}?${search}` : pathname);
+  const rawHref = search ? `${pathname}?${search}` : pathname;
+  const href =
+    pathname === "/anime"
+      ? normalizeBrowseHrefForRestore(rawHref)
+      : normalizeHrefForScrollRestore(rawHref);
   const payload: DetailReturn = {
     href,
     label: options?.label ?? getDetailReturnLabel(pathname),
-    scrollY: readScrollY(),
+    scrollY: readAppliedScrollY(),
   };
 
   sessionStorage.setItem(DETAIL_RETURN_KEY, JSON.stringify(payload));

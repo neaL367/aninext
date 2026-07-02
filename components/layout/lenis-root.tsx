@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState, type ComponentType, type ReactNode } from "react";
+import { LenisScrollBridge } from "@/components/layout/lenis-scroll-bridge";
 
 const lenisOptions = {
   autoRaf: true,
   lerp: 0.12,
   smoothWheel: true,
   wheelMultiplier: 0.9,
+  stopInertiaOnNavigate: true,
   /** Cheaper scroll metrics on pages with hundreds of cards. */
   naiveDimensions: true,
 } as const;
@@ -39,7 +41,7 @@ export function LenisRoot({ children }: LenisRootProps) {
       {children}
       {ReactLenis ? (
         <ReactLenis root options={lenisOptions}>
-          <span hidden aria-hidden />
+          <LenisScrollBridge />
         </ReactLenis>
       ) : null}
     </>

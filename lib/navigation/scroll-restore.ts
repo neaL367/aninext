@@ -1,3 +1,5 @@
+import { readAppliedScrollY, resizeScrollMetrics, scrollToY } from "@/lib/navigation/scroll-apply";
+
 const PENDING_SCROLL_RESTORE_KEY = "aninext:pending-scroll-restore";
 
 type PendingScrollRestore = {
@@ -29,10 +31,7 @@ export function readCurrentHref(): string {
 }
 
 export function readScrollY(): number {
-  if (typeof window === "undefined") {
-    return 0;
-  }
-  return Math.max(0, Math.round(window.scrollY));
+  return readAppliedScrollY();
 }
 
 export function getMaxScrollY(): number {
@@ -93,30 +92,98 @@ export function consumePendingScrollRestore(currentHref: string): number | null 
 }
 
 const RESTORE_MAX_ATTEMPTS = 24;
+const RESTORE_LATE_MS = 150;
+const USER_INPUT_EVENTS = ["wheel", "touchstart", "keydown"] as const;
 
-/** Re-apply scroll until the page is tall enough (infinite lists) or attempts run out. */
+let activeRestoreCleanup: (() => void) | null = null;
+
+/** Stop any in-flight programmatic scroll restore (e.g. user started scrolling). */
+export function cancelScrollRestore(): void {
+  activeRestoreCleanup?.();
+  activeRestoreCleanup = null;
+}
+
+/** Re-apply scroll until the page is tall enough, then release control to the user. */
 export function restoreScrollWithRetry(scrollY: number): void {
   if (typeof window === "undefined" || scrollY <= 0) {
     return;
   }
 
+  cancelScrollRestore();
+
+  resizeScrollMetrics();
+
+  let cancelled = false;
   let attempts = 0;
+  let rafId = 0;
+  const timeouts: ReturnType<typeof setTimeout>[] = [];
+
+  const cleanup = () => {
+    if (cancelled) {
+      return;
+    }
+
+    cancelled = true;
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+    }
+    for (const timeout of timeouts) {
+      clearTimeout(timeout);
+    }
+    for (const event of USER_INPUT_EVENTS) {
+      window.removeEventListener(event, onUserInput);
+    }
+    if (activeRestoreCleanup === cleanup) {
+      activeRestoreCleanup = null;
+    }
+  };
+
+  const onUserInput = () => {
+    cleanup();
+  };
 
   const apply = () => {
-    const target = clampScrollY(scrollY);
-    window.scrollTo({ top: target, left: 0, behavior: "instant" });
+    if (cancelled) {
+      return;
+    }
 
+    const target = clampScrollY(scrollY);
+    scrollToY(target, { immediate: true });
+
+    const closeEnough = Math.abs(readAppliedScrollY() - target) <= 8;
     const tallEnough =
       getMaxScrollY() >= scrollY - 1 ||
       document.documentElement.scrollHeight >= scrollY + window.innerHeight * 0.5;
 
+    if (closeEnough && tallEnough) {
+      cleanup();
+      return;
+    }
+
     attempts += 1;
-    if (!tallEnough && attempts < RESTORE_MAX_ATTEMPTS) {
-      requestAnimationFrame(apply);
+    if (attempts < RESTORE_MAX_ATTEMPTS) {
+      rafId = requestAnimationFrame(apply);
+    } else {
+      cleanup();
     }
   };
 
-  requestAnimationFrame(apply);
+  activeRestoreCleanup = cleanup;
+
+  for (const event of USER_INPUT_EVENTS) {
+    window.addEventListener(event, onUserInput, { passive: true });
+  }
+
+  rafId = requestAnimationFrame(apply);
+
+  timeouts.push(
+    setTimeout(() => {
+      if (!cancelled) {
+        scrollToY(clampScrollY(scrollY), { immediate: true });
+        cleanup();
+      }
+    }, RESTORE_LATE_MS),
+  );
 }
 
 /** Clear a stranded scroll position when the new page is shorter than the viewport offset. */
@@ -127,6 +194,6 @@ export function reconcileScrollPosition(): void {
 
   const maxScroll = getMaxScrollY();
   if (window.scrollY > maxScroll) {
-    window.scrollTo({ top: maxScroll, left: 0, behavior: "instant" });
+    scrollToY(maxScroll, { immediate: true });
   }
 }

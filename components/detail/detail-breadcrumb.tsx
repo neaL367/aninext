@@ -43,12 +43,10 @@ function DetailBreadcrumbNavLink({ crumb }: DetailBreadcrumbNavLinkProps) {
       const targetHref = crumb.href ?? "/";
       const detailReturn = readDetailReturn();
 
-      // Pop history when returning to the page we came from — same path as browser
-      // back, which restores scroll and infinite-list state. router.push remounts the
-      // browse page from page 1 so queued scrollY cannot reach the saved position.
+      // router.push with scroll:false — browse snapshot restores pages + scroll.
       if (isDetailReturnOrigin(targetHref, detailReturn)) {
         event.preventDefault();
-        router.back();
+        router.push(href, { scroll: false });
         return;
       }
 

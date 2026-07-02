@@ -30,6 +30,7 @@ import {
   ANIME_CARD_STATS_CLASS,
   ANIME_CARD_TITLE_CLASS,
 } from "@/lib/styles/anime-grid-layout";
+import { persistBrowseRestoreSnapshot } from "@/lib/navigation/browse-restore";
 import { saveDetailReturnFromCurrentPage } from "@/lib/navigation/detail-return";
 import { getMediaDetailHref } from "@/lib/anilist/display/media-links";
 import { cn } from "@/lib/utils";
@@ -95,6 +96,9 @@ export function AnimeCardArticle({
 
   const handleNavigateToDetail = () => {
     if (!external) {
+      if (pathname === "/anime") {
+        persistBrowseRestoreSnapshot();
+      }
       saveDetailReturnFromCurrentPage(pathname, searchParams.toString());
     }
   };
