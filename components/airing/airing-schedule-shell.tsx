@@ -1,7 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { AiringDayListSkeleton } from "@/components/airing/airing-day-chunks";
+import {
+  AiringDayCountFallback,
+  AiringDayListSkeleton,
+} from "@/components/airing/airing-day-chunks";
 import { Button } from "@/components/ui/button";
 import {
   formatLocalDate,
@@ -51,7 +54,7 @@ export function AiringScheduleShell() {
             Week of {weekRangeLabel.start} – {weekRangeLabel.end}
           </p>
           <p className="text-xs text-muted-foreground">
-            Episodes load by day — counts appear as each weekday finishes
+            Show counts per weekday — select a day for the full schedule
           </p>
         </div>
         <span
@@ -82,7 +85,7 @@ export function AiringScheduleShell() {
               <span className="text-[10px] font-semibold uppercase tracking-wide">
                 {getWeekdayShortLabel(dateKey)}
               </span>
-              <span className="text-[11px] font-medium tabular-nums opacity-40">—</span>
+              <AiringDayCountFallback />
             </Button>
           );
         })}

@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useClientMounted } from "@/lib/hooks/use-client-mounted";
 import type { AiringScheduleItem } from "@/lib/anilist/domain/types";
+import { cn } from "@/lib/utils";
 
 type AiringDayCountProps = {
   promise: Promise<AiringScheduleItem[]>;
@@ -13,11 +14,42 @@ type AiringDayCountProps = {
 
 export function AiringDayCount({ promise }: AiringDayCountProps) {
   const items = use(promise);
-  return <span className="text-[11px] font-medium tabular-nums opacity-80">{items.length}</span>;
+  return <AiringDayTabCountValue count={items.length} />;
+}
+
+export function AiringDayTabCount({ promise }: { promise: Promise<number> }) {
+  const count = use(promise);
+  return <AiringDayTabCountValue count={count} />;
+}
+
+export function AiringDayTabCountBadge({ count }: { count: number | undefined }) {
+  if (count === undefined) {
+    return <AiringDayCountFallback />;
+  }
+
+  return <AiringDayTabCountValue count={count} />;
+}
+
+function AiringDayTabCountValue({ count }: { count: number }) {
+  return (
+    <span
+      className={cn(
+        "text-[11px] font-medium tabular-nums",
+        count > 0 ? "opacity-90" : "opacity-55",
+      )}
+    >
+      {count}
+    </span>
+  );
 }
 
 export function AiringDayCountFallback() {
-  return <span className="text-[11px] font-medium tabular-nums opacity-40">—</span>;
+  return (
+    <span
+      aria-hidden
+      className="inline-block h-3.5 w-4 animate-pulse rounded-sm bg-current opacity-25"
+    />
+  );
 }
 
 type AiringDayListProps = {
@@ -86,6 +118,14 @@ export function AiringDayCountSuspense({ promise }: { promise: Promise<AiringSch
   return (
     <ClientSuspense fallback={<AiringDayCountFallback />}>
       <AiringDayCount promise={promise} />
+    </ClientSuspense>
+  );
+}
+
+export function AiringDayTabCountSuspense({ promise }: { promise: Promise<number> }) {
+  return (
+    <ClientSuspense fallback={<AiringDayCountFallback />}>
+      <AiringDayTabCount promise={promise} />
     </ClientSuspense>
   );
 }

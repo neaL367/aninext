@@ -1,12 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  AiringDayCountSuspense,
+  AiringDayCountFallback,
   AiringDayListSuspense,
   AiringDayShowCountSuspense,
+  AiringDayTabCountBadge,
 } from "@/components/airing/airing-day-chunks";
 import { Button } from "@/components/ui/button";
+import { loadAiringDayCountClient } from "@/lib/anilist/client/airing-day-count-load";
+import { loadAiringDayClient } from "@/lib/anilist/client/airing-day-load";
 import type { AiringScheduleItem } from "@/lib/anilist/domain/types";
 import {
   formatLocalDate,
@@ -19,11 +22,10 @@ import {
 } from "@/lib/anilist/display/datetime";
 import { cn } from "@/lib/utils";
 
-type AiringDayPromises = Record<string, Promise<AiringScheduleItem[]>>;
-
 type AiringScheduleInteractiveProps = {
   dateKeys: readonly string[];
-  dayPromises: AiringDayPromises;
+  priorityDateKey: string;
+  initialDayPromise: Promise<AiringScheduleItem[]>;
 };
 
 function buildWeekRangeLabel(dateKeys: readonly string[]) {
@@ -41,7 +43,8 @@ function buildWeekRangeLabel(dateKeys: readonly string[]) {
 
 export function AiringScheduleInteractive({
   dateKeys,
-  dayPromises,
+  priorityDateKey,
+  initialDayPromise,
 }: AiringScheduleInteractiveProps) {
   "use memo";
 
@@ -53,9 +56,86 @@ export function AiringScheduleInteractive({
     };
   }, [dateKeys]);
 
-  const [selectedDay, setSelectedDay] = useState(todayKey);
-  const activeDay = dateKeys.includes(selectedDay) ? selectedDay : todayKey;
-  const activePromise = dayPromises[activeDay];
+  const [selectedDay, setSelectedDay] = useState(priorityDateKey);
+  const [dayCounts, setDayCounts] = useState<Record<string, number>>({});
+  const [dayPromises, setDayPromises] = useState<Record<string, Promise<AiringScheduleItem[]>>>(
+    () => ({
+      [priorityDateKey]: initialDayPromise,
+    }),
+  );
+  const dayPromisesRef = useRef(dayPromises);
+  dayPromisesRef.current = dayPromises;
+  const loadedCountsRef = useRef(new Set<string>());
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void initialDayPromise.then((items) => {
+      if (cancelled || loadedCountsRef.current.has(priorityDateKey)) {
+        return;
+      }
+
+      loadedCountsRef.current.add(priorityDateKey);
+      setDayCounts((current) => ({ ...current, [priorityDateKey]: items.length }));
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [initialDayPromise, priorityDateKey]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void (async () => {
+      for (const dateKey of dateKeys) {
+        if (cancelled || dateKey === priorityDateKey || loadedCountsRef.current.has(dateKey)) {
+          continue;
+        }
+
+        try {
+          const count = await loadAiringDayCountClient(dateKey);
+          if (cancelled) {
+            return;
+          }
+
+          loadedCountsRef.current.add(dateKey);
+          setDayCounts((current) => ({ ...current, [dateKey]: count }));
+        } catch {
+          // Keep the pulse badge — user can still open the day for a full retry.
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [dateKeys, priorityDateKey]);
+
+  const handleSelectDay = useCallback((dateKey: string) => {
+    setSelectedDay(dateKey);
+
+    if (dateKey in dayPromisesRef.current) {
+      return;
+    }
+
+    const promise = loadAiringDayClient(dateKey);
+    setDayPromises((current) =>
+      dateKey in current ? current : { ...current, [dateKey]: promise },
+    );
+
+    void promise.then((items) => {
+      if (loadedCountsRef.current.has(dateKey)) {
+        return;
+      }
+
+      loadedCountsRef.current.add(dateKey);
+      setDayCounts((current) => ({ ...current, [dateKey]: items.length }));
+    });
+  }, []);
+
+  const activeDay = dateKeys.includes(selectedDay) ? selectedDay : priorityDateKey;
+  const activePromise = activeDay in dayPromises ? dayPromises[activeDay] : undefined;
   const activeDate = parseLocalDateKey(activeDay);
 
   return (
@@ -66,7 +146,7 @@ export function AiringScheduleInteractive({
             Week of {weekRangeLabel.start} – {weekRangeLabel.end}
           </p>
           <p className="text-xs text-muted-foreground">
-            Today loads first — switch days to browse the rest of the week
+            Show counts per weekday — select a day for the full schedule
           </p>
         </div>
         <span
@@ -81,7 +161,6 @@ export function AiringScheduleInteractive({
         {dateKeys.map((dateKey) => {
           const isToday = dateKey === todayKey;
           const isSelected = dateKey === activeDay;
-          const promise = dayPromises[dateKey];
 
           return (
             <Button
@@ -93,16 +172,12 @@ export function AiringScheduleInteractive({
                 "h-auto min-w-0 flex-col gap-0.5 px-1 py-2 text-center",
                 isToday && !isSelected && "ring-1 ring-primary/30",
               )}
-              onClick={() => setSelectedDay(dateKey)}
+              onClick={() => handleSelectDay(dateKey)}
             >
               <span className="text-[10px] font-semibold uppercase tracking-wide">
                 {getWeekdayShortLabel(dateKey)}
               </span>
-              {promise ? (
-                <AiringDayCountSuspense promise={promise} />
-              ) : (
-                <span className="text-[11px] font-medium tabular-nums opacity-40">—</span>
-              )}
+              <AiringDayTabCountBadge count={dayCounts[dateKey]} />
             </Button>
           );
         })}
@@ -123,7 +198,15 @@ export function AiringScheduleInteractive({
             </p>
           </div>
           <div className="text-sm font-medium tabular-nums text-muted-foreground">
-            {activePromise ? <AiringDayShowCountSuspense promise={activePromise} /> : "—"}
+            {activePromise ? (
+              <AiringDayShowCountSuspense promise={activePromise} />
+            ) : dayCounts[activeDay] !== undefined ? (
+              <>
+                {dayCounts[activeDay]} {dayCounts[activeDay] === 1 ? "show" : "shows"}
+              </>
+            ) : (
+              <AiringDayCountFallback />
+            )}
           </div>
         </header>
 

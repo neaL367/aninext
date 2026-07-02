@@ -7,29 +7,43 @@ import type { AiringScheduleItem } from "@/lib/anilist/domain/types";
 
 export type AiringDayPromises = Record<string, Promise<AiringScheduleItem[]>>;
 
-/**
- * Kick off the visible day first. Other weekdays intentionally wait behind it,
- * so the main schedule list can replace the skeleton without waiting for the
- * whole week to paginate through AniList.
- */
+/** @deprecated Use getAiringScheduleBootstrap — loads only the priority day. */
 export async function getAiringDayPromisesForRequest(): Promise<{
   dateKeys: string[];
   dayPromises: AiringDayPromises;
+}> {
+  const bootstrap = await getAiringScheduleBootstrap();
+  return {
+    dateKeys: bootstrap.dateKeys,
+    dayPromises: { [bootstrap.priorityDateKey]: bootstrap.initialDayPromise },
+  };
+}
+
+/**
+ * SSR: load today's schedule only. Weekday tab counts load on the client after
+ * paint via `loadAiringDayCount` so the route does not block on six extra queries.
+ */
+export async function getAiringScheduleBootstrap(): Promise<{
+  dateKeys: string[];
+  priorityDateKey: string;
+  initialDayPromise: Promise<AiringScheduleItem[]>;
 }> {
   await connection();
   const dateKeys = getWeekDateKeys();
   const todayKey = toLocalDateKeyFromDate(new Date());
   const priorityDateKey = dateKeys.includes(todayKey) ? todayKey : dateKeys[0]!;
-  const priorityPromise = anilist.airingSchedulesForDay(priorityDateKey);
 
-  const dayPromises = Object.fromEntries(
-    dateKeys.map((dateKey) => [
-      dateKey,
-      dateKey === priorityDateKey
-        ? priorityPromise
-        : priorityPromise.then(() => anilist.airingSchedulesForDay(dateKey)),
-    ]),
-  ) as AiringDayPromises;
+  return {
+    dateKeys,
+    priorityDateKey,
+    initialDayPromise: anilist.airingSchedulesForDay(priorityDateKey),
+  };
+}
 
-  return { dateKeys, dayPromises };
+export async function getAiringSchedulesForDay(dateKey: string): Promise<AiringScheduleItem[]> {
+  return anilist.airingSchedulesForDay(dateKey);
+}
+
+export async function getAiringScheduleCountForDay(dateKey: string): Promise<number> {
+  return anilist.airingScheduleCountForDay(dateKey);
 }

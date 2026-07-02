@@ -5,7 +5,7 @@ import { PageContainer } from "@/components/layout/page-container";
 import { PageHeader } from "@/components/layout/page-header";
 import { AniListRateLimitNotice } from "@/components/shared/anilist-rate-limit-notice";
 import { isAniListRateLimitError } from "@/lib/anilist/domain/errors";
-import { getAiringDayPromisesForRequest } from "@/lib/anilist/server/get-airing-schedules";
+import { getAiringScheduleBootstrap } from "@/lib/anilist/server/get-airing-schedules";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata = createPageMetadata({
@@ -16,8 +16,14 @@ export const metadata = createPageMetadata({
 
 async function AiringPageContent() {
   try {
-    const { dateKeys, dayPromises } = await getAiringDayPromisesForRequest();
-    return <AiringScheduleInteractive dateKeys={dateKeys} dayPromises={dayPromises} />;
+    const { dateKeys, priorityDateKey, initialDayPromise } = await getAiringScheduleBootstrap();
+    return (
+      <AiringScheduleInteractive
+        dateKeys={dateKeys}
+        priorityDateKey={priorityDateKey}
+        initialDayPromise={initialDayPromise}
+      />
+    );
   } catch (error) {
     if (isAniListRateLimitError(error)) {
       return <AniListRateLimitNotice title="Unable to load airing schedule" />;
