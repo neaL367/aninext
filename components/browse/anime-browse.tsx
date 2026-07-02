@@ -9,6 +9,7 @@ import {
 } from "@/components/browse/browse-filters-provider";
 import { EmptyState } from "@/components/shared/empty-state";
 import { AniListRateLimitNotice } from "@/components/shared/anilist-rate-limit-notice";
+import { consumeBrowseMediaPagePrefetch } from "@/lib/anilist/client/browse-page-prefetch";
 import {
   canLoadMorePages,
   getNextPageNumber,
@@ -60,13 +61,13 @@ function AnimeBrowseResults({
   );
   const [rateLimited, setRateLimited] = useState(false);
   const [isFetchingNextPage, setIsFetchingNextPage] = useState(false);
-  const [isPending, startTransition] = useTransition();
+  const [isRefetching, setIsRefetching] = useState(false);
+  const [, startTransition] = useTransition();
 
   const rankTop100 = params.sort === "top-100";
   const media = useMemo(() => mergeInfiniteMediaPages(pages, rankTop100), [pages, rankTop100]);
   const nextPage = getNextPageNumber(pages, params);
   const showLoadMore = canLoadMorePages(pages, params, media.length);
-  const isPlaceholderData = isPending && pages.length > 0;
 
   isFetchingNextPageRef.current = isFetchingNextPage;
 
@@ -83,22 +84,28 @@ function AnimeBrowseResults({
     }
 
     const requestId = ++requestIdRef.current;
+    setIsRefetching(true);
 
-    startTransition(() => {
-      void loadMediaPage(params, 1, currentSeason, nextSeason).then((result) => {
-        if (requestId !== requestIdRef.current) {
-          return;
+    const prefetched = consumeBrowseMediaPagePrefetch(filterKey);
+    const request = prefetched ?? loadMediaPage(params, 1, currentSeason, nextSeason);
+
+    void request.then((result) => {
+      if (requestId !== requestIdRef.current) {
+        return;
+      }
+
+      if (!result.ok) {
+        if (result.code === "rate_limit") {
+          setRateLimited(true);
         }
+        setIsRefetching(false);
+        return;
+      }
 
-        if (!result.ok) {
-          if (result.code === "rate_limit") {
-            setRateLimited(true);
-          }
-          return;
-        }
-
-        setRateLimited(false);
+      setRateLimited(false);
+      startTransition(() => {
         setPages([result.data]);
+        setIsRefetching(false);
       });
     });
   }, [filterKey, params, currentSeason, nextSeason]);
@@ -137,7 +144,7 @@ function AnimeBrowseResults({
 
   useEffect(() => {
     const element = loadMoreRef.current;
-    if (!element || !showLoadMore || isPlaceholderData) {
+    if (!element || !showLoadMore) {
       return;
     }
 
@@ -151,17 +158,22 @@ function AnimeBrowseResults({
     );
     observer.observe(element);
     return () => observer.disconnect();
-  }, [fetchNextPage, isPlaceholderData, showLoadMore]);
+  }, [fetchNextPage, showLoadMore]);
 
   if (rateLimited) {
     return <AniListRateLimitNotice title="Unable to load anime list" />;
   }
 
-  const showInitialSkeleton = isPending && pages.length === 0;
-  const showSearchOverlay = isPending && pages.length > 0;
+  const showInitialSkeleton = isRefetching && media.length === 0;
 
   return (
     <div className="relative flex flex-col gap-4">
+      {isRefetching ? (
+        <p className="text-xs text-muted-foreground" aria-live="polite">
+          Updating results…
+        </p>
+      ) : null}
+
       {showInitialSkeleton ? (
         <AnimeMediaGridSkeleton layout="browse" />
       ) : !media.length ? (
@@ -170,9 +182,7 @@ function AnimeBrowseResults({
           description="Try different keywords or clear some filters."
         />
       ) : (
-        <div className={showSearchOverlay ? "opacity-60" : ""} aria-busy={showSearchOverlay}>
-          <AnimeMediaGrid layout="browse" media={media} />
-        </div>
+        <AnimeMediaGrid layout="browse" media={media} />
       )}
 
       {showLoadMore ? (
