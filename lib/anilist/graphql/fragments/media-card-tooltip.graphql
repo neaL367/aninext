@@ -1,4 +1,5 @@
 fragment MediaCardTooltipFields on Media {
+  isAdult
   bannerImage
   description(asHtml: false)
   studios(isMain: true) {

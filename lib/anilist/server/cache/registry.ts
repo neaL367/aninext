@@ -140,7 +140,7 @@ export const anilist = {
     profile: anilistCacheProfiles.tooltip,
     variables: (mediaId: number) => ({ id: mediaId }),
     cacheVars: (mediaId: number) => ({ mediaId }),
-    normalize: (data) => data.Media ?? null,
+    normalize: (data) => (data.Media?.isAdult ? null : data.Media ?? null),
   }),
 
   airingSchedulesForDay: defineDataFetcher({

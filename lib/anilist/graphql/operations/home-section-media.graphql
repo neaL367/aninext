@@ -11,6 +11,7 @@ query HomeSectionMedia(
   Page(page: 1, perPage: $perPage) {
     media(
       type: ANIME
+      isAdult: false
       sort: $sort
       season: $season
       seasonYear: $seasonYear

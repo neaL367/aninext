@@ -1,6 +1,7 @@
 fragment MediaCardGridFields on Media {
   id
   type
+  isAdult
   title {
     romaji
     english

@@ -98,6 +98,7 @@ export function normalizeMediaPageResult(data: MediaPageQuery): MediaPageResult 
 export function normalizeAiringSchedules(data: AiringSchedulesQuery): AiringScheduleItem[] {
   return (data.Page?.airingSchedules ?? [])
     .filter((item): item is NonNullable<typeof item> => item !== null)
+    .filter((item) => !item.media?.isAdult)
     .map((item) => ({
       id: item.id,
       airingAt: item.airingAt,
@@ -110,6 +111,9 @@ export function normalizeAiringSchedules(data: AiringSchedulesQuery): AiringSche
 export function normalizeMediaDetail(data: {
   Media: MediaDetailFieldsFragment | null;
 }): MediaDetail | null {
+  if (data.Media?.isAdult) {
+    return null;
+  }
   return data.Media;
 }
 

@@ -14,6 +14,10 @@ export function filterNonNullMedia(media: Array<MediaCard | null> | null | undef
   return (media ?? []).filter((item): item is MediaCard => item !== null);
 }
 
+function filterNonAdultMedia(media: MediaCard[]): MediaCard[] {
+  return media.filter((item) => !item.isAdult);
+}
+
 function dedupeMediaById(media: MediaCard[]): MediaCard[] {
   const seen = new Set<number>();
 
@@ -32,7 +36,9 @@ export function normalizeListedMedia(
   media: Array<MediaCard | null> | null | undefined,
   options: NormalizeListedMediaOptions = {},
 ): MediaCard[] {
-  let result = applyPopularityPercents(dedupeMediaById(filterNonNullMedia(media)));
+  let result = applyPopularityPercents(
+    dedupeMediaById(filterNonAdultMedia(filterNonNullMedia(media))),
+  );
 
   if (options.rankMode === "top100") {
     const limit = options.limit ?? TOP_100_LIMIT;
