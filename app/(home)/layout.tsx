@@ -11,8 +11,6 @@ type HomeLayoutProps = {
   "top-100": ReactNode;
 };
 
-export const instant = false;
-
 export default function HomeLayout({
   children,
   "trending-now": trendingNow,

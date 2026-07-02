@@ -1,4 +1,3 @@
-import { connection } from "next/server";
 import { Suspense } from "react";
 import { AnimeBrowse } from "@/components/browse/anime-browse";
 import { BrowseContentSkeleton } from "@/components/browse/browse-skeleton";
@@ -9,12 +8,10 @@ import { isAniListRateLimitError } from "@/lib/anilist/domain/errors";
 import { LISTING_PAGE_SIZE } from "@/lib/anilist/domain/listing";
 import { getCurrentAnimeSeason, getNextAnimeSeason } from "@/lib/anilist/domain/season";
 import type { MediaPageQueryVariables } from "@/lib/anilist/generated/graphql";
+import { anilist } from "@/lib/anilist/server/fetchers";
 import { getGenreCollection } from "@/lib/anilist/server/get-genre-collection";
-import { getCachedMediaPage } from "@/lib/anilist/server/get-media-page";
 import { parseAnimeListParams, paramsToMediaQuery } from "@/lib/browse/params";
 import { createPageMetadata } from "@/lib/seo/metadata";
-
-export const instant = false;
 
 export const metadata = createPageMetadata({
   title: "Browse Anime",
@@ -27,7 +24,6 @@ type AnimeListingPageProps = {
 };
 
 async function AnimeListingContent({ searchParams }: AnimeListingPageProps) {
-  await connection();
   const resolved = await searchParams;
   const params = parseAnimeListParams(resolved);
   const currentSeason = getCurrentAnimeSeason();
@@ -43,7 +39,7 @@ async function AnimeListingContent({ searchParams }: AnimeListingPageProps) {
 
     const [genres, initialResult] = await Promise.all([
       getGenreCollection(),
-      getCachedMediaPage(variables),
+      anilist.mediaPage(variables),
     ]);
 
     return (

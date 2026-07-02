@@ -1,5 +1,3 @@
-export const instant = true;
-
 export default function HomePage() {
   return (
     <header className="flex max-w-prose flex-col gap-2 pb-2">

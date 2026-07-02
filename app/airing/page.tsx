@@ -8,8 +8,6 @@ import { isAniListRateLimitError } from "@/lib/anilist/domain/errors";
 import { getAiringDayPromisesForRequest } from "@/lib/anilist/server/get-airing-schedules";
 import { createPageMetadata } from "@/lib/seo/metadata";
 
-export const instant = false;
-
 export const metadata = createPageMetadata({
   title: "Airing Schedule",
   description: "See what anime is airing this week, grouped by weekday and format.",

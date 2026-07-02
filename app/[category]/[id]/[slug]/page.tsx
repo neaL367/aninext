@@ -2,18 +2,15 @@ import type { Metadata } from "next";
 import { EntityDetailPage } from "@/components/detail/entity-detail-page";
 import { parseDetailCategory } from "@/lib/anilist/domain/detail-categories";
 import type { EntityDetailRouteParams } from "@/lib/anilist/domain/detail-route-params";
-import { getEntityDetailStaticParams } from "@/lib/anilist/server/entity-detail-static-params";
 import { createEntityDetailMetadata } from "@/lib/seo/entity-detail-metadata";
 
-export const instant = false;
+/** Matches `detailRouteRevalidate` in lib/anilist/server/cache/route-config.ts */
+export const revalidate = 600;
+export const dynamicParams = true;
 
 type EntityDetailRouteProps = {
   params: EntityDetailRouteParams;
 };
-
-export async function generateStaticParams() {
-  return getEntityDetailStaticParams();
-}
 
 export async function generateMetadata({ params }: EntityDetailRouteProps): Promise<Metadata> {
   const { category: categoryParam } = await params;
