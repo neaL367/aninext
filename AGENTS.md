@@ -15,7 +15,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Data source is AniList GraphQL only — never fabricate data; display `—` for missing values.
 - Server-first architecture with GraphQL Code Generator typed documents; browse pagination and tooltips use cached Server Actions.
 - AniList data via codegen operations in `lib/anilist/graphql/`; run `bun run codegen` after `.graphql` changes. Never edit `lib/anilist/generated/` by hand (gitignored; auto-runs on dev and build).
-- SSR renders initial browse data in Server Components; client interactions call `loadMediaPage` / `getMediaCardTooltipAction`.
+- SSR renders initial browse data in Server Components; client interactions call `loadMediaPage` / `getMediaCardTooltipsBatchAction` (home grids still batch-fetch tooltips).
 - Package runner: `bun` / `bunx --bun`.
 
 ## AniList caching (dynamic routes)
