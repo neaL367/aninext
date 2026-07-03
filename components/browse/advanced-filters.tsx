@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useBrowseFilters } from "@/components/browse/browse-filters-provider";
 import { FilterMoreOptions } from "@/components/browse/filter-more-options";
 import { FilterMinField, FilterRangeField } from "@/components/browse/filter-range-field";
@@ -21,6 +21,7 @@ import {
   FILTER_YEAR_MIN,
 } from "@/lib/browse/filter-bounds";
 import type { AnimeListParams } from "@/lib/browse/params";
+import { DEFAULT_ANIME_LIST_PARAMS } from "@/lib/browse/params/types";
 import {
   formatMediaFormat,
   formatMediaSeason,
@@ -56,25 +57,48 @@ const ALL_SEASONS = [
 
 type AdvancedFiltersProps = {
   className?: string;
+  onApply?: () => void;
 };
 
-export function AdvancedFilters({ className }: AdvancedFiltersProps) {
+function cloneParams(params: AnimeListParams): AnimeListParams {
+  return {
+    ...params,
+    genres: [...params.genres],
+    tags: [...params.tags],
+    formats: [...params.formats],
+    statuses: [...params.statuses],
+  };
+}
+
+function buildResetParams(sort: AnimeListParams["sort"]): AnimeListParams {
+  return {
+    ...DEFAULT_ANIME_LIST_PARAMS,
+    sort,
+  };
+}
+
+export function AdvancedFilters({ className, onApply }: AdvancedFiltersProps) {
   "use memo";
 
   const { state, actions, meta } = useBrowseFilters();
   const { params } = state;
   const { applyFilters, resetFilters } = actions;
   const { genres } = meta;
+  const [draft, setDraft] = useState(() => cloneParams(params));
+  const resetParams = useMemo(() => buildResetParams(params.sort), [params.sort]);
+  const isDirty = JSON.stringify(draft) !== JSON.stringify(params);
 
   const patch = useCallback(
-    (partial: Partial<AnimeListParams>) => applyFilters({ ...params, ...partial }),
-    [applyFilters, params],
+    (partial: Partial<AnimeListParams>) => {
+      setDraft((current) => ({ ...current, ...partial }));
+    },
+    [],
   );
 
   const handleSeasonChange = (values: string[]) => {
     const next = values.at(-1) as MediaSeason | undefined;
     const season = next ?? null;
-    if (season && !params.year) {
+    if (season && !draft.year) {
       patch({
         season,
         year: getCurrentAnimeSeason().year,
@@ -85,10 +109,24 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
     }
     patch({
       season,
-      year: season ? params.year : null,
-      yearMin: season ? null : params.yearMin,
-      yearMax: season ? null : params.yearMax,
+      year: season ? draft.year : null,
+      yearMin: season ? null : draft.yearMin,
+      yearMax: season ? null : draft.yearMax,
     });
+  };
+
+  const handleApply = () => {
+    applyFilters(draft);
+    onApply?.();
+  };
+
+  const handleReset = () => {
+    setDraft(cloneParams(resetParams));
+  };
+
+  const handleResetAndApply = () => {
+    resetFilters(resetParams);
+    onApply?.();
   };
 
   return (
@@ -96,7 +134,7 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
       <FilterSection title="Format & status">
         <div className="flex flex-col gap-3">
           <ToggleGroup
-            value={params.formats}
+            value={draft.formats}
             onValueChange={(formats) => patch({ formats: formats as MediaFormat[] })}
             variant="outline"
             size="sm"
@@ -111,7 +149,7 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
             ))}
           </ToggleGroup>
           <ToggleGroup
-            value={params.statuses}
+            value={draft.statuses}
             onValueChange={(statuses) => patch({ statuses: statuses as MediaStatus[] })}
             variant="outline"
             size="sm"
@@ -131,7 +169,7 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
       <FilterSection title="Release">
         <div className="flex flex-col gap-3">
           <ToggleGroup
-            value={params.season ? [params.season] : []}
+            value={draft.season ? [draft.season] : []}
             onValueChange={handleSeasonChange}
             variant="outline"
             size="sm"
@@ -145,12 +183,12 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
             ))}
           </ToggleGroup>
 
-          {params.season ? (
+          {draft.season ? (
             <FilterMinField
               label="Season year"
               min={FILTER_YEAR_MIN}
               max={FILTER_YEAR_MAX}
-              value={params.year}
+              value={draft.year}
               onChange={(year) => patch({ year })}
             />
           ) : (
@@ -158,8 +196,8 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
               label="Years"
               min={FILTER_YEAR_MIN}
               max={FILTER_YEAR_MAX}
-              valueMin={params.yearMin}
-              valueMax={params.yearMax}
+              valueMin={draft.yearMin}
+              valueMax={draft.yearMax}
               onChange={(yearMin, yearMax) => patch({ yearMin, yearMax })}
             />
           )}
@@ -167,7 +205,7 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
       </FilterSection>
 
       <FilterSection title="Genres">
-        <GenrePicker params={params} genres={genres} onChange={applyFilters} />
+        <GenrePicker params={draft} genres={genres} onChange={setDraft} />
       </FilterSection>
 
       <div className="flex flex-col gap-4">
@@ -178,7 +216,7 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
           max={FILTER_SCORE_MAX}
           step={5}
           emptyValue={FILTER_SCORE_MIN}
-          value={params.scoreMin}
+          value={draft.scoreMin}
           onChange={(scoreMin) => patch({ scoreMin })}
           formatValue={(v) => `${v}%`}
         />
@@ -188,8 +226,8 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
           min={FILTER_EPISODES_MIN}
           max={FILTER_EPISODES_MAX}
           step={1}
-          valueMin={params.episodesMin}
-          valueMax={params.episodesMax}
+          valueMin={draft.episodesMin}
+          valueMax={draft.episodesMax}
           onChange={(episodesMin, episodesMax) => patch({ episodesMin, episodesMax })}
         />
         <FilterRangeField
@@ -197,18 +235,28 @@ export function AdvancedFilters({ className }: AdvancedFiltersProps) {
           min={FILTER_DURATION_MIN}
           max={FILTER_DURATION_MAX}
           step={5}
-          valueMin={params.durationMin}
-          valueMax={params.durationMax}
+          valueMin={draft.durationMin}
+          valueMax={draft.durationMax}
           onChange={(durationMin, durationMax) => patch({ durationMin, durationMax })}
           formatValue={(v) => `${v}m`}
         />
       </div>
 
-      <FilterMoreOptions params={params} onPatch={patch} />
+      <FilterMoreOptions params={draft} onPatch={patch} />
 
-      <Button type="button" variant="outline" size="sm" className="w-full" onClick={resetFilters}>
-        Reset all filters
-      </Button>
+      <div className="mt-1 flex flex-col gap-2 border-t border-border pt-4">
+        <div className="flex gap-2">
+          <Button type="button" variant="outline" size="sm" className="flex-1" onClick={handleReset}>
+            Reset draft
+          </Button>
+          <Button type="button" size="sm" className="flex-1" onClick={handleApply} disabled={!isDirty}>
+            Apply filters
+          </Button>
+        </div>
+        <Button type="button" variant="ghost" size="sm" className="w-full" onClick={handleResetAndApply}>
+          Clear all now
+        </Button>
+      </div>
     </div>
   );
 }

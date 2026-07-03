@@ -64,8 +64,6 @@ export function paramsToNuqsState(params: AnimeListParams): NuqsState {
   };
 }
 
-const RESET_NUQS_STATE = paramsToNuqsState(DEFAULT_ANIME_LIST_PARAMS);
-
 export function useAnimeListParams() {
   "use memo";
 
@@ -82,9 +80,12 @@ export function useAnimeListParams() {
     [setState],
   );
 
-  const resetFilters = useCallback(() => {
-    void setState(RESET_NUQS_STATE);
-  }, [setState]);
+  const resetFilters = useCallback(
+    (next: AnimeListParams = DEFAULT_ANIME_LIST_PARAMS) => {
+      void setState(paramsToNuqsState(next));
+    },
+    [setState],
+  );
 
   const setSearchInput = useCallback(
     (value: string) => {

@@ -15,6 +15,7 @@ import type { GenreOption } from "@/lib/anilist/domain/genres";
 import type { AnimeSeason } from "@/lib/anilist/domain/season";
 import type { AnimeListParams } from "@/lib/browse/params";
 import { DEFAULT_ANIME_LIST_PARAMS } from "@/lib/browse/params/types";
+import { normalizeSearchQuery, shouldPrefetchBrowseSearch } from "@/lib/browse/params/search";
 
 type BrowseFiltersState = {
   params: AnimeListParams;
@@ -22,7 +23,7 @@ type BrowseFiltersState = {
 
 type BrowseFiltersActions = {
   applyFilters: (params: AnimeListParams) => void;
-  resetFilters: () => void;
+  resetFilters: (params?: AnimeListParams) => void;
   setSearchInput: (value: string) => void;
   prefetchFilters: (params: AnimeListParams) => void;
 };
@@ -85,16 +86,26 @@ export function BrowseFiltersProvider({
 
   const setSearchInputWithPrefetch = useCallback(
     (value: string) => {
-      setSearchInput(value);
+      const normalized = normalizeSearchQuery(value);
+      const next = { ...params, q: normalized };
+
+      if (shouldPrefetchBrowseSearch(normalized)) {
+        prefetchFilters(next);
+      }
+
+      setSearchInput(normalized);
     },
-    [setSearchInput],
+    [params, prefetchFilters, setSearchInput],
   );
 
-  const resetFiltersWithFocus = useCallback(() => {
-    prefetchFilters(DEFAULT_ANIME_LIST_PARAMS);
-    resetFilters();
+  const resetFiltersWithFocus = useCallback((next: AnimeListParams = {
+    ...DEFAULT_ANIME_LIST_PARAMS,
+    sort: params.sort,
+  }) => {
+    prefetchFilters(next);
+    resetFilters(next);
     searchRef.current?.focus();
-  }, [prefetchFilters, resetFilters]);
+  }, [params.sort, prefetchFilters, resetFilters]);
 
   const value = useMemo<BrowseFiltersContextValue>(
     () => ({

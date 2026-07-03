@@ -38,7 +38,7 @@ export function FilterChips() {
         variant="ghost"
         size="xs"
         className="h-7 text-muted-foreground"
-        onClick={resetFilters}
+        onClick={() => resetFilters()}
       >
         Clear all
       </Button>

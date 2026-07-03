@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { SearchIcon, SlidersHorizontalIcon } from "lucide-react";
 import { useBrowseFilters } from "@/components/browse/browse-filters-provider";
@@ -19,6 +19,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { countBrowseFilters, getActiveFilterChips } from "@/lib/browse/params";
+import { normalizeSearchQuery, shouldPrefetchBrowseSearch } from "@/lib/browse/params/search";
 
 const AdvancedFilters = dynamic(
   () => import("@/components/browse/advanced-filters").then((module) => module.AdvancedFilters),
@@ -34,24 +35,39 @@ export function AnimeBrowseToolbar() {
   const { searchRef } = meta;
   const [sheetOpen, setSheetOpen] = useState(false);
   const [searchDraft, setSearchDraft] = useState(params.q);
-  const [debouncedSearch, { flush: flushSearch }] = useDebounce(searchDraft, 350);
+  const [debouncedSearch] = useDebounce(searchDraft, 350);
   const filterCount = countBrowseFilters(params);
   const hasChips = getActiveFilterChips(params).length > 0;
+  const searchTooShort =
+    searchDraft.trim().length > 0 && !shouldPrefetchBrowseSearch(normalizeSearchQuery(searchDraft));
 
   useEffect(() => {
     setSearchDraft(params.q);
   }, [params.q]);
 
+  const commitSearch = useCallback(
+    (value: string) => {
+      const normalized = normalizeSearchQuery(value);
+      if (normalized === params.q || !shouldPrefetchBrowseSearch(normalized)) {
+        return;
+      }
+
+      setSearchInput(normalized);
+    },
+    [params.q, setSearchInput],
+  );
+
   useEffect(() => {
     if (debouncedSearch !== params.q && debouncedSearch === searchDraft) {
-      setSearchInput(debouncedSearch);
+      commitSearch(debouncedSearch);
     }
-  }, [debouncedSearch, searchDraft, params.q, setSearchInput]);
+  }, [commitSearch, debouncedSearch, searchDraft, params.q]);
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex gap-2">
-        <div className="relative min-w-0 flex-1">
+      <div className="flex items-start gap-2">
+        <div className="min-w-0 flex-1">
+          <div className="relative">
           <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             ref={searchRef}
@@ -59,11 +75,21 @@ export function AnimeBrowseToolbar() {
             type="search"
             value={searchDraft}
             onChange={(e) => setSearchDraft(e.target.value)}
-            onBlur={() => flushSearch()}
+            onBlur={() => commitSearch(searchDraft)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                commitSearch(searchDraft);
+              }
+            }}
             placeholder="Search anime..."
             autoComplete="off"
             className="h-9 pl-9"
           />
+          </div>
+          {searchTooShort ? (
+            <p className="pt-1 text-xs text-muted-foreground">Type at least 2 characters to search.</p>
+          ) : null}
         </div>
 
         <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
@@ -84,7 +110,7 @@ export function AnimeBrowseToolbar() {
             <SheetHeader className="shrink-0 border-b border-border">
               <SheetTitle>Filters</SheetTitle>
               <SheetDescription>
-                Toggles apply instantly. Sliders update when you release.
+                Adjust multiple filters, then apply once to avoid extra loading.
               </SheetDescription>
             </SheetHeader>
             <div
@@ -92,7 +118,7 @@ export function AnimeBrowseToolbar() {
               data-lenis-prevent
               data-lenis-prevent-wheel
             >
-              {sheetOpen ? <AdvancedFilters /> : null}
+              {sheetOpen ? <AdvancedFilters onApply={() => setSheetOpen(false)} /> : null}
             </div>
           </SheetContent>
         </Sheet>
