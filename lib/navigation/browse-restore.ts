@@ -1,7 +1,7 @@
 import type { MediaPageResult } from "@/lib/anilist/domain/types";
 import { normalizeBrowseHrefForRestore } from "@/lib/navigation/browse-href";
 import { readAppliedScrollY } from "@/lib/navigation/scroll-apply";
-import { readCurrentHref } from "@/lib/navigation/scroll-restore";
+import { getMaxScrollY, readCurrentHref } from "@/lib/navigation/scroll-restore";
 
 const BROWSE_RESTORE_KEY = "aninext:browse-restore";
 const PENDING_SCROLL_RESTORE_KEY = "aninext:pending-scroll-restore";
@@ -11,7 +11,10 @@ export type BrowseRestoreState = {
   filterKey: string;
   pages: MediaPageResult[];
   scrollY: number;
+  wasNearBottom?: boolean;
 };
+
+const BROWSE_RESUME_THRESHOLD_PX = 900;
 
 let latestSnapshot: Pick<BrowseRestoreState, "href" | "filterKey" | "pages"> | null = null;
 
@@ -40,6 +43,7 @@ export function persistBrowseRestoreSnapshot(scrollY = readAppliedScrollY()): vo
   const payload: BrowseRestoreState = {
     ...latestSnapshot,
     scrollY: Math.max(0, Math.round(scrollY)),
+    wasNearBottom: getMaxScrollY() - scrollY <= BROWSE_RESUME_THRESHOLD_PX,
   };
 
   try {
@@ -89,7 +93,7 @@ export function hasBrowseRestorePending(currentHref = readCurrentHref()): boolea
 
 export function consumeBrowseRestore(
   currentHref: string,
-): Pick<BrowseRestoreState, "pages" | "scrollY"> | null {
+): Pick<BrowseRestoreState, "pages" | "scrollY" | "wasNearBottom"> | null {
   const payload = peekBrowseRestore(currentHref);
   if (!payload) {
     return null;
@@ -100,10 +104,11 @@ export function consumeBrowseRestore(
 
   const pages = Array.isArray(payload.pages) ? payload.pages : [];
   const scrollY = typeof payload.scrollY === "number" ? payload.scrollY : 0;
+  const wasNearBottom = payload.wasNearBottom === true;
 
   if (pages.length === 0 && scrollY <= 0) {
     return null;
   }
 
-  return { pages, scrollY };
+  return { pages, scrollY, wasNearBottom };
 }

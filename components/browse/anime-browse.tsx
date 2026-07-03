@@ -55,6 +55,8 @@ type AnimeBrowseProps = {
   initialResult: MediaPageResult;
 };
 
+const LOAD_MORE_ROOT_MARGIN_PX = 250;
+
 function AnimeBrowseResults({
   initialParams,
   initialResult,
@@ -73,10 +75,14 @@ function AnimeBrowseResults({
   const requestIdRef = useRef(0);
   const previousFilterKeyRef = useRef<string | null>(null);
   const pendingScrollYRef = useRef<number | null>(null);
+  const pendingResumeLoadMoreRef = useRef(false);
   const restoreWhenPageCountRef = useRef(0);
   const restoreAttemptedRef = useRef(false);
   const pagesLengthRef = useRef(0);
   const pauseLoadMoreUntilRef = useRef(0);
+  const fetchNextPageRef = useRef<(() => Promise<void>) | null>(null);
+  const resumeLoadMoreAfterRestoreRef = useRef(false);
+  const resumeLoadMoreTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const filterKey = useMemo(
     () => serializeBrowseFilterKey(params, currentSeason, nextSeason),
@@ -103,10 +109,48 @@ function AnimeBrowseResults({
   isFetchingNextPageRef.current = isFetchingNextPage;
   pagesLengthRef.current = pages.length;
 
-  const beginScrollRestore = useCallback((scrollY: number) => {
-    pauseLoadMoreUntilRef.current = Date.now() + 700;
-    restoreScrollWithRetry(scrollY);
+  const clearResumeLoadMoreTimeout = useCallback(() => {
+    if (resumeLoadMoreTimeoutRef.current) {
+      clearTimeout(resumeLoadMoreTimeoutRef.current);
+      resumeLoadMoreTimeoutRef.current = null;
+    }
   }, []);
+
+  const scheduleResumeLoadMoreCheck = useCallback(() => {
+    clearResumeLoadMoreTimeout();
+
+    resumeLoadMoreTimeoutRef.current = setTimeout(() => {
+      resumeLoadMoreTimeoutRef.current = null;
+      const shouldForceResume = resumeLoadMoreAfterRestoreRef.current;
+      resumeLoadMoreAfterRestoreRef.current = false;
+
+      if (Date.now() < pauseLoadMoreUntilRef.current || isFetchingNextPageRef.current) {
+        return;
+      }
+
+      const element = loadMoreRef.current;
+      if (!element) {
+        return;
+      }
+
+      const rect = element.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      const withinObserverRange =
+        rect.top <= viewportHeight + LOAD_MORE_ROOT_MARGIN_PX &&
+        rect.bottom >= -LOAD_MORE_ROOT_MARGIN_PX;
+
+      if (withinObserverRange || shouldForceResume) {
+        void fetchNextPageRef.current?.();
+      }
+    }, Math.max(0, pauseLoadMoreUntilRef.current - Date.now()) + 16);
+  }, [clearResumeLoadMoreTimeout]);
+
+  const beginScrollRestore = useCallback((scrollY: number, shouldResumeLoadMore = false) => {
+    pauseLoadMoreUntilRef.current = Date.now() + 700;
+    resumeLoadMoreAfterRestoreRef.current = shouldResumeLoadMore;
+    scheduleResumeLoadMoreCheck();
+    restoreScrollWithRetry(scrollY);
+  }, [scheduleResumeLoadMoreCheck]);
 
   const tryRestoreBrowse = useCallback(() => {
     if (pathname !== "/anime" || restoreAttemptedRef.current) {
@@ -122,7 +166,7 @@ function AnimeBrowseResults({
       if (pagesLengthRef.current >= peek.pages.length) {
         const restored = consumeBrowseRestore(href);
         if (restored?.scrollY && restored.scrollY > 0) {
-          beginScrollRestore(restored.scrollY);
+          beginScrollRestore(restored.scrollY, restored.wasNearBottom);
         }
         return;
       }
@@ -135,12 +179,13 @@ function AnimeBrowseResults({
       if (restored.pages.length > 0) {
         restoreWhenPageCountRef.current = restored.pages.length;
         pendingScrollYRef.current = restored.scrollY;
+        pendingResumeLoadMoreRef.current = restored.wasNearBottom === true;
         setPages(restored.pages);
         return;
       }
 
       if (restored.scrollY > 0) {
-        beginScrollRestore(restored.scrollY);
+        beginScrollRestore(restored.scrollY, restored.wasNearBottom);
       }
       return;
     }
@@ -155,9 +200,10 @@ function AnimeBrowseResults({
   useEffect(() => {
     if (pathname !== "/anime") {
       restoreAttemptedRef.current = false;
+      clearResumeLoadMoreTimeout();
       cancelScrollRestore();
     }
-  }, [pathname]);
+  }, [pathname, clearResumeLoadMoreTimeout]);
 
   useLayoutEffect(() => {
     tryRestoreBrowse();
@@ -174,10 +220,12 @@ function AnimeBrowseResults({
 
     restoreWhenPageCountRef.current = 0;
     const scrollY = pendingScrollYRef.current;
+    const shouldResumeLoadMore = pendingResumeLoadMoreRef.current;
     pendingScrollYRef.current = null;
+    pendingResumeLoadMoreRef.current = false;
 
     if (scrollY != null && scrollY > 0) {
-      beginScrollRestore(scrollY);
+      beginScrollRestore(scrollY, shouldResumeLoadMore);
     }
   }, [pages, beginScrollRestore]);
 
@@ -298,6 +346,8 @@ function AnimeBrowseResults({
     }
   }, [nextPage, params, currentSeason, nextSeason, filterKey]);
 
+  fetchNextPageRef.current = fetchNextPage;
+
   useEffect(() => {
     const element = loadMoreRef.current;
     if (!element || !showLoadMore) {
@@ -306,19 +356,28 @@ function AnimeBrowseResults({
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (Date.now() < pauseLoadMoreUntilRef.current) {
+        const isIntersecting = entries[0]?.isIntersecting;
+        if (!isIntersecting) {
           return;
         }
 
-        if (entries[0]?.isIntersecting && !isFetchingNextPageRef.current) {
+        if (Date.now() < pauseLoadMoreUntilRef.current) {
+          scheduleResumeLoadMoreCheck();
+          return;
+        }
+
+        if (!isFetchingNextPageRef.current) {
           void fetchNextPage();
         }
       },
-      { rootMargin: "250px" },
+      { rootMargin: `${LOAD_MORE_ROOT_MARGIN_PX}px` },
     );
     observer.observe(element);
-    return () => observer.disconnect();
-  }, [fetchNextPage, showLoadMore]);
+    return () => {
+      observer.disconnect();
+      clearResumeLoadMoreTimeout();
+    };
+  }, [fetchNextPage, showLoadMore, scheduleResumeLoadMoreCheck, clearResumeLoadMoreTimeout]);
 
   const showEmptyRateLimit = rateLimited && media.length === 0;
 
