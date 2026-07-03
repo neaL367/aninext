@@ -75,7 +75,6 @@ export function AnimeBrowseToolbar() {
             type="search"
             value={searchDraft}
             onChange={(e) => setSearchDraft(e.target.value)}
-            onBlur={() => commitSearch(searchDraft)}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 event.preventDefault();
