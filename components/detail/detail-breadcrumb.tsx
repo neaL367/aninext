@@ -86,28 +86,6 @@ export function DetailBreadcrumb({ title }: DetailBreadcrumbProps) {
     setDetailReturn(readDetailReturn());
   }, [mediaId]);
 
-  useLayoutEffect(() => {
-    const onPopState = () => {
-      const nextHref = `${window.location.pathname}${window.location.search}`;
-      const nextPathname = window.location.pathname || "/";
-      const pendingReturn = readDetailReturn();
-
-      if (
-        nextPathname !== "/anime" &&
-        pendingReturn?.scrollY != null &&
-        pendingReturn.scrollY > 0 &&
-        isDetailReturnOrigin(nextHref, pendingReturn)
-      ) {
-        queueScrollRestore(nextHref, pendingReturn.scrollY);
-      }
-    };
-
-    window.addEventListener("popstate", onPopState);
-    return () => {
-      window.removeEventListener("popstate", onPopState);
-    };
-  }, []);
-
   const crumbs = buildDetailBreadcrumbs(title, detailReturn);
 
   return (
