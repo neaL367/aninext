@@ -6,6 +6,7 @@ import {
   MIN_RATE_LIMIT_RETRY_MS,
   RATE_LIMIT_RESET_BUFFER_MS,
   TOKEN_BUCKET_CAPACITY,
+  TOKEN_BUCKET_LIGHT_SPACING_MS,
   TOKEN_BUCKET_RATE_PER_MIN,
 } from "./constants";
 
@@ -143,12 +144,14 @@ function getTokenBucketWaitMs(config: TokenBucketConfig, now = Date.now()): numb
     return tokenBucket.headerPauseUntilMs - now;
   }
 
-  const spacingWait = Math.max(0, config.minSpacingMs - (now - tokenBucket.lastRequestMs));
+  const sinceLastRequest = now - tokenBucket.lastRequestMs;
 
   if (tokenBucket.tokens >= 1) {
-    return spacingWait;
+    const lightSpacing = Math.min(config.minSpacingMs, TOKEN_BUCKET_LIGHT_SPACING_MS);
+    return Math.max(0, lightSpacing - sinceLastRequest);
   }
 
+  const spacingWait = Math.max(0, config.minSpacingMs - sinceLastRequest);
   const msPerToken = 60_000 / config.ratePerMin;
   const refillWait = msPerToken - ((now - tokenBucket.lastRefillMs) % msPerToken);
   return Math.max(spacingWait, refillWait);

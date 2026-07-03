@@ -18,7 +18,10 @@ import {
 } from "@/components/browse/browse-filters-provider";
 import { EmptyState } from "@/components/shared/empty-state";
 import { AniListRateLimitNotice } from "@/components/shared/anilist-rate-limit-notice";
-import { consumeBrowseMediaPagePrefetch } from "@/lib/anilist/client/browse-page-prefetch";
+import {
+  consumeBrowseMediaPagePrefetch,
+  prefetchBrowseNextMediaPage,
+} from "@/lib/anilist/client/browse-page-prefetch";
 import {
   canLoadMorePages,
   getNextPageNumber,
@@ -30,6 +33,7 @@ import type { GenreOption } from "@/lib/anilist/domain/genres";
 import type { AnimeSeason } from "@/lib/anilist/domain/season";
 import type { MediaPageResult } from "@/lib/anilist/domain/types";
 import type { AnimeListParams } from "@/lib/browse/params";
+import { shouldPrefetchBrowseSearch } from "@/lib/browse/params/search";
 import {
   consumeBrowseRestore,
   peekBrowseRestore,
@@ -251,6 +255,14 @@ function AnimeBrowseResults({
     });
   }, [filterKey, params, currentSeason, nextSeason]);
 
+  useEffect(() => {
+    if (!nextPage || !shouldPrefetchBrowseSearch(params.q)) {
+      return;
+    }
+
+    prefetchBrowseNextMediaPage(params, nextPage, currentSeason, nextSeason);
+  }, [nextPage, params, currentSeason, nextSeason]);
+
   const fetchNextPage = useCallback(async () => {
     if (!nextPage || isFetchingNextPageRef.current) {
       return;
@@ -262,7 +274,10 @@ function AnimeBrowseResults({
     const requestId = requestIdRef.current;
 
     try {
-      const result = await loadMediaPage(params, nextPage, currentSeason, nextSeason);
+      const prefetched = consumeBrowseMediaPagePrefetch(filterKey, nextPage);
+      const result = prefetched
+        ? await prefetched
+        : await loadMediaPage(params, nextPage, currentSeason, nextSeason);
 
       if (requestId !== requestIdRef.current) {
         return;
@@ -281,7 +296,7 @@ function AnimeBrowseResults({
       isFetchingNextPageRef.current = false;
       setIsFetchingNextPage(false);
     }
-  }, [nextPage, params, currentSeason, nextSeason]);
+  }, [nextPage, params, currentSeason, nextSeason, filterKey]);
 
   useEffect(() => {
     const element = loadMoreRef.current;

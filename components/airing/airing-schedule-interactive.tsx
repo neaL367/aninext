@@ -8,7 +8,7 @@ import {
   AiringDayTabCountBadge,
 } from "@/components/airing/airing-day-chunks";
 import { Button } from "@/components/ui/button";
-import { loadAiringDayCountClient } from "@/lib/anilist/client/airing-day-count-load";
+import { loadAiringWeekCountsClient } from "@/lib/anilist/client/airing-week-counts-load";
 import { loadAiringDayClient } from "@/lib/anilist/client/airing-day-load";
 import type { AiringScheduleItem } from "@/lib/anilist/domain/types";
 import {
@@ -87,30 +87,26 @@ export function AiringScheduleInteractive({
   useEffect(() => {
     let cancelled = false;
 
-    void (async () => {
-      for (const dateKey of dateKeys) {
-        if (cancelled || dateKey === priorityDateKey || loadedCountsRef.current.has(dateKey)) {
-          continue;
+    void loadAiringWeekCountsClient(dateKeys)
+      .then((counts) => {
+        if (cancelled) {
+          return;
         }
 
-        try {
-          const count = await loadAiringDayCountClient(dateKey);
-          if (cancelled) {
-            return;
-          }
-
+        for (const dateKey of Object.keys(counts)) {
           loadedCountsRef.current.add(dateKey);
-          setDayCounts((current) => ({ ...current, [dateKey]: count }));
-        } catch {
-          // Keep the pulse badge — user can still open the day for a full retry.
         }
-      }
-    })();
+
+        setDayCounts((current) => ({ ...current, ...counts }));
+      })
+      .catch(() => {
+        // Keep pulse badges — user can still open a day for a full retry.
+      });
 
     return () => {
       cancelled = true;
     };
-  }, [dateKeys, priorityDateKey]);
+  }, [dateKeys]);
 
   const handleSelectDay = useCallback((dateKey: string) => {
     setSelectedDay(dateKey);

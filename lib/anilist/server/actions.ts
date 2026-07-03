@@ -109,3 +109,25 @@ export async function loadAiringDay(dateKey: string): Promise<AiringDayActionRes
     return toActionError(error);
   }
 }
+
+export type AiringWeekCountsActionResult =
+  | { ok: true; data: Record<string, number> }
+  | { ok: false; code: "rate_limit"; message: string }
+  | { ok: false; code: "error"; message: string };
+
+/** All weekday tab counts in one server round trip (L2 hits skip AniList). */
+export async function loadAiringWeekCounts(
+  dateKeys: readonly string[],
+): Promise<AiringWeekCountsActionResult> {
+  try {
+    const entries = await Promise.all(
+      dateKeys.map(async (dateKey) => {
+        const count = await getAiringScheduleCountForDay(dateKey);
+        return [dateKey, count] as const;
+      }),
+    );
+    return { ok: true, data: Object.fromEntries(entries) };
+  } catch (error) {
+    return toActionError(error);
+  }
+}

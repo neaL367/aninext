@@ -15,23 +15,26 @@ export const RATE_LIMIT_RESET_BUFFER_MS = 500;
 /** Proactive gate cap in development — home page can fan out ~6 sections on cold cache. */
 export const MAX_RATE_LIMIT_WAIT_MS_DEV = 120_000;
 
-/** Proactive gate cap in production — wait longer before failing into backup cache. */
-export const MAX_RATE_LIMIT_WAIT_MS_PROD = 30_000;
+/** Proactive gate cap in production — fail into L2 backup rather than blocking UX. */
+export const MAX_RATE_LIMIT_WAIT_MS_PROD = 8_000;
 
 /** Interactive lane (browse, tooltips, detail) — reserved so search is not starved by home/airing. */
 export const MAX_CONCURRENT_INTERACTIVE_REQUESTS = 1;
 
 /** Background lane (home carousels, airing pagination, genres). */
-export const MAX_CONCURRENT_BACKGROUND_REQUESTS = process.env.NODE_ENV === "development" ? 2 : 1;
+export const MAX_CONCURRENT_BACKGROUND_REQUESTS = 2;
 
 /**
  * Conservative local token bucket — AniList's degraded cap is ~30 req/min but
  * X-RateLimit-Remaining can lie. Per warm serverless instance only; not shared
  * across instances without Redis.
  */
-export const TOKEN_BUCKET_RATE_PER_MIN = 22;
+export const TOKEN_BUCKET_RATE_PER_MIN = 28;
 
-export const TOKEN_BUCKET_CAPACITY = 3;
+export const TOKEN_BUCKET_CAPACITY = 6;
+
+/** When the bucket has budget, pace lightly; full spacing applies only when tokens are exhausted. */
+export const TOKEN_BUCKET_LIGHT_SPACING_MS = 350;
 
 /** Production spacing — dev overrides live in rate-limit.ts getTokenBucketConfig(). */
 export const TOKEN_BUCKET_MIN_SPACING_MS = Math.ceil(60_000 / TOKEN_BUCKET_RATE_PER_MIN);
