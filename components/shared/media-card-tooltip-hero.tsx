@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 type MediaCardTooltipHeroProps = {
   title: string;
   placeholderColor: string | null | undefined;
+  coverImage?: string | null;
   bannerImage: string | null | undefined;
   sizes: string;
   className?: string;
@@ -18,12 +19,14 @@ type MediaCardTooltipHeroProps = {
 export function MediaCardTooltipHero({
   title,
   placeholderColor,
+  coverImage,
   bannerImage,
   sizes,
   className,
   onBannerLoad,
 }: MediaCardTooltipHeroProps) {
   const bannerSrc = bannerImage ? (buildProgressiveImageSources(bannerImage)[0] ?? null) : null;
+  const coverSrc = coverImage ? (buildProgressiveImageSources(coverImage)[0] ?? null) : null;
   const [bannerLoaded, setBannerLoaded] = useState(!bannerSrc);
 
   useEffect(() => {
@@ -60,6 +63,15 @@ export function MediaCardTooltipHero({
             loading="eager"
             onLoad={handleBannerLoad}
             onError={handleBannerLoad}
+          />
+        ) : coverSrc ? (
+          <Image
+            src={coverSrc}
+            alt=""
+            fill
+            className="object-cover blur-xl opacity-40"
+            sizes={sizes}
+            loading="eager"
           />
         ) : null}
       </div>

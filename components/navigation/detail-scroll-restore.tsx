@@ -3,7 +3,11 @@
 import { usePathname, useSearchParams } from "next/navigation";
 import { useLayoutEffect, useRef } from "react";
 import { hasBrowseRestorePending } from "@/lib/navigation/browse-restore";
-import { isDetailPath, isDetailReturnOrigin, readDetailReturn } from "@/lib/navigation/detail-return";
+import {
+  isDetailPath,
+  isDetailReturnOrigin,
+  readDetailReturn,
+} from "@/lib/navigation/detail-return";
 import {
   consumePendingScrollRestore,
   hasPendingScrollRestore,

@@ -1,5 +1,7 @@
 #import "./media-card-grid.graphql"
+#import "./media-card-tooltip.graphql"
 
 fragment MediaCardFields on Media {
   ...MediaCardGridFields
+  ...MediaCardTooltipFields
 }

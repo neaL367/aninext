@@ -194,9 +194,7 @@ export function AiringScheduleInteractive({
             </p>
           </div>
           <div className="text-sm font-medium tabular-nums text-muted-foreground">
-            {activePromise ? (
-              <AiringDayShowCountSuspense promise={activePromise} />
-            ) : dayCounts[activeDay] !== undefined ? (
+            {dayCounts[activeDay] !== undefined ? (
               <>
                 {dayCounts[activeDay]} {dayCounts[activeDay] === 1 ? "show" : "shows"}
               </>

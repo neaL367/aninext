@@ -10,14 +10,32 @@ import { anilist } from "@/lib/anilist/server/fetchers";
 
 export const maxDuration = 60;
 
-function buildWarmTasks() {
+async function buildWarmTasks() {
   const weekDateKeys = getWeekDateKeys();
 
-  return [
+  const tasks: Array<() => Promise<any>> = [
     () => anilist.genreCollection(),
     () => anilist.homePageSections(),
     ...weekDateKeys.map((dateKey) => () => anilist.airingSchedulesForDay(dateKey)),
-  ] as const;
+  ];
+
+  // Warm trending media detail pages
+  try {
+    const trending = await anilist.mediaPage({
+      sort: ["TRENDING"],
+      perPage: 20,
+      page: 1,
+    });
+    
+    const trendingIds = trending.media.map(m => m.id);
+    trendingIds.forEach(id => {
+      tasks.push(() => anilist.mediaDetail(id));
+    });
+  } catch (e) {
+    console.error("[cache-warm] failed to fetch trending media:", e);
+  }
+
+  return tasks;
 }
 
 export async function GET(request: NextRequest) {
@@ -51,7 +69,7 @@ export async function GET(request: NextRequest) {
 
   const schedule = request.headers.get("x-vercel-cron-schedule");
   const startedAt = Date.now();
-  const warmTasks = buildWarmTasks();
+  const warmTasks = await buildWarmTasks();
   const results: PromiseSettledResult<unknown>[] = [];
 
   // Sequential warming avoids bursting AniList when the bucket is nearly empty.

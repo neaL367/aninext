@@ -6,6 +6,7 @@ import {
   ANIME_BROWSE_GRID_CLASS,
   ANIME_GRID_CELL_CLASS,
   ANIME_GRID_CLASS,
+  ANIME_CARD_ROOT_CLASS,
 } from "@/lib/styles/anime-grid-layout";
 import { cn } from "@/lib/utils";
 
@@ -67,9 +68,9 @@ export function AnimeMediaGridSkeleton({
     <div className={cn(grid, className)}>
       {Array.from({ length: count }).map((_, index) => (
         <div key={index} className={cell}>
-          <div className="flex h-full flex-col overflow-hidden rounded-md border border-border/80 bg-card">
+          <div className={cn("flex h-full flex-col overflow-hidden rounded-md bg-card", ANIME_CARD_ROOT_CLASS)}>
             <Skeleton className={coverClass} />
-            <div className="flex flex-col gap-1.5 border-t border-border p-2.5">
+            <div className="flex flex-col gap-1.5 p-2.5">
               <Skeleton className="h-4 w-4/5" />
               <Skeleton className="h-3.5 w-3/5" />
             </div>

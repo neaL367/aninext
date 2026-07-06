@@ -40,7 +40,7 @@ export function SectionHeader({
           ) : null)}
       </div>
       {href ? (
-        <Link href={href} prefetch className={viewAllLinkClassName}>
+        <Link href={href} prefetch={false} className={viewAllLinkClassName}>
           {viewAllLabel}
         </Link>
       ) : null}

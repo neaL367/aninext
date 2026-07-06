@@ -53,7 +53,6 @@ export function AiringItemCard({ item, className }: AiringItemCardProps) {
     >
       <Link
         href={detailHref}
-        prefetch
         className={AIRING_ITEM_COVER_CLASS}
         onClick={handleNavigateToDetail}
       >
@@ -88,7 +87,6 @@ export function AiringItemCard({ item, className }: AiringItemCardProps) {
 
           <Link
             href={detailHref}
-            prefetch
             className="line-clamp-2 text-sm font-medium leading-snug underline-offset-2 hover:underline"
             onClick={handleNavigateToDetail}
           >

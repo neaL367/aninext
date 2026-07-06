@@ -10,13 +10,24 @@ type PageMetadataInput = {
   title: string;
   description?: string;
   path?: string;
+  image?: string | null;
 };
+
+function getDynamicOgUrl(title: string, description: string): string {
+  const params = new URLSearchParams({
+    title: title,
+    description: description,
+  });
+  return `${METADATA_BASE}/api/og?${params.toString()}`;
+}
 
 /** Root layout only — no canonical/og:url (breaks dynamic child generateMetadata). */
 export function createRootLayoutMetadata({
   title,
   description = SITE_DESCRIPTION,
 }: Pick<PageMetadataInput, "title" | "description">): Metadata {
+  const ogImage = getDynamicOgUrl(title, description);
+
   return {
     title: {
       default: SITE_NAME,
@@ -29,11 +40,13 @@ export function createRootLayoutMetadata({
       description,
       siteName: SITE_NAME,
       type: "website",
+      images: [ogImage],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [ogImage],
     },
   };
 }
@@ -42,8 +55,10 @@ export function createPageMetadata({
   title,
   description = SITE_DESCRIPTION,
   path = "/",
+  image,
 }: PageMetadataInput): Metadata {
   const canonicalPath = path.startsWith("/") ? path : `/${path}`;
+  const ogImage = image ?? getDynamicOgUrl(title, description);
 
   return {
     title,
@@ -56,15 +71,22 @@ export function createPageMetadata({
       description,
       type: "website",
       url: canonicalPath,
+      images: [ogImage],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [ogImage],
     },
   };
 }
 
-export function createDetailMetadata(title: string, description: string, path: string): Metadata {
-  return createPageMetadata({ title, description, path });
+export function createDetailMetadata(
+  title: string,
+  description: string,
+  path: string,
+  image?: string | null,
+): Metadata {
+  return createPageMetadata({ title, description, path, image });
 }

@@ -21,7 +21,7 @@ export type DetailBreadcrumbCrumb = {
 const DETAIL_PATH = /^\/(anime|manga|character|staff)\/\d+\/[^/]+$/;
 
 export function isHomeReturn(detailReturn: DetailReturn): boolean {
-  const pathname = detailReturn.href.split("?")[0];
+  const pathname = detailReturn.href?.split("?")[0] || "";
   return pathname === "/" || detailReturn.label === "Home";
 }
 

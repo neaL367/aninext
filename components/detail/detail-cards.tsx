@@ -20,7 +20,7 @@ export function DetailCharacterCard({ edge }: { edge: NonNullable<CharacterEdge>
     <div className="overflow-hidden rounded-lg border border-border bg-card">
       <Link
         href={character?.id ? getCharacterDetailHref(character.id, characterName) : ("#" as Route)}
-        prefetch
+        prefetch={false}
         className="flex items-center gap-4 p-4 transition-colors hover:bg-muted/40"
       >
         <div className="relative size-[4.75rem] shrink-0 overflow-hidden rounded-lg border border-border bg-muted sm:size-20">

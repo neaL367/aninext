@@ -114,11 +114,12 @@ export function DetailCoverBanner({ media }: AnimeDetailMediaProps) {
   const bannerSources = buildProgressiveImageSources(media.bannerImage);
 
   return (
-    <div className="absolute inset-0">
+    <div className="absolute inset-0 overflow-hidden">
       <div
         className="absolute inset-0"
         style={{ backgroundColor: media.coverImage?.color ?? "var(--muted)" }}
       />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
       {bannerSources.length ? (
         <ProgressiveImage
           sources={bannerSources}

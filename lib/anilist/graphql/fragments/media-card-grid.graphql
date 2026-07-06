@@ -12,6 +12,7 @@ fragment MediaCardGridFields on Media {
     medium
     color
   }
+  bannerImage
   format
   season
   seasonYear
@@ -19,6 +20,7 @@ fragment MediaCardGridFields on Media {
   duration
   averageScore
   popularity
+  description(asHtml: false)
   genres
   status
   nextAiringEpisode {

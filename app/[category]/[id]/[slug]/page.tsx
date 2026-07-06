@@ -4,10 +4,6 @@ import { parseDetailCategory } from "@/lib/anilist/domain/detail-categories";
 import type { EntityDetailRouteParams } from "@/lib/anilist/domain/detail-route-params";
 import { createEntityDetailMetadata } from "@/lib/seo/entity-detail-metadata";
 
-/** Matches `detailRouteRevalidate` in lib/anilist/server/cache/route-config.ts */
-export const revalidate = 600;
-export const dynamicParams = true;
-
 type EntityDetailRouteProps = {
   params: EntityDetailRouteParams;
 };

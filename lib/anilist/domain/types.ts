@@ -2,6 +2,7 @@ import type {
   AiringMediaFieldsFragment,
   AiringSchedulesQuery,
   CharacterDetailFieldsFragment,
+  GlobalSearchQuery,
   MediaCardGridFieldsFragment,
   MediaCardTooltipFieldsFragment,
   MediaDetailFieldsFragment,
@@ -18,7 +19,7 @@ const MEDIA_CARD_TOOLTIP_KEYS = [
 ] as const satisfies readonly (keyof MediaCardTooltipFieldsFragment)[];
 
 export function hasMediaCardTooltipFields(media: Partial<MediaCardTooltipFieldsFragment>): boolean {
-  return MEDIA_CARD_TOOLTIP_KEYS.every((key) => Object.hasOwn(media, key));
+  return MEDIA_CARD_TOOLTIP_KEYS.every((key) => !!media[key]);
 }
 
 export type {
@@ -46,6 +47,12 @@ export type MediaDetail = MediaDetailFieldsFragment;
 export type CharacterDetail = CharacterDetailFieldsFragment;
 
 export type StaffDetail = StaffDetailFieldsFragment;
+
+export type GlobalSearchResult = 
+  | { type: 'anime'; data: any }
+  | { type: 'manga'; data: any }
+  | { type: 'character'; data: any }
+  | { type: 'staff'; data: any };
 
 export type AiringScheduleMedia = AiringMediaFieldsFragment;
 

@@ -34,7 +34,17 @@ const tokenBucket = {
   lastRefillMs: Date.now(),
   lastRequestMs: 0,
   headerPauseUntilMs: 0,
+  dynamicRatePerMin: null as number | null,
+  dynamicCapacity: null as number | null,
 };
+
+/** Update bucket calibration based on AniList's actual reported limits. */
+export function setDynamicLimit(limit: number, capacity?: number): void {
+  tokenBucket.dynamicRatePerMin = limit;
+  if (capacity !== undefined) {
+    tokenBucket.dynamicCapacity = capacity;
+  }
+}
 
 /** Serialize reserve + consume so parallel callers cannot bypass spacing. */
 let bucketLock: Promise<void> = Promise.resolve();
@@ -55,10 +65,12 @@ function getTokenBucketConfig(): TokenBucketConfig {
     };
   }
 
-  const ratePerMin = TOKEN_BUCKET_RATE_PER_MIN;
+  const ratePerMin = tokenBucket.dynamicRatePerMin ?? TOKEN_BUCKET_RATE_PER_MIN;
+  const capacity = tokenBucket.dynamicCapacity ?? TOKEN_BUCKET_CAPACITY;
+
   return {
     ratePerMin,
-    capacity: TOKEN_BUCKET_CAPACITY,
+    capacity,
     minSpacingMs: Math.ceil(60_000 / ratePerMin),
     maxWaitMs: MAX_RATE_LIMIT_WAIT_MS_PROD,
   };
@@ -183,6 +195,7 @@ export function updateAniListRateLimitFromHeaders(headers: Headers): void {
 
   if (limit !== undefined) {
     headerState.limit = limit;
+    setDynamicLimit(limit);
   }
 
   if (remaining !== undefined) {

@@ -98,14 +98,19 @@ export function BrowseFiltersProvider({
     [params, prefetchFilters, setSearchInput],
   );
 
-  const resetFiltersWithFocus = useCallback((next: AnimeListParams = {
-    ...DEFAULT_ANIME_LIST_PARAMS,
-    sort: params.sort,
-  }) => {
-    prefetchFilters(next);
-    resetFilters(next);
-    searchRef.current?.focus();
-  }, [params.sort, prefetchFilters, resetFilters]);
+  const resetFiltersWithFocus = useCallback(
+    (
+      next: AnimeListParams = {
+        ...DEFAULT_ANIME_LIST_PARAMS,
+        sort: params.sort,
+      },
+    ) => {
+      prefetchFilters(next);
+      resetFilters(next);
+      searchRef.current?.focus();
+    },
+    [params.sort, prefetchFilters, resetFilters],
+  );
 
   const value = useMemo<BrowseFiltersContextValue>(
     () => ({

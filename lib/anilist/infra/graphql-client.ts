@@ -20,7 +20,62 @@ import {
   updateAniListRateLimitFromHeaders,
 } from "./rate-limit";
 
+/**
+ * Circuit Breaker: Prevents cascading failures by stopping requests 
+ * to a failing downstream service for a period of time.
+ */
+class CircuitBreaker {
+  private failures = 0;
+  private lastFailureTime: number | null = null;
+  private state: "CLOSED" | "OPEN" | "HALF_OPEN" = "CLOSED";
+
+  private readonly FAILURE_THRESHOLD = 5;
+  private readonly RESET_TIMEOUT_MS = 30_000;
+
+  getState() {
+    if (this.state === "OPEN" && this.lastFailureTime) {
+      if (Date.now() - this.lastFailureTime > this.RESET_TIMEOUT_MS) {
+        this.state = "HALF_OPEN";
+      }
+    }
+    return this.state;
+  }
+
+  recordSuccess() {
+    this.failures = 0;
+    this.state = "CLOSED";
+    this.lastFailureTime = null;
+  }
+
+  recordFailure() {
+    this.failures++;
+    this.lastFailureTime = Date.now();
+    if (this.failures >= this.FAILURE_THRESHOLD) {
+      this.state = "OPEN";
+    }
+  }
+
+  shouldAllowRequest(): boolean {
+    const state = this.getState();
+    return state === "CLOSED" || state === "HALF_OPEN";
+  }
+}
+
+const breaker = new CircuitBreaker();
+
+/** Request Coalescing: Deduplicates simultaneous identical GraphQL calls. */
+const inFlightRequests = new Map<string, Promise<unknown>>();
+
+function getRequestHash(document: TypedDocumentNode<unknown, unknown>, variables?: Record<string, unknown>): string {
+  const query = getPrintedQuery(document);
+  const varString = variables ? JSON.stringify(variables) : "null";
+  return `${query}:${varString}`;
+}
+
 type GraphQLResponse<T> = {
+
+// ... (rest of the file)
+
   readonly data?: T;
   readonly errors?: readonly { message: string }[];
 };
@@ -236,6 +291,13 @@ async function executeGraphQLWithRetry<TData, TVariables extends Record<string, 
   document: TypedDocumentNode<TData, TVariables>,
   variables?: TVariables,
 ): Promise<TData> {
+  if (!breaker.shouldAllowRequest()) {
+    throw new AniListError(
+      "circuit_breaker",
+      "AniList API is currently experiencing issues. Please try again in a few moments.",
+    );
+  }
+
   let attempt = 0;
   let lastError: unknown;
 
@@ -244,9 +306,20 @@ async function executeGraphQLWithRetry<TData, TVariables extends Record<string, 
       await reserveAniListRequest();
       const operationName = getOperationName(document as TypedDocumentNode<unknown, unknown>);
       const lane = getConcurrencyLane(operationName);
-      return await withConcurrencyLimit(() => fetchGraphQLOnce(document, variables), lane);
+      const result = await withConcurrencyLimit(() => fetchGraphQLOnce(document, variables), lane);
+      
+      breaker.recordSuccess();
+      return result;
     } catch (error) {
       lastError = error;
+      
+      const isCriticalError = error instanceof AniListError && 
+        (error.code === "network" || error.code === "validation");
+      
+      if (isCriticalError) {
+        breaker.recordFailure();
+      }
+
       const retryable =
         error instanceof AniListError &&
         !error.proactiveGate &&
@@ -284,5 +357,22 @@ export async function executeGraphQL<TData, TVariables extends Record<string, un
   document: TypedDocumentNode<TData, TVariables>,
   variables?: TVariables,
 ): Promise<TData> {
-  return executeGraphQLWithRetry(document, variables);
+  const hash = getRequestHash(document as any, variables as any);
+  const inFlight = inFlightRequests.get(hash);
+
+  if (inFlight) {
+    if (process.env.NODE_ENV === "development") {
+      console.log(`[anilist-coalesce] hooking into in-flight request: ${getOperationName(document as any)}`);
+    }
+    return inFlight as Promise<TData>;
+  }
+
+  const promise = executeGraphQLWithRetry(document, variables);
+  inFlightRequests.set(hash, promise);
+
+  try {
+    return await promise;
+  } finally {
+    inFlightRequests.delete(hash);
+  }
 }

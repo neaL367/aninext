@@ -58,7 +58,6 @@ export function NavLinks({
           <li key={item.sortKey ?? item.href}>
             <Link
               href={item.href}
-              prefetch
               onClick={onNavigate}
               title={compact ? item.title : undefined}
               aria-current={active ? "page" : undefined}

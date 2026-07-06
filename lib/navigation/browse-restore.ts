@@ -14,9 +14,12 @@ export type BrowseRestoreState = {
   wasNearBottom?: boolean;
 };
 
+/** Map of filterKey -> BrowseRestoreState to remember positions across different sorts/filters. */
+type BrowseRestoreMap = Record<string, BrowseRestoreState>;
+
 const BROWSE_RESUME_THRESHOLD_PX = 900;
 
-let latestSnapshot: Pick<BrowseRestoreState, "href" | "filterKey" | "pages"> | null = null;
+let latestSnapshots: Partial<Record<string, Pick<BrowseRestoreState, "href" | "filterKey" | "pages">>> = {};
 
 export function updateBrowseRestoreSnapshot(
   href: string,
@@ -27,84 +30,109 @@ export function updateBrowseRestoreSnapshot(
     return;
   }
 
-  latestSnapshot = {
+  latestSnapshots[filterKey] = {
     href: normalizeBrowseHrefForRestore(href),
     filterKey,
     pages,
   };
 }
 
-/** Persist loaded browse pages + scroll before leaving for a detail page. */
+/** Persist the current browse state into the global map. */
 export function persistBrowseRestoreSnapshot(scrollY = readAppliedScrollY()): void {
-  if (typeof window === "undefined" || !latestSnapshot) {
+  if (typeof window === "undefined") {
     return;
   }
 
-  const payload: BrowseRestoreState = {
-    ...latestSnapshot,
+  // We need the current filterKey to know which entry to update.
+  // We can derive it from the current URL.
+  const currentHref = readCurrentHref();
+  if (!currentHref) return;
+  
+  // Use a temporary extraction of the filterKey from the URL or a provided one.
+  // Since we don't have the filterKey here, we'll look for the match in our latestSnapshots.
+  const matchingKey = Object.keys(latestSnapshots).find(key => 
+    latestSnapshots[key]?.href === normalizeBrowseHrefForRestore(currentHref)
+  );
+
+  if (!matchingKey) return;
+
+  const snapshot = latestSnapshots[matchingKey];
+  if (!snapshot) return;
+  const state: BrowseRestoreState = {
+    ...snapshot,
     scrollY: Math.max(0, Math.round(scrollY)),
     wasNearBottom: getMaxScrollY() - scrollY <= BROWSE_RESUME_THRESHOLD_PX,
   };
 
   try {
-    sessionStorage.setItem(BROWSE_RESTORE_KEY, JSON.stringify(payload));
+    const map: BrowseRestoreMap = JSON.parse(sessionStorage.getItem(BROWSE_RESTORE_KEY) || "{}");
+    map[matchingKey] = state;
+    sessionStorage.setItem(BROWSE_RESTORE_KEY, JSON.stringify(map));
   } catch {
     sessionStorage.removeItem(BROWSE_RESTORE_KEY);
   }
 }
 
-function readBrowseRestoreRaw(): BrowseRestoreState | null {
+function readBrowseRestoreMap(): BrowseRestoreMap {
   if (typeof window === "undefined") {
-    return null;
+    return {};
   }
 
   try {
     const raw = sessionStorage.getItem(BROWSE_RESTORE_KEY);
     if (!raw) {
-      return null;
+      return {};
     }
 
-    return JSON.parse(raw) as BrowseRestoreState;
+    return JSON.parse(raw) as BrowseRestoreMap;
   } catch {
     sessionStorage.removeItem(BROWSE_RESTORE_KEY);
-    return null;
+    return {};
   }
 }
 
-export function peekBrowseRestore(currentHref: string): BrowseRestoreState | null {
-  const payload = readBrowseRestoreRaw();
-  if (!payload) {
-    return null;
+export function peekBrowseRestore(currentHref: string, filterKey?: string): BrowseRestoreState | null {
+  const map = readBrowseRestoreMap();
+  
+  // If filterKey is provided, look it up directly.
+  if (filterKey && map[filterKey]) {
+    const state = map[filterKey];
+    if (normalizeBrowseHrefForRestore(state.href) === normalizeBrowseHrefForRestore(currentHref)) {
+      return state;
+    }
   }
 
-  const normalizedCurrent = normalizeBrowseHrefForRestore(currentHref);
-  const normalizedSaved = normalizeBrowseHrefForRestore(payload.href);
+  // Fallback: look for any entry that matches the current href.
+  const matchingEntry = Object.values(map).find(state => 
+    normalizeBrowseHrefForRestore(state.href) === normalizeBrowseHrefForRestore(currentHref)
+  );
 
-  if (normalizedSaved !== normalizedCurrent) {
-    return null;
-  }
-
-  return payload;
+  return matchingEntry ?? null;
 }
 
-export function hasBrowseRestorePending(currentHref = readCurrentHref()): boolean {
-  return peekBrowseRestore(currentHref) != null;
+export function hasBrowseRestorePending(currentHref = readCurrentHref(), filterKey?: string): boolean {
+  return peekBrowseRestore(currentHref, filterKey) != null;
 }
 
 export function consumeBrowseRestore(
   currentHref: string,
+  filterKey?: string,
 ): Pick<BrowseRestoreState, "pages" | "scrollY" | "wasNearBottom"> | null {
-  const payload = peekBrowseRestore(currentHref);
-  if (!payload) {
+  const map = readBrowseRestoreMap();
+  const state = peekBrowseRestore(currentHref, filterKey);
+
+  if (!state) {
     return null;
   }
 
-  sessionStorage.removeItem(BROWSE_RESTORE_KEY);
+  // Remove only the specific entry we are consuming.
+  delete map[state.filterKey];
+  sessionStorage.setItem(BROWSE_RESTORE_KEY, JSON.stringify(map));
   sessionStorage.removeItem(PENDING_SCROLL_RESTORE_KEY);
 
-  const pages = Array.isArray(payload.pages) ? payload.pages : [];
-  const scrollY = typeof payload.scrollY === "number" ? payload.scrollY : 0;
-  const wasNearBottom = payload.wasNearBottom === true;
+  const pages = Array.isArray(state.pages) ? state.pages : [];
+  const scrollY = typeof state.scrollY === "number" ? state.scrollY : 0;
+  const wasNearBottom = state.wasNearBottom === true;
 
   if (pages.length === 0 && scrollY <= 0) {
     return null;

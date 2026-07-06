@@ -11,6 +11,7 @@ import { formatDisplayTitle } from "@/lib/anilist/display/format";
 import { formatMediaFormat } from "@/lib/anilist/display/labels";
 import { getMediaDetailHref } from "@/lib/anilist/display/media-links";
 import { saveDetailReturnFromCurrentPage } from "@/lib/navigation/detail-return";
+import { usePrefetchMedia } from "@/lib/hooks/use-prefetch-media";
 import {
   ANIME_CARD_COMPACT_COVER_CLASS,
   ANIME_CARD_COVER_GRADIENT_BOTTOM_CLASS,
@@ -40,7 +41,7 @@ export type CompactMediaCardProps = {
 
 /** Shared small cover-card primitive for relation, recommendation, and credit grids. */
 export function CompactMediaCard({ media, badgeLabel, className }: CompactMediaCardProps) {
-  "use memo";
+  const { prefetch, cancel } = usePrefetchMedia(media.id);
 
   const title = formatDisplayTitle(media.title);
   const coverUrl = coverCardImageUrl(media.coverImage);
@@ -92,7 +93,11 @@ export function CompactMediaCard({ media, badgeLabel, className }: CompactMediaC
   );
 
   return (
-    <article className={cn(ANIME_CARD_ROOT_CLASS, className)}>
+    <article 
+      className={cn(ANIME_CARD_ROOT_CLASS, className)}
+      onMouseEnter={prefetch}
+      onMouseLeave={cancel}
+    >
       {external ? (
         <a
           href={href}

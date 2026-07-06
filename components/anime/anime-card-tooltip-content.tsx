@@ -55,9 +55,6 @@ function AnimeCardTooltipLoaded({
 }) {
   "use memo";
 
-  const [bannerReady, setBannerReady] = useState(!mergedMedia.bannerImage);
-  const handleBannerLoad = useCallback(() => setBannerReady(true), []);
-
   const title = formatDisplayTitle(mergedMedia.title);
   const score = formatScore(mergedMedia.averageScore);
   const synopsis = excerptSynopsis(mergedMedia.description);
@@ -71,60 +68,56 @@ function AnimeCardTooltipLoaded({
       <MediaCardTooltipHero
         title={title}
         placeholderColor={mergedMedia.coverImage?.color}
+        coverImage={mergedMedia.coverImage?.large}
         bannerImage={mergedMedia.bannerImage}
         sizes="448px"
-        onBannerLoad={handleBannerLoad}
       />
 
-      {!bannerReady ? (
-        <MediaCardTooltipBodySkeleton />
-      ) : (
-        <div className="flex min-w-0 flex-col gap-3 p-4">
-          {synopsis ? (
-            <p className="line-clamp-6 text-sm leading-relaxed text-muted-foreground">{synopsis}</p>
-          ) : (
-            <p className="text-sm italic text-muted-foreground">
-              {tooltipFailed ? "Details unavailable." : "No synopsis available."}
-            </p>
-          )}
+      <div className="flex min-w-0 flex-col gap-3 p-4">
+        {synopsis ? (
+          <p className="line-clamp-6 text-sm leading-relaxed text-muted-foreground">{synopsis}</p>
+        ) : (
+          <p className="text-sm italic text-muted-foreground">
+            {tooltipFailed ? "Details currently unavailable." : "Loading details..."}
+          </p>
+        )}
 
-          <MediaTooltipGenreChips genres={mergedMedia.genres} />
+        <MediaTooltipGenreChips genres={mergedMedia.genres} />
 
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-border pt-3 text-sm text-muted-foreground">
-            {studio ? (
-              <span className="inline-flex items-center gap-1.5">
-                <UsersIcon className="size-3.5 shrink-0" />
-                {studio}
-              </span>
-            ) : null}
-            {score !== "—" ? (
-              <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
-                <StarIcon className="size-3.5 fill-amber-400 text-amber-400" />
-                {score}
-              </span>
-            ) : null}
-            {popularity ? <span className="tabular-nums">{popularity} users</span> : null}
-          </div>
-
-          {tags.length > 0 ? (
-            <div className="flex flex-wrap gap-1.5">
-              {tags.map((tag) => (
-                <Badge key={tag} variant="outline" className="px-2 py-0 text-xs font-normal">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-border pt-3 text-sm text-muted-foreground">
+          {studio ? (
+            <span className="inline-flex items-center gap-1.5">
+              <UsersIcon className="size-3.5 shrink-0" />
+              {studio}
+            </span>
           ) : null}
-
-          {nextAiring ? (
-            <NextAiringCountdown
-              airingAt={nextAiring.airingAt}
-              timeUntilAiring={nextAiring.timeUntilAiring}
-              episode={nextAiring.episode}
-            />
+          {score !== "—" ? (
+            <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
+              <StarIcon className="size-3.5 fill-amber-400 text-amber-400" />
+              {score}
+            </span>
           ) : null}
+          {popularity ? <span className="tabular-nums">{popularity} users</span> : null}
         </div>
-      )}
+
+        {tags.length > 0 ? (
+          <div className="flex flex-wrap gap-1.5">
+            {tags.map((tag) => (
+              <Badge key={tag} variant="outline" className="px-2 py-0 text-xs font-normal">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        ) : null}
+
+        {nextAiring ? (
+          <NextAiringCountdown
+            airingAt={nextAiring.airingAt}
+            timeUntilAiring={nextAiring.timeUntilAiring}
+            episode={nextAiring.episode}
+          />
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -139,22 +132,17 @@ export function AnimeCardTooltipContent({ media }: AnimeCardTooltipContentProps)
     data: tooltipOverlay,
     isPending,
     isError,
-  } = useMediaCardTooltip(media.id, tooltipOpen && !hasEmbeddedTooltipFields);
+  } = useMediaCardTooltip(Number(media.id), tooltipOpen || !hasEmbeddedTooltipFields);
 
   const mergedMedia = useMemo(() => {
-    if (hasEmbeddedTooltipFields) {
-      return media;
-    }
-    if (tooltipOverlay) {
-      return { ...media, ...tooltipOverlay };
-    }
-    return media;
-  }, [hasEmbeddedTooltipFields, media, tooltipOverlay]);
+    return { ...media, ...tooltipOverlay };
+  }, [media, tooltipOverlay]);
 
   const hasTooltipFields = hasEmbeddedTooltipFields || hasMediaCardTooltipFields(mergedMedia);
-  const isLoading = !hasEmbeddedTooltipFields && isPending;
+  
+  const isLoading = !hasTooltipFields && isPending && tooltipOverlay === undefined;
 
-  if (isLoading || !hasTooltipFields) {
+  if (isLoading) {
     return (
       <div className="flex min-w-0 w-full flex-col overflow-hidden">
         <MediaCardTooltipHero
@@ -170,7 +158,6 @@ export function AnimeCardTooltipContent({ media }: AnimeCardTooltipContentProps)
 
   return (
     <AnimeCardTooltipLoaded
-      key={`${media.id}-${mergedMedia.bannerImage ?? "none"}`}
       mergedMedia={mergedMedia}
       tooltipFailed={isError}
     />

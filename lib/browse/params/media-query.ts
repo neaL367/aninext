@@ -73,30 +73,30 @@ export function paramsToMediaQuery(
     startDate_lesser: params.yearMax ? `${params.yearMax}1231` : undefined,
   };
 
-  if (params.sort === "popular-this-season" && currentSeason) {
-    return {
-      ...base,
-      season: params.season ?? currentSeason.season,
-      seasonYear: params.year ?? currentSeason.year,
-    };
+  // Determine season and year
+  let season = params.season;
+  let seasonYear = params.year;
+
+  // Only apply default seasonal logic if no manual season/year is provided
+  if (!season || !seasonYear) {
+    if (params.sort === "popular-this-season" && currentSeason) {
+      season = params.season ?? currentSeason.season;
+      seasonYear = params.year ?? currentSeason.year;
+    } else if (params.sort === "upcoming-next-season" && nextSeason) {
+      season = params.season ?? nextSeason.season;
+      seasonYear = params.year ?? nextSeason.year;
+    }
   }
 
-  if (params.sort === "upcoming-next-season" && nextSeason) {
-    return {
-      ...base,
-      season: params.season ?? nextSeason.season,
-      seasonYear: params.year ?? nextSeason.year,
-      status_in: ["NOT_YET_RELEASED"],
-    };
+  const query = {
+    ...base,
+    season: season ?? undefined,
+    seasonYear: seasonYear ?? undefined,
+  };
+
+  if (params.sort === "upcoming-next-season") {
+    query.status_in = ["NOT_YET_RELEASED"];
   }
 
-  if (params.season && params.year) {
-    return {
-      ...base,
-      season: params.season,
-      seasonYear: params.year,
-    };
-  }
-
-  return base;
+  return query;
 }

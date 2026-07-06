@@ -1,29 +1,32 @@
 import "server-only";
 
-export { anilist } from "@/lib/anilist/server/cache/registry";
+import { getGenreCollection } from "@/lib/anilist/server/dal/genres";
+import { getHomePageSections } from "@/lib/anilist/server/dal/home";
+import { getMediaDetail } from "@/lib/anilist/server/dal/media";
+import { getCharacterDetail, getStaffDetail } from "@/lib/anilist/server/dal/people";
+import { getMediaPage } from "@/lib/anilist/server/dal/pages";
+import { getAiringSchedulesForDay, getAiringScheduleCountForDay } from "@/lib/anilist/server/dal/airing";
+import { getMediaCardTooltipBatch } from "@/lib/anilist/server/dal/tooltips";
 
-import { anilist } from "@/lib/anilist/server/cache/registry";
+export const anilist = {
+  genreCollection: getGenreCollection,
+  homePageSections: getHomePageSections,
+  mediaDetail: getMediaDetail,
+  characterDetail: getCharacterDetail,
+  staffDetail: getStaffDetail,
+  mediaPage: getMediaPage,
+  mediaCardTooltipBatch: getMediaCardTooltipBatch,
+  airingSchedulesForDay: getAiringSchedulesForDay,
+  airingScheduleCountForDay: getAiringScheduleCountForDay,
+} as const;
 
-/** @deprecated Use `anilist.genreCollection` */
-export const getCachedGenreCollection = anilist.genreCollection;
+export { 
+  getGenreCollection,
+  getHomePageSections,
+  getMediaDetail,
+  getCharacterDetail,
+  getStaffDetail,
+  getMediaPage
+};
 
-/** @deprecated Use `anilist.mediaPage` */
-export const getCachedMediaPage = anilist.mediaPage;
 
-/** @deprecated Use `anilist.mediaDetail` */
-export const getCachedMediaDetail = anilist.mediaDetail;
-
-/** @deprecated Use `anilist.characterDetail` */
-export const getCachedCharacterDetail = anilist.characterDetail;
-
-/** @deprecated Use `anilist.staffDetail` */
-export const getCachedStaffDetail = anilist.staffDetail;
-
-/** @deprecated Use `anilist.airingSchedulesForDay` */
-export const getCachedAiringSchedulesForDay = anilist.airingSchedulesForDay;
-
-export const getGenreCollection = anilist.genreCollection;
-export const getHomePageSections = anilist.homePageSections;
-export const getMediaDetail = anilist.mediaDetail;
-export const getCharacterDetail = anilist.characterDetail;
-export const getStaffDetail = anilist.staffDetail;

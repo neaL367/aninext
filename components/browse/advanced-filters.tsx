@@ -88,12 +88,9 @@ export function AdvancedFilters({ className, onApply }: AdvancedFiltersProps) {
   const resetParams = useMemo(() => buildResetParams(params.sort), [params.sort]);
   const isDirty = JSON.stringify(draft) !== JSON.stringify(params);
 
-  const patch = useCallback(
-    (partial: Partial<AnimeListParams>) => {
-      setDraft((current) => ({ ...current, ...partial }));
-    },
-    [],
-  );
+  const patch = useCallback((partial: Partial<AnimeListParams>) => {
+    setDraft((current) => ({ ...current, ...partial }));
+  }, []);
 
   const handleSeasonChange = (values: string[]) => {
     const next = values.at(-1) as MediaSeason | undefined;
@@ -246,14 +243,32 @@ export function AdvancedFilters({ className, onApply }: AdvancedFiltersProps) {
 
       <div className="mt-1 flex flex-col gap-2 border-t border-border pt-4">
         <div className="flex gap-2">
-          <Button type="button" variant="outline" size="sm" className="flex-1" onClick={handleReset}>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="flex-1"
+            onClick={handleReset}
+          >
             Reset draft
           </Button>
-          <Button type="button" size="sm" className="flex-1" onClick={handleApply} disabled={!isDirty}>
+          <Button
+            type="button"
+            size="sm"
+            className="flex-1"
+            onClick={handleApply}
+            disabled={!isDirty}
+          >
             Apply filters
           </Button>
         </div>
-        <Button type="button" variant="ghost" size="sm" className="w-full" onClick={handleResetAndApply}>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="w-full"
+          onClick={handleResetAndApply}
+        >
           Clear all now
         </Button>
       </div>

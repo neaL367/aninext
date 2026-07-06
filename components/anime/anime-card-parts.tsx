@@ -223,7 +223,7 @@ export function AnimeCardArticle({
       ) : (
         <Link
           href={href as Route}
-          prefetch={layout !== "browse"}
+          prefetch={false}
           className={linkClassName}
           onClick={handleNavigateToDetail}
         >

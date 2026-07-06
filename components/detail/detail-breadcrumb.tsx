@@ -41,14 +41,18 @@ function DetailBreadcrumbNavLink({ crumb }: DetailBreadcrumbNavLinkProps) {
   const handleClick = useCallback(
     (event: MouseEvent<HTMLAnchorElement>) => {
       const targetHref = crumb.href ?? "/";
-      const targetPathname = targetHref.split("?")[0] || "/";
+      const targetPathname = targetHref?.split("?")[0] || "/";
       const detailReturn = readDetailReturn();
 
       // Browse has its own page+scroll snapshot restore, so it only needs
       // scroll:false during the client transition back to `/anime?...`.
       if (isDetailReturnOrigin(targetHref, detailReturn)) {
         event.preventDefault();
-        if (targetPathname !== "/anime" && detailReturn.scrollY != null && detailReturn.scrollY > 0) {
+        if (
+          targetPathname !== "/anime" &&
+          detailReturn.scrollY != null &&
+          detailReturn.scrollY > 0
+        ) {
           queueScrollRestore(targetHref, detailReturn.scrollY);
         }
         router.push(href, { scroll: false });

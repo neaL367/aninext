@@ -31,7 +31,12 @@ export async function createEntityDetailMetadata(
         ? stripHtml(media.description).slice(0, 160)
         : `Anime details for ${title} on AniNext.`;
 
-      return createDetailMetadata(title, description, animeDetailPath(media.id, title));
+      return createDetailMetadata(
+        title,
+        description,
+        animeDetailPath(media.id, title),
+        media.bannerImage,
+      );
     }
     case "manga": {
       const media = await resolveMangaDetailMedia(slugParams);
@@ -40,7 +45,12 @@ export async function createEntityDetailMetadata(
         ? stripHtml(media.description).slice(0, 160)
         : `Manga details for ${title} on AniNext.`;
 
-      return createDetailMetadata(title, description, mangaDetailPath(media.id, title));
+      return createDetailMetadata(
+        title,
+        description,
+        mangaDetailPath(media.id, title),
+        media.bannerImage,
+      );
     }
     case "character": {
       const character = await resolveCharacterDetail(slugParams);

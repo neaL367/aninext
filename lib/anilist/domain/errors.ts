@@ -1,4 +1,4 @@
-export type AniListErrorCode = "rate_limit" | "graphql" | "network" | "not_found" | "validation";
+export type AniListErrorCode = "rate_limit" | "graphql" | "network" | "not_found" | "validation" | "circuit_breaker";
 
 export class AniListError extends Error {
   readonly code: AniListErrorCode;

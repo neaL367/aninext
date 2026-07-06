@@ -1,0 +1,9 @@
+fragment StaffCardBrowseFields on Staff {
+  id
+  name {
+    full
+  }
+  image {
+    large
+  }
+}

@@ -9,18 +9,20 @@ type PendingScrollRestore = {
 
 /** Stable comparison for `/anime?b=1&a=2` vs `/anime?a=2&b=1`. */
 export function normalizeHrefForScrollRestore(href: string): string {
+  if (!href) return "/";
   const [pathname, search = ""] = href.split("?");
+  const lowerPathname = pathname.toLowerCase();
   if (!search) {
-    return pathname || "/";
+    return lowerPathname || "/";
   }
 
   const params = new URLSearchParams(search);
   const normalizedSearch = [...params.entries()]
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([key, value]) => `${key}=${value}`)
+    .map(([key, value]) => `${key.toLowerCase()}=${value.toLowerCase()}`)
     .join("&");
 
-  return normalizedSearch ? `${pathname}?${normalizedSearch}` : pathname || "/";
+  return normalizedSearch ? `${lowerPathname}?${normalizedSearch}` : lowerPathname || "/";
 }
 
 export function readCurrentHref(): string {

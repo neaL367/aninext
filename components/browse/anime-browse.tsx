@@ -1,15 +1,7 @@
 "use client";
 
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { usePathname } from "next/navigation";
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  useTransition,
-} from "react";
 import { AnimeMediaGrid, AnimeMediaGridSkeleton } from "@/components/anime/anime-media-grid";
 import { AnimeBrowseToolbar } from "@/components/browse/anime-browse-toolbar";
 import {
@@ -18,34 +10,17 @@ import {
 } from "@/components/browse/browse-filters-provider";
 import { EmptyState } from "@/components/shared/empty-state";
 import { AniListRateLimitNotice } from "@/components/shared/anilist-rate-limit-notice";
-import {
-  consumeBrowseMediaPagePrefetch,
-  prefetchBrowseNextMediaPage,
-} from "@/lib/anilist/client/browse-page-prefetch";
-import {
-  canLoadMorePages,
-  getNextPageNumber,
-  mergeInfiniteMediaPages,
-  serializeBrowseFilterKey,
-} from "@/lib/anilist/client/media-page-list";
+import { consumeBrowseMediaPagePrefetch } from "@/lib/anilist/client/browse-page-prefetch";
+import { serializeBrowseFilterKey } from "@/lib/anilist/client/media-page-list";
 import { loadMediaPage } from "@/lib/anilist/server/actions";
+import { peekBrowseRestore } from "@/lib/navigation/browse-restore";
 import type { GenreOption } from "@/lib/anilist/domain/genres";
 import type { AnimeSeason } from "@/lib/anilist/domain/season";
 import type { MediaPageResult } from "@/lib/anilist/domain/types";
 import type { AnimeListParams } from "@/lib/browse/params";
-import { shouldPrefetchBrowseSearch } from "@/lib/browse/params/search";
-import {
-  consumeBrowseRestore,
-  peekBrowseRestore,
-  persistBrowseRestoreSnapshot,
-  updateBrowseRestoreSnapshot,
-} from "@/lib/navigation/browse-restore";
-import {
-  cancelScrollRestore,
-  consumePendingScrollRestore,
-  readCurrentHref,
-  restoreScrollWithRetry,
-} from "@/lib/navigation/scroll-restore";
+import { useBrowseInfiniteScroll } from "@/components/browse/parts/use-browse-infinite-scroll";
+import { useBrowseScrollRestore } from "@/components/browse/parts/use-browse-scroll-restore";
+import { restoreScrollWithRetry } from "@/lib/navigation/scroll-restore";
 
 type AnimeBrowseProps = {
   genres: GenreOption[];
@@ -55,34 +30,21 @@ type AnimeBrowseProps = {
   initialResult: MediaPageResult;
 };
 
-const LOAD_MORE_ROOT_MARGIN_PX = 250;
-
-function AnimeBrowseResults({
+export function AnimeBrowseResults({
   initialParams,
   initialResult,
 }: {
   initialParams: AnimeListParams;
   initialResult: MediaPageResult;
 }) {
-  "use memo";
-
   const { state, meta } = useBrowseFilters();
   const { params } = state;
   const { currentSeason, nextSeason } = meta;
   const pathname = usePathname() || "/";
   const loadMoreRef = useRef<HTMLDivElement>(null);
-  const isFetchingNextPageRef = useRef(false);
   const requestIdRef = useRef(0);
   const previousFilterKeyRef = useRef<string | null>(null);
-  const pendingScrollYRef = useRef<number | null>(null);
-  const pendingResumeLoadMoreRef = useRef(false);
-  const restoreWhenPageCountRef = useRef(0);
-  const restoreAttemptedRef = useRef(false);
-  const pagesLengthRef = useRef(0);
-  const pauseLoadMoreUntilRef = useRef(0);
-  const fetchNextPageRef = useRef<(() => Promise<void>) | null>(null);
-  const resumeLoadMoreAfterRestoreRef = useRef(false);
-  const resumeLoadMoreTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [, startTransition] = useTransition();
 
   const filterKey = useMemo(
     () => serializeBrowseFilterKey(params, currentSeason, nextSeason),
@@ -97,183 +59,45 @@ function AnimeBrowseResults({
     filterKey === initialFilterKey ? [initialResult] : [],
   );
   const [rateLimited, setRateLimited] = useState(false);
-  const [isFetchingNextPage, setIsFetchingNextPage] = useState(false);
   const [isRefetching, setIsRefetching] = useState(false);
-  const [, startTransition] = useTransition();
 
-  const rankTop100 = params.sort === "top-100";
-  const media = useMemo(() => mergeInfiniteMediaPages(pages, rankTop100), [pages, rankTop100]);
-  const nextPage = getNextPageNumber(pages, params);
-  const showLoadMore = canLoadMorePages(pages, params, media.length);
+  const { media, showLoadMore, beginScrollRestore, isFetchingNextPage } = useBrowseInfiniteScroll({
+    params,
+    currentSeason,
+    nextSeason,
+    filterKey,
+    pages,
+    setPages,
+    setRateLimited,
+    loadMoreRef,
+  });
 
-  isFetchingNextPageRef.current = isFetchingNextPage;
-  pagesLengthRef.current = pages.length;
-
-  const clearResumeLoadMoreTimeout = useCallback(() => {
-    if (resumeLoadMoreTimeoutRef.current) {
-      clearTimeout(resumeLoadMoreTimeoutRef.current);
-      resumeLoadMoreTimeoutRef.current = null;
-    }
-  }, []);
-
-  const scheduleResumeLoadMoreCheck = useCallback(() => {
-    clearResumeLoadMoreTimeout();
-
-    resumeLoadMoreTimeoutRef.current = setTimeout(() => {
-      resumeLoadMoreTimeoutRef.current = null;
-      const shouldForceResume = resumeLoadMoreAfterRestoreRef.current;
-      resumeLoadMoreAfterRestoreRef.current = false;
-
-      if (Date.now() < pauseLoadMoreUntilRef.current || isFetchingNextPageRef.current) {
-        return;
+  useBrowseScrollRestore({
+    pathname,
+    filterKey,
+    pages,
+    setPages,
+    onRestore: (scrollY, shouldResumeLoadMore) => {
+      if (scrollY > 0) {
+        restoreScrollWithRetry(scrollY);
       }
-
-      const element = loadMoreRef.current;
-      if (!element) {
-        return;
-      }
-
-      const rect = element.getBoundingClientRect();
-      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-      const withinObserverRange =
-        rect.top <= viewportHeight + LOAD_MORE_ROOT_MARGIN_PX &&
-        rect.bottom >= -LOAD_MORE_ROOT_MARGIN_PX;
-
-      if (withinObserverRange || shouldForceResume) {
-        void fetchNextPageRef.current?.();
-      }
-    }, Math.max(0, pauseLoadMoreUntilRef.current - Date.now()) + 16);
-  }, [clearResumeLoadMoreTimeout]);
-
-  const beginScrollRestore = useCallback((scrollY: number, shouldResumeLoadMore = false) => {
-    pauseLoadMoreUntilRef.current = Date.now() + 700;
-    resumeLoadMoreAfterRestoreRef.current = shouldResumeLoadMore;
-    scheduleResumeLoadMoreCheck();
-    restoreScrollWithRetry(scrollY);
-  }, [scheduleResumeLoadMoreCheck]);
-
-  const tryRestoreBrowse = useCallback(() => {
-    if (pathname !== "/anime" || restoreAttemptedRef.current) {
-      return;
-    }
-
-    const href = readCurrentHref();
-    const peek = peekBrowseRestore(href);
-
-    if (peek) {
-      restoreAttemptedRef.current = true;
-
-      if (pagesLengthRef.current >= peek.pages.length) {
-        const restored = consumeBrowseRestore(href);
-        if (restored?.scrollY && restored.scrollY > 0) {
-          beginScrollRestore(restored.scrollY, restored.wasNearBottom);
-        }
-        return;
-      }
-
-      const restored = consumeBrowseRestore(href);
-      if (!restored) {
-        return;
-      }
-
-      if (restored.pages.length > 0) {
-        restoreWhenPageCountRef.current = restored.pages.length;
-        pendingScrollYRef.current = restored.scrollY;
-        pendingResumeLoadMoreRef.current = restored.wasNearBottom === true;
-        setPages(restored.pages);
-        return;
-      }
-
-      if (restored.scrollY > 0) {
-        beginScrollRestore(restored.scrollY, restored.wasNearBottom);
-      }
-      return;
-    }
-
-    const pendingScrollY = consumePendingScrollRestore(href);
-    if (pendingScrollY != null && pendingScrollY > 0) {
-      restoreAttemptedRef.current = true;
-      beginScrollRestore(pendingScrollY);
-    }
-  }, [pathname, beginScrollRestore]);
-
-  useEffect(() => {
-    if (pathname !== "/anime") {
-      restoreAttemptedRef.current = false;
-      clearResumeLoadMoreTimeout();
-      cancelScrollRestore();
-    }
-  }, [pathname, clearResumeLoadMoreTimeout]);
-
-  useLayoutEffect(() => {
-    tryRestoreBrowse();
-  }, [tryRestoreBrowse]);
-
-  useEffect(() => {
-    if (restoreWhenPageCountRef.current === 0) {
-      return;
-    }
-
-    if (pages.length < restoreWhenPageCountRef.current) {
-      return;
-    }
-
-    restoreWhenPageCountRef.current = 0;
-    const scrollY = pendingScrollYRef.current;
-    const shouldResumeLoadMore = pendingResumeLoadMoreRef.current;
-    pendingScrollYRef.current = null;
-    pendingResumeLoadMoreRef.current = false;
-
-    if (scrollY != null && scrollY > 0) {
       beginScrollRestore(scrollY, shouldResumeLoadMore);
-    }
-  }, [pages, beginScrollRestore]);
-
-  useEffect(() => {
-    updateBrowseRestoreSnapshot(readCurrentHref(), filterKey, pages);
-  }, [filterKey, pages]);
-
-  useEffect(() => {
-    const onPageHide = () => {
-      persistBrowseRestoreSnapshot();
-    };
-
-    window.addEventListener("pagehide", onPageHide);
-    return () => window.removeEventListener("pagehide", onPageHide);
-  }, [filterKey, pages]);
-
-  useEffect(() => {
-    const onPopState = () => {
-      requestAnimationFrame(() => {
-        tryRestoreBrowse();
-      });
-    };
-
-    window.addEventListener("popstate", onPopState);
-    return () => window.removeEventListener("popstate", onPopState);
-  }, [tryRestoreBrowse]);
-
-  useEffect(() => {
-    const onPageShow = (event: PageTransitionEvent) => {
-      if (event.persisted) {
-        tryRestoreBrowse();
-      }
-    };
-
-    window.addEventListener("pageshow", onPageShow);
-    return () => window.removeEventListener("pageshow", onPageShow);
-  }, [tryRestoreBrowse]);
+    },
+  });
 
   useEffect(() => {
     const previousKey = previousFilterKeyRef.current;
-    if (previousKey === filterKey) {
-      return;
-    }
+    if (previousKey === filterKey) return;
 
     previousFilterKeyRef.current = filterKey;
 
-    if (previousKey === null) {
-      return;
+    // If we are transitioning to a new filter set, we should clear the old pages
+    // to prevent displaying stale data while the new request is in flight.
+    // We only keep the pages if we're restoring from cache (handled in useBrowseScrollRestore).
+    const currentHref = `${pathname}${typeof window !== "undefined" ? window.location.search : ""}`;
+    const cached = peekBrowseRestore(currentHref);
+    if (!(cached && cached.filterKey === filterKey)) {
+      setPages([]);
     }
 
     const requestId = ++requestIdRef.current;
@@ -283,14 +107,10 @@ function AnimeBrowseResults({
     const request = prefetched ?? loadMediaPage(params, 1, currentSeason, nextSeason);
 
     void request.then((result) => {
-      if (requestId !== requestIdRef.current) {
-        return;
-      }
+      if (requestId !== requestIdRef.current) return;
 
       if (!result.ok) {
-        if (result.code === "rate_limit") {
-          setRateLimited(true);
-        }
+        if (result.code === "rate_limit") setRateLimited(true);
         setIsRefetching(false);
         return;
       }
@@ -302,82 +122,6 @@ function AnimeBrowseResults({
       });
     });
   }, [filterKey, params, currentSeason, nextSeason]);
-
-  useEffect(() => {
-    if (!nextPage || !shouldPrefetchBrowseSearch(params.q)) {
-      return;
-    }
-
-    prefetchBrowseNextMediaPage(params, nextPage, currentSeason, nextSeason);
-  }, [nextPage, params, currentSeason, nextSeason]);
-
-  const fetchNextPage = useCallback(async () => {
-    if (!nextPage || isFetchingNextPageRef.current) {
-      return;
-    }
-
-    isFetchingNextPageRef.current = true;
-    setIsFetchingNextPage(true);
-
-    const requestId = requestIdRef.current;
-
-    try {
-      const prefetched = consumeBrowseMediaPagePrefetch(filterKey, nextPage);
-      const result = prefetched
-        ? await prefetched
-        : await loadMediaPage(params, nextPage, currentSeason, nextSeason);
-
-      if (requestId !== requestIdRef.current) {
-        return;
-      }
-
-      if (!result.ok) {
-        if (result.code === "rate_limit") {
-          setRateLimited(true);
-        }
-        return;
-      }
-
-      setRateLimited(false);
-      setPages((current) => [...current, result.data]);
-    } finally {
-      isFetchingNextPageRef.current = false;
-      setIsFetchingNextPage(false);
-    }
-  }, [nextPage, params, currentSeason, nextSeason, filterKey]);
-
-  fetchNextPageRef.current = fetchNextPage;
-
-  useEffect(() => {
-    const element = loadMoreRef.current;
-    if (!element || !showLoadMore) {
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const isIntersecting = entries[0]?.isIntersecting;
-        if (!isIntersecting) {
-          return;
-        }
-
-        if (Date.now() < pauseLoadMoreUntilRef.current) {
-          scheduleResumeLoadMoreCheck();
-          return;
-        }
-
-        if (!isFetchingNextPageRef.current) {
-          void fetchNextPage();
-        }
-      },
-      { rootMargin: `${LOAD_MORE_ROOT_MARGIN_PX}px` },
-    );
-    observer.observe(element);
-    return () => {
-      observer.disconnect();
-      clearResumeLoadMoreTimeout();
-    };
-  }, [fetchNextPage, showLoadMore, scheduleResumeLoadMoreCheck, clearResumeLoadMoreTimeout]);
 
   const showEmptyRateLimit = rateLimited && media.length === 0;
 
@@ -393,13 +137,7 @@ function AnimeBrowseResults({
         <AniListRateLimitNotice title="Could not load more results" variant="section" />
       ) : null}
 
-      {isRefetching ? (
-        <p className="text-xs text-muted-foreground" aria-live="polite">
-          Updating results…
-        </p>
-      ) : null}
-
-      {showInitialSkeleton ? (
+      {!media.length && isRefetching ? (
         <AnimeMediaGridSkeleton layout="browse" />
       ) : !media.length ? (
         <EmptyState
@@ -426,8 +164,6 @@ export function AnimeBrowse({
   initialParams,
   initialResult,
 }: AnimeBrowseProps) {
-  "use memo";
-
   return (
     <BrowseFiltersProvider genres={genres} currentSeason={currentSeason} nextSeason={nextSeason}>
       <AnimeBrowseToolbar />

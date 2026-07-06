@@ -68,26 +68,28 @@ export function AnimeBrowseToolbar() {
       <div className="flex items-start gap-2">
         <div className="min-w-0 flex-1">
           <div className="relative">
-          <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            ref={searchRef}
-            id="anime-search"
-            type="search"
-            value={searchDraft}
-            onChange={(e) => setSearchDraft(e.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                event.preventDefault();
-                commitSearch(searchDraft);
-              }
-            }}
-            placeholder="Search anime..."
-            autoComplete="off"
-            className="h-9 pl-9"
-          />
+            <SearchIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              ref={searchRef}
+              id="anime-search"
+              type="search"
+              value={searchDraft}
+              onChange={(e) => setSearchDraft(e.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  commitSearch(searchDraft);
+                }
+              }}
+              placeholder="Search anime..."
+              autoComplete="off"
+              className="h-9 pl-9"
+            />
           </div>
           {searchTooShort ? (
-            <p className="pt-1 text-xs text-muted-foreground">Type at least 2 characters to search.</p>
+            <p className="pt-1 text-xs text-muted-foreground">
+              Type at least 2 characters to search.
+            </p>
           ) : null}
         </div>
 
