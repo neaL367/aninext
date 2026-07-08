@@ -2,66 +2,62 @@ import { HomePageSectionsSkeleton, HomeSectionPage } from "@/components/home/hom
 import { getHomePageSections } from "@/lib/anilist/server/get-home-sections";
 import { HOME_SECTION_BROWSE_HREFS } from "@/lib/browse/url";
 import { Suspense } from "react";
+import type { HomeSectionId } from "@/lib/anilist/domain/home-sections";
 
 function HomePageSections() {
   return (
+    <div className="space-y-12">
+      <SectionWrapper section="trending" title="Trending Now" subtitle="The most active anime in the past hour" />
+      <SectionWrapper section="airingNow" title="Airing Now" subtitle="Popular anime currently releasing" showCountdown />
+      <SectionWrapper section="popularThisSeason" title="Popular This Season" subtitle="The season's most popular picks" seasonSubtitle="current" />
+      <SectionWrapper section="upcomingNextSeason" title="Upcoming Next Season" subtitle="Next season's most anticipated anime" seasonSubtitle="next" />
+      <SectionWrapper section="allTimePopular" title="All-Time Popular" subtitle="The biggest anime on AniList" />
+      <SectionWrapper section="top100" title="Top 100 Anime" subtitle="Highest-rated anime across AniList" />
+    </div>
+  );
+}
+
+async function SectionWrapper({ 
+  section, 
+  title, 
+  subtitle, 
+  ...props 
+}: { 
+  section: HomeSectionId, 
+  title: string, 
+  subtitle: string, 
+  [key: string]: any 
+}) {
+  return (
     <Suspense fallback={<HomePageSectionsSkeleton />}>
-      <HomePageSectionsContent />
+      <SectionContent section={section} title={title} subtitle={subtitle} {...props} />
     </Suspense>
   );
 }
 
-async function HomePageSectionsContent() {
+async function SectionContent({ 
+  section, 
+  title, 
+  subtitle, 
+  ...props 
+}: { 
+  section: HomeSectionId, 
+  title: string, 
+  subtitle: string, 
+  [key: string]: any 
+}) {
   const sections = await getHomePageSections();
-
+  const media = (sections as any)[section];
+  
   return (
-    <>
-      <HomeSectionPage
-        section="trending"
-        media={sections.trending}
-        title="Trending Now"
-        subtitle="The most active anime in the past hour"
-        href={HOME_SECTION_BROWSE_HREFS.trending}
-      />
-      <HomeSectionPage
-        section="airingNow"
-        media={sections.airingNow}
-        title="Airing Now"
-        subtitle="Popular anime currently releasing"
-        href={HOME_SECTION_BROWSE_HREFS.airingNow}
-        showCountdown
-      />
-      <HomeSectionPage
-        section="popularThisSeason"
-        media={sections.popularThisSeason}
-        title="Popular This Season"
-        subtitle="The season's most popular picks"
-        href={HOME_SECTION_BROWSE_HREFS.popularThisSeason}
-        seasonSubtitle="current"
-      />
-      <HomeSectionPage
-        section="upcomingNextSeason"
-        media={sections.upcomingNextSeason}
-        title="Upcoming Next Season"
-        subtitle="Next season's most anticipated anime"
-        href={HOME_SECTION_BROWSE_HREFS.upcomingNextSeason}
-        seasonSubtitle="next"
-      />
-      <HomeSectionPage
-        section="allTimePopular"
-        media={sections.allTimePopular}
-        title="All-Time Popular"
-        subtitle="The biggest anime on AniList"
-        href={HOME_SECTION_BROWSE_HREFS.allTimePopular}
-      />
-      <HomeSectionPage
-        section="top100"
-        media={sections.top100}
-        title="Top 100"
-        subtitle="Highest-rated anime across AniList"
-        href={HOME_SECTION_BROWSE_HREFS.top100}
-      />
-    </>
+    <HomeSectionPage
+      section={section}
+      media={media}
+      title={title}
+      subtitle={subtitle}
+      href={HOME_SECTION_BROWSE_HREFS[section as keyof typeof HOME_SECTION_BROWSE_HREFS]}
+      {...props}
+    />
   );
 }
 
