@@ -21,7 +21,7 @@ import {
 } from "./rate-limit";
 
 /**
- * Circuit Breaker: Prevents cascading failures by stopping requests 
+ * Circuit Breaker: Prevents cascading failures by stopping requests
  * to a failing downstream service for a period of time.
  */
 class CircuitBreaker {
@@ -66,15 +66,17 @@ const breaker = new CircuitBreaker();
 /** Request Coalescing: Deduplicates simultaneous identical GraphQL calls. */
 const inFlightRequests = new Map<string, Promise<unknown>>();
 
-function getRequestHash(document: TypedDocumentNode<unknown, unknown>, variables?: Record<string, unknown>): string {
+function getRequestHash(
+  document: TypedDocumentNode<unknown, unknown>,
+  variables?: Record<string, unknown>,
+): string {
   const query = getPrintedQuery(document);
   const varString = variables ? JSON.stringify(variables) : "null";
   return `${query}:${varString}`;
 }
 
 type GraphQLResponse<T> = {
-
-// ... (rest of the file)
+  // ... (rest of the file)
 
   readonly data?: T;
   readonly errors?: readonly { message: string }[];
@@ -307,15 +309,15 @@ async function executeGraphQLWithRetry<TData, TVariables extends Record<string, 
       const operationName = getOperationName(document as TypedDocumentNode<unknown, unknown>);
       const lane = getConcurrencyLane(operationName);
       const result = await withConcurrencyLimit(() => fetchGraphQLOnce(document, variables), lane);
-      
+
       breaker.recordSuccess();
       return result;
     } catch (error) {
       lastError = error;
-      
-      const isCriticalError = error instanceof AniListError && 
-        (error.code === "network" || error.code === "validation");
-      
+
+      const isCriticalError =
+        error instanceof AniListError && (error.code === "network" || error.code === "validation");
+
       if (isCriticalError) {
         breaker.recordFailure();
       }
@@ -362,7 +364,9 @@ export async function executeGraphQL<TData, TVariables extends Record<string, un
 
   if (inFlight) {
     if (process.env.NODE_ENV === "development") {
-      console.log(`[anilist-coalesce] hooking into in-flight request: ${getOperationName(document as any)}`);
+      console.log(
+        `[anilist-coalesce] hooking into in-flight request: ${getOperationName(document as any)}`,
+      );
     }
     return inFlight as Promise<TData>;
   }
@@ -375,4 +379,102 @@ export async function executeGraphQL<TData, TVariables extends Record<string, un
   } finally {
     inFlightRequests.delete(hash);
   }
+}
+
+/**
+ * Executes a raw GraphQL query string. 
+ * Used by API routes that receive queries from the client.
+ */
+export async function executeGraphQLRaw<TData>(
+  query: string,
+  variables?: Record<string, unknown>,
+): Promise<TData> {
+  // Wrap raw query in a dummy TypedDocumentNode to reuse the retry/bucket logic
+  const dummyDocument = {
+    kind: "Document",
+    definitions: [],
+    loc: { start: 0, end: 0 },
+  } as any;
+
+  // Override getPrintedQuery for this specific call
+  const originalGetPrintedQuery = (doc: any) => {
+    if (doc === dummyDocument) return query;
+    return print(doc);
+  };
+
+  // Since getPrintedQuery is internal, we'll use a simplified wrapper 
+  // that mimics the execution path of executeGraphQLWithRetry.
+  
+  // Actually, the cleanest way is to just expose the retry/bucket loop 
+  // for raw queries.
+  return executeGraphQLWithRetryRaw<TData>(query, variables);
+}
+
+async function executeGraphQLWithRetryRaw<TData>(
+  query: string,
+  variables?: Record<string, unknown>,
+): Promise<TData> {
+  if (!breaker.shouldAllowRequest()) {
+    throw new AniListError(
+      "circuit_breaker",
+      "AniList API is currently experiencing issues. Please try again in a few moments.",
+    );
+  }
+
+  let attempt = 0;
+  let lastError: unknown;
+
+  while (true) {
+    try {
+      await reserveAniListRequest();
+      
+      // Infer operation name for concurrency lanes
+      const match = /(?:query|mutation)\s+(\w+)/.exec(query);
+      const operationName = match?.[1] ?? "anonymous";
+      const lane = getConcurrencyLane(operationName);
+      
+      const result = await withConcurrencyLimit(async () => {
+        const started = Date.now();
+        const response = await fetch(ANILIST_API_URL, {
+          method: "POST",
+          headers: buildGraphQLHeaders(),
+          body: JSON.stringify({
+            query,
+            variables: variables ?? {},
+          }),
+          signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        });
+
+        const elapsed = Date.now() - started;
+        logGraphQLRequest(operationName, elapsed, variables);
+        updateAniListRateLimitFromHeaders(response.headers);
+
+        if (response.status === 429) {
+          const retryAfterMs = markAniListRateLimitExceeded(response.headers);
+          throw new AniListError("rate_limit", "AniList rate limit exceeded", undefined, retryAfterMs);
+        }
+
+        const payload = await response.json();
+        if (payload.errors?.length) {
+          const message = payload.errors.map((e: any) => e.message).join("; ");
+          throw new AniListError("graphql", message);
+        }
+        return payload.data;
+      }, lane);
+
+      breaker.recordSuccess();
+      return result;
+    } catch (error) {
+      lastError = error;
+      if (error instanceof AniListError && (error.code === "network" || error.code === "validation")) {
+        breaker.recordFailure();
+      }
+      const retryable = error instanceof AniListError && (error.code === "rate_limit" || error.code === "network");
+      if (!retryable || attempt >= MAX_RETRIES) break;
+      await sleep(applyJitter(2 ** attempt * 250));
+      attempt += 1;
+    }
+  }
+  if (lastError instanceof AniListError) throw lastError;
+  throw new AniListError("network", "AniList request failed after retries", lastError);
 }

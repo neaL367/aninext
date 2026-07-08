@@ -207,6 +207,14 @@ export function updateAniListRateLimitFromHeaders(headers: Headers): void {
   }
 }
 
+export function getAniListRateLimit() {
+  return {
+    limit: headerState.limit,
+    remaining: headerState.remaining,
+    resetAtMs: headerState.resetAtMs,
+  };
+}
+
 /** Advisory only — not used for proactive throttling (headers can lie during degradation). */
 export function getAniListRateLimitWaitMs(now = Date.now()): number {
   refreshExpiredHeaderWindow(now);
