@@ -6,7 +6,12 @@ import { PageHeader } from "@/components/layout/page-header";
 import { AniListRateLimitNotice } from "@/components/shared/anilist-rate-limit-notice";
 import { isAniListRateLimitError } from "@/lib/anilist/domain/errors";
 import { LISTING_PAGE_SIZE } from "@/lib/anilist/domain/listing";
-import { getCurrentAnimeSeason, getNextAnimeSeason, formatSeasonLabel, type AnimeSeason } from "@/lib/anilist/domain/season";
+import {
+  getCurrentAnimeSeason,
+  getNextAnimeSeason,
+  formatSeasonLabel,
+  type AnimeSeason,
+} from "@/lib/anilist/domain/season";
 import type { MediaPageQueryVariables } from "@/lib/anilist/generated/graphql";
 import { anilist } from "@/lib/anilist/server/fetchers";
 import { getGenreCollection } from "@/lib/anilist/server/get-genre-collection";
@@ -16,7 +21,10 @@ import type { AnimeSort } from "@/lib/browse/params/types";
 import { BrowseFiltersProvider } from "@/components/browse/browse-filters-provider";
 import { AnimeBrowseToolbar } from "@/components/browse/anime-browse-toolbar";
 
-const SORT_HEADERS: Record<AnimeSort, { title: string; description: (current: string, next: string) => string }> = {
+const SORT_HEADERS: Record<
+  AnimeSort,
+  { title: string; description: (current: string, next: string) => string }
+> = {
   trending: {
     title: "Trending Anime",
     description: () => "Currently popular and trending series across the community.",
@@ -51,12 +59,12 @@ type AnimeListingPageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-async function AnimeListingContent({ 
-  searchParams, 
-  genres, 
-  currentSeason, 
-  nextSeason 
-}: { 
+async function AnimeListingContent({
+  searchParams,
+  genres,
+  currentSeason,
+  nextSeason,
+}: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
   genres: any[];
   currentSeason: AnimeSeason;
@@ -75,12 +83,7 @@ async function AnimeListingContent({
 
     const initialResult = await anilist.mediaPage(variables);
 
-    return (
-      <AnimeBrowseResults 
-        initialParams={params} 
-        initialResult={initialResult} 
-      />
-    );
+    return <AnimeBrowseResults initialParams={params} initialResult={initialResult} />;
   } catch (error) {
     if (isAniListRateLimitError(error)) {
       return <AniListRateLimitNotice title="Unable to load anime list" />;
@@ -90,39 +93,65 @@ async function AnimeListingContent({
 }
 
 export default async function AnimePage({ searchParams }: AnimeListingPageProps) {
+  return (
+    <PageContainer className="py-8 lg:py-10">
+      <Suspense fallback={<BrowsePageSkeleton />}>
+        <BrowsePageInner searchParams={searchParams} />
+      </Suspense>
+    </PageContainer>
+  );
+}
+
+async function BrowsePageInner({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const resolved = await searchParams;
   const params = parseAnimeListParams(resolved);
-  
+
   const currentSeason = getCurrentAnimeSeason();
   const nextSeason = getNextAnimeSeason();
   const currentSeasonStr = formatSeasonLabel(currentSeason);
   const nextSeasonStr = formatSeasonLabel(nextSeason);
-  
+
   const header = SORT_HEADERS[params.sort] || SORT_HEADERS.trending;
   const genres = await getGenreCollection();
 
   return (
-    <PageContainer className="py-8 lg:py-10">
-      <div className="flex flex-col gap-6">
-        <PageHeader
-          title={header.title}
-          description={header.description(currentSeasonStr, nextSeasonStr)}
-        />
-        <BrowseFiltersProvider genres={genres} currentSeason={currentSeason} nextSeason={nextSeason}>
-          <AnimeBrowseToolbar />
-          <Suspense 
-            key={`${params.sort}-${params.q}-${params.genres.join(",")}`} 
-            fallback={<BrowseContentSkeleton />}
-          >
-            <AnimeListingContent 
-              searchParams={searchParams} 
-              genres={genres} 
-              currentSeason={currentSeason} 
-              nextSeason={nextSeason} 
-            />
-          </Suspense>
-        </BrowseFiltersProvider>
-      </div>
-    </PageContainer>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title={header.title}
+        description={header.description(currentSeasonStr, nextSeasonStr)}
+      />
+      <BrowseFiltersProvider
+        genres={genres}
+        currentSeason={currentSeason}
+        nextSeason={nextSeason}
+      >
+        <AnimeBrowseToolbar />
+        <Suspense
+          key={`${params.sort}-${params.q}-${params.genres.join(",")}`}
+          fallback={<BrowseContentSkeleton />}
+        >
+          <AnimeListingContent
+            searchParams={searchParams}
+            genres={genres}
+            currentSeason={currentSeason}
+            nextSeason={nextSeason}
+          />
+        </Suspense>
+      </BrowseFiltersProvider>
+    </div>
+  );
+}
+
+function BrowsePageSkeleton() {
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="h-20 w-full animate-pulse rounded-lg bg-muted/50" />
+      <div className="h-12 w-full animate-pulse rounded-lg bg-muted/50" />
+      <BrowseContentSkeleton />
+    </div>
   );
 }
