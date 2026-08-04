@@ -6,6 +6,7 @@ import { Providers } from "@/components/providers";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteMobileNav } from "@/components/site-mobile-nav";
+import { ScrollToTop } from "@/components/scroll-to-top";
 import { SearchCommand } from "@/features/anime/components/search-command";
 import "./globals.css";
 
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} dark`}
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
       <body className="font-sans antialiased">
@@ -47,7 +49,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 Skip to content
               </a>
               <SiteHeader />
-              <main id="main-content" className="flex-1 pb-20 md:pb-0">
+              <ScrollToTop />
+              <main id="main-content" className="min-w-0 flex-1 pb-20 md:pb-0">
                 {children}
               </main>
               <SiteFooter />

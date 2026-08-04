@@ -1,77 +1,71 @@
-import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Empty, EmptyHeader, EmptyTitle, EmptyMedia } from "@/components/ui/empty";
 import { UsersIcon } from "lucide-react";
 import { getAnimeCharacters } from "@/features/anime/anime-queries";
 import type { CharacterEdge, PageInfo } from "@/features/anime/types/anime";
+import { ImageWithLoading } from "@/components/image-with-loading";
 
-export async function AnimeCharacters({
-  id,
-  edges: edgesProp,
-  pageInfo: pageInfoProp,
-}: {
-  id?: number;
-  edges?: CharacterEdge[];
-  pageInfo?: PageInfo;
-}) {
-  const { edges, pageInfo } =
-    edgesProp !== undefined
-      ? { edges: edgesProp, pageInfo: pageInfoProp! }
-      : await getAnimeCharacters(id!);
+export async function AnimeCharacters({ id, edges: edgesProp, pageInfo: pageInfoProp }: { id?: number; edges?: CharacterEdge[]; pageInfo?: PageInfo }) {
+  const edges = edgesProp ?? (await getAnimeCharacters(id!)).edges;
 
   if (edges.length === 0) {
-    return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <UsersIcon />
-          </EmptyMedia>
-          <EmptyTitle>No characters available</EmptyTitle>
-        </EmptyHeader>
-      </Empty>
-    );
+    return <Empty><EmptyHeader><EmptyMedia variant="icon"><UsersIcon /></EmptyMedia><EmptyTitle>No characters available</EmptyTitle></EmptyHeader></Empty>;
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      <h2 className="text-xl font-bold tracking-tight sm:text-2xl">Characters</h2>
-      <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 md:grid-cols-4 lg:grid-cols-6">
-        {edges.map((edge, i) => (
-          <div key={`${edge.node.id}-${i}`} className="group w-[120px] shrink-0 snap-start sm:w-auto">
-            <div className="relative aspect-[2/3] w-full overflow-hidden rounded-lg bg-muted transition-all duration-300 group-hover:ring-1 group-hover:ring-accent/40 group-hover:shadow-[0_0_12px_var(--glow)]">
-              {edge.node.image.medium && (
-                <Image
-                  src={edge.node.image.medium}
-                  alt={edge.node.name.full}
-                  fill
-                  sizes="(max-width: 640px) 120px, (max-width: 1024px) 25vw, 16vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-[1.05] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-                  loading="lazy"
-                />
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+      {edges.map((edge, index) => {
+        const voiceActor = edge.voiceActors?.[0];
+        return (
+          <article key={`${edge.node.id}-${index}`} className="group flex items-center gap-4 border border-border p-3 transition-colors hover:border-accent/40 hover:bg-surface-1/40">
+            <div className="relative h-[72px] w-[54px] shrink-0 overflow-hidden bg-surface-2">
+              {edge.node.image.medium ? (
+                <ImageWithLoading src={edge.node.image.medium} alt={edge.node.name.full} fill sizes="54px" className="object-cover" />
+              ) : (
+                <div className="flex h-full items-center justify-center p-1 text-center font-mono text-[0.5rem] uppercase text-muted-foreground">{edge.node.name.full}</div>
               )}
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-2">
-                <p className="line-clamp-1 text-xs font-semibold text-white">{edge.node.name.full}</p>
-                <p className="line-clamp-1 text-[10px] text-white/70">{edge.role}</p>
-              </div>
             </div>
-          </div>
-        ))}
-      </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold">{edge.node.name.full}</p>
+              <p className="mt-0.5 font-mono text-xs uppercase tracking-[0.06em] text-muted-foreground">{edge.role}</p>
+            </div>
+            {voiceActor && (
+              <div className="flex shrink-0 items-center gap-2 border-l border-border pl-3">
+                <div className="relative size-9 shrink-0 overflow-hidden rounded-full bg-surface-2">
+                  {voiceActor.image.medium && <ImageWithLoading src={voiceActor.image.medium} alt={voiceActor.name.full} fill sizes="36px" className="object-cover" />}
+                </div>
+                <div className="hidden sm:block sm:min-w-0 sm:max-w-[120px]">
+                  <p className="truncate text-xs font-medium text-foreground">{voiceActor.name.full}</p>
+                  <p className="truncate font-mono text-[0.55rem] uppercase tracking-[0.04em] text-muted-foreground">VA</p>
+                </div>
+              </div>
+            )}
+          </article>
+        );
+      })}
     </div>
   );
 }
 
 export function AnimeCharactersSkeleton() {
   return (
-    <div className="flex flex-col gap-5">
-      <div className="h-7 w-32 rounded-md shimmer" />
-      <div className="flex gap-4 overflow-hidden sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-        {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className="w-[120px] shrink-0 sm:w-auto">
-            <div className="shimmer aspect-[2/3] w-full rounded-lg" />
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-4 border border-border p-3">
+          <div className="shimmer h-[72px] w-[54px]" />
+          <div className="flex-1 space-y-2">
+            <div className="shimmer h-4 w-3/4 rounded" />
+            <div className="shimmer h-3 w-1/3 rounded" />
           </div>
-        ))}
-      </div>
+          <div className="flex items-center gap-2 border-l border-border pl-3">
+            <div className="shimmer size-9 rounded-full" />
+            <div className="hidden sm:block sm:space-y-1">
+              <div className="shimmer h-3 w-20 rounded" />
+              <div className="shimmer h-2 w-8 rounded" />
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

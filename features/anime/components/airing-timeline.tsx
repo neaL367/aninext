@@ -1,142 +1,129 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { Route } from "next";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
+import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { getAiringWeek } from "@/features/anime/anime-queries";
 import type { AiringScheduleNode } from "@/features/anime/types/anime";
-import { getTitle, fromAiringTimestamp } from "@/features/anime/lib/media-helpers";
-import { CalendarIcon } from "lucide-react";
+import { formatFormat, fromAiringTimestamp, getTitle } from "@/features/anime/lib/media-helpers";
+import { CalendarIcon, ExternalLinkIcon } from "lucide-react";
+import { ImageWithLoading } from "@/components/image-with-loading";
+
+function currentBlockName(): string {
+  const hour = new Date().getHours();
+  if (hour >= 6 && hour < 12) return "Morning";
+  if (hour >= 12 && hour < 18) return "Afternoon";
+  if (hour >= 18 && hour < 24) return "Evening";
+  return "Night";
+}
 
 export async function AiringTimeline({ day }: { day: string }) {
   const date = new Date(day);
   const start = Math.floor(date.setHours(0, 0, 0, 0) / 1000);
-  const end = start + 86400;
+  const schedules = await getAiringWeek(start, start + 86400);
 
-  const schedules = await getAiringWeek(start, end);
-
-  if (schedules.length === 0) {
-    return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <CalendarIcon />
-          </EmptyMedia>
-          <EmptyTitle>Nothing airing today</EmptyTitle>
-        </EmptyHeader>
-        <EmptyContent>
-          <EmptyDescription>
-            Check back tomorrow or try a different day.
-          </EmptyDescription>
-        </EmptyContent>
-      </Empty>
-    );
-  }
+  if (schedules.length === 0) return <Empty><EmptyHeader><EmptyMedia variant="icon"><CalendarIcon /></EmptyMedia><EmptyTitle>Nothing airing today</EmptyTitle></EmptyHeader><EmptyContent><EmptyDescription>Choose another day to scan the week.</EmptyDescription></EmptyContent></Empty>;
 
   const grouped = groupByTimeBlock(schedules);
+  const now = Date.now() / 1000;
+  const today = new Date().toISOString().split("T")[0];
+  const isToday = day === today;
+  const activeBlock = isToday ? currentBlockName() : null;
 
   return (
-    <div className="flex flex-col gap-6">
-      {Object.entries(grouped).map(([block, items]) => (
-        <div key={block} className="flex flex-col gap-3">
-          <div className="flex items-center gap-3">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              {block}
-            </h3>
-            <div className="h-px flex-1 bg-border-soft" />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            {items.map((item, i) => (
-              <AiringRow key={`${item.media?.id}-${i}`} item={item} />
-            ))}
-          </div>
-        </div>
-      ))}
+    <div className="space-y-10">
+      {Object.entries(grouped).map(([block, items]) => {
+        const isActive = block === activeBlock;
+        return (
+          <section key={block}>
+            <div className="mb-4 flex items-center gap-3">
+              <span className={isActive ? "flex size-2 animate-pulse rounded-full bg-live-badge" : "flex size-2 rounded-full bg-accent"} />
+              <h2 className={isActive ? "text-sm font-semibold uppercase tracking-[0.1em] text-live-badge" : "text-sm font-semibold uppercase tracking-[0.1em] text-foreground"}>{block}</h2>
+              {isActive && <span className="font-mono text-xs text-live-badge">now</span>}
+              <span className="font-mono text-xs text-muted-foreground">{items.length}</span>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {items.map((item, index) => {
+                if (!item.media) return null;
+                const title = getTitle(item.media.title);
+                const time = fromAiringTimestamp(item.airingAt);
+                const diff = item.airingAt - now;
+                const isClose = diff > 0 && diff < 3600;
+                const isLive = diff <= 0 && diff > -1800;
+                return (
+                  <article key={`${item.media.id}-${index}`} className="group flex gap-4 border border-border p-4 transition-colors hover:border-accent/50 hover:bg-surface-1/40">
+                    <Link href={`/anime/${item.media.id}` as Route<string>} className="relative h-[88px] w-[66px] shrink-0 overflow-hidden bg-surface-2">
+                      {item.media.coverImage.medium ? (
+                        <ImageWithLoading src={item.media.coverImage.medium} alt={title} fill sizes="66px" className="object-cover transition-transform duration-300 group-hover:scale-[1.05]" />
+                      ) : (
+                        <div className="flex h-full items-center justify-center p-1 text-center font-mono text-[0.5rem] text-muted-foreground">{title}</div>
+                      )}
+                    </Link>
+                    <div className="flex min-w-0 flex-1 flex-col justify-between">
+                      <div>
+                        <Link href={`/anime/${item.media.id}` as Route<string>} className="line-clamp-2 text-sm font-medium leading-snug hover:text-accent">{title}</Link>
+                        <p className="mt-1 font-mono text-xs text-muted-foreground">Ep {item.episode} {item.media.format ? `· ${formatFormat(item.media.format)}` : ""}</p>
+                      </div>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          {isLive ? (
+                            <span className="flex items-center gap-1 font-mono text-xs text-live-badge">
+                              <span className="size-1.5 animate-pulse rounded-full bg-live-badge" />Live
+                            </span>
+                          ) : isClose ? (
+                            <span className="flex items-center gap-1 font-mono text-xs text-live-badge">Soon</span>
+                          ) : (
+                            <time dateTime={time.toISOString()} className="font-mono text-xs tabular-nums text-muted-foreground">
+                              {time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+                            </time>
+                          )}
+                        </div>
+                        <Link href={`/anime/${item.media.id}` as Route<string>} className="shrink-0 text-muted-foreground hover:text-accent" aria-label={`Open ${title}`}>
+                          <ExternalLinkIcon className="size-3.5" />
+                        </Link>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        );
+      })}
     </div>
   );
 }
 
-function AiringRow({ item }: { item: AiringScheduleNode }) {
-  if (!item.media) return null;
-  const title = getTitle(item.media.title);
-  const cover = item.media.coverImage.medium;
-  const time = fromAiringTimestamp(item.airingAt);
-
-  return (
-    <Link href={`/anime/${item.media.id}` as Route<string>} className="group">
-      <div className="flex items-center gap-3 rounded-xl p-2.5 transition-colors hover:bg-surface-2/50">
-        {cover && (
-          <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-md bg-muted">
-            <Image
-              src={cover}
-              alt={title}
-              fill
-              sizes="48px"
-              className="object-cover"
-              loading="lazy"
-            />
-          </div>
-        )}
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium">{title}</p>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="font-mono tabular-nums">Episode {item.episode}</span>
-            <span>·</span>
-            <span className="font-mono tabular-nums">
-              {time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
-            </span>
-          </div>
-        </div>
-        {item.media.format && (
-          <Badge variant="outline" className="shrink-0 rounded-full border-border/60 bg-transparent text-[10px]">
-            {item.media.format}
-          </Badge>
-        )}
-      </div>
-    </Link>
-  );
-}
-
 function groupByTimeBlock(schedules: AiringScheduleNode[]): Record<string, AiringScheduleNode[]> {
-  const blocks: Record<string, AiringScheduleNode[]> = {
-    "Morning (6:00 – 12:00)": [],
-    "Afternoon (12:00 – 18:00)": [],
-    "Evening (18:00 – 00:00)": [],
-    "Late Night (00:00 – 6:00)": [],
-  };
-
+  const blocks: Record<string, AiringScheduleNode[]> = { "Morning": [], "Afternoon": [], "Evening": [], "Night": [] };
   for (const item of schedules) {
     const hour = fromAiringTimestamp(item.airingAt).getHours();
-    if (hour >= 6 && hour < 12) blocks["Morning (6:00 – 12:00)"].push(item);
-    else if (hour >= 12 && hour < 18) blocks["Afternoon (12:00 – 18:00)"].push(item);
-    else if (hour >= 18 && hour < 24) blocks["Evening (18:00 – 00:00)"].push(item);
-    else blocks["Late Night (00:00 – 6:00)"].push(item);
+    if (hour >= 6 && hour < 12) blocks["Morning"].push(item);
+    else if (hour >= 12 && hour < 18) blocks["Afternoon"].push(item);
+    else if (hour >= 18 && hour < 24) blocks["Evening"].push(item);
+    else blocks["Night"].push(item);
   }
-
   return Object.fromEntries(Object.entries(blocks).filter(([, items]) => items.length > 0));
 }
 
 export function AiringTimelineSkeleton() {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="space-y-10">
       {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} className="flex flex-col gap-3">
-          <Skeleton className="h-4 w-40 rounded" />
-          <div className="flex flex-col gap-1.5">
-            {Array.from({ length: 4 }).map((_, j) => (
-              <div key={j} className="flex items-center gap-3 rounded-xl p-2.5">
-                <Skeleton className="h-16 w-12 shrink-0 rounded-md" />
-                <div className="flex-1 flex flex-col gap-2">
-                  <Skeleton className="h-4 w-3/4 rounded" />
-                  <Skeleton className="h-3 w-1/3 rounded" />
+        <div key={i}>
+          <div className="mb-4 flex items-center gap-3">
+            <div className="shimmer size-2 rounded-full" />
+            <div className="shimmer h-4 w-24 rounded" />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 4 }).map((__, j) => (
+              <div key={j} className="flex gap-4 border border-border p-4">
+                <div className="shimmer h-[88px] w-[66px]" />
+                <div className="flex flex-1 flex-col justify-between">
+                  <div className="space-y-2">
+                    <div className="shimmer h-4 w-3/4 rounded" />
+                    <div className="shimmer h-3 w-1/2 rounded" />
+                  </div>
+                  <div className="shimmer h-3 w-12 rounded" />
                 </div>
               </div>
             ))}

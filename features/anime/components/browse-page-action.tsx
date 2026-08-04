@@ -13,11 +13,13 @@ export async function renderBrowsePage(
   page: number
 ): Promise<BrowsePage> {
   "use server";
-  const { items, pageInfo } = await getBrowseCollection(collection, filters, page);
-  const capped = collection === "top100" ? page * 25 <= 100 : true;
+  const perPage = 25;
+  const { items, pageInfo } = await getBrowseCollection(collection, filters, page, perPage);
+  const capped = collection === "top100" ? page * perPage <= 100 : true;
+  const rankStart = collection === "top100" ? (page - 1) * perPage + 1 : undefined;
   return {
     hasMore: pageInfo.hasNextPage && capped,
     hasItems: items.length > 0,
-    node: <MediaGrid items={items} />,
+    node: <MediaGrid items={items} rankStart={rankStart} />,
   };
 }

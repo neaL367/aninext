@@ -1,8 +1,8 @@
 import type { Media } from "@/features/anime/types/anime";
-import { HeroContent } from "./hero-content";
+import { HeroInfo } from "./hero-content";
 
 export function HeroBanner({ media }: { media: Media }) {
-  return <HeroContent media={media} />;
+  return <HeroInfo media={media} />;
 }
 
 export function HeroBannerSkeleton() {

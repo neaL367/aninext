@@ -72,6 +72,16 @@ export const COLLECTIONS: Record<AnimeCollection, CollectionConfig> = {
     sort: ["POPULARITY_DESC"],
     cacheLife: "home",
   },
+  seasonal: {
+    title: "Seasonal Anime — AniNext",
+    heading: "Seasonal Anime",
+    description: "Browse anime by season and year.",
+    pageHeading: "Seasonal Anime",
+    pageDescription: "Explore anime from specific seasons and years",
+    navLabel: "Seasonal",
+    sort: ["POPULARITY_DESC"],
+    cacheLife: "home",
+  },
 };
 
 const COLLECTION_ORDER: AnimeCollection[] = [
@@ -80,6 +90,7 @@ const COLLECTION_ORDER: AnimeCollection[] = [
   "top100",
   "upcoming",
   "alltimepopular",
+  "seasonal",
 ];
 
 export const COLLECTION_NAV_ITEMS = COLLECTION_ORDER.map((id) => ({

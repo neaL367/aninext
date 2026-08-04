@@ -21,7 +21,7 @@ import type {
 const MEDIA_CARD_FIELDS = `
   id
   title { romaji english userPreferred }
-  coverImage { extraLarge large medium }
+  coverImage { extraLarge large medium color }
   bannerImage
   averageScore
   popularity
@@ -31,6 +31,8 @@ const MEDIA_CARD_FIELDS = `
   season
   seasonYear
   genres
+  description(asHtml: false)
+  studios(isMain: true) { nodes { id name } }
 `;
 
 const BROWSE_QUERY = `
@@ -137,6 +139,8 @@ const HERO_FIELDS = `
   source
   studios(isMain: true) { nodes { id name siteUrl } }
   nextAiringEpisode { episode airingAt timeUntilAiring }
+  streamingEpisodes { title thumbnail url site }
+  trailer { id site thumbnail }
 `;
 
 const HERO_QUERY = `

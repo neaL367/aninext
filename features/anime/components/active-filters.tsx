@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import { XIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { formatFormat, formatStatus } from "@/features/anime/lib/media-helpers";
 
 export function ActiveFilters() {
   const router = useRouter();
@@ -28,10 +29,10 @@ export function ActiveFilters() {
   const genre = searchParams.get("genre");
   if (genre) filters.push({ key: "genre", label: genre });
   searchParams.getAll("format").forEach((f) =>
-    filters.push({ key: "format", label: f, value: f })
+    filters.push({ key: "format", label: formatFormat(f), value: f })
   );
   searchParams.getAll("status").forEach((s) =>
-    filters.push({ key: "status", label: s.replace("_", " "), value: s })
+    filters.push({ key: "status", label: formatStatus(s), value: s })
   );
   const country = searchParams.get("country");
   if (country) filters.push({ key: "country", label: country });
@@ -42,15 +43,16 @@ export function ActiveFilters() {
 
   return (
     <div className="flex flex-wrap items-center gap-2" data-pending={isPending ? "" : undefined}>
+      <span className="eyebrow mr-1">Active</span>
       {filters.map((f, i) => (
         <span
           key={`${f.key}-${f.value ?? i}`}
-          className="inline-flex items-center gap-1 rounded-full bg-surface-2 px-3 py-1 text-xs font-medium text-foreground"
+          className="inline-flex items-center gap-2 border border-signal/35 bg-signal-soft px-2.5 py-1 font-mono text-[0.62rem] uppercase tracking-[0.08em] text-signal"
         >
           {f.label}
           <button
             onClick={() => removeFilter(f.key, f.value)}
-            className="rounded-full p-0.5 transition-colors hover:bg-muted"
+            className="p-0.5 transition-colors hover:bg-background/40"
           >
             <XIcon className="size-3" />
           </button>
@@ -64,7 +66,7 @@ export function ActiveFilters() {
             router.replace("?", { scroll: false });
           });
         }}
-        className="text-xs text-muted-foreground"
+        className="ml-1 h-7 rounded-none px-2 font-mono text-[0.62rem] uppercase tracking-[0.1em] text-muted-foreground"
       >
         Clear all
       </Button>

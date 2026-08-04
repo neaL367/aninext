@@ -24,25 +24,23 @@ export function SearchBar() {
   const searchValue = searchParams.get("search") ?? "";
 
   return (
-    <div className="relative">
-      <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+    <label className="group flex h-12 items-center gap-3 border-b border-border-soft bg-surface-1/40 px-3 transition-colors focus-within:border-signal">
+      <SearchIcon className="size-4 shrink-0 text-muted-foreground group-focus-within:text-signal" />
       <input
         type="search"
-        placeholder="Search anime..."
+        placeholder="Search by title or genre..."
         defaultValue={searchValue}
         onChange={(e) => debouncedUpdate(e.target.value)}
-        className="h-10 w-full rounded-full border border-border-soft bg-surface-1/50 pl-10 pr-10 text-sm text-foreground placeholder:text-muted-foreground transition-colors focus:border-accent/50 focus:bg-surface-2 focus:outline-none focus:ring-1 focus:ring-accent/30"
+        className="min-w-0 flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+        aria-label="Search anime"
       />
-      {searchValue && (
-        <button
-          type="button"
-          onClick={handleClear}
-          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-0.5 text-muted-foreground transition-colors hover:text-foreground"
-        >
+      {searchValue ? (
+        <button type="button" onClick={handleClear} className="rounded-sm p-1 text-muted-foreground hover:text-foreground" aria-label="Clear search">
           <XIcon className="size-4" />
-          <span className="sr-only">Clear search</span>
         </button>
+      ) : (
+        <span className="hidden font-mono text-[0.6rem] uppercase tracking-[0.12em] text-muted-foreground sm:inline">Enter query</span>
       )}
-    </div>
+    </label>
   );
 }

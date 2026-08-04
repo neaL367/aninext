@@ -1,14 +1,29 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { Route } from "next";
+import { ViewTransition } from "react";
 import type { Media } from "@/features/anime/types/anime";
-import { scoreColor, scoreBg } from "@/features/anime/lib/score";
-import { getMediaTitle, getMediaCover } from "@/features/anime/lib/media-helpers";
+import { scoreColor } from "@/features/anime/lib/score";
+import { formatFormat, formatStatus, getMediaCover, getMediaTitle } from "@/features/anime/lib/media-helpers";
 import { cn } from "@/lib/utils";
+import { ImageWithLoading } from "@/components/image-with-loading";
 
-export function MediaCard({ media, size = "default" }: { media: Media; size?: "default" | "featured" }) {
+export function MediaCard({
+  media,
+  size = "default",
+  rank,
+  viewTransition = false,
+  vtIndex,
+}: {
+  media: Media;
+  size?: "default" | "featured";
+  rank?: number;
+  viewTransition?: boolean;
+  vtIndex?: number;
+}) {
   const title = getMediaTitle(media);
   const cover = getMediaCover(media);
+  const color = media.coverImage.color;
+  const score = media.averageScore;
   const isReleasing = media.status === "RELEASING";
 
   return (
@@ -16,55 +31,78 @@ export function MediaCard({ media, size = "default" }: { media: Media; size?: "d
       href={`/anime/${media.id}` as Route<string>}
       aria-label={`Open ${title}`}
       className={cn(
-        "group relative block cursor-pointer rounded-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-        size === "featured" ? "col-span-1 sm:col-span-2" : ""
+        "group block min-w-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal",
+        size === "featured" && "md:col-span-2"
       )}
     >
-      <div className="relative overflow-hidden rounded-xl bg-card transition-all duration-300 group-hover:ring-1 group-hover:ring-accent/40 group-hover:shadow-[0_0_20px_var(--glow)] motion-reduce:transition-none motion-reduce:group-hover:shadow-none">
-        <div className={cn(
-          "relative overflow-hidden",
-          size === "featured" ? "aspect-[16/10]" : "aspect-[2/3]"
-        )}>
-          {cover && (
-            <Image
+      <div
+        className={cn(
+          "relative overflow-hidden border border-border-soft bg-surface-1 transition-[border-color,transform] duration-300 group-hover:-translate-y-1 group-hover:border-signal/55 motion-reduce:transform-none",
+          size === "featured" ? "aspect-[16/9]" : "aspect-[2/3]"
+        )}
+        style={!cover && color ? { background: `linear-gradient(135deg, ${color}55, var(--surface-2) 72%)` } : undefined}
+      >
+        {cover ? (
+          viewTransition ? (
+            <ViewTransition name={`anime-cover-grid-${media.id}-${vtIndex ?? 0}`} share="morph" default="none">
+              <ImageWithLoading
+                src={cover}
+                alt={`${title} cover`}
+                fill
+                sizes={size === "featured" ? "(min-width: 1024px) 42vw, 92vw" : "(min-width: 1280px) 16vw, (min-width: 768px) 24vw, 44vw"}
+                className="object-cover transition-transform duration-500 group-hover:scale-[1.035] motion-reduce:transform-none"
+              />
+            </ViewTransition>
+          ) : (
+            <ImageWithLoading
               src={cover}
               alt={`${title} cover`}
               fill
-              className="object-cover transition-transform duration-500 group-hover:scale-[1.05] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
-              sizes={size === "featured" ? "(min-width:1024px) 40vw, 90vw" : "(min-width:1024px) 16vw, 45vw"}
+              sizes={size === "featured" ? "(min-width: 1024px) 42vw, 92vw" : "(min-width: 1280px) 16vw, (min-width: 768px) 24vw, 44vw"}
+              className="object-cover transition-transform duration-500 group-hover:scale-[1.035] motion-reduce:transform-none"
             />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-
-          {media.averageScore && (
-            <div className="absolute right-2 top-2 flex items-center gap-1 rounded-md bg-black/70 px-1.5 py-0.5 backdrop-blur-sm">
-              <span className={cn("size-1.5 rounded-full", scoreBg(media.averageScore))} />
-              <span className={cn("font-mono text-xs font-semibold tabular-nums text-white", scoreColor(media.averageScore))}>
-                {(media.averageScore / 10).toFixed(1)}
-              </span>
-            </div>
-          )}
-
-          {isReleasing && (
-            <div className="absolute left-2 top-2 flex items-center gap-1.5 rounded-md bg-live-badge/90 px-2 py-0.5 backdrop-blur-sm">
-              <span className="size-1.5 animate-pulse rounded-full bg-white" />
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-white">
-                Airing
-              </span>
-            </div>
-          )}
-
-          <div className="absolute inset-x-0 bottom-0 p-3">
-            <h3 className="line-clamp-2 text-sm font-semibold leading-tight text-white drop-shadow-sm">
-              {title}
-            </h3>
-            <div className="mt-1 flex items-center gap-1.5 font-mono text-[11px] text-white/70 tabular-nums">
-              {media.format && <span>{media.format}</span>}
-              {media.format && media.episodes && <span>·</span>}
-              {media.episodes && <span>{media.episodes} ep</span>}
-            </div>
+          )
+        ) : (
+          <div className="flex h-full items-center justify-center p-5 text-center">
+            <span className="max-w-[14rem] font-mono text-xs uppercase tracking-[0.12em] text-paper/75">{title}</span>
           </div>
+        )}
+
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent" />
+
+        {rank !== undefined && rank <= 100 && (
+          <span
+            className="absolute left-3 top-3 flex size-8 items-center justify-center border border-white/35 font-mono text-xs font-semibold text-white backdrop-blur-sm"
+            style={{ backgroundColor: color ?? "var(--signal-strong)" }}
+          >
+            {String(rank).padStart(2, "0")}
+          </span>
+        )}
+
+        {score !== undefined && (
+          <span className={cn("absolute right-3 top-3 rounded-sm bg-black/60 px-1.5 py-0.5 font-mono text-xs font-semibold tabular-nums backdrop-blur-sm", scoreColor(score))}>
+            {(score / 10).toFixed(1)}
+          </span>
+        )}
+
+        {isReleasing && rank === undefined && (
+          <span className="absolute left-3 top-3 flex items-center gap-1.5 bg-live-badge px-2 py-1 font-mono text-[0.6rem] font-semibold uppercase tracking-[0.12em] text-white">
+            <span className="size-1.5 animate-pulse rounded-full bg-white" />
+            Live
+          </span>
+        )}
+
+        <div className="absolute inset-x-0 bottom-0 p-3.5">
+          <p className="line-clamp-2 text-sm font-semibold leading-snug text-white">{title}</p>
         </div>
+      </div>
+
+      <div className="flex items-center justify-between gap-3 border-b border-border-soft py-2.5">
+        <p className="min-w-0 truncate font-mono text-[0.7rem] uppercase tracking-[0.06em] text-muted-foreground">
+          {media.format ? formatFormat(media.format) : media.status ? formatStatus(media.status) : "Anime"}
+          {media.episodes ? ` / ${media.episodes} ep` : ""}
+        </p>
+        {media.seasonYear && <span className="shrink-0 font-mono text-[0.7rem] text-muted-foreground">{media.seasonYear}</span>}
       </div>
     </Link>
   );
@@ -72,15 +110,11 @@ export function MediaCard({ media, size = "default" }: { media: Media; size?: "d
 
 export function MediaCardSkeleton({ size = "default" }: { size?: "default" | "featured" }) {
   return (
-    <div className={cn(
-      "overflow-hidden rounded-xl bg-card",
-      size === "featured" ? "col-span-1 sm:col-span-2" : ""
-    )}>
-      <div className={cn(
-        "relative overflow-hidden",
-        size === "featured" ? "aspect-[16/10]" : "aspect-[2/3]"
-      )}>
-        <div className="shimmer absolute inset-0" />
+    <div className={cn("min-w-0", size === "featured" && "md:col-span-2")}>
+      <div className={cn("shimmer border border-border-soft", size === "featured" ? "aspect-[16/9]" : "aspect-[2/3]")} />
+      <div className="flex items-center justify-between border-b border-border-soft py-2.5">
+        <div className="shimmer h-2.5 w-24 rounded" />
+        <div className="shimmer h-2.5 w-8 rounded" />
       </div>
     </div>
   );

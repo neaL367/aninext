@@ -3,6 +3,7 @@
 import { Suspense, use, useEffect, useState, useTransition, type ReactNode } from "react";
 import { Crossfade } from "@/components/crossfade";
 import { InfiniteScrollSentinel } from "./infinite-scroll-sentinel";
+import { BrowseGrid } from "./browse-grid";
 import { renderBrowsePage, type BrowsePage } from "./browse-page-action";
 import type { AnimeCollection, AnimeFilters } from "@/features/anime/types/anime";
 
@@ -36,24 +37,26 @@ export function BrowsePaginator({
 
   return (
     <>
-      {pages.map((page, i) => (
-        <Suspense key={i} fallback={skeleton}>
-          {i === 0 ? (
-            <PageContent page={page} onResolved={setHasItems} />
-          ) : (
-            <Crossfade>
-              <PageContent page={page} onResolved={() => undefined} />
-            </Crossfade>
-          )}
-        </Suspense>
-      ))}
+      <BrowseGrid>
+        {pages.map((page, i) => (
+          <Suspense key={i} fallback={skeleton}>
+            {i === 0 ? (
+              <PageContent page={page} onResolved={setHasItems} />
+            ) : (
+              <Crossfade>
+                <PageContent page={page} onResolved={() => undefined} />
+              </Crossfade>
+            )}
+          </Suspense>
+        ))}
+      </BrowseGrid>
       {!hasItems ? (
         emptyComponent
       ) : hasMore ? (
         <InfiniteScrollSentinel onLoadMore={loadMore} isLoading={isPending} />
       ) : (
-        <p className="py-8 text-center text-sm text-muted-foreground">
-          You've reached the end
+        <p className="border-t border-border-soft py-8 text-center font-mono text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground">
+          End of results
         </p>
       )}
     </>

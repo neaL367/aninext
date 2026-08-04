@@ -34,7 +34,7 @@ export function InfiniteScrollSentinel({
   return (
     <div
       ref={ref}
-      className="flex items-center justify-center py-8"
+      className="flex items-center justify-center border-t border-border-soft py-8"
       aria-label="Load more anime"
     >
       {isLoading && <Spinner className="size-5" />}

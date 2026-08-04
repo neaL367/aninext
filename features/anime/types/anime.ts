@@ -43,6 +43,22 @@ export interface Media {
     airingAt: number;
     timeUntilAiring: number;
   };
+  streamingEpisodes?: StreamingEpisode[];
+  trailer?: Trailer;
+}
+
+export interface Trailer {
+  id?: string;
+  site?: string;
+  thumbnail?: string;
+}
+
+export interface StreamingEpisode {
+  id?: number;
+  title?: string;
+  thumbnail?: string;
+  url?: string;
+  site?: string;
 }
 
 export interface PageInfo {
@@ -118,7 +134,8 @@ export type AnimeCollection =
   | "popular"
   | "top100"
   | "upcoming"
-  | "alltimepopular";
+  | "alltimepopular"
+  | "seasonal";
 
 export interface AnimeFilters {
   genre?: string;

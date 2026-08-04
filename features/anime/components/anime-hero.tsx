@@ -1,215 +1,89 @@
-import Image from "next/image";
-import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import type { Route } from "next";
+import { PlayIcon } from "lucide-react";
+import { ViewTransition } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Media } from "@/features/anime/types/anime";
-import { scoreColor, scoreBg } from "@/features/anime/lib/score";
-import { getMediaTitle, getMediaCover, fromAiringTimestamp } from "@/features/anime/lib/media-helpers";
+import { scoreColor } from "@/features/anime/lib/score";
+import { formatFormat, formatStatus, getMediaCover, getMediaTitle } from "@/features/anime/lib/media-helpers";
+import { ImageWithLoading } from "@/components/image-with-loading";
 import { cn } from "@/lib/utils";
-
-function AiringCountdown({ airingAt, episode }: { airingAt: number; episode: number }) {
-  const date = fromAiringTimestamp(airingAt);
-  const now = Date.now();
-  const diff = airingAt * 1000 - now;
-  const days = Math.floor(diff / 86400000);
-  const hours = Math.floor((diff % 86400000) / 3600000);
-
-  return (
-    <div className="flex items-center gap-3 rounded-xl border border-border-soft bg-surface-2/50 p-3">
-      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-live-badge/15">
-        <span className="size-2 animate-pulse rounded-full bg-live-badge" />
-      </div>
-      <div>
-        <p className="text-sm font-medium">Next Episode</p>
-        <p className="font-mono text-xs text-muted-foreground tabular-nums">
-          Episode {episode} — {days > 0 ? `${days}d ` : ""}{hours}h
-        </p>
-      </div>
-    </div>
-  );
-}
 
 export function AnimeHero({ media }: { media: Media }) {
   const title = getMediaTitle(media);
   const cover = getMediaCover(media);
   const banner = media.bannerImage;
+  const color = media.coverImage.color;
   const studio = media.studios?.nodes[0]?.name;
+  const description = media.description?.replace(/<[^>]*>/g, "").trim();
 
   return (
-    <div className="flex flex-col">
-      {/* Banner */}
-      {banner && (
-        <div className="relative h-72 w-full overflow-hidden sm:h-80 lg:h-96">
-          <Image
-            src={banner}
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/20 to-transparent" />
-        </div>
-      )}
+    <section className="relative">
+      <div className="relative h-[360px] overflow-hidden border-b border-border-soft sm:h-[440px]">
+        {banner ? (
+          <ImageWithLoading src={banner} alt="" fill priority sizes="100vw" className="object-cover" />
+        ) : (
+          <div className="absolute inset-0" style={{ background: color ? `linear-gradient(120deg, ${color}70, var(--surface-2) 75%)` : "linear-gradient(120deg, var(--signal-strong), var(--surface-2) 75%)" }} />
+        )}
+        <div className="paper-grid absolute inset-0 opacity-20" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/50 via-transparent to-transparent" />
+      </div>
 
-      {/* Content */}
-      <div className="relative -mt-24 px-4 sm:-mt-32 sm:px-6 lg:-mt-40 lg:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col gap-8 sm:flex-row">
-          {/* Cover */}
-          {cover && (
-            <div className="shrink-0">
-              <div className="relative w-40 overflow-hidden rounded-xl border border-border/40 shadow-2xl sm:w-48 lg:w-56">
-                <div className="aspect-[2/3]">
-                  <Image
-                    src={cover}
-                    alt={`${title} cover`}
-                    fill
-                    priority
-                    className="object-cover"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Info */}
-          <div className="flex flex-1 flex-col gap-5 pt-4 sm:pt-0">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
-                {title}
-              </h1>
-              {media.title.native && (
-                <p className="mt-2 text-lg text-muted-foreground">{media.title.native}</p>
-              )}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              {media.averageScore && (
-                <div className={cn("flex items-center gap-1.5 rounded-lg bg-black/20 px-2.5 py-1 backdrop-blur-sm", scoreBg(media.averageScore))}>
-                  <span className={cn("font-mono text-sm font-bold tabular-nums text-white", scoreColor(media.averageScore))}>
-                    {(media.averageScore / 10).toFixed(1)}
-                  </span>
-                </div>
-              )}
-              {media.format && (
-                <Badge
-                  variant="secondary"
-                  className="rounded-md border-none bg-secondary/80 font-mono text-[11px] font-medium uppercase tracking-wide backdrop-blur-sm"
-                >
-                  {media.format}
-                </Badge>
-              )}
-              {media.status && (
-                <Badge
-                  variant="outline"
-                  className="rounded-md border-border/60 bg-transparent backdrop-blur-sm"
-                >
-                  {media.status === "RELEASING" ? (
-                    <span className="flex items-center gap-1.5">
-                      <span className="size-1.5 animate-pulse rounded-full bg-live-badge" />
-                      Airing
-                    </span>
-                  ) : (
-                    media.status
-                  )}
-                </Badge>
-              )}
-              {media.episodes && (
-                <span className="font-mono text-sm text-muted-foreground tabular-nums">
-                  {media.episodes} episodes
-                </span>
-              )}
-              {media.duration && (
-                <span className="font-mono text-sm text-muted-foreground tabular-nums">
-                  {media.duration} min/ep
-                </span>
-              )}
-            </div>
-
-            <div className="flex flex-wrap gap-1.5">
-              {media.genres.map((g) => (
-                <span
-                  key={g}
-                  className="rounded-full border border-border/60 bg-transparent px-3 py-1 text-xs font-medium text-muted-foreground"
-                >
-                  {g}
-                </span>
-              ))}
-            </div>
-
-            {media.description && (
-              <div
-                className="max-w-2xl text-sm leading-relaxed text-muted-foreground [&_br]:block [&_i]:italic [&_b]:font-medium [&_b]:text-foreground"
-                dangerouslySetInnerHTML={{ __html: media.description }}
-              />
-            )}
-
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-              {studio && (
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Studio</p>
-                  <p className="mt-0.5 text-sm font-medium">{studio}</p>
-                </div>
-              )}
-              {media.source && (
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Source</p>
-                  <p className="mt-0.5 text-sm font-medium">{media.source}</p>
-                </div>
-              )}
-              {media.season && media.seasonYear && (
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Season</p>
-                  <p className="mt-0.5 text-sm font-medium">{media.season} {media.seasonYear}</p>
+      <div className="relative mx-auto -mt-36 w-full max-w-[1680px] px-4 pb-8 sm:-mt-48 sm:px-7 sm:pb-12 lg:px-10">
+        <div className="grid gap-7 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10">
+          <div className="relative mx-auto w-44 shrink-0 self-end sm:mx-0 sm:w-52 lg:w-[220px]">
+            <div className="relative aspect-[2/3] overflow-hidden border border-white/25 bg-surface-2 shadow-2xl">
+              {cover ? (
+                <ViewTransition name={`anime-cover-hero-${media.id}`} share="morph" default="none"><ImageWithLoading src={cover} alt={`${title} cover`} fill priority sizes="220px" className="object-cover" /></ViewTransition>
+              ) : (
+                <div className="flex h-full items-center justify-center p-6 text-center" style={{ background: color ? `linear-gradient(135deg, ${color}55, var(--surface-2))` : undefined }}>
+                  <span className="font-mono text-xs uppercase tracking-[0.14em] text-paper/80">{title}</span>
                 </div>
               )}
             </div>
+          </div>
 
-            {media.nextAiringEpisode && (
-              <AiringCountdown
-                airingAt={media.nextAiringEpisode.airingAt}
-                episode={media.nextAiringEpisode.episode}
-              />
-            )}
+          <div className="min-w-0 self-end">
+            <p className="eyebrow text-accent">Anime details</p>
+            <h1 className="mt-3 max-w-4xl text-4xl font-semibold leading-[0.98] tracking-[-0.055em] sm:text-6xl">{title}</h1>
+            {media.title.native && <p className="mt-3 text-sm text-muted-foreground">{media.title.native}</p>}
+            <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-muted-foreground">
+              {media.averageScore && <span className={cn("text-base font-semibold", scoreColor(media.averageScore))}>{(media.averageScore / 10).toFixed(1)}<span className="ml-1 text-xs font-normal text-muted-foreground">score</span></span>}
+              {media.format && <span>{formatFormat(media.format)}</span>}
+              {media.episodes && <span>{media.episodes} episodes</span>}
+              {media.duration && <span>{media.duration} min</span>}
+              {media.status && <span className={media.status === "RELEASING" ? "text-live-badge" : ""}>{formatStatus(media.status)}</span>}
+            </div>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {media.genres.slice(0, 5).map((genre) => <span key={genre} className="border border-border-soft px-2 py-1 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted-foreground">{genre}</span>)}
+            </div>
+            {description && <p className="mt-6 line-clamp-3 max-w-2xl text-sm leading-7 text-muted-foreground">{description}</p>}
+            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
+              {studio && <span><span className="font-medium text-foreground">{studio}</span> <span className="font-mono uppercase tracking-[0.06em]">Studio</span></span>}
+              {media.source && <span><span className="font-medium text-foreground">{media.source.replaceAll("_", " ")}</span> <span className="font-mono uppercase tracking-[0.06em]">Source</span></span>}
+              {media.season && media.seasonYear && <span><span className="font-medium text-foreground">{media.season} {media.seasonYear}</span> <span className="font-mono uppercase tracking-[0.06em]">Season</span></span>}
+              {media.studios?.nodes[1]?.name && <span><span className="font-medium text-foreground">{media.studios.nodes[1].name}</span> <span className="font-mono uppercase tracking-[0.06em]">Producer</span></span>}
+            </div>
+            <div className="mt-7 flex flex-wrap items-center gap-5">
+              {media.trailer?.id && media.trailer.site === "youtube" && <a href={`https://www.youtube.com/watch?v=${media.trailer.id}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 border-b border-signal pb-2 text-sm font-medium text-signal hover:text-paper"><PlayIcon className="size-4 fill-current" /> Watch trailer</a>}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
 export function AnimeHeroSkeleton() {
   return (
-    <div className="flex flex-col">
-      <div className="shimmer h-72 w-full sm:h-80 lg:h-96" />
-      <div className="relative -mt-24 px-4 sm:-mt-32 sm:px-6 lg:-mt-40 lg:px-8">
-        <div className="mx-auto flex max-w-7xl flex-col gap-8 sm:flex-row">
-          <Skeleton className="h-60 w-40 shrink-0 rounded-xl sm:w-48 lg:h-72 lg:w-56" />
-          <div className="flex flex-1 flex-col gap-5 pt-4 sm:pt-0">
-            <Skeleton className="h-10 w-3/4" />
-            <Skeleton className="h-6 w-1/2" />
-            <div className="flex gap-2">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-7 w-16 rounded-full" />
-              ))}
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <Skeleton key={i} className="h-6 w-20 rounded-full" />
-              ))}
-            </div>
-            <Skeleton className="h-32 w-full max-w-2xl" />
-            <div className="grid grid-cols-3 gap-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="flex flex-col gap-1">
-                  <Skeleton className="h-3 w-12" />
-                  <Skeleton className="h-5 w-20" />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+    <section>
+      <div className="h-[360px] bg-surface-2 sm:h-[440px]" />
+      <div className="mx-auto -mt-32 grid max-w-[1680px] gap-7 px-4 pb-12 sm:-mt-44 sm:grid-cols-[220px_minmax(0,1fr)] sm:px-7 lg:grid-cols-[220px_minmax(0,1fr)_240px] lg:px-10">
+        <div className="shimmer aspect-[2/3] w-44 sm:w-52 lg:w-[220px]" />
+        <div className="self-end space-y-5"><div className="shimmer h-2.5 w-24 rounded" /><div className="shimmer h-16 w-4/5 rounded" /><div className="shimmer h-4 w-2/3 rounded" /><div className="shimmer h-20 w-full rounded" /></div>
+        <div className="hidden space-y-7 border-l border-border-soft pl-7 lg:block"><Skeleton className="h-12 w-full" /><Skeleton className="h-12 w-full" /><Skeleton className="h-12 w-full" /></div>
       </div>
-    </div>
+    </section>
   );
 }

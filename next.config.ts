@@ -14,6 +14,9 @@ const nextConfig: NextConfig = {
     home: { stale: 300, revalidate: 900, expire: 86400 },
     static: { stale: 3600, revalidate: 21600, expire: 604800 },
   },
+  experimental: {
+    useTypeScriptCli: true
+  },
 };
 
 export default nextConfig;

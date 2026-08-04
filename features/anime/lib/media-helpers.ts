@@ -19,3 +19,27 @@ export function getMediaCover(media: Media): string | undefined {
 export function fromAiringTimestamp(unixSeconds: number): Date {
   return new Date(unixSeconds * 1000);
 }
+
+export function formatStatus(status: string): string {
+  const map: Record<string, string> = {
+    FINISHED: "Finished",
+    RELEASING: "Airing",
+    NOT_YET_RELEASED: "Not yet released",
+    CANCELLED: "Cancelled",
+    HIATUS: "Hiatus",
+  };
+  return map[status] ?? status;
+}
+
+export function formatFormat(format: string): string {
+  const map: Record<string, string> = {
+    TV: "TV",
+    TV_SHORT: "TV Short",
+    MOVIE: "Movie",
+    SPECIAL: "Special",
+    OVA: "OVA",
+    ONA: "ONA",
+    MUSIC: "Music",
+  };
+  return map[format] ?? format;
+}

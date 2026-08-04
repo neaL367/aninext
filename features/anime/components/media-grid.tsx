@@ -1,28 +1,29 @@
 import type { Media } from "@/features/anime/types/anime";
 import { MediaCard, MediaCardSkeleton } from "./media-card";
+import { AnimePreviewCard } from "./anime-preview-card";
 
-export function MediaGrid({ items }: { items: Media[] }) {
+export function MediaGrid({ items, rankStart }: { items: Media[]; rankStart?: number }) {
   return (
-    <div
-      className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-5 lg:grid-cols-4 xl:grid-cols-5"
-      role="list"
-      aria-label="Anime results"
-    >
-      {items.map((item) => (
+    <>
+      {items.map((item, i) => (
         <div key={item.id} role="listitem">
-          <MediaCard media={item} />
+          <AnimePreviewCard media={item}>
+            <MediaCard media={item} rank={rankStart !== undefined ? rankStart + i : undefined} viewTransition vtIndex={(rankStart ?? 0) + i} />
+          </AnimePreviewCard>
         </div>
       ))}
-    </div>
+    </>
   );
 }
 
 export function MediaGridSkeleton({ count = 20 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-5 lg:grid-cols-4 xl:grid-cols-5">
+    <>
       {Array.from({ length: count }).map((_, i) => (
-        <MediaCardSkeleton key={i} />
+        <div key={i} role="listitem">
+          <MediaCardSkeleton />
+        </div>
       ))}
-    </div>
+    </>
   );
 }
