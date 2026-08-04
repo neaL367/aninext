@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     template: "%s | AniNext",
   },
   description: "Discover trending, popular, and upcoming anime from AniList.",
-  metadataBase: new URL("https://aninext.vercel.app"),
+  metadataBase: new URL("https://ani-next.vercel.app"),
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
