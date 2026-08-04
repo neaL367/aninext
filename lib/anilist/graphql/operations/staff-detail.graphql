@@ -1,7 +1,0 @@
-#import "../fragments/staff-detail.graphql"
-
-query StaffDetail($id: Int) {
-  Staff(id: $id) {
-    ...StaffDetailFields
-  }
-}

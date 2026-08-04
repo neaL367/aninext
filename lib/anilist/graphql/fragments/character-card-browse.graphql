@@ -1,9 +1,0 @@
-fragment CharacterCardBrowseFields on Character {
-  id
-  name {
-    full
-  }
-  image {
-    large
-  }
-}

@@ -1,7 +1,0 @@
-#import "../fragments/character-detail.graphql"
-
-query CharacterDetail($id: Int) {
-  Character(id: $id) {
-    ...CharacterDetailFields
-  }
-}

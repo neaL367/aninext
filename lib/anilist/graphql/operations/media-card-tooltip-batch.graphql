@@ -1,9 +1,0 @@
-#import "../fragments/media-card-tooltip.graphql"
-
-query MediaCardTooltipBatch($ids: [Int!]) {
-  Page(perPage: 20) {
-    media(isAdult: false, id_in: $ids) {
-      ...MediaCardTooltipFields
-    }
-  }
-}
