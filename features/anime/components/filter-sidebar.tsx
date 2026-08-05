@@ -49,7 +49,7 @@ function formatFilterValue(value: string): string {
 }
 
 export function FilterSidebar({ genresPromise, mobile = false, collection }: { genresPromise: Promise<string[]>; mobile?: boolean; collection?: AnimeCollection }) {
-  const genres = use(genresPromise);
+  const allGenres = use(genresPromise);
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -73,6 +73,9 @@ export function FilterSidebar({ genresPromise, mobile = false, collection }: { g
   const [adultOpen, setAdultOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
+  const ADULT_GENRES = ["Ecchi", "Hentai"];
+  const genres = isAdult ? allGenres : allGenres.filter((g) => !ADULT_GENRES.includes(g));
+
   const seasonDefault = collection === "seasonal" || !!currentSeason;
   const yearDefault = collection === "seasonal" || !!currentYear;
 
@@ -80,19 +83,19 @@ export function FilterSidebar({ genresPromise, mobile = false, collection }: { g
     <aside className={cn(mobile ? "flex w-full" : "hidden w-full lg:flex", "flex-col")} data-pending={isPending ? "" : undefined}>
       <div className="space-y-1">
         <CollapsibleSection label="Genre" defaultOpen count={currentGenres.length || undefined}>
-          <ToggleGroup multiple value={currentGenres} onValueChange={(value: string[]) => updateFilter("genre", value.length ? value : undefined)} className="flex flex-wrap gap-1">
+          <ToggleGroup key={`genre-${currentGenres.join(",")}`} multiple value={currentGenres} onValueChange={(value: string[]) => updateFilter("genre", value.length ? value : undefined)} className="flex flex-wrap gap-1">
             {genres.map((genre) => <ToggleGroupItem key={genre} value={genre} className="h-7 rounded-none border border-border px-1.5 text-xs data-[state=on]:border-accent data-[state=on]:bg-accent/10 data-[state=on]:text-accent">{genre}</ToggleGroupItem>)}
           </ToggleGroup>
         </CollapsibleSection>
 
         <CollapsibleSection label="Format" count={currentFormats.length || undefined}>
-          <ToggleGroup multiple value={currentFormats} onValueChange={(value: string[]) => updateFilter("format", value.length ? value : undefined)} className="flex flex-wrap gap-1">
+          <ToggleGroup key={`format-${currentFormats.join(",")}`} multiple value={currentFormats} onValueChange={(value: string[]) => updateFilter("format", value.length ? value : undefined)} className="flex flex-wrap gap-1">
             {FORMATS.map((format) => <ToggleGroupItem key={format} value={format} className="h-7 rounded-none border border-border px-1.5 text-xs data-[state=on]:border-accent data-[state=on]:bg-accent/10 data-[state=on]:text-accent">{formatFilterValue(format)}</ToggleGroupItem>)}
           </ToggleGroup>
         </CollapsibleSection>
 
         <CollapsibleSection label="Status" count={currentStatuses.length || undefined}>
-          <ToggleGroup multiple value={currentStatuses} onValueChange={(value: string[]) => updateFilter("status", value.length ? value : undefined)} className="flex flex-wrap gap-1">
+          <ToggleGroup key={`status-${currentStatuses.join(",")}`} multiple value={currentStatuses} onValueChange={(value: string[]) => updateFilter("status", value.length ? value : undefined)} className="flex flex-wrap gap-1">
             {STATUSES.map((status) => <ToggleGroupItem key={status} value={status} className="h-7 rounded-none border border-border px-1.5 text-xs data-[state=on]:border-accent data-[state=on]:bg-accent/10 data-[state=on]:text-accent">{formatFilterValue(status)}</ToggleGroupItem>)}
           </ToggleGroup>
         </CollapsibleSection>
