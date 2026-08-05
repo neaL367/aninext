@@ -49,14 +49,16 @@ export function AiringHomeSection({ schedules }: { schedules: AiringScheduleNode
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium group-hover:text-accent">{title}</p>
                 <p className="mt-1 font-mono text-xs text-muted-foreground">
-                  Ep {item.episode}
+                  Ep {item.episode} <span className="hidden sm:inline">· </span>
+                  <span className="text-foreground">{time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}</span>
+                  <span className={`ml-1 ${isClose ? "text-live-badge" : "text-muted-foreground"}`}>({countdown})</span>
                 </p>
               </div>
-              <div className="shrink-0 text-right">
-                <time dateTime={time.toISOString()} className="block font-mono text-xs sm:text-sm tabular-nums text-foreground">
+              <div className="hidden shrink-0 text-right sm:block">
+                <time dateTime={time.toISOString()} className="block font-mono text-sm tabular-nums text-foreground">
                   {time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
                 </time>
-                <span className={`block mt-0.5 font-mono text-[0.6rem] sm:text-xs tabular-nums ${isClose ? "text-live-badge" : "text-muted-foreground"}`}>
+                <span className={`block mt-0.5 font-mono text-xs tabular-nums ${isClose ? "text-live-badge" : "text-muted-foreground"}`}>
                   {countdown}
                 </span>
               </div>
@@ -79,11 +81,11 @@ export function AiringHomeSectionSkeleton() {
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="flex items-center gap-3 p-3 sm:gap-4 sm:p-4 border border-border">
             <div className="shimmer h-[72px] w-[54px]" />
-            <div className="min-w-0 flex-1 space-y-1">
+            <div className="min-w-0 flex-1 space-y-2">
               <div className="shimmer h-4 w-3/4 rounded" />
-              <div className="shimmer h-3 w-1/3 rounded" />
+              <div className="shimmer h-3 w-2/3 rounded" />
             </div>
-            <div className="shrink-0 space-y-1">
+            <div className="hidden shrink-0 space-y-1 sm:block">
               <div className="shimmer h-3 w-10 rounded" />
               <div className="shimmer h-2 w-8 rounded" />
             </div>
