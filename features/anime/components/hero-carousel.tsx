@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import type { Media } from "@/features/anime/types/anime";
 import { HeroInfo } from "./hero-content";
 import { ImageWithLoading } from "@/components/image-with-loading";
@@ -12,25 +12,25 @@ export function HeroCarousel({ items }: { items: Media[] }) {
   currentRef.current = current;
   const media = items[current] ?? items[0];
 
-  const next = useCallback(() => {
-    setPrev(currentRef.current);
-    setCurrent((c) => (c + 1) % items.length);
-  }, [items.length]);
-
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (mediaQuery.matches) return;
 
-    let timeout: ReturnType<typeof setTimeout>;
-    const advance = () => {
-      timeout = setTimeout(() => {
-        next();
-        advance();
-      }, 7000);
+    let raf: number;
+    let lastStep = performance.now();
+    const INTERVAL = 7000;
+
+    const loop = (now: number) => {
+      if (now - lastStep >= INTERVAL) {
+        lastStep = now;
+        setPrev(currentRef.current);
+        setCurrent((c) => (c + 1) % items.length);
+      }
+      raf = requestAnimationFrame(loop);
     };
-    advance();
-    return () => clearTimeout(timeout);
-  }, [next]);
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [items.length]);
 
   return (
     <section aria-label="Featured anime" className="relative bg-surface-1 lg:min-h-[660px]">

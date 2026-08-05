@@ -6,6 +6,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { Crossfade } from "@/components/crossfade";
 import { AiringCalendar, AiringCalendarSkeleton } from "@/features/anime/components/airing-calendar";
 import { AiringTimeline, AiringTimelineSkeleton } from "@/features/anime/components/airing-timeline";
+import { AiringDefaultDaySync } from "@/features/anime/components/airing-default-day-sync";
 
 export const instant = false;
 
@@ -18,8 +19,7 @@ export const metadata: Metadata = {
 export default function AiringPage({ searchParams }: { searchParams: Promise<{ day?: string }> }) {
   return searchParams.then(async (sp) => {
     await connection();
-    const today = new Date().toISOString().split("T")[0];
-    const day = sp.day ?? today;
+    const day = sp.day ?? new Date().toISOString().split("T")[0];
 
     return (
       <Crossfade>
@@ -29,8 +29,9 @@ export default function AiringPage({ searchParams }: { searchParams: Promise<{ d
           <h1 className="mt-4 text-4xl font-semibold tracking-[-0.055em] sm:text-6xl">Schedule</h1>
         </header>
 
+        <AiringDefaultDaySync day={day} />
         <Suspense fallback={<AiringCalendarSkeleton />}>
-          <AiringCalendar currentDay={day} today={today} />
+          <AiringCalendar currentDay={day} />
         </Suspense>
 
         <div className="mt-10">
