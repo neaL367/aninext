@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useTransition, use, useState } from "react";
+import { useTransition, use, useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
@@ -169,6 +169,14 @@ export function FilterSidebar({ genresPromise, mobile = false, collection }: { g
 
 function CollapsibleSection({ label, children, defaultOpen = false, count }: { label: string; children: React.ReactNode; defaultOpen?: boolean; count?: number }) {
   const [open, setOpen] = useState(defaultOpen);
+
+  useEffect(() => {
+    if (count && count > 0) setOpen(true);
+  }, [count]);
+
+  useEffect(() => {
+    setOpen(defaultOpen);
+  }, [defaultOpen]);
   return (
     <div className="border-b border-border py-2">
       <button type="button" onClick={() => setOpen(!open)} className="flex w-full items-center gap-2 py-1 text-left text-xs font-medium text-foreground hover:text-accent">
