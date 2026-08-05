@@ -35,10 +35,16 @@ export function ActiveFilters() {
   searchParams.getAll("status").forEach((s) =>
     filters.push({ key: "status", label: formatStatus(s), value: s })
   );
+  const season = searchParams.get("season");
+  if (season) filters.push({ key: "season", label: season.charAt(0) + season.slice(1).toLowerCase() });
+  const year = searchParams.get("year");
+  if (year) filters.push({ key: "year", label: year });
   const country = searchParams.get("country");
   if (country) filters.push({ key: "country", label: country });
   const search = searchParams.get("search");
   if (search) filters.push({ key: "search", label: `"${search}"` });
+  const isAdult = searchParams.get("isAdult");
+  if (isAdult === "true") filters.push({ key: "isAdult", label: "18+" });
 
   if (filters.length === 0) return null;
 
