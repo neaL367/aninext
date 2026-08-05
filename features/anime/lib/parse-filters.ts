@@ -6,7 +6,9 @@ export function parseFilters(
   const filters: AnimeFilters = {};
 
   const genre = searchParams.genre;
-  if (typeof genre === "string") filters.genre = genre;
+  if (genre) {
+    filters.genre = Array.isArray(genre) ? genre : [genre];
+  }
 
   const format = searchParams.format;
   if (format) {
@@ -45,7 +47,7 @@ export function parseFilters(
 
 export function buildFilterHash(filters: AnimeFilters): string {
   const parts: string[] = [];
-  if (filters.genre) parts.push(`genre=${filters.genre}`);
+  if (filters.genre?.length) parts.push(`genre=${filters.genre.join(",")}`);
   if (filters.format?.length) parts.push(`format=${filters.format.join(",")}`);
   if (filters.status?.length) parts.push(`status=${filters.status.join(",")}`);
   if (filters.season) parts.push(`season=${filters.season}`);

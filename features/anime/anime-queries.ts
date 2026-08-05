@@ -39,7 +39,7 @@ const BROWSE_QUERY = `
   query BrowseCollection(
     $page: Int, $perPage: Int, $sort: [MediaSort], $season: MediaSeason, $seasonYear: Int,
     $status: MediaStatus, $statusIn: [MediaStatus], $formatIn: [MediaFormat],
-    $genre: String, $country: CountryCode, $search: String, $isAdult: Boolean
+    $genreIn: [String], $country: CountryCode, $search: String, $isAdult: Boolean
   ) {
     Page(page: $page, perPage: $perPage) {
       pageInfo { hasNextPage total }
@@ -51,7 +51,7 @@ const BROWSE_QUERY = `
         status: $status
         status_in: $statusIn
         format_in: $formatIn
-        genre: $genre
+        genres_in: $genreIn
         countryOfOrigin: $country
         search: $search
         isAdult: $isAdult
@@ -86,7 +86,7 @@ export async function getBrowseCollection(
   if (config.season) variables.season = config.season;
   if (config.seasonYear) variables.seasonYear = config.seasonYear;
 
-  if (filters.genre) variables.genre = filters.genre;
+  if (filters.genre?.length) variables.genreIn = filters.genre;
   if (filters.format?.length) variables.formatIn = filters.format;
   if (filters.status?.length) variables.statusIn = filters.status;
   if (filters.season) variables.season = filters.season;
@@ -366,6 +366,7 @@ const AIRING_WEEK_QUERY = `
           title { userPreferred }
           coverImage { medium }
           format
+          externalLinks { url site type }
         }
       }
     }

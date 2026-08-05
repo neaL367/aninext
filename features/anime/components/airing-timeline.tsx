@@ -77,9 +77,25 @@ export async function AiringTimeline({ day }: { day: string }) {
                             </time>
                           )}
                         </div>
-                        <Link href={`/anime/${item.media.id}` as Route<string>} className="shrink-0 text-muted-foreground hover:text-accent" aria-label={`Open ${title}`}>
-                          <ExternalLinkIcon className="size-3.5" />
-                        </Link>
+                        {(() => {
+                          const streamingLinks = item.media?.externalLinks?.filter((link) => link.type === "STREAMING") ?? [];
+                          if (streamingLinks.length > 0) {
+                            return (
+                              <div className="flex shrink-0 items-center gap-1.5">
+                                {streamingLinks.slice(0, 2).map((link) => (
+                                  <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer" className="font-mono text-[0.6rem] uppercase tracking-[0.08em] text-muted-foreground transition-colors hover:text-accent" aria-label={`Watch on ${link.site}`}>
+                                    {link.site}
+                                  </a>
+                                ))}
+                              </div>
+                            );
+                          }
+                          return (
+                            <Link href={`/anime/${item.media.id}` as Route<string>} className="shrink-0 text-muted-foreground hover:text-accent" aria-label={`Open ${title}`}>
+                              <ExternalLinkIcon className="size-3.5" />
+                            </Link>
+                          );
+                        })()}
                       </div>
                     </div>
                   </article>

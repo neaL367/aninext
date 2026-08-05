@@ -63,7 +63,7 @@ export function FilterSidebar({ genresPromise, mobile = false, collection }: { g
     });
   }
 
-  const currentGenre = searchParams.get("genre") ?? "";
+  const currentGenres = searchParams.getAll("genre");
   const currentFormats = searchParams.getAll("format");
   const currentStatuses = searchParams.getAll("status");
   const currentCountry = searchParams.get("country") ?? "";
@@ -79,11 +79,10 @@ export function FilterSidebar({ genresPromise, mobile = false, collection }: { g
   return (
     <aside className={cn(mobile ? "flex w-full" : "hidden w-full lg:flex", "flex-col")} data-pending={isPending ? "" : undefined}>
       <div className="space-y-1">
-        <CollapsibleSection label="Genre" defaultOpen count={currentGenre ? 1 : undefined}>
-          <div className="flex flex-wrap gap-1">
-            <FilterChip active={!currentGenre} onClick={() => updateFilter("genre", undefined)}>All</FilterChip>
-            {genres.map((genre) => <FilterChip key={genre} active={currentGenre === genre} onClick={() => updateFilter("genre", genre)}>{genre}</FilterChip>)}
-          </div>
+        <CollapsibleSection label="Genre" defaultOpen count={currentGenres.length || undefined}>
+          <ToggleGroup multiple value={currentGenres} onValueChange={(value: string[]) => updateFilter("genre", value.length ? value : undefined)} className="flex flex-wrap gap-1">
+            {genres.map((genre) => <ToggleGroupItem key={genre} value={genre} className="h-7 rounded-none border border-border px-1.5 text-xs data-[state=on]:border-accent data-[state=on]:bg-accent/10 data-[state=on]:text-accent">{genre}</ToggleGroupItem>)}
+          </ToggleGroup>
         </CollapsibleSection>
 
         <CollapsibleSection label="Format" count={currentFormats.length || undefined}>

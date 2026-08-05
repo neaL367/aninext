@@ -126,7 +126,14 @@ export interface AiringScheduleNode {
     title: MediaTitle;
     coverImage: MediaCoverImage;
     format?: string;
+    externalLinks?: MediaExternalLink[];
   };
+}
+
+export interface MediaExternalLink {
+  url: string;
+  site: string;
+  type?: string;
 }
 
 export type AnimeCollection =
@@ -138,7 +145,7 @@ export type AnimeCollection =
   | "seasonal";
 
 export interface AnimeFilters {
-  genre?: string;
+  genre?: string[];
   format?: string[];
   status?: string[];
   season?: string;

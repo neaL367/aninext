@@ -16,7 +16,7 @@ export async function renderBrowsePage(
   const perPage = 25;
   const { items, pageInfo } = await getBrowseCollection(collection, filters, page, perPage);
   const capped = collection === "top100" ? page * perPage <= 100 : true;
-  const rankStart = collection === "top100" ? (page - 1) * perPage + 1 : undefined;
+  const rankStart = collection === "top100" && !filters.search ? (page - 1) * perPage + 1 : undefined;
   return {
     hasMore: pageInfo.hasNextPage && capped,
     hasItems: items.length > 0,

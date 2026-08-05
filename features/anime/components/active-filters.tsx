@@ -26,8 +26,9 @@ export function ActiveFilters() {
   }
 
   const filters: { key: string; label: string; value?: string }[] = [];
-  const genre = searchParams.get("genre");
-  if (genre) filters.push({ key: "genre", label: genre });
+  searchParams.getAll("genre").forEach((g) =>
+    filters.push({ key: "genre", label: g, value: g })
+  );
   searchParams.getAll("format").forEach((f) =>
     filters.push({ key: "format", label: formatFormat(f), value: f })
   );

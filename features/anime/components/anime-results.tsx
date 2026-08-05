@@ -33,7 +33,7 @@ function getEmptyComponent(
   if (filters.search) {
     return <EmptySearch />;
   }
-  if (filters.genre || filters.format?.length || filters.status?.length || filters.country) {
+  if (filters.genre?.length || filters.format?.length || filters.status?.length || filters.country) {
     return <EmptyFilters />;
   }
   if (collection === "upcoming") {
