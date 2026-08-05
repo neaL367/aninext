@@ -121,11 +121,7 @@ export interface ReviewNode {
 export interface AiringScheduleNode {
   episode: number;
   airingAt: number;
-  media?: {
-    id: number;
-    title: MediaTitle;
-    coverImage: MediaCoverImage;
-    format?: string;
+  media?: Media & {
     externalLinks?: MediaExternalLink[];
   };
 }

@@ -7,6 +7,7 @@ import type { AiringScheduleNode } from "@/features/anime/types/anime";
 import { formatFormat, fromAiringTimestamp, getTitle } from "@/features/anime/lib/media-helpers";
 import { CalendarIcon, ExternalLinkIcon } from "lucide-react";
 import { ImageWithLoading } from "@/components/image-with-loading";
+import { AnimePreviewCard } from "./anime-preview-card";
 
 function currentBlockName(): string {
   const hour = new Date().getHours();
@@ -59,70 +60,72 @@ export async function AiringTimeline({ day }: { day: string }) {
                 const isClose = diff > 0 && diff < 3600;
                 const isLive = diff <= 0 && diff > -1800;
                 return (
-                  <article key={`${item.media.id}-${index}`} className="group flex gap-4 border border-border p-4 transition-colors hover:border-accent/50 hover:bg-surface-1/40">
-                    <Link href={`/anime/${item.media.id}` as Route<string>} className="relative h-[88px] w-[66px] shrink-0 overflow-hidden bg-surface-2">
-                      {item.media.coverImage.medium ? (
-                        <ImageWithLoading src={item.media.coverImage.medium} alt={title} fill sizes="66px" className="object-cover transition-transform duration-300 group-hover:scale-[1.05]" />
-                      ) : (
-                        <div className="flex h-full items-center justify-center p-1 text-center font-mono text-[0.5rem] text-muted-foreground">{title}</div>
-                      )}
-                    </Link>
-                    <div className="flex min-w-0 flex-1 flex-col justify-between">
-                      <div>
-                        <Link href={`/anime/${item.media.id}` as Route<string>} className="line-clamp-2 text-sm font-medium leading-snug hover:text-accent">{title}</Link>
-                        <p className="mt-1 font-mono text-xs text-muted-foreground">Ep {item.episode} {item.media.format ? `· ${formatFormat(item.media.format)}` : ""}</p>
-                      </div>
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          {isLive ? (
-                            <span className="flex items-center gap-1 font-mono text-xs text-live-badge">
-                              <span className="size-1.5 animate-pulse rounded-full bg-live-badge" />Live
-                            </span>
-                          ) : isClose ? (
-                            <span className="flex items-center gap-1 font-mono text-xs text-live-badge">Soon</span>
-                          ) : (
-                            <time dateTime={time.toISOString()} className="font-mono text-xs tabular-nums text-muted-foreground">
-                              {time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
-                            </time>
-                          )}
+                  <AnimePreviewCard key={`${item.media.id}-${index}`} media={item.media}>
+                    <article className="group flex gap-4 border border-border p-4 transition-colors hover:border-accent/50 hover:bg-surface-1/40">
+                      <Link href={`/anime/${item.media.id}` as Route<string>} className="relative h-[88px] w-[66px] shrink-0 overflow-hidden bg-surface-2">
+                        {item.media.coverImage.medium ? (
+                          <ImageWithLoading src={item.media.coverImage.medium} alt={title} fill sizes="66px" className="object-cover transition-transform duration-300 group-hover:scale-[1.05]" />
+                        ) : (
+                          <div className="flex h-full items-center justify-center p-1 text-center font-mono text-[0.5rem] text-muted-foreground">{title}</div>
+                        )}
+                      </Link>
+                      <div className="flex min-w-0 flex-1 flex-col justify-between">
+                        <div>
+                          <Link href={`/anime/${item.media.id}` as Route<string>} className="line-clamp-2 text-sm font-medium leading-snug hover:text-accent">{title}</Link>
+                          <p className="mt-1 font-mono text-xs text-muted-foreground">Ep {item.episode} {item.media.format ? `· ${formatFormat(item.media.format)}` : ""}</p>
                         </div>
-                        {(() => {
-                          const streamingLinks = item.media?.externalLinks?.filter((link) => link.type === "STREAMING") ?? [];
-                          if (streamingLinks.length > 0) {
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            {isLive ? (
+                              <span className="flex items-center gap-1 font-mono text-xs text-live-badge">
+                                <span className="size-1.5 animate-pulse rounded-full bg-live-badge" />Live
+                              </span>
+                            ) : isClose ? (
+                              <span className="flex items-center gap-1 font-mono text-xs text-live-badge">Soon</span>
+                            ) : (
+                              <time dateTime={time.toISOString()} className="font-mono text-xs tabular-nums text-muted-foreground">
+                                {time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+                              </time>
+                            )}
+                          </div>
+                          {(() => {
+                            const streamingLinks = item.media?.externalLinks?.filter((link) => link.type === "STREAMING") ?? [];
+                            if (streamingLinks.length > 0) {
+                              return (
+                                <div className="flex shrink-0 items-center gap-1">
+                                  {streamingLinks.slice(0, 3).map((link) => {
+                                    const favicon = getFaviconUrl(link.url);
+                                    return (
+                                      <a
+                                        key={link.url}
+                                        href={link.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex size-5 items-center justify-center rounded-sm border border-border-soft bg-surface-1 transition-colors hover:border-accent hover:bg-accent/10"
+                                        aria-label={`Watch on ${link.site}`}
+                                        title={link.site}
+                                      >
+                                        {favicon ? (
+                                          <img src={favicon} alt="" className="size-3.5" loading="lazy" />
+                                        ) : (
+                                          <ExternalLinkIcon className="size-3 text-muted-foreground" />
+                                        )}
+                                      </a>
+                                    );
+                                  })}
+                                </div>
+                              );
+                            }
                             return (
-                              <div className="flex shrink-0 items-center gap-1">
-                                {streamingLinks.slice(0, 3).map((link) => {
-                                  const favicon = getFaviconUrl(link.url);
-                                  return (
-                                    <a
-                                      key={link.url}
-                                      href={link.url}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="flex size-5 items-center justify-center rounded-sm border border-border-soft bg-surface-1 transition-colors hover:border-accent hover:bg-accent/10"
-                                      aria-label={`Watch on ${link.site}`}
-                                      title={link.site}
-                                    >
-                                      {favicon ? (
-                                        <img src={favicon} alt="" className="size-3.5" loading="lazy" />
-                                      ) : (
-                                        <ExternalLinkIcon className="size-3 text-muted-foreground" />
-                                      )}
-                                    </a>
-                                  );
-                                })}
-                              </div>
+                              <Link href={`/anime/${item.media.id}` as Route<string>} className="shrink-0 text-muted-foreground hover:text-accent" aria-label={`Open ${title}`}>
+                                <ExternalLinkIcon className="size-3.5" />
+                              </Link>
                             );
-                          }
-                          return (
-                            <Link href={`/anime/${item.media.id}` as Route<string>} className="shrink-0 text-muted-foreground hover:text-accent" aria-label={`Open ${title}`}>
-                              <ExternalLinkIcon className="size-3.5" />
-                            </Link>
-                          );
-                        })()}
+                          })()}
+                        </div>
                       </div>
-                    </div>
-                  </article>
+                    </article>
+                  </AnimePreviewCard>
                 );
               })}
             </div>

@@ -363,9 +363,18 @@ const AIRING_WEEK_QUERY = `
         airingAt
         media {
           id
-          title { userPreferred }
-          coverImage { medium }
+          title { romaji english userPreferred }
+          coverImage { extraLarge large medium color }
+          bannerImage
+          description(asHtml: false)
+          averageScore
           format
+          episodes
+          status
+          season
+          seasonYear
+          genres
+          studios(isMain: true) { nodes { id name } }
           externalLinks { url site type }
         }
       }
