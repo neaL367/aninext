@@ -14,7 +14,7 @@ export function AnimePreviewCard({ media, children }: { media: Media; children: 
 
   return (
     <HoverCard>
-      <HoverCardTrigger asChild>{children}</HoverCardTrigger>
+      <HoverCardTrigger>{children}</HoverCardTrigger>
       <HoverCardContent
         side="right"
         align="start"
