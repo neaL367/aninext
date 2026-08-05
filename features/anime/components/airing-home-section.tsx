@@ -1,3 +1,6 @@
+"use client";
+
+import { useMemo } from "react";
 import Link from "next/link";
 import type { Route } from "next";
 import { HoverPrefetchLink } from "@/components/hover-prefetch-link";
@@ -7,8 +10,22 @@ import type { AiringScheduleNode } from "@/features/anime/types/anime";
 import { fromAiringTimestamp, getTitle } from "@/features/anime/lib/media-helpers";
 import { ImageWithLoading } from "@/components/image-with-loading";
 
+function localDayBounds(): { start: number; end: number } {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const end = new Date(start.getTime() + 86400000);
+  return { start: Math.floor(start.getTime() / 1000), end: Math.floor(end.getTime() / 1000) };
+}
+
 export function AiringHomeSection({ schedules }: { schedules: AiringScheduleNode[] }) {
-  if (schedules.length === 0) return null;
+  const today = useMemo(() => localDayBounds(), []);
+
+  const todaySchedules = useMemo(
+    () => schedules.filter((s) => s.airingAt >= today.start && s.airingAt < today.end).slice(0, 7),
+    [schedules, today],
+  );
+
+  if (todaySchedules.length === 0) return null;
 
   return (
     <section>
@@ -23,7 +40,7 @@ export function AiringHomeSection({ schedules }: { schedules: AiringScheduleNode
         </HoverPrefetchLink>
       </div>
       <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {schedules.map((item, index) => {
+        {todaySchedules.map((item, index) => {
           if (!item.media) return null;
           const title = getTitle(item.media.title);
           const time = fromAiringTimestamp(item.airingAt);
@@ -38,7 +55,7 @@ export function AiringHomeSection({ schedules }: { schedules: AiringScheduleNode
           const isClose = minutes > 0 && minutes < 60;
 
           return (
-            <Link key={`${item.media.id}-${index}`} href={`/anime/${item.media.id}` as Route<string>} className="group flex items-center gap-3 p-3 sm:gap-4 sm:p-4 border border-border transition-colors hover:border-accent/50 hover:bg-surface-1/50">
+            <Link key={`${item.media.id}-${index}`} href={`/anime/${item.media.id}` as Route<string>} className="group flex items-center gap-3 p-3 sm:gap-4 sm:p-4 border border-border transition-colors hover:border-accent/50 hover:bg-surface-1/50 overflow-hidden">
               <div className="relative h-[72px] w-[54px] shrink-0 overflow-hidden bg-surface-2">
                 {item.media.coverImage.medium ? (
                   <ImageWithLoading src={item.media.coverImage.medium} alt={title} fill sizes="54px" className="object-cover" />
@@ -46,8 +63,8 @@ export function AiringHomeSection({ schedules }: { schedules: AiringScheduleNode
                   <div className="flex h-full items-center justify-center text-center font-mono text-[0.5rem] text-muted-foreground">{title}</div>
                 )}
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium group-hover:text-accent">{title}</p>
+              <div className="w-0 flex-1">
+                <p className="line-clamp-1 text-sm font-medium group-hover:text-accent">{title}</p>
                 <p className="mt-1 font-mono text-xs text-muted-foreground">
                   Ep {item.episode} <span className="hidden sm:inline">· </span>
                   <span className="text-foreground">{time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}</span>
@@ -79,9 +96,9 @@ export function AiringHomeSectionSkeleton() {
       </div>
       <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="flex items-center gap-3 p-3 sm:gap-4 sm:p-4 border border-border">
+          <div key={i} className="flex items-center gap-3 p-3 sm:gap-4 sm:p-4 border border-border overflow-hidden">
             <div className="shimmer h-[72px] w-[54px]" />
-            <div className="min-w-0 flex-1 space-y-2">
+            <div className="w-0 flex-1 space-y-2">
               <div className="shimmer h-4 w-3/4 rounded" />
               <div className="shimmer h-3 w-2/3 rounded" />
             </div>

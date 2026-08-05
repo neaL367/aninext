@@ -83,10 +83,11 @@ async function PopularSection() {
 
 async function AiringSection() {
   await connection();
-  const today = new Date();
-  const start = Math.floor(new Date(today.setHours(0, 0, 0, 0)).getTime() / 1000);
-  const schedules = await getAiringWeek(start, start + 86400);
-  return <AiringHomeSection schedules={schedules.slice(0, 7)} />;
+  const now = Math.floor(Date.now() / 1000);
+  const start = now - 43200;
+  const end = now + 129600;
+  const schedules = await getAiringWeek(start, end);
+  return <AiringHomeSection schedules={schedules} />;
 }
 
 async function Top100Section() {

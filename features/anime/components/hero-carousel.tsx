@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import type { Media } from "@/features/anime/types/anime";
 import { HeroInfo } from "./hero-content";
 import { ImageWithLoading } from "@/components/image-with-loading";
@@ -8,18 +8,28 @@ import { ImageWithLoading } from "@/components/image-with-loading";
 export function HeroCarousel({ items }: { items: Media[] }) {
   const [current, setCurrent] = useState(0);
   const [prev, setPrev] = useState(-1);
+  const currentRef = useRef(current);
+  currentRef.current = current;
   const media = items[current] ?? items[0];
 
   const next = useCallback(() => {
-    setPrev(current);
+    setPrev(currentRef.current);
     setCurrent((c) => (c + 1) % items.length);
-  }, [current, items.length]);
+  }, [items.length]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (mediaQuery.matches) return;
-    const timer = setInterval(next, 7000);
-    return () => clearInterval(timer);
+
+    let timeout: ReturnType<typeof setTimeout>;
+    const advance = () => {
+      timeout = setTimeout(() => {
+        next();
+        advance();
+      }, 7000);
+    };
+    advance();
+    return () => clearTimeout(timeout);
   }, [next]);
 
   return (
@@ -45,7 +55,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
             </div>
           );
         })}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-surface-1/90 via-surface-1/50 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 hidden bg-gradient-to-r from-surface-1/90 via-surface-1/50 to-transparent lg:block" />
         <div className="absolute bottom-4 right-4 z-10 font-mono text-xs tabular-nums tracking-[0.1em] text-white/60">
           {String(current + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
         </div>
