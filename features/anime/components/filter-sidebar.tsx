@@ -1,11 +1,10 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useTransition, use, useState, useEffect, useCallback } from "react";
+import { useTransition, use, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,7 +17,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ChevronDownIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ActiveFilters } from "./active-filters";
 
 const FORMATS = ["TV", "TV_SHORT", "MOVIE", "SPECIAL", "OVA", "ONA", "MUSIC"];
 const STATUSES = ["FINISHED", "RELEASING", "NOT_YET_RELEASED", "CANCELLED", "HIATUS"];
@@ -28,7 +26,6 @@ const COUNTRIES = [
   { value: "CN", label: "China" },
   { value: "TW", label: "Taiwan" },
 ];
-
 const SEASONS = [
   { value: "WINTER", label: "Winter" },
   { value: "SPRING", label: "Spring" },
@@ -80,57 +77,209 @@ export function FilterSidebar({ genresPromise, mobile = false, collection }: { g
   const seasonDefault = collection === "seasonal" || !!currentSeason;
   const yearDefault = collection === "seasonal" || !!currentYear;
 
+  const activeCount = currentGenres.length + currentFormats.length + currentStatuses.length + (currentSeason ? 1 : 0) + (currentYear ? 1 : 0) + (currentCountry ? 1 : 0) + (isAdult ? 1 : 0);
+
   return (
     <aside className={cn(mobile ? "flex w-full" : "hidden w-full lg:flex", "flex-col")} data-pending={isPending ? "" : undefined}>
-      <ActiveFilters compact />
-      <div className="space-y-1">
-        <CollapsibleSection label="Genre" defaultOpen count={currentGenres.length || undefined}>
-          <ToggleGroup key={`genre-${currentGenres.join(",")}`} multiple value={currentGenres} onValueChange={(value: string[]) => updateFilter("genre", value.length ? value : undefined)} className="flex flex-wrap gap-1">
-            {genres.map((genre) => <ToggleGroupItem key={genre} value={genre} className="h-7 rounded-none border border-border px-1.5 text-xs data-[state=on]:border-accent data-[state=on]:bg-accent/10 data-[state=on]:text-accent">{genre}</ToggleGroupItem>)}
-          </ToggleGroup>
-        </CollapsibleSection>
+      <div className="mb-3 flex items-center justify-between border-b border-border-soft pb-3">
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-foreground">Filters</span>
+          {activeCount > 0 && (
+            <span className="flex size-5 items-center justify-center rounded-full bg-accent font-mono text-[0.6rem] font-semibold text-accent-foreground">
+              {activeCount}
+            </span>
+          )}
+        </div>
+        {activeCount > 0 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              startTransition(() => {
+                router.replace("?", { scroll: false });
+              });
+            }}
+            className="h-6 rounded-none px-2 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted-foreground hover:text-foreground"
+          >
+            Reset
+          </Button>
+        )}
+      </div>
 
-        <CollapsibleSection label="Format" count={currentFormats.length || undefined}>
-          <ToggleGroup key={`format-${currentFormats.join(",")}`} multiple value={currentFormats} onValueChange={(value: string[]) => updateFilter("format", value.length ? value : undefined)} className="flex flex-wrap gap-1">
-            {FORMATS.map((format) => <ToggleGroupItem key={format} value={format} className="h-7 rounded-none border border-border px-1.5 text-xs data-[state=on]:border-accent data-[state=on]:bg-accent/10 data-[state=on]:text-accent">{formatFilterValue(format)}</ToggleGroupItem>)}
-          </ToggleGroup>
-        </CollapsibleSection>
-
-        <CollapsibleSection label="Status" count={currentStatuses.length || undefined}>
-          <ToggleGroup key={`status-${currentStatuses.join(",")}`} multiple value={currentStatuses} onValueChange={(value: string[]) => updateFilter("status", value.length ? value : undefined)} className="flex flex-wrap gap-1">
-            {STATUSES.map((status) => <ToggleGroupItem key={status} value={status} className="h-7 rounded-none border border-border px-1.5 text-xs data-[state=on]:border-accent data-[state=on]:bg-accent/10 data-[state=on]:text-accent">{formatFilterValue(status)}</ToggleGroupItem>)}
-          </ToggleGroup>
-        </CollapsibleSection>
-
-        <CollapsibleSection label="Season" defaultOpen={seasonDefault} count={currentSeason ? 1 : undefined}>
-          <div className="flex flex-wrap gap-1">
-            <FilterChip active={!currentSeason} onClick={() => updateFilter("season", undefined)}>Any</FilterChip>
-            {SEASONS.map((s) => <FilterChip key={s.value} active={currentSeason === s.value} onClick={() => updateFilter("season", s.value)}>{s.label}</FilterChip>)}
+      <div className="space-y-0">
+        <FilterSection label="Genre" defaultOpen count={currentGenres.length}>
+          <div className="flex flex-wrap gap-1.5">
+            {genres.map((genre) => {
+              const active = currentGenres.includes(genre);
+              return (
+                <button
+                  key={genre}
+                  onClick={() => {
+                    const next = active ? currentGenres.filter((g) => g !== genre) : [...currentGenres, genre];
+                    updateFilter("genre", next.length ? next : undefined);
+                  }}
+                  className={cn(
+                    "rounded-sm border px-2 py-1 font-mono text-[0.65rem] transition-colors",
+                    active
+                      ? "border-accent bg-accent/10 text-accent"
+                      : "border-border-soft bg-surface-1/50 text-muted-foreground hover:border-accent/40 hover:text-foreground"
+                  )}
+                >
+                  {genre}
+                </button>
+              );
+            })}
           </div>
-        </CollapsibleSection>
+        </FilterSection>
 
-        <CollapsibleSection label="Year" defaultOpen={yearDefault} count={currentYear ? 1 : undefined}>
-          <div className="flex flex-wrap gap-1">
-            <FilterChip active={!currentYear} onClick={() => updateFilter("year", undefined)}>Any</FilterChip>
-            {YEARS.map((y) => <FilterChip key={y} active={currentYear === String(y)} onClick={() => updateFilter("year", String(y))}>{y}</FilterChip>)}
+        <FilterSection label="Format" count={currentFormats.length}>
+          <div className="flex flex-wrap gap-1.5">
+            {FORMATS.map((format) => {
+              const active = currentFormats.includes(format);
+              return (
+                <button
+                  key={format}
+                  onClick={() => {
+                    const next = active ? currentFormats.filter((f) => f !== format) : [...currentFormats, format];
+                    updateFilter("format", next.length ? next : undefined);
+                  }}
+                  className={cn(
+                    "rounded-sm border px-2 py-1 font-mono text-[0.65rem] transition-colors",
+                    active
+                      ? "border-accent bg-accent/10 text-accent"
+                      : "border-border-soft bg-surface-1/50 text-muted-foreground hover:border-accent/40 hover:text-foreground"
+                  )}
+                >
+                  {formatFilterValue(format)}
+                </button>
+              );
+            })}
           </div>
-        </CollapsibleSection>
+        </FilterSection>
 
-        <CollapsibleSection label="Origin" count={currentCountry ? 1 : undefined}>
-          <div className="flex flex-wrap gap-1">
-            <FilterChip active={!currentCountry} onClick={() => updateFilter("country", undefined)}>All</FilterChip>
-            {COUNTRIES.map((country) => <FilterChip key={country.value} active={currentCountry === country.value} onClick={() => updateFilter("country", country.value)}>{country.label}</FilterChip>)}
+        <FilterSection label="Status" count={currentStatuses.length}>
+          <div className="flex flex-wrap gap-1.5">
+            {STATUSES.map((status) => {
+              const active = currentStatuses.includes(status);
+              return (
+                <button
+                  key={status}
+                  onClick={() => {
+                    const next = active ? currentStatuses.filter((s) => s !== status) : [...currentStatuses, status];
+                    updateFilter("status", next.length ? next : undefined);
+                  }}
+                  className={cn(
+                    "rounded-sm border px-2 py-1 font-mono text-[0.65rem] transition-colors",
+                    active
+                      ? "border-accent bg-accent/10 text-accent"
+                      : "border-border-soft bg-surface-1/50 text-muted-foreground hover:border-accent/40 hover:text-foreground"
+                  )}
+                >
+                  {formatFilterValue(status)}
+                </button>
+              );
+            })}
           </div>
-        </CollapsibleSection>
+        </FilterSection>
 
-        <div className="border-b border-border py-2">
-          <button type="button" onClick={() => setAdultOpen(!adultOpen)} className="flex w-full items-center gap-2 py-1 text-left text-xs font-medium text-foreground hover:text-accent">
-            <ChevronDownIcon className={cn("size-3 transition-transform", adultOpen && "rotate-180")} />
-            Adult content
-            {isAdult ? <span className="ml-auto font-mono text-[0.65rem] text-live-badge">On</span> : null}
+        <FilterSection label="Season" defaultOpen={seasonDefault} count={currentSeason ? 1 : 0}>
+          <div className="flex flex-wrap gap-1.5">
+            <button
+              onClick={() => updateFilter("season", undefined)}
+              className={cn(
+                "rounded-sm border px-2 py-1 font-mono text-[0.65rem] transition-colors",
+                !currentSeason
+                  ? "border-accent bg-accent/10 text-accent"
+                  : "border-border-soft bg-surface-1/50 text-muted-foreground hover:border-accent/40 hover:text-foreground"
+              )}
+            >
+              Any
+            </button>
+            {SEASONS.map((s) => (
+              <button
+                key={s.value}
+                onClick={() => updateFilter("season", s.value)}
+                className={cn(
+                  "rounded-sm border px-2 py-1 font-mono text-[0.65rem] transition-colors",
+                  currentSeason === s.value
+                    ? "border-accent bg-accent/10 text-accent"
+                    : "border-border-soft bg-surface-1/50 text-muted-foreground hover:border-accent/40 hover:text-foreground"
+                )}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </FilterSection>
+
+        <FilterSection label="Year" defaultOpen={yearDefault} count={currentYear ? 1 : 0}>
+          <div className="flex flex-wrap gap-1.5">
+            <button
+              onClick={() => updateFilter("year", undefined)}
+              className={cn(
+                "rounded-sm border px-2 py-1 font-mono text-[0.65rem] transition-colors",
+                !currentYear
+                  ? "border-accent bg-accent/10 text-accent"
+                  : "border-border-soft bg-surface-1/50 text-muted-foreground hover:border-accent/40 hover:text-foreground"
+              )}
+            >
+              Any
+            </button>
+            {YEARS.map((y) => (
+              <button
+                key={y}
+                onClick={() => updateFilter("year", String(y))}
+                className={cn(
+                  "rounded-sm border px-2 py-1 font-mono text-[0.65rem] transition-colors",
+                  currentYear === String(y)
+                    ? "border-accent bg-accent/10 text-accent"
+                    : "border-border-soft bg-surface-1/50 text-muted-foreground hover:border-accent/40 hover:text-foreground"
+                )}
+              >
+                {y}
+              </button>
+            ))}
+          </div>
+        </FilterSection>
+
+        <FilterSection label="Origin" count={currentCountry ? 1 : 0}>
+          <div className="flex flex-wrap gap-1.5">
+            <button
+              onClick={() => updateFilter("country", undefined)}
+              className={cn(
+                "rounded-sm border px-2 py-1 font-mono text-[0.65rem] transition-colors",
+                !currentCountry
+                  ? "border-accent bg-accent/10 text-accent"
+                  : "border-border-soft bg-surface-1/50 text-muted-foreground hover:border-accent/40 hover:text-foreground"
+              )}
+            >
+              All
+            </button>
+            {COUNTRIES.map((country) => (
+              <button
+                key={country.value}
+                onClick={() => updateFilter("country", country.value)}
+                className={cn(
+                  "rounded-sm border px-2 py-1 font-mono text-[0.65rem] transition-colors",
+                  currentCountry === country.value
+                    ? "border-accent bg-accent/10 text-accent"
+                    : "border-border-soft bg-surface-1/50 text-muted-foreground hover:border-accent/40 hover:text-foreground"
+                )}
+              >
+                {country.label}
+              </button>
+            ))}
+          </div>
+        </FilterSection>
+
+        <div className="border-b border-border-soft py-3">
+          <button type="button" onClick={() => setAdultOpen(!adultOpen)} className="flex w-full items-center gap-2 text-left">
+            <ChevronDownIcon className={cn("size-3.5 transition-transform", adultOpen && "rotate-180")} />
+            <span className="font-mono text-[0.65rem] font-medium text-foreground">Adult content</span>
+            {isAdult && <span className="ml-auto rounded-sm bg-live-badge/10 px-1.5 py-0.5 font-mono text-[0.6rem] font-medium text-live-badge">Enabled</span>}
           </button>
           {adultOpen && (
-            <div className="mt-2 space-y-3">
+            <div className="mt-3 space-y-3">
               <p className="text-xs leading-5 text-muted-foreground">
                 This includes mature themes and graphic material. You must be 18 years or older to view adult content.
               </p>
@@ -172,7 +321,7 @@ export function FilterSidebar({ genresPromise, mobile = false, collection }: { g
   );
 }
 
-function CollapsibleSection({ label, children, defaultOpen = false, count }: { label: string; children: React.ReactNode; defaultOpen?: boolean; count?: number }) {
+function FilterSection({ label, children, defaultOpen = false, count }: { label: string; children: React.ReactNode; defaultOpen?: boolean; count?: number }) {
   const [open, setOpen] = useState(defaultOpen);
 
   useEffect(() => {
@@ -182,20 +331,19 @@ function CollapsibleSection({ label, children, defaultOpen = false, count }: { l
   useEffect(() => {
     setOpen(defaultOpen);
   }, [defaultOpen]);
+
   return (
-    <div className="border-b border-border py-2">
-      <button type="button" onClick={() => setOpen(!open)} className="flex w-full items-center gap-2 py-1 text-left text-xs font-medium text-foreground hover:text-accent">
-        <ChevronDownIcon className={cn("size-3 transition-transform", open && "rotate-180")} />
-        {label}
-        {count ? <span className="ml-auto font-mono text-[0.65rem] text-accent">{count}</span> : null}
+    <div className="border-b border-border-soft py-3">
+      <button type="button" onClick={() => setOpen(!open)} className="flex w-full items-center gap-2 text-left">
+        <ChevronDownIcon className={cn("size-3.5 transition-transform", open && "rotate-180")} />
+        <span className="font-mono text-[0.65rem] font-medium text-foreground">{label}</span>
+        {count !== undefined && count > 0 && (
+          <span className="ml-auto font-mono text-[0.6rem] text-accent">{count}</span>
+        )}
       </button>
-      {open && <div className="mt-2">{children}</div>}
+      {open && <div className="mt-3">{children}</div>}
     </div>
   );
-}
-
-function FilterChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return <Button variant="ghost" size="sm" onClick={onClick} className={cn("h-7 rounded-none border px-1.5 text-xs font-normal", active ? "border-accent bg-accent/10 text-accent" : "border-border text-muted-foreground hover:border-foreground/20 hover:text-foreground")}>{children}</Button>;
 }
 
 export function FilterSidebarSkeleton() {
