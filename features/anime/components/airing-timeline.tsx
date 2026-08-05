@@ -16,6 +16,15 @@ function currentBlockName(): string {
   return "Night";
 }
 
+function getFaviconUrl(url: string): string {
+  try {
+    const domain = new URL(url).hostname;
+    return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+  } catch {
+    return "";
+  }
+}
+
 export async function AiringTimeline({ day }: { day: string }) {
   const date = new Date(day);
   const start = Math.floor(date.setHours(0, 0, 0, 0) / 1000);
@@ -81,12 +90,27 @@ export async function AiringTimeline({ day }: { day: string }) {
                           const streamingLinks = item.media?.externalLinks?.filter((link) => link.type === "STREAMING") ?? [];
                           if (streamingLinks.length > 0) {
                             return (
-                              <div className="flex shrink-0 items-center gap-1.5">
-                                {streamingLinks.slice(0, 2).map((link) => (
-                                  <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer" className="font-mono text-[0.6rem] uppercase tracking-[0.08em] text-muted-foreground transition-colors hover:text-accent" aria-label={`Watch on ${link.site}`}>
-                                    {link.site}
-                                  </a>
-                                ))}
+                              <div className="flex shrink-0 items-center gap-1">
+                                {streamingLinks.slice(0, 3).map((link) => {
+                                  const favicon = getFaviconUrl(link.url);
+                                  return (
+                                    <a
+                                      key={link.url}
+                                      href={link.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="flex size-5 items-center justify-center rounded-sm border border-border-soft bg-surface-1 transition-colors hover:border-accent hover:bg-accent/10"
+                                      aria-label={`Watch on ${link.site}`}
+                                      title={link.site}
+                                    >
+                                      {favicon ? (
+                                        <img src={favicon} alt="" className="size-3.5" loading="lazy" />
+                                      ) : (
+                                        <ExternalLinkIcon className="size-3 text-muted-foreground" />
+                                      )}
+                                    </a>
+                                  );
+                                })}
                               </div>
                             );
                           }
