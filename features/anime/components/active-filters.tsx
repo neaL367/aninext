@@ -24,7 +24,7 @@ const FILTER_TYPE_LABELS: Record<string, string> = {
   isAdult: "Content",
 };
 
-export function ActiveFilters() {
+export function ActiveFilters({ compact = false }: { compact?: boolean } = {}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -67,6 +67,59 @@ export function ActiveFilters() {
     return items;
   }, [searchParams]);
 
+  if (filters.length === 0) return null;
+
+  if (compact) {
+    return (
+      <div
+        className="flex flex-col gap-2 border-b border-border-soft pb-3"
+        data-pending={isPending ? "" : undefined}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-[0.6rem] font-semibold uppercase tracking-[0.1em] text-foreground">
+              Active
+            </span>
+            <span className="flex size-4 items-center justify-center rounded-full bg-accent font-mono text-[0.55rem] font-semibold text-accent-foreground">
+              {filters.length}
+            </span>
+          </div>
+          <button
+            onClick={() => {
+              startTransition(() => {
+                router.replace("?", { scroll: false });
+              });
+            }}
+            className="font-mono text-[0.55rem] uppercase tracking-[0.08em] text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Clear
+          </button>
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {filters.map((item, i) => (
+            <span
+              key={`${item.key}-${item.value ?? i}`}
+              className={cn(
+                "group inline-flex items-center gap-1 rounded-sm border px-1.5 py-0.5 font-mono text-[0.6rem] transition-colors",
+                "border-border-soft bg-surface-1/50 text-foreground",
+                "hover:border-accent/60 hover:bg-accent/5 hover:text-accent"
+              )}
+            >
+              <span className="leading-none">{item.label}</span>
+              <button
+                onClick={() => removeFilter(item.key, item.value)}
+                className="flex size-3 items-center justify-center rounded-sm transition-colors hover:bg-accent/20"
+                aria-label={`Remove ${item.label}`}
+              >
+                <XIcon className="size-2" />
+              </button>
+            </span>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   const groupedFilters = useMemo(() => {
     const groups: Record<string, FilterItem[]> = {};
     filters.forEach((f) => {
@@ -75,8 +128,6 @@ export function ActiveFilters() {
     });
     return groups;
   }, [filters]);
-
-  if (filters.length === 0) return null;
 
   const filterOrder = ["search", "genre", "format", "status", "season", "year", "country", "isAdult"];
 

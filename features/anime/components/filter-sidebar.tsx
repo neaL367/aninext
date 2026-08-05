@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ChevronDownIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ActiveFilters } from "./active-filters";
 
 const FORMATS = ["TV", "TV_SHORT", "MOVIE", "SPECIAL", "OVA", "ONA", "MUSIC"];
 const STATUSES = ["FINISHED", "RELEASING", "NOT_YET_RELEASED", "CANCELLED", "HIATUS"];
@@ -81,6 +82,7 @@ export function FilterSidebar({ genresPromise, mobile = false, collection }: { g
 
   return (
     <aside className={cn(mobile ? "flex w-full" : "hidden w-full lg:flex", "flex-col")} data-pending={isPending ? "" : undefined}>
+      <ActiveFilters compact />
       <div className="space-y-1">
         <CollapsibleSection label="Genre" defaultOpen count={currentGenres.length || undefined}>
           <ToggleGroup key={`genre-${currentGenres.join(",")}`} multiple value={currentGenres} onValueChange={(value: string[]) => updateFilter("genre", value.length ? value : undefined)} className="flex flex-wrap gap-1">
