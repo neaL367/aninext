@@ -51,7 +51,7 @@ const BROWSE_QUERY = `
         status: $status
         status_in: $statusIn
         format_in: $formatIn
-        genres_in: $genreIn
+        genre_in: $genreIn
         countryOfOrigin: $country
         search: $search
         isAdult: $isAdult
