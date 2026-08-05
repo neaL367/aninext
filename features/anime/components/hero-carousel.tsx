@@ -13,23 +13,35 @@ export function HeroCarousel({ items }: { items: Media[] }) {
   const media = items[current] ?? items[0];
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (mediaQuery.matches) return;
+    let timer: ReturnType<typeof setInterval>;
 
-    let raf: number;
-    let lastStep = performance.now();
-    const INTERVAL = 7000;
-
-    const loop = (now: number) => {
-      if (now - lastStep >= INTERVAL) {
-        lastStep = now;
-        setPrev(currentRef.current);
-        setCurrent((c) => (c + 1) % items.length);
-      }
-      raf = requestAnimationFrame(loop);
+    const tick = () => {
+      setPrev(currentRef.current);
+      setCurrent((c) => (c + 1) % items.length);
     };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
+
+    const start = () => {
+      clearInterval(timer);
+      timer = setInterval(tick, 7000);
+    };
+
+    const stop = () => clearInterval(timer);
+
+    const onVisibility = () => {
+      if (document.hidden) {
+        stop();
+      } else {
+        tick();
+        start();
+      }
+    };
+
+    start();
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      stop();
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, [items.length]);
 
   return (
