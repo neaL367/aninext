@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { BrowsePageShell, BrowsePageResults } from "@/features/anime/components/browse-page-shell";
 import { parseFilters } from "@/features/anime/lib/parse-filters";
 import { getCollectionMetadata } from "@/features/anime/lib/collection-config";
@@ -27,6 +28,7 @@ async function SeasonalResults({
   searchParams,
 }: Pick<PageProps<"/anime/seasonal">, "searchParams">) {
   const sp = await searchParams;
+  await connection();
   const current = getCurrentSeason();
   const season = sp.season ?? current.season;
   const year = sp.year ?? String(current.seasonYear);
