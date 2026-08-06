@@ -12,10 +12,3 @@ export function getCurrentSeason(): { season: string; seasonYear: number } {
   const { seasonIndex, year } = getSeasonInfo();
   return { season: SEASONS[seasonIndex], seasonYear: year };
 }
-
-export function getNextSeason(): { season: string; seasonYear: number } {
-  const { seasonIndex, year } = getSeasonInfo();
-  const nextIndex = (seasonIndex + 1) % 4;
-  const nextYear = seasonIndex === 3 ? year + 1 : year;
-  return { season: SEASONS[nextIndex], seasonYear: nextYear };
-}

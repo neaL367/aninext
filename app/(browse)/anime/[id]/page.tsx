@@ -8,16 +8,17 @@ import { AnimeCharacters, AnimeCharactersSkeleton } from "@/features/anime/compo
 import { AnimeStaff, AnimeStaffSkeleton } from "@/features/anime/components/detail/anime-staff";
 import { AnimeRelations, AnimeRelationsSkeleton } from "@/features/anime/components/detail/anime-relations";
 import { AnimeRecommendations, AnimeRecommendationsSkeleton } from "@/features/anime/components/detail/anime-recommendations";
-import { AnimeAiringScheduleSkeleton, AnimeAiringScheduleAsync } from "@/features/anime/components/detail/anime-airing-schedule";
+import { AnimeAiringSchedule, AnimeAiringScheduleSkeleton } from "@/features/anime/components/detail/anime-airing-schedule";
 import { AnimeStreamingEpisodes, AnimeStreamingEpisodesSkeleton } from "@/features/anime/components/detail/anime-streaming-episodes";
 import { AnimeTrailer, AnimeTrailerSkeleton } from "@/features/anime/components/detail/anime-trailer";
-import { getAnimeHero, getAnimeDetail } from "@/features/anime/anime-queries";
+import { getAnimeDetail } from "@/features/anime/anime-queries";
 import { GenreList } from "@/features/anime/components/home/genre-pills";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   try {
-    const media = await getAnimeHero(Number(id));
+    const detail = await getAnimeDetail(Number(id));
+    const media = detail.media;
     if (!media) return {};
     const title = media.title.english ?? media.title.romaji ?? "Unknown";
     const description = media.description?.replace(/<[^>]*>/g, "").slice(0, 160) ?? "";
@@ -45,7 +46,7 @@ async function DetailSection({ params }: { params: Promise<{ id: string }> }) {
   const detail = await getAnimeDetail(Number(id));
   if (!detail.media) notFound();
 
-  const { media, characters, staff, relations, recommendations } = detail;
+  const { media, characters, staff, relations, recommendations, airingSchedule } = detail;
 
   return (
     <Crossfade>
@@ -78,9 +79,9 @@ async function DetailSection({ params }: { params: Promise<{ id: string }> }) {
             <div className="space-y-12">
               <section aria-label="Airing schedule">
                 <ErrorBoundary title="Schedule failed to load">
-                  <Suspense fallback={<div className="mt-5"><AnimeAiringScheduleSkeleton /></div>}>
-                    <AnimeAiringScheduleAsync id={Number(id)} />
-                  </Suspense>
+                  <div className="mt-5">
+                    <AnimeAiringSchedule nodes={airingSchedule} />
+                  </div>
                 </ErrorBoundary>
               </section>
               <section aria-label="Related anime">

@@ -142,23 +142,6 @@ const HERO_FIELDS = `
   trailer { id site thumbnail }
 `;
 
-const HERO_QUERY = `
-  query AnimeHero($id: Int) {
-    Media(id: $id, type: ANIME) {
-      ${HERO_FIELDS}
-    }
-  }
-`;
-
-export async function getAnimeHero(id: number) {
-  "use cache";
-  cacheTag("anime", ANIME_CACHE.detail(id));
-  cacheLife({ stale: 300, revalidate: 900, expire: 86400 });
-
-  const data = await anilistFetch<{ Media: Media }>(HERO_QUERY, { id });
-  return data.Media;
-}
-
 const CHARACTERS_SUBFIELDS = `
   pageInfo { hasNextPage }
   edges {
@@ -214,28 +197,6 @@ const RECOMMENDATIONS_SUBFIELDS = `
 const AIRING_SCHEDULE_SUBFIELDS = `
   nodes { episode airingAt }
 `;
-
-const AIRING_SCHEDULE_QUERY = `
-  query AnimeAiringSchedule($id: Int) {
-    Media(id: $id) {
-      airingSchedule(notYetAired: true, perPage: 25) {
-        ${AIRING_SCHEDULE_SUBFIELDS}
-      }
-    }
-  }
-`;
-
-export async function getAnimeAiringSchedule(id: number) {
-  "use cache";
-  cacheTag("anime", ANIME_CACHE.airingSchedule(id));
-  cacheLife({ stale: 60, revalidate: 300, expire: 3600 });
-
-  const data = await anilistFetch<{
-    Media: { airingSchedule: { nodes: AiringScheduleNode[] } };
-  }>(AIRING_SCHEDULE_QUERY, { id });
-
-  return data.Media.airingSchedule.nodes;
-}
 
 const AIRING_WEEK_QUERY = `
   query AiringWeek($start: Int, $end: Int) {

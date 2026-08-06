@@ -69,11 +69,6 @@ export interface PageInfo {
   perPage: number;
 }
 
-export interface PageResult<T> {
-  pageInfo: PageInfo;
-  items: T[];
-}
-
 export interface CharacterEdge {
   role: string;
   voiceActors: {
@@ -140,8 +135,4 @@ export interface AnimeFilters {
   search?: string;
   isAdult?: boolean;
   studio?: string;
-}
-
-export interface GenreCollection {
-  genres: string[];
 }
