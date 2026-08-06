@@ -23,10 +23,6 @@ export function BrowsePageShell({ collection, children }: { collection: AnimeCol
             <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-[-0.055em] sm:text-6xl">{config.pageHeading}</h1>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">{config.pageDescription}</p>
           </div>
-          <div className="hidden text-right sm:block">
-            <p className="font-mono text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground">Data</p>
-            <p className="mt-2 font-mono text-sm text-signal">Live / cached</p>
-          </div>
         </div>
         <div className="mt-6"><Suspense fallback={<nav className="h-9 border-b border-border-soft" aria-hidden />}><CollectionNav /></Suspense></div>
       </header>
