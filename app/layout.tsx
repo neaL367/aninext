@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { Providers } from "@/components/providers";
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeader, SiteHeaderFallback } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteMobileNav } from "@/components/site-mobile-nav";
 import { ScrollToTop } from "@/components/scroll-to-top";
@@ -31,6 +31,11 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://ani-next.vercel.app"),
 };
 
+export const viewport: Viewport = {
+  themeColor: "#0a0a0a",
+  colorScheme: "dark",
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
@@ -50,7 +55,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               >
                 Skip to content
               </a>
-              <Suspense fallback={<HeaderFallback />}><SiteHeader /></Suspense>
+              <Suspense fallback={<SiteHeaderFallback />}><SiteHeader /></Suspense>
               <Suspense fallback={null}><ScrollToTop /></Suspense>
               <main id="main-content" className="min-w-0 flex-1 pb-20 md:pb-0">
                 {children}
@@ -65,8 +70,4 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </body>
     </html>
   );
-}
-
-function HeaderFallback() {
-  return <header className="sticky top-0 z-50 border-b border-border-soft bg-background/90 backdrop-blur-xl" aria-hidden><div className="mx-auto min-h-16 w-full max-w-[1680px] px-4 sm:px-7 lg:px-10" /></header>;
 }

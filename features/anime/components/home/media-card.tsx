@@ -13,12 +13,14 @@ export function MediaCard({
   rank,
   viewTransition = false,
   vtIndex,
+  priority = false,
 }: {
   media: Media;
   size?: "default" | "featured";
   rank?: number;
   viewTransition?: boolean;
   vtIndex?: number;
+  priority?: boolean;
 }) {
   const title = getMediaTitle(media);
   const cover = getMediaCover(media);
@@ -31,6 +33,7 @@ export function MediaCard({
       src={cover}
       alt={`${title} cover`}
       fill
+      priority={priority}
       sizes={size === "featured" ? "(min-width: 1024px) 42vw, 92vw" : "(min-width: 1280px) 16vw, (min-width: 768px) 24vw, 44vw"}
       className="object-cover transition-transform duration-500 group-hover:scale-[1.035] motion-reduce:transform-none"
     />

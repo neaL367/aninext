@@ -19,7 +19,7 @@ export function EmptySearch() {
       </EmptyHeader>
       <EmptyContent>
         <EmptyDescription>
-          Try adjusting your search terms or filters to find what you're looking for.
+          Try adjusting your search terms or filters to find what you&apos;re looking for.
         </EmptyDescription>
       </EmptyContent>
     </Empty>
@@ -73,7 +73,7 @@ export function EmptyGeneric() {
       </EmptyHeader>
       <EmptyContent>
         <EmptyDescription>
-          There's nothing to display at the moment.
+          There&apos;s nothing to display at the moment.
         </EmptyDescription>
       </EmptyContent>
     </Empty>

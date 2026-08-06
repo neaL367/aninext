@@ -5,7 +5,6 @@ import Link from "next/link";
 import type { Route } from "next";
 import { HoverPrefetchLink } from "@/components/hover-prefetch-link";
 import { ArrowRightIcon } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import type { AiringScheduleNode } from "@/features/anime/types/anime";
 import { fromAiringTimestamp, getTitle } from "@/features/anime/lib/media-helpers";
 import { ImageWithLoading } from "@/components/image-with-loading";
@@ -44,6 +43,7 @@ export function AiringHomeSection({ schedules }: { schedules: AiringScheduleNode
           if (!item.media) return null;
           const title = getTitle(item.media.title);
           const time = fromAiringTimestamp(item.airingAt);
+          // eslint-disable-next-line react-hooks/purity -- live countdown, recomputed per render
           const now = Date.now();
           const diff = item.airingAt * 1000 - now;
           const minutes = Math.floor(diff / 60000);

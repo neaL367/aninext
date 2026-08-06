@@ -148,7 +148,6 @@ const HERO_FIELDS = `
 `;
 
 const CHARACTERS_SUBFIELDS = `
-  pageInfo { hasNextPage }
   edges {
     role
     voiceActors(language: JAPANESE) { id name { full } image { medium } }
@@ -215,7 +214,7 @@ export async function getAnimeDetail(id: number) {
 
   const data = await anilistFetch<{
     Media: Media & {
-      characters: { pageInfo: PageInfo; edges: CharacterEdge[] };
+      characters: { edges: CharacterEdge[] };
       staff: { edges: StaffEdge[] };
       relations: { edges: RelationEdge[] };
       recommendations: { nodes: RecommendationNode[] };
@@ -248,7 +247,7 @@ export async function getAnimeDetail(id: number) {
   const m = data.Media;
   return {
     media: m as Media,
-    characters: { edges: m.characters.edges, pageInfo: m.characters.pageInfo },
+    characters: { edges: m.characters.edges },
     staff: m.staff.edges,
     relations: m.relations.edges,
     recommendations: m.recommendations.nodes,

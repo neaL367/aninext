@@ -65,3 +65,11 @@ export function SiteHeader() {
     </header>
   );
 }
+
+export function SiteHeaderFallback() {
+  return (
+    <header className="sticky top-0 z-50 border-b border-border-soft bg-background/90 backdrop-blur-xl" aria-hidden>
+      <div className="mx-auto min-h-16 w-full max-w-[1680px] px-4 sm:px-7 lg:px-10" />
+    </header>
+  );
+}

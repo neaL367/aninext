@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
+import { use, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
@@ -227,19 +227,12 @@ export function FilterSidebar({ genresPromise, mobile = false, collection }: { g
 }
 
 function FilterSection({ label, children, defaultOpen = false, count }: { label: string; children: React.ReactNode; defaultOpen?: boolean; count?: number }) {
-  const [open, setOpen] = useState(defaultOpen);
-
-  useEffect(() => {
-    if (count && count > 0) setOpen(true);
-  }, [count]);
-
-  useEffect(() => {
-    setOpen(defaultOpen);
-  }, [defaultOpen]);
+  const [toggled, setToggled] = useState<boolean | null>(null);
+  const open = toggled ?? ((count ?? 0) > 0 ? true : defaultOpen);
 
   return (
     <div className="border-b border-border-soft py-3">
-      <button type="button" onClick={() => setOpen(!open)} className="flex w-full items-center gap-2 text-left">
+      <button type="button" onClick={() => setToggled(!open)} className="flex w-full items-center gap-2 text-left">
         <ChevronDownIcon className={cn("size-3.5 transition-transform", open && "rotate-180")} />
         <span className="font-mono text-[0.65rem] font-medium text-foreground">{label}</span>
         {count !== undefined && count > 0 && (

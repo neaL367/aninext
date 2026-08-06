@@ -8,7 +8,7 @@ export function MediaGrid({ items, rankStart }: { items: Media[]; rankStart?: nu
       {items.map((item, i) => (
         <div key={item.id} role="listitem">
           <AnimePreviewCard media={item}>
-            <MediaCard media={item} rank={rankStart !== undefined ? rankStart + i : undefined} viewTransition vtIndex={(rankStart ?? 0) + i} />
+            <MediaCard media={item} rank={rankStart !== undefined ? rankStart + i : undefined} viewTransition vtIndex={(rankStart ?? 0) + i} priority={i === 0} />
           </AnimePreviewCard>
         </div>
       ))}

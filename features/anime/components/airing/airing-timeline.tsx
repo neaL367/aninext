@@ -1,6 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Route } from "next";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { getAiringWeek } from "@/features/anime/anime-queries";
 import type { AiringScheduleNode } from "@/features/anime/types/anime";
@@ -106,7 +106,7 @@ export async function AiringTimeline({ day }: { day: string }) {
                                         title={link.site}
                                       >
                                         {favicon ? (
-                                          <img src={favicon} alt="" className="size-3.5" loading="lazy" />
+                                          <Image src={favicon} alt="" width={14} height={14} className="size-3.5" unoptimized />
                                         ) : (
                                           <ExternalLinkIcon className="size-3 text-muted-foreground" />
                                         )}

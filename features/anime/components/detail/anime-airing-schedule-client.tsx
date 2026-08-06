@@ -1,6 +1,5 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
 import type { AiringScheduleNode } from "@/features/anime/types/anime";
 import { fromAiringTimestamp } from "@/features/anime/lib/media-helpers";
 

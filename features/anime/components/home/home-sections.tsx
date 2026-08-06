@@ -23,6 +23,7 @@ export async function PopularSection() {
 
 export async function AiringSection() {
   await connection();
+  // eslint-disable-next-line react-hooks/purity -- streaming region, time-of-request is intended
   const now = Math.floor(Date.now() / 1000);
   const start = now - 43200;
   const end = now + 129600;

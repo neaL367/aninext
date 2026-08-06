@@ -1,5 +1,3 @@
-import Link from "next/link";
-import type { Route } from "next";
 import { PlayIcon } from "lucide-react";
 import { ViewTransition } from "react";
 import { Skeleton } from "@/components/ui/skeleton";

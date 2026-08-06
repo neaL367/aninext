@@ -36,7 +36,7 @@ export async function DetailSection({ id }: { id: number }) {
           <main className="min-w-0">
             <section aria-label="Characters">
               <SectionHeading eyebrow="Cast" title="Characters and voices" />
-              <div className="mt-7"><AnimeCharacters edges={characters.edges} pageInfo={characters.pageInfo} /></div>
+              <div className="mt-7"><AnimeCharacters edges={characters.edges} /></div>
             </section>
 
             <section aria-label="More like this" className="border-t border-border-soft pt-12 mt-12">

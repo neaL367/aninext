@@ -9,8 +9,11 @@ export function HeroCarousel({ items }: { items: Media[] }) {
   const [current, setCurrent] = useState(0);
   const [prev, setPrev] = useState(-1);
   const currentRef = useRef(current);
-  currentRef.current = current;
   const media = items[current] ?? items[0];
+
+  useEffect(() => {
+    currentRef.current = current;
+  }, [current]);
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval>;

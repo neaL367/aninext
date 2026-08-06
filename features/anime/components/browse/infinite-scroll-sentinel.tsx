@@ -12,7 +12,10 @@ export function InfiniteScrollSentinel({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const callbackRef = useRef(onLoadMore);
-  callbackRef.current = onLoadMore;
+
+  useEffect(() => {
+    callbackRef.current = onLoadMore;
+  });
 
   useEffect(() => {
     const el = ref.current;

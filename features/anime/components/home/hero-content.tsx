@@ -10,7 +10,6 @@ import { getMediaTitle, formatFormat } from "@/features/anime/lib/media-helpers"
 function useStaggeredReveal(key: string, steps: number) {
   const [step, setStep] = useState(0);
   useEffect(() => {
-    setStep(0);
     const timers = Array.from({ length: steps }, (_, i) =>
       setTimeout(() => setStep(i + 1), 80 + i * 100)
     );
