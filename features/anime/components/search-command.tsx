@@ -27,6 +27,7 @@ const COLLECTION_ICONS: Record<AnimeCollection, React.ReactNode> = {
   popular: <StarIcon />,
   top100: <StarIcon />,
   upcoming: <CalendarIcon />,
+  seasonal: <ClockIcon />,
   alltimepopular: <StarIcon />,
 };
 
