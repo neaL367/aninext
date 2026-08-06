@@ -5,17 +5,18 @@ import Link from "next/link";
 import type { Route } from "next";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { localDateStr } from "@/features/anime/lib/media-helpers";
 
 export function AiringCalendar({ currentDay }: { currentDay: string }) {
-  const localToday = useMemo(() => new Date().toISOString().split("T")[0], []);
+  const localToday = useMemo(() => localDateStr(), []);
   const weekDays = useMemo(() => {
-    const todayDate = new Date(localToday);
+    const today = new Date();
     return Array.from({ length: 7 }).map((_, index) => {
-      const date = new Date(todayDate);
-      date.setDate(todayDate.getDate() + index);
-      return date.toISOString().split("T")[0];
+      const date = new Date(today);
+      date.setDate(today.getDate() + index);
+      return localDateStr(date);
     });
-  }, [localToday]);
+  }, []);
 
   return (
     <nav className="grid grid-cols-7 border-y border-border-soft" aria-label="Airing days">

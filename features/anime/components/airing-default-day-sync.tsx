@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { localDateStr } from "@/features/anime/lib/media-helpers";
 
 export function AiringDefaultDaySync({ day }: { day?: string }) {
   const router = useRouter();
@@ -11,8 +12,7 @@ export function AiringDefaultDaySync({ day }: { day?: string }) {
     if (done.current) return;
     if (day) return;
     done.current = true;
-    const localToday = new Date().toISOString().split("T")[0];
-    router.replace(`/airing?day=${localToday}`);
+    router.replace(`/airing?day=${localDateStr()}`);
   }, [day, router]);
 
   return null;

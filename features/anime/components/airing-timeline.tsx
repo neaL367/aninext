@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
 import { getAiringWeek } from "@/features/anime/anime-queries";
 import type { AiringScheduleNode } from "@/features/anime/types/anime";
-import { formatFormat, fromAiringTimestamp, getTitle } from "@/features/anime/lib/media-helpers";
+import { formatFormat, fromAiringTimestamp, getTitle, localDateStr } from "@/features/anime/lib/media-helpers";
 import { CalendarIcon, ExternalLinkIcon } from "lucide-react";
 import { ImageWithLoading } from "@/components/image-with-loading";
 import { AnimePreviewCard } from "./anime-preview-card";
@@ -35,7 +35,7 @@ export async function AiringTimeline({ day }: { day: string }) {
 
   const grouped = groupByTimeBlock(schedules);
   const now = Date.now() / 1000;
-  const today = new Date().toISOString().split("T")[0];
+  const today = localDateStr();
   const isToday = day === today;
   const activeBlock = isToday ? currentBlockName() : null;
 

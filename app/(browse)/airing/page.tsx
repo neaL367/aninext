@@ -6,6 +6,7 @@ import { ErrorBoundary } from "@/components/error-boundary";
 import { Crossfade } from "@/components/crossfade";
 import { AiringCalendar, AiringCalendarSkeleton } from "@/features/anime/components/airing-calendar";
 import { AiringTimeline, AiringTimelineSkeleton } from "@/features/anime/components/airing-timeline";
+import { localDateStr } from "@/features/anime/lib/media-helpers";
 import { AiringDefaultDaySync } from "@/features/anime/components/airing-default-day-sync";
 
 export const metadata: Metadata = {
@@ -34,7 +35,7 @@ export default function AiringPage({ searchParams }: { searchParams: Promise<{ d
 async function AiringContent({ searchParams }: { searchParams: Promise<{ day?: string }> }) {
   const sp = await searchParams;
   await connection();
-  const day = sp.day ?? new Date().toISOString().split("T")[0];
+  const day = sp.day ?? localDateStr();
 
   return (
     <>
