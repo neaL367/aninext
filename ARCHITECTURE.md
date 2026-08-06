@@ -801,7 +801,7 @@ export function getCollectionMetadata(collection: AnimeCollection): Metadata {
 
 - **Multi-genre**: swap `genre` → `genre_in: [String]` once the sidebar goes from radio to checkboxes for genre.
 - **Tag filters**: add `tag` / `tag_in` (AniList media tags, distinct from genres) — same shape as format/status.
-- **Studio filter**: implement the `Studio.media` branch sketched in §3.7. The blocker isn't missing data, it's UX — resolving a studio _name_ to the right `Studio` node needs its own type-ahead (AniList's `Studio(search: ...)` returns a best-effort match, not a guaranteed unique result).
+- **Studio filter**: implement the `Studio.media` branch sketched in §3.7. Two blockers, both open: resolving a studio _name_ to the right `Studio` node needs its own type-ahead (AniList's `Studio(search: ...)` returns a best-effort match, not a guaranteed unique result), and `Studio.media` is a bare `MediaConnection` supporting only `sort`/`page`/`perPage` — it cannot combine with the genre/format/status/country/search filters (see §3.7's "picks the root field at request time" note). Until both are resolved the `studio` param is deliberately **not parsed** in `parse-filters.ts` and not part of `AnimeFilters` — an incoming `?studio=` is ignored server-side, and `buildFilterHash` never sees it (no phantom cache entries). Migration checklist when built: add `studio` back to `parseFilters`/`AnimeFilters`/`buildFilterHash`, implement the `Studio.media` root branch in `anime-queries.ts` (same `{ items, pageInfo }` return shape), decide the studio-vs-other-filters combination policy, and add a `?studio=` e2e case.
 - **Sort by date**: `START_DATE_DESC` / `END_DATE_DESC` as additional collection variants.
 - **New collections**: one `collection-config.ts` entry + one route folder — additive by design (§3.5).
 
@@ -1327,7 +1327,6 @@ export interface AnimeFilters {
   country?: string; // → countryOfOrigin
   search?: string;
   isAdult?: boolean;
-  studio?: string; // deferred, see §3.22
 }
 ```
 
@@ -1342,7 +1341,7 @@ export interface AnimeFilters {
 - [ ] `anime-queries.ts` starts with `import 'server-only'`
 - [ ] There is no `anime-actions.ts` and no `FavoriteButton` anywhere in the tree
 - [ ] Every `getBrowseCollection`/detail-section read is `'use cache'` with global + collection/id-scoped `cacheTag`s and a named `cacheLife`
-- [ ] The `Studio.media` branch (when built) is exercised by a `?studio=` test case, not silently dropped
+- [ ] `studio` is intentionally **not** parsed (see §3.22); when the `Studio.media` branch is built it must be exercised by a `?studio=` test case, not silently dropped
 - [ ] `/anime` uses `permanentRedirect`, not `redirect`
 - [ ] `top100`'s sentinel disables itself at 100 loaded items
 - [ ] `renderBrowsePage` / `BrowsePaginator` return and accumulate rendered RSC nodes, not raw JSON re-rendered client-side

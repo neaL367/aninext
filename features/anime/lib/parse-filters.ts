@@ -39,9 +39,6 @@ export function parseFilters(
   if (isAdult === "true") filters.isAdult = true;
   else if (isAdult === "false") filters.isAdult = false;
 
-  const studio = searchParams.studio;
-  if (typeof studio === "string") filters.studio = studio;
-
   return filters;
 }
 
@@ -55,6 +52,5 @@ export function buildFilterHash(filters: AnimeFilters): string {
   if (filters.country) parts.push(`country=${filters.country}`);
   if (filters.search) parts.push(`search=${filters.search}`);
   if (filters.isAdult !== undefined) parts.push(`isAdult=${filters.isAdult}`);
-  if (filters.studio) parts.push(`studio=${filters.studio}`);
   return parts.sort().join(";");
 }

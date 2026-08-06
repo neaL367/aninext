@@ -134,5 +134,4 @@ export interface AnimeFilters {
   country?: string;
   search?: string;
   isAdult?: boolean;
-  studio?: string;
 }

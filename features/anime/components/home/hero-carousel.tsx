@@ -58,13 +58,14 @@ export function HeroCarousel({ items }: { items: Media[] }) {
           const color = item.coverImage.color;
           const isCurrent = i === current;
           const isPrev = i === prev;
+          const isMounted = isCurrent || isPrev || i === 0;
           return (
             <div
               key={item.id}
               className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
               style={{ opacity: isCurrent ? 1 : isPrev ? 0 : 0 }}
             >
-              {image ? (
+              {image && isMounted ? (
                 <ImageWithLoading
                   src={image}
                   alt=""

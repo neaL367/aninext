@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 
 import { ErrorBoundary } from "@/components/error-boundary";
-import { getAnimeDetail } from "@/features/anime/anime-queries";
+import { getAnimeMeta } from "@/features/anime/anime-queries";
 import {
   DetailSection,
   DetailSectionSkeleton,
@@ -16,8 +16,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   try {
-    const detail = await getAnimeDetail(Number(id));
-    const media = detail.media;
+    const media = await getAnimeMeta(Number(id));
     if (!media) return {};
     const title = media.title.english ?? media.title.romaji ?? "Unknown";
     const description = media.description?.replace(/<[^>]*>/g, "").slice(0, 160) ?? "";

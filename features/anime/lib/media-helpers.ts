@@ -6,16 +6,21 @@ export function getTitle(title: MediaTitle): string {
   return title.english ?? title.romaji ?? title.userPreferred ?? "Unknown";
 }
 
-export function getCover(image: MediaCoverImage): string | undefined {
-  return image.large ?? image.extraLarge;
+export type CoverTier = "extraLarge" | "large" | "medium";
+
+export function getCover(
+  image: MediaCoverImage,
+  tier: CoverTier = "large",
+): string | undefined {
+  return image[tier] ?? image.large ?? image.extraLarge;
 }
 
 export function getMediaTitle(media: Media): string {
   return getTitle(media.title);
 }
 
-export function getMediaCover(media: Media): string | undefined {
-  return getCover(media.coverImage);
+export function getMediaCover(media: Media, tier?: CoverTier): string | undefined {
+  return getCover(media.coverImage, tier);
 }
 
 export function fromAiringTimestamp(unixSeconds: number): Date {

@@ -15,6 +15,7 @@ export function MediaGrid({ items, rankStart }: { items: Media[]; rankStart?: nu
               viewTransition
               vtIndex={(rankStart ?? 0) + i}
               priority={i === 0}
+              coverTier="extraLarge"
             />
           </AnimePreviewCard>
         </div>

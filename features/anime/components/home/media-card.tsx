@@ -11,6 +11,7 @@ import {
 import { scoreColor } from "@/features/anime/lib/score";
 import { cn } from "@/lib/utils";
 
+import type { CoverTier } from "@/features/anime/lib/media-helpers";
 import type { Media } from "@/features/anime/types/anime";
 import type { Route } from "next";
 
@@ -21,6 +22,7 @@ export function MediaCard({
   viewTransition = false,
   vtIndex,
   priority = false,
+  coverTier,
 }: {
   media: Media;
   size?: "default" | "featured";
@@ -28,9 +30,10 @@ export function MediaCard({
   viewTransition?: boolean;
   vtIndex?: number;
   priority?: boolean;
+  coverTier?: CoverTier;
 }) {
   const title = getMediaTitle(media);
-  const cover = getMediaCover(media);
+  const cover = getMediaCover(media, coverTier);
   const color = media.coverImage.color;
   const score = media.averageScore;
   const isReleasing = media.status === "RELEASING";

@@ -126,6 +126,30 @@ export async function getGenres() {
   return data.GenreCollection;
 }
 
+const META_FIELDS = `
+  id
+  title { english romaji userPreferred }
+  bannerImage
+  description(asHtml: false)
+`;
+
+export async function getAnimeMeta(id: number) {
+  "use cache";
+  cacheTag("anime", ANIME_CACHE.detail(id));
+  cacheLife({ stale: 300, revalidate: 900, expire: 86400 });
+
+  const data = await anilistFetch<{ Media: Media }>(
+    `query AnimeMeta($id: Int) {
+      Media(id: $id, type: ANIME) {
+        ${META_FIELDS}
+      }
+    }`,
+    { id },
+  );
+
+  return data.Media;
+}
+
 const HERO_FIELDS = `
   id
   title { romaji english native userPreferred }

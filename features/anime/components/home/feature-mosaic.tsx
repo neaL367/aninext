@@ -37,7 +37,7 @@ export function FeatureMosaic({
         {items.slice(0, 5).map((item, i) => (
           <div key={item.id}>
             <AnimePreviewCard media={item}>
-              <MediaCard media={item} priority={i === 0} />
+              <MediaCard media={item} priority={i === 0} coverTier="extraLarge" />
             </AnimePreviewCard>
           </div>
         ))}
