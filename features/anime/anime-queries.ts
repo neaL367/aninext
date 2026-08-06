@@ -4,7 +4,7 @@ import { anilistFetch } from "@/lib/anilist";
 import { ANIME_CACHE } from "./anime-cache";
 import { COLLECTIONS } from "./lib/collection-config";
 import { buildFilterHash } from "./lib/parse-filters";
-import { fromAiringTimestamp } from "./lib/media-helpers";
+import { localDateStr, fromAiringTimestamp } from "./lib/media-helpers";
 import type {
   AnimeCollection,
   AnimeFilters,
@@ -17,7 +17,7 @@ import type {
   AiringScheduleNode,
 } from "./types/anime";
 
-const MEDIA_CARD_FIELDS = `
+const MEDIA_SUMMARY_FIELDS = `
   id
   title { romaji english userPreferred }
   coverImage { extraLarge large medium color }
@@ -30,6 +30,10 @@ const MEDIA_CARD_FIELDS = `
   season
   seasonYear
   genres
+`;
+
+const MEDIA_CARD_FIELDS = `
+  ${MEDIA_SUMMARY_FIELDS}
   description(asHtml: false)
   studios(isMain: true) { nodes { id name } }
 `;
@@ -72,7 +76,8 @@ export async function getBrowseCollection(
   cacheTag("anime", `anime:browse:${collection}`, ANIME_CACHE.browseCollection(collection, hash));
 
   const config = COLLECTIONS[collection];
-  cacheLife({ stale: 60, revalidate: 300, expire: 3600 });
+  // custom profiles (next.config cacheLife) aren't part of the builtin union
+  cacheLife(config.cacheLife as Parameters<typeof cacheLife>[0]);
 
   const variables: Record<string, unknown> = {
     page,
@@ -159,18 +164,7 @@ const RELATIONS_SUBFIELDS = `
   edges {
     relationType(version: 2)
     node {
-      id
-      title { romaji english userPreferred }
-      coverImage { extraLarge large }
-      bannerImage
-      averageScore
-      popularity
-      format
-      episodes
-      status
-      season
-      seasonYear
-      genres
+      ${MEDIA_SUMMARY_FIELDS}
     }
   }
 `;
@@ -178,18 +172,7 @@ const RELATIONS_SUBFIELDS = `
 const RECOMMENDATIONS_SUBFIELDS = `
   nodes {
     mediaRecommendation {
-      id
-      title { romaji english userPreferred }
-      coverImage { extraLarge large }
-      bannerImage
-      averageScore
-      popularity
-      format
-      episodes
-      status
-      season
-      seasonYear
-      genres
+      ${MEDIA_SUMMARY_FIELDS}
     }
   }
 `;
@@ -215,7 +198,7 @@ const AIRING_WEEK_QUERY = `
 
 export async function getAiringWeek(start: number, end: number) {
   "use cache";
-  const date = fromAiringTimestamp(start).toISOString().split("T")[0];
+  const date = localDateStr(fromAiringTimestamp(start));
   cacheTag("anime", ANIME_CACHE.airingDay(date));
   cacheLife({ stale: 60, revalidate: 300, expire: 3600 });
 

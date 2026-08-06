@@ -1,19 +1,11 @@
 import "server-only";
+import { AniListError } from "./anilist-errors";
 
 const ENDPOINT = "https://graphql.anilist.co";
+const REQUEST_TIMEOUT_MS = 15_000;
 
 const activeRequests: Promise<unknown>[] = [];
 const MAX_CONCURRENT = 4;
-
-export class AniListError extends Error {
-  constructor(
-    message: string,
-    public kind: "rate_limited" | "outage" | "graphql" | "network",
-    public retryAfterSeconds?: number
-  ) {
-    super(message);
-  }
-}
 
 function wait(ms: number) {
   return new Promise<void>((r) => setTimeout(r, ms));
@@ -51,6 +43,7 @@ export async function anilistFetch<T>(
           Accept: "application/json",
         },
         body: JSON.stringify({ query, variables }),
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       })
     );
 
@@ -92,6 +85,9 @@ export async function anilistFetch<T>(
     const json = await res.json();
     if (json.errors?.length) {
       throw new AniListError(json.errors[0].message, "graphql");
+    }
+    if (json.data == null) {
+      throw new AniListError("AniList returned an empty response", "outage");
     }
     return json.data as T;
   };
