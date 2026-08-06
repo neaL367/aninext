@@ -38,7 +38,7 @@ async function AiringContent({ searchParams }: { searchParams: Promise<{ day?: s
 
   return (
     <>
-      <AiringDefaultDaySync day={day} />
+      <AiringDefaultDaySync day={sp.day} />
       <Suspense fallback={<AiringCalendarSkeleton />}>
         <AiringCalendar currentDay={day} />
       </Suspense>
