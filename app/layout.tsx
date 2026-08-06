@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
@@ -48,13 +49,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               >
                 Skip to content
               </a>
-              <SiteHeader />
-              <ScrollToTop />
+              <Suspense fallback={<HeaderFallback />}><SiteHeader /></Suspense>
+              <Suspense fallback={null}><ScrollToTop /></Suspense>
               <main id="main-content" className="min-w-0 flex-1 pb-20 md:pb-0">
                 {children}
               </main>
               <SiteFooter />
-              <SiteMobileNav />
+              <Suspense fallback={null}><SiteMobileNav /></Suspense>
             </div>
           </TooltipProvider>
           <Toaster position="top-right" />
@@ -62,4 +63,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </body>
     </html>
   );
+}
+
+function HeaderFallback() {
+  return <header className="sticky top-0 z-50 border-b border-border-soft bg-background/90 backdrop-blur-xl" aria-hidden><div className="mx-auto min-h-16 w-full max-w-[1680px] px-4 sm:px-7 lg:px-10" /></header>;
 }

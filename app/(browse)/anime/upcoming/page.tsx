@@ -1,10 +1,9 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { BrowsePageShell, BrowsePageResults } from "@/features/anime/components/browse-page-shell";
 import { parseFilters } from "@/features/anime/lib/parse-filters";
 import { getCollectionMetadata } from "@/features/anime/lib/collection-config";
-
-export const prefetch = "partial";
-export const instant = false;
+import { AnimeResultsSkeleton } from "@/features/anime/components/anime-results";
 
 export function generateMetadata(): Metadata {
   return getCollectionMetadata("upcoming");
@@ -15,10 +14,17 @@ export default function UpcomingPage({
 }: PageProps<"/anime/upcoming">) {
   return (
     <BrowsePageShell collection="upcoming">
-      {searchParams.then((sp) => {
-        const filters = parseFilters(sp as Record<string, string | string[] | undefined>);
-        return <BrowsePageResults collection="upcoming" filters={filters} />;
-      })}
+      <Suspense fallback={<AnimeResultsSkeleton count={20} />}>
+        <UpcomingResults searchParams={searchParams} />
+      </Suspense>
     </BrowsePageShell>
   );
+}
+
+async function UpcomingResults({
+  searchParams,
+}: Pick<PageProps<"/anime/upcoming">, "searchParams">) {
+  const sp = await searchParams;
+  const filters = parseFilters(sp as Record<string, string | string[] | undefined>);
+  return <BrowsePageResults collection="upcoming" filters={filters} />;
 }

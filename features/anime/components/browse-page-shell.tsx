@@ -28,11 +28,11 @@ export function BrowsePageShell({ collection, children }: { collection: AnimeCol
             <p className="mt-2 font-mono text-sm text-signal">Live / cached</p>
           </div>
         </div>
-        <div className="mt-6"><CollectionNav /></div>
+        <div className="mt-6"><Suspense fallback={<nav className="h-9 border-b border-border-soft" aria-hidden />}><CollectionNav /></Suspense></div>
       </header>
 
       <div className="mt-8 flex items-center gap-3 lg:hidden">
-        <div className="min-w-0 flex-1"><SearchBar /></div>
+        <div className="min-w-0 flex-1"><Suspense fallback={<SearchBarFallback />}><SearchBar /></Suspense></div>
         <Suspense><MobileFilterDrawer genresPromise={getGenres()} collection={collection} /></Suspense>
       </div>
 
@@ -44,12 +44,16 @@ export function BrowsePageShell({ collection, children }: { collection: AnimeCol
           </div>
         </aside>
         <div className="min-w-0">
-          <div className="mb-6 hidden lg:block"><SearchBar /></div>
+          <div className="mb-6 hidden lg:block"><Suspense fallback={<SearchBarFallback />}><SearchBar /></Suspense></div>
           <Crossfade>{children}</Crossfade>
         </div>
       </div>
       </div>
   );
+}
+
+function SearchBarFallback() {
+  return <div className="h-12 border-b border-border-soft bg-surface-1/40" />;
 }
 
 export function BrowsePageResults({ collection, filters }: { collection: AnimeCollection; filters: import("@/features/anime/types/anime").AnimeFilters }) {

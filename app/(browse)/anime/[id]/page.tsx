@@ -14,8 +14,6 @@ import { AnimeTrailer, AnimeTrailerSkeleton } from "@/features/anime/components/
 import { getAnimeHero, getAnimeDetail } from "@/features/anime/anime-queries";
 import { GenreList } from "@/features/anime/components/genre-pills";
 
-export const instant = false;
-
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   try {
@@ -35,15 +33,16 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 }
 
 export default function AnimeDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  return params.then(({ id }) => (
+  return (
     <ErrorBoundary title="Anime details failed to load">
-      <Suspense fallback={<DetailSkeleton />}><DetailSection id={Number(id)} /></Suspense>
+      <Suspense fallback={<DetailSkeleton />}><DetailSection params={params} /></Suspense>
     </ErrorBoundary>
-  ));
+  );
 }
 
-async function DetailSection({ id }: { id: number }) {
-  const detail = await getAnimeDetail(id);
+async function DetailSection({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const detail = await getAnimeDetail(Number(id));
   if (!detail.media) notFound();
 
   const { media, characters, staff, relations, recommendations } = detail;
@@ -80,7 +79,7 @@ async function DetailSection({ id }: { id: number }) {
               <section aria-label="Airing schedule">
                 <ErrorBoundary title="Schedule failed to load">
                   <Suspense fallback={<div className="mt-5"><AnimeAiringScheduleSkeleton /></div>}>
-                    <AiringScheduleSection id={id} />
+                    <AiringScheduleSection id={Number(id)} />
                   </Suspense>
                 </ErrorBoundary>
               </section>
