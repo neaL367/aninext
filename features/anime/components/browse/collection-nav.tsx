@@ -20,6 +20,7 @@ export function CollectionNav() {
           <HoverPrefetchLink
             key={id}
             href={`/anime/${id}` as Route<string>}
+            prefetch={id === "seasonal" ? false : undefined}
             className={cn(
               "group relative flex shrink-0 items-center gap-2 px-3 pb-3 pt-1 text-sm transition-colors",
               isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"

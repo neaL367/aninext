@@ -5,6 +5,7 @@ import { useState, type ComponentProps } from "react";
 
 export function HoverPrefetchLink({
   href,
+  prefetch,
   onMouseEnter,
   onFocus,
   onTouchStart,
@@ -15,7 +16,7 @@ export function HoverPrefetchLink({
     <Link
       {...props}
       href={href}
-      prefetch={intent ? true : null}
+      prefetch={prefetch === false ? false : intent ? true : null}
       onMouseEnter={(e) => {
         setIntent(true);
         onMouseEnter?.(e);

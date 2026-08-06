@@ -28,6 +28,7 @@ export function AiringCalendar({ currentDay }: { currentDay: string }) {
           <Link
             key={day}
             href={`/airing?day=${day}` as Route<string>}
+            prefetch={isSelected ? false : undefined}
             className={cn(
               "group relative flex min-h-20 flex-col justify-between border-r border-border-soft px-2 py-3 transition-colors last:border-r-0 sm:min-h-24 sm:px-4 sm:py-4",
               isSelected ? "bg-signal-soft text-foreground" : "hover:bg-surface-1",

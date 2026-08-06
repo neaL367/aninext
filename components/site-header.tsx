@@ -6,10 +6,10 @@ import { usePathname } from "next/navigation";
 import { SearchIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const navItems: Array<{ href: Route; label: string }> = [
+const navItems: Array<{ href: Route; label: string; prefetch?: boolean }> = [
   { href: "/anime/trending", label: "Discover" },
   { href: "/anime/top100", label: "Rankings" },
-  { href: "/airing", label: "Airing" },
+  { href: "/airing", label: "Airing", prefetch: false },
 ];
 
 export function SiteHeader() {
@@ -38,6 +38,7 @@ export function SiteHeader() {
             <Link
               key={item.href}
               href={item.href}
+              prefetch={item.prefetch}
               className={cn(
                 "group flex items-center gap-2 px-3 py-2 text-sm transition-colors",
                 isActive(item.href) ? "text-foreground" : "text-muted-foreground hover:text-foreground"

@@ -6,10 +6,10 @@ import { usePathname } from "next/navigation";
 import { CalendarDaysIcon, CompassIcon, SearchIcon, TrophyIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const items: Array<{ href: Route; label: string; icon: typeof CompassIcon }> = [
+const items: Array<{ href: Route; label: string; icon: typeof CompassIcon; prefetch?: boolean }> = [
   { href: "/", label: "Home", icon: CompassIcon },
   { href: "/anime/top100", label: "Rank", icon: TrophyIcon },
-  { href: "/airing", label: "Live", icon: CalendarDaysIcon },
+  { href: "/airing", label: "Live", icon: CalendarDaysIcon, prefetch: false },
 ];
 
 export function SiteMobileNav() {
@@ -27,12 +27,13 @@ export function SiteMobileNav() {
       className="fixed inset-x-0 bottom-0 z-40 border-t border-border-soft bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
     >
       <div className="mx-auto grid h-16 max-w-md grid-cols-4 px-2">
-        {items.map(({ href, label, icon: Icon }) => {
+        {items.map(({ href, label, icon: Icon, prefetch }) => {
           const active = isActive(href);
           return (
             <Link
               key={href}
               href={href}
+              prefetch={prefetch}
               aria-current={active ? "page" : undefined}
               className={cn(
                 "relative flex min-h-11 flex-col items-center justify-center gap-1 text-[0.63rem] font-medium transition-colors",
