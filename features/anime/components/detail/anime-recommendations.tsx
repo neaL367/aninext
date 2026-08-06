@@ -1,8 +1,8 @@
 import { Empty, EmptyHeader, EmptyTitle, EmptyMedia } from "@/components/ui/empty";
 import { ThumbsUpIcon } from "lucide-react";
 import { getAnimeRecommendations } from "@/features/anime/anime-queries";
-import { AnimePreviewCard } from "./anime-preview-card";
-import { MediaCard, MediaCardSkeleton } from "./media-card";
+import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
+import { MediaCard, MediaCardSkeleton } from "@/features/anime/components/home/media-card";
 import type { RecommendationNode } from "@/features/anime/types/anime";
 
 export async function AnimeRecommendations({

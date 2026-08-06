@@ -1,7 +1,7 @@
 "use server";
 
 import type { ReactNode } from "react";
-import { MediaGrid } from "@/features/anime/components/media-grid";
+import { MediaGrid } from "@/features/anime/components/browse/media-grid";
 import { getBrowseCollection } from "@/features/anime/anime-queries";
 import type { AnimeCollection, AnimeFilters } from "@/features/anime/types/anime";
 

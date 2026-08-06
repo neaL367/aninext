@@ -3,7 +3,7 @@ import { ArrowRightIcon } from "lucide-react";
 import { HoverPrefetchLink } from "@/components/hover-prefetch-link";
 import type { Media } from "@/features/anime/types/anime";
 import { MediaCard, MediaCardSkeleton } from "./media-card";
-import { AnimePreviewCard } from "./anime-preview-card";
+import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 
 export function SectionRow({
   title,

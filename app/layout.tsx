@@ -9,7 +9,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteMobileNav } from "@/components/site-mobile-nav";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { OfflineBanner } from "@/components/offline-banner";
-import { SearchCommand } from "@/features/anime/components/search-command";
+import { SearchCommand } from "@/features/anime/components/browse/search-command";
 import "./globals.css";
 
 const geistSans = Geist({

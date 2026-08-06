@@ -3,16 +3,16 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { Crossfade } from "@/components/crossfade";
-import { AnimeHero, AnimeHeroSkeleton } from "@/features/anime/components/anime-hero";
-import { AnimeCharacters, AnimeCharactersSkeleton } from "@/features/anime/components/anime-characters";
-import { AnimeStaff, AnimeStaffSkeleton } from "@/features/anime/components/anime-staff";
-import { AnimeRelations, AnimeRelationsSkeleton } from "@/features/anime/components/anime-relations";
-import { AnimeRecommendations, AnimeRecommendationsSkeleton } from "@/features/anime/components/anime-recommendations";
-import { AnimeAiringScheduleSkeleton } from "@/features/anime/components/anime-airing-schedule";
-import { AnimeStreamingEpisodes, AnimeStreamingEpisodesSkeleton } from "@/features/anime/components/anime-streaming-episodes";
-import { AnimeTrailer, AnimeTrailerSkeleton } from "@/features/anime/components/anime-trailer";
+import { AnimeHero, AnimeHeroSkeleton } from "@/features/anime/components/detail/anime-hero";
+import { AnimeCharacters, AnimeCharactersSkeleton } from "@/features/anime/components/detail/anime-characters";
+import { AnimeStaff, AnimeStaffSkeleton } from "@/features/anime/components/detail/anime-staff";
+import { AnimeRelations, AnimeRelationsSkeleton } from "@/features/anime/components/detail/anime-relations";
+import { AnimeRecommendations, AnimeRecommendationsSkeleton } from "@/features/anime/components/detail/anime-recommendations";
+import { AnimeAiringScheduleSkeleton } from "@/features/anime/components/detail/anime-airing-schedule";
+import { AnimeStreamingEpisodes, AnimeStreamingEpisodesSkeleton } from "@/features/anime/components/detail/anime-streaming-episodes";
+import { AnimeTrailer, AnimeTrailerSkeleton } from "@/features/anime/components/detail/anime-trailer";
 import { getAnimeHero, getAnimeDetail } from "@/features/anime/anime-queries";
-import { GenreList } from "@/features/anime/components/genre-pills";
+import { GenreList } from "@/features/anime/components/home/genre-pills";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
@@ -112,7 +112,7 @@ async function AiringScheduleSection({ id }: { id: number }) {
   const { getAnimeAiringSchedule } = await import("@/features/anime/anime-queries");
   const nodes = await getAnimeAiringSchedule(id);
   if (nodes.length === 0) return null;
-  const { AnimeAiringScheduleClient } = await import("@/features/anime/components/anime-airing-schedule-client");
+  const { AnimeAiringScheduleClient } = await import("@/features/anime/components/detail/anime-airing-schedule-client");
   return (
     <>
       <SectionHeading eyebrow="Schedule" title="Next episodes" />

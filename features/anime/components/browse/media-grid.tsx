@@ -1,6 +1,6 @@
 import type { Media } from "@/features/anime/types/anime";
-import { MediaCard, MediaCardSkeleton } from "./media-card";
-import { AnimePreviewCard } from "./anime-preview-card";
+import { MediaCard, MediaCardSkeleton } from "@/features/anime/components/home/media-card";
+import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 
 export function MediaGrid({ items, rankStart }: { items: Media[]; rankStart?: number }) {
   return (

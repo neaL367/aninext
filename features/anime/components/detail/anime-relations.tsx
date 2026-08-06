@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Empty, EmptyHeader, EmptyTitle, EmptyMedia } from "@/components/ui/empty";
 import { LinkIcon } from "lucide-react";
-import { AnimePreviewCard } from "./anime-preview-card";
+import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 import type { RelationEdge } from "@/features/anime/types/anime";
 import { getTitle, getCover } from "@/features/anime/lib/media-helpers";
 import Link from "next/link";

@@ -7,7 +7,7 @@ import type { AiringScheduleNode } from "@/features/anime/types/anime";
 import { formatFormat, fromAiringTimestamp, getTitle, localDateStr } from "@/features/anime/lib/media-helpers";
 import { CalendarIcon, ExternalLinkIcon } from "lucide-react";
 import { ImageWithLoading } from "@/components/image-with-loading";
-import { AnimePreviewCard } from "./anime-preview-card";
+import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 
 function currentBlockName(): string {
   const hour = new Date().getHours();

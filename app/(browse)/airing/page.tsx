@@ -5,8 +5,8 @@ import { redirect } from "next/navigation";
 import { RadioIcon } from "lucide-react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { Crossfade } from "@/components/crossfade";
-import { AiringCalendar, AiringCalendarSkeleton } from "@/features/anime/components/airing-calendar";
-import { AiringTimeline, AiringTimelineSkeleton } from "@/features/anime/components/airing-timeline";
+import { AiringCalendar, AiringCalendarSkeleton } from "@/features/anime/components/airing/airing-calendar";
+import { AiringTimeline, AiringTimelineSkeleton } from "@/features/anime/components/airing/airing-timeline";
 import { localDateStr } from "@/features/anime/lib/media-helpers";
 
 export const metadata: Metadata = {

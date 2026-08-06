@@ -17,7 +17,7 @@ import {
 import { ChevronDownIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { FilterButton } from "./filter-button";
-import { useFilters } from "../hooks/use-filters";
+import { useFilters } from "../../hooks/use-filters";
 import {
   FILTER_FORMATS,
   FILTER_STATUSES,
@@ -26,7 +26,7 @@ import {
   FILTER_ADULT_GENRES,
   getYears,
   formatFilterValue,
-} from "../lib/filter-constants";
+} from "../../lib/filter-constants";
 
 import type { AnimeCollection } from "@/features/anime/types/anime";
 

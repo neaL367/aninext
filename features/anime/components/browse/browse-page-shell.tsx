@@ -1,12 +1,12 @@
 import { Suspense } from "react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { Crossfade } from "@/components/crossfade";
-import { AnimeResults, AnimeResultsSkeleton } from "@/features/anime/components/anime-results";
-import { CollectionNav } from "@/features/anime/components/collection-nav";
-import { SearchBar } from "@/features/anime/components/search-bar";
-import { FilterSidebar, FilterSidebarSkeleton } from "@/features/anime/components/filter-sidebar";
-import { MobileFilterDrawer } from "@/features/anime/components/mobile-filter-drawer";
-import { ActiveFilters } from "@/features/anime/components/active-filters";
+import { AnimeResults, AnimeResultsSkeleton } from "@/features/anime/components/browse/anime-results";
+import { CollectionNav } from "@/features/anime/components/browse/collection-nav";
+import { SearchBar } from "@/features/anime/components/browse/search-bar";
+import { FilterSidebar, FilterSidebarSkeleton } from "@/features/anime/components/browse/filter-sidebar";
+import { MobileFilterDrawer } from "@/features/anime/components/browse/mobile-filter-drawer";
+import { ActiveFilters } from "@/features/anime/components/browse/active-filters";
 import { COLLECTIONS } from "@/features/anime/lib/collection-config";
 import { getGenres } from "@/features/anime/anime-queries";
 import type { AnimeCollection } from "@/features/anime/types/anime";

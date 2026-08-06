@@ -2,8 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { FilterChip } from "./filter-button";
-import { useFilters } from "../hooks/use-filters";
-import { FILTER_TYPE_LABELS, FILTER_ORDER } from "../lib/filter-constants";
+import { useFilters } from "../../hooks/use-filters";
+import { FILTER_TYPE_LABELS, FILTER_ORDER } from "../../lib/filter-constants";
 
 export function ActiveFilters() {
   const { isPending, removeFilter, clearAll, activeFilters, groupedFilters } = useFilters();

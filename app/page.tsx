@@ -6,14 +6,14 @@ import { Crossfade } from "@/components/crossfade";
 import { HoverPrefetchLink } from "@/components/hover-prefetch-link";
 import { ArrowUpRightIcon } from "lucide-react";
 import type { Route } from "next";
-import { HeroCarousel, HeroCarouselSkeleton } from "@/features/anime/components/hero-carousel";
-import { SectionRow, SectionRowSkeleton } from "@/features/anime/components/section-row";
-import { MediaCard, MediaCardSkeleton } from "@/features/anime/components/media-card";
+import { HeroCarousel, HeroCarouselSkeleton } from "@/features/anime/components/home/hero-carousel";
+import { SectionRow, SectionRowSkeleton } from "@/features/anime/components/home/section-row";
+import { MediaCard, MediaCardSkeleton } from "@/features/anime/components/home/media-card";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 import { getBrowseCollection, getAiringWeek } from "@/features/anime/anime-queries";
 import type { Media } from "@/features/anime/types/anime";
-import { GenreExplorer, GenrePillsSkeleton } from "@/features/anime/components/genre-pills";
-import { AiringHomeSection, AiringHomeSectionSkeleton } from "@/features/anime/components/airing-home-section";
+import { GenreExplorer, GenrePillsSkeleton } from "@/features/anime/components/home/genre-pills";
+import { AiringHomeSection, AiringHomeSectionSkeleton } from "@/features/anime/components/airing/airing-home-section";
 
 export const metadata: Metadata = {
   title: "AniNext — Discover anime",
