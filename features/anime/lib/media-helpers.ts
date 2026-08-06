@@ -1,5 +1,4 @@
 import type { Media, MediaTitle, MediaCoverImage } from "@/features/anime/types/anime";
-import { formatFormat, formatStatus } from "./labels";
 
 export { formatFormat, formatStatus } from "./labels";
 
