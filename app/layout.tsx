@@ -8,6 +8,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteMobileNav } from "@/components/site-mobile-nav";
 import { ScrollToTop } from "@/components/scroll-to-top";
+import { OfflineBanner } from "@/components/offline-banner";
 import { SearchCommand } from "@/features/anime/components/search-command";
 import "./globals.css";
 
@@ -59,6 +60,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </div>
           </TooltipProvider>
           <Toaster position="top-right" />
+          <OfflineBanner />
         </Providers>
       </body>
     </html>

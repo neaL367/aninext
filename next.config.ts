@@ -15,7 +15,8 @@ const nextConfig: NextConfig = {
     static: { stale: 3600, revalidate: 21600, expire: 604800 },
   },
   experimental: {
-    useTypeScriptCli: true
+    useTypeScriptCli: true,
+    useOffline: true,
   },
 };
 
