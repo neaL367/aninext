@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   typedRoutes: true,
   reactStrictMode: true,
+  reactCompiler: true,
   images: {
     unoptimized: true,
     remotePatterns: [{ hostname: "s4.anilist.co", protocol: "https" }],
@@ -18,6 +19,8 @@ const nextConfig: NextConfig = {
     useTypeScriptCli: true,
     useOffline: true,
     exposeTestingApiInProductionBuild: true,
+    inlineCss: true,
+    turbopackRustReactCompiler: true,
   },
   async headers() {
     return [
