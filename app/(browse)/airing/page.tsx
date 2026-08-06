@@ -1,13 +1,8 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { connection } from "next/server";
-import { redirect } from "next/navigation";
 import { RadioIcon } from "lucide-react";
-import { ErrorBoundary } from "@/components/error-boundary";
 import { Crossfade } from "@/components/crossfade";
-import { AiringCalendar, AiringCalendarSkeleton } from "@/features/anime/components/airing/airing-calendar";
-import { AiringTimeline, AiringTimelineSkeleton } from "@/features/anime/components/airing/airing-timeline";
-import { localDateStr } from "@/features/anime/lib/media-helpers";
+import { AiringContent, AiringContentSkeleton } from "@/features/anime/components/airing/airing-content";
 
 export const metadata: Metadata = {
   title: "Airing schedule — AniNext",
@@ -29,41 +24,5 @@ export default function AiringPage({ searchParams }: { searchParams: Promise<{ d
         </Suspense>
       </div>
     </Crossfade>
-  );
-}
-
-async function AiringContent({ searchParams }: { searchParams: Promise<{ day?: string }> }) {
-  const sp = await searchParams;
-  await connection();
-
-  if (!sp.day) {
-    redirect(`/airing?day=${localDateStr()}`);
-  }
-
-  const day = sp.day;
-
-  return (
-    <>
-      <Suspense fallback={<AiringCalendarSkeleton />}>
-        <AiringCalendar currentDay={day} />
-      </Suspense>
-
-      <div className="mt-10">
-        <ErrorBoundary title="Schedule failed to load">
-          <Suspense fallback={<AiringTimelineSkeleton />}>
-            <AiringTimeline day={day} />
-          </Suspense>
-        </ErrorBoundary>
-      </div>
-    </>
-  );
-}
-
-function AiringContentSkeleton() {
-  return (
-    <>
-      <AiringCalendarSkeleton />
-      <div className="mt-10"><AiringTimelineSkeleton /></div>
-    </>
   );
 }

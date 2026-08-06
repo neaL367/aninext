@@ -1,20 +1,15 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { connection } from "next/server";
-import { redirect } from "next/navigation";
-import { BrowsePageShell, BrowsePageResults } from "@/features/anime/components/browse/browse-page-shell";
-import { parseFilters } from "@/features/anime/lib/parse-filters";
+import { BrowsePageShell } from "@/features/anime/components/browse/browse-page-shell";
+import { SeasonalResults } from "@/features/anime/components/browse/seasonal-results";
 import { getCollectionMetadata } from "@/features/anime/lib/collection-config";
-import { getCurrentSeason } from "@/features/anime/lib/season";
 import { AnimeResultsSkeleton } from "@/features/anime/components/browse/anime-results";
 
 export function generateMetadata(): Metadata {
   return getCollectionMetadata("seasonal");
 }
 
-export default function SeasonalPage({
-  searchParams,
-}: PageProps<"/anime/seasonal">) {
+export default function SeasonalPage({ searchParams }: PageProps<"/anime/seasonal">) {
   return (
     <BrowsePageShell collection="seasonal">
       <Suspense fallback={<AnimeResultsSkeleton count={20} />}>
@@ -22,23 +17,4 @@ export default function SeasonalPage({
       </Suspense>
     </BrowsePageShell>
   );
-}
-
-async function SeasonalResults({
-  searchParams,
-}: Pick<PageProps<"/anime/seasonal">, "searchParams">) {
-  const sp = await searchParams;
-  await connection();
-
-  if (!sp.season || !sp.year) {
-    const current = getCurrentSeason();
-    const params = new URLSearchParams(sp as Record<string, string>);
-    if (!sp.season) params.set("season", current.season);
-    if (!sp.year) params.set("year", String(current.seasonYear));
-    redirect(`/anime/seasonal?${params.toString()}`);
-  }
-
-  const filters = parseFilters(sp as Record<string, string | string[] | undefined>);
-
-  return <BrowsePageResults collection="seasonal" filters={filters} />;
 }
