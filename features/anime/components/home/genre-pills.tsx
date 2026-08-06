@@ -1,5 +1,4 @@
 import Link from "next/link";
-import type { Route } from "next";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowUpRightIcon } from "lucide-react";
 import { getGenres } from "@/features/anime/anime-queries";
@@ -18,7 +17,7 @@ export async function GenreExplorer() {
       </div>
       <div className="grid grid-cols-2 gap-x-8 sm:grid-cols-3">
         {genres.map((genre) => (
-          <Link key={genre} href={`/anime/trending?genre=${encodeURIComponent(genre)}` as Route<string>} className="group flex items-center justify-between border-b border-border-soft py-3 text-sm text-muted-foreground transition-colors hover:border-accent/60 hover:text-foreground">
+          <Link key={genre} href={`/anime/trending?genre=${encodeURIComponent(genre)}` } className="group flex items-center justify-between border-b border-border-soft py-3 text-sm text-muted-foreground transition-colors hover:border-accent/60 hover:text-foreground">
             <span>{genre}</span><ArrowUpRightIcon className="size-3 opacity-0 transition-opacity group-hover:opacity-100 group-hover:text-accent" />
           </Link>
         ))}
@@ -29,7 +28,7 @@ export async function GenreExplorer() {
 
 export function GenreList({ genres }: { genres: string[] }) {
   if (genres.length === 0) return null;
-  return <div className="grid grid-cols-2 gap-x-4">{genres.map((genre) => <Link key={genre} href={`/anime/trending?genre=${encodeURIComponent(genre)}` as Route<string>} className="border-b border-border-soft py-2 text-xs text-muted-foreground transition-colors hover:border-accent/60 hover:text-accent">{genre}</Link>)}</div>;
+  return <div className="grid grid-cols-2 gap-x-4">{genres.map((genre) => <Link key={genre} href={`/anime/trending?genre=${encodeURIComponent(genre)}` } className="border-b border-border-soft py-2 text-xs text-muted-foreground transition-colors hover:border-accent/60 hover:text-accent">{genre}</Link>)}</div>;
 }
 
 export function GenrePillsSkeleton() {

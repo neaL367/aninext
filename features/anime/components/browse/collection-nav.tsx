@@ -1,6 +1,5 @@
 "use client";
 
-import type { Route } from "next";
 import { usePathname } from "next/navigation";
 import { ArrowUpRightIcon } from "lucide-react";
 import { HoverPrefetchLink } from "@/components/hover-prefetch-link";
@@ -19,7 +18,7 @@ export function CollectionNav() {
         return (
           <HoverPrefetchLink
             key={id}
-            href={`/anime/${id}` as Route<string>}
+            href={`/anime/${id}`}
             prefetch={id === "seasonal" ? false : undefined}
             className={cn(
               "group relative flex shrink-0 items-center gap-2 px-3 pb-3 pt-1 text-sm transition-colors",

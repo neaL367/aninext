@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import type { Route } from "next";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { localDateStr } from "@/features/anime/lib/media-helpers";
@@ -27,7 +26,7 @@ export function AiringCalendar({ currentDay }: { currentDay: string }) {
         return (
           <Link
             key={day}
-            href={`/airing?day=${day}` as Route<string>}
+            href={`/airing?day=${day}`}
             prefetch={isSelected ? false : undefined}
             className={cn(
               "group relative flex min-h-20 flex-col justify-between border-r border-border-soft px-2 py-3 transition-colors last:border-r-0 sm:min-h-24 sm:px-4 sm:py-4",

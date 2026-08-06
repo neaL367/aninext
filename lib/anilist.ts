@@ -23,7 +23,7 @@ async function track<T>(p: Promise<T>): Promise<T> {
     return await p;
   } finally {
     const idx = activeRequests.indexOf(p);
-    if (idx !== -1) activeRequests.splice(idx, 1);
+    if (idx !== -1) void activeRequests.splice(idx, 1);
   }
 }
 
@@ -82,14 +82,17 @@ export async function anilistFetch<T>(
       );
     }
 
-    const json = await res.json();
+    const json = (await res.json()) as {
+      errors?: { message: string }[];
+      data?: T | null;
+    };
     if (json.errors?.length) {
       throw new AniListError(json.errors[0].message, "graphql");
     }
     if (json.data == null) {
       throw new AniListError("AniList returned an empty response", "outage");
     }
-    return json.data as T;
+    return json.data;
   };
 
   return attempt(retries);

@@ -18,7 +18,7 @@ export async function SeasonalResults({
     redirect(`/anime/seasonal?${params.toString()}`);
   }
 
-  const filters = parseFilters(sp as Record<string, string | string[] | undefined>);
+  const filters = parseFilters(sp);
 
   return <BrowsePageResults collection="seasonal" filters={filters} />;
 }

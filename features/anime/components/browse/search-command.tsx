@@ -1,7 +1,7 @@
 "use client";
+import type { Route } from "next";
 
 import { useRouter } from "next/navigation";
-import type { Route } from "next";
 import { useEffect, useState } from "react";
 import {
   CalendarIcon,
@@ -62,11 +62,13 @@ export function SearchCommand() {
   function search() {
     const value = query.trim();
     if (!value) return;
+    // oxlint-disable-next-line typescript/no-unnecessary-type-assertion -- typedRoutes narrowing for router.push
     router.push(`/anime/trending?search=${encodeURIComponent(value)}` as Route<string>);
     close();
   }
 
   function navigateTo(path: string) {
+    // oxlint-disable-next-line typescript/no-unnecessary-type-assertion -- typedRoutes narrowing for router.push
     router.push(path as Route<string>);
     close();
   }
