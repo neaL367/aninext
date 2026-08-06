@@ -33,9 +33,15 @@ test.describe("hover preview card", () => {
 test.describe("offline banner", () => {
   test("shows banner when browser goes offline", async ({ page, context }) => {
     await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    await expect.poll(() => page.evaluate(() => navigator.onLine), { timeout: 10_000 }).toBe(true);
+
     await context.setOffline(true);
-    await expect(page.getByRole("status")).toBeVisible({ timeout: 5000 });
+    await expect.poll(() => page.evaluate(() => navigator.onLine), { timeout: 10_000 }).toBe(false);
+
+    await expect(page.getByRole("status")).toBeVisible({ timeout: 10_000 });
     await context.setOffline(false);
+    await expect(page.getByRole("status")).toHaveCount(0, { timeout: 10_000 });
   });
 });
 
