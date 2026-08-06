@@ -33,7 +33,7 @@ export function BrowsePageShell({ collection, children }: { collection: AnimeCol
 
       <div className="mt-8 flex items-center gap-3 lg:hidden">
         <div className="min-w-0 flex-1"><Suspense fallback={<SearchBarFallback />}><SearchBar /></Suspense></div>
-        <Suspense><MobileFilterDrawer genresPromise={getGenres()} collection={collection} /></Suspense>
+        <Suspense fallback={<MobileFilterDrawerFallback />}><MobileFilterDrawer genresPromise={getGenres()} collection={collection} /></Suspense>
       </div>
 
       <div className="mt-10 grid gap-10 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-12">
@@ -56,10 +56,33 @@ function SearchBarFallback() {
   return <div className="h-12 border-b border-border-soft bg-surface-1/40" />;
 }
 
+function MobileFilterDrawerFallback() {
+  return <div className="h-10 w-24 border border-border-soft bg-surface-1/40" />;
+}
+
+function ActiveFiltersSkeleton() {
+  return (
+    <div className="flex flex-col gap-3 border-b border-border-soft py-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="shimmer h-3 w-12 rounded" />
+          <div className="shimmer size-5 rounded-full" />
+        </div>
+        <div className="shimmer h-3 w-14 rounded" />
+      </div>
+      <div className="flex flex-wrap gap-3">
+        <div className="shimmer h-5 w-20 rounded-full" />
+        <div className="shimmer h-5 w-28 rounded-full" />
+        <div className="shimmer h-5 w-16 rounded-full" />
+      </div>
+    </div>
+  );
+}
+
 export function BrowsePageResults({ collection, filters }: { collection: AnimeCollection; filters: import("@/features/anime/types/anime").AnimeFilters }) {
   return (
     <>
-      <Suspense><ActiveFilters /></Suspense>
+      <Suspense fallback={<ActiveFiltersSkeleton />}><ActiveFilters /></Suspense>
       <ErrorBoundary title="Results failed to load">
         <Suspense fallback={<AnimeResultsSkeleton count={20} />}>
           <AnimeResults collection={collection} filters={filters} />
