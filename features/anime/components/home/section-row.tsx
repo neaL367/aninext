@@ -48,7 +48,7 @@ export function SectionRow({
         {items.map((item, i) => (
           <div key={item.id} className="w-[148px] shrink-0 snap-start sm:w-[164px] md:w-auto">
             <AnimePreviewCard media={item}>
-              <MediaCard media={item} rank={showRank ? i + 1 : undefined} />
+              <MediaCard media={item} rank={showRank ? i + 1 : undefined} priority={i === 0} />
             </AnimePreviewCard>
           </div>
         ))}

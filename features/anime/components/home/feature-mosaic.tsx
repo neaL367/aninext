@@ -34,10 +34,10 @@ export function FeatureMosaic({
         </HoverPrefetchLink>
       </div>
       <div className="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
-        {items.slice(0, 5).map((item) => (
+        {items.slice(0, 5).map((item, i) => (
           <div key={item.id}>
             <AnimePreviewCard media={item}>
-              <MediaCard media={item} />
+              <MediaCard media={item} priority={i === 0} />
             </AnimePreviewCard>
           </div>
         ))}
