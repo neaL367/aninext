@@ -1,9 +1,11 @@
 import { Suspense } from "react";
-import type { Metadata } from "next";
+
+import { AnimeResultsSkeleton } from "@/features/anime/components/browse/anime-results";
 import { BrowsePageShell } from "@/features/anime/components/browse/browse-page-shell";
 import { SeasonalResults } from "@/features/anime/components/browse/seasonal-results";
 import { getCollectionMetadata } from "@/features/anime/lib/collection-config";
-import { AnimeResultsSkeleton } from "@/features/anime/components/browse/anime-results";
+
+import type { Metadata } from "next";
 
 export function generateMetadata(): Metadata {
   return getCollectionMetadata("seasonal");

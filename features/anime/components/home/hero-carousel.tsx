@@ -1,9 +1,12 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import type { Media } from "@/features/anime/types/anime";
-import { HeroInfo } from "./hero-content";
+
 import { ImageWithLoading } from "@/components/image-with-loading";
+
+import { HeroInfo } from "./hero-content";
+
+import type { Media } from "@/features/anime/types/anime";
 
 export function HeroCarousel({ items }: { items: Media[] }) {
   const [current, setCurrent] = useState(0);
@@ -62,9 +65,23 @@ export function HeroCarousel({ items }: { items: Media[] }) {
               style={{ opacity: isCurrent ? 1 : isPrev ? 0 : 0 }}
             >
               {image ? (
-                <ImageWithLoading src={image} alt="" fill priority={i === 0} sizes="(min-width: 1024px) 55vw, 100vw" className="object-cover" />
+                <ImageWithLoading
+                  src={image}
+                  alt=""
+                  fill
+                  priority={i === 0}
+                  sizes="(min-width: 1024px) 55vw, 100vw"
+                  className="object-cover"
+                />
               ) : (
-                <div className="absolute inset-0" style={{ background: color ? `linear-gradient(135deg, ${color}80, var(--surface-2))` : "linear-gradient(135deg, var(--signal-strong), var(--surface-2))" }} />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: color
+                      ? `linear-gradient(135deg, ${color}80, var(--surface-2))`
+                      : "linear-gradient(135deg, var(--signal-strong), var(--surface-2))",
+                  }}
+                />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-surface-1 via-transparent to-transparent" />
             </div>

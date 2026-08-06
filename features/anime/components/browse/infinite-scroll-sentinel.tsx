@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+
 import { Spinner } from "@/components/ui/spinner";
 
 export function InfiniteScrollSentinel({
@@ -27,7 +28,7 @@ export function InfiniteScrollSentinel({
           callbackRef.current();
         }
       },
-      { rootMargin: "600px" }
+      { rootMargin: "600px" },
     );
 
     observer.observe(el);

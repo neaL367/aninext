@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
 import Link from "next/link";
+import { useMemo } from "react";
+
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
 import { localDateStr } from "@/features/anime/lib/media-helpers";
+import { cn } from "@/lib/utils";
 
 export function AiringCalendar({ currentDay }: { currentDay: string }) {
   const localToday = useMemo(() => localDateStr(), []);
@@ -36,10 +37,20 @@ export function AiringCalendar({ currentDay }: { currentDay: string }) {
             <span className="font-mono text-[0.58rem] uppercase tracking-[0.12em] text-muted-foreground">
               {date.toLocaleDateString("en-US", { weekday: "short" })}
             </span>
-            <span className={cn("font-mono text-2xl tabular-nums sm:text-3xl", isSelected ? "text-signal" : "text-foreground")}>
+            <span
+              className={cn(
+                "font-mono text-2xl tabular-nums sm:text-3xl",
+                isSelected ? "text-signal" : "text-foreground",
+              )}
+            >
               {date.getDate()}
             </span>
-            {isToday && <span className="absolute bottom-0 left-0 h-1 w-full bg-live-badge" aria-label="Today" />}
+            {isToday && (
+              <span
+                className="absolute bottom-0 left-0 h-1 w-full bg-live-badge"
+                aria-label="Today"
+              />
+            )}
           </Link>
         );
       })}

@@ -1,8 +1,10 @@
-import { connection } from "next/server";
 import { redirect } from "next/navigation";
-import { BrowsePageResults } from "./browse-page-shell";
+import { connection } from "next/server";
+
 import { parseFilters } from "@/features/anime/lib/parse-filters";
 import { getCurrentSeason } from "@/features/anime/lib/season";
+
+import { BrowsePageResults } from "./browse-page-shell";
 
 export async function SeasonalResults({
   searchParams,

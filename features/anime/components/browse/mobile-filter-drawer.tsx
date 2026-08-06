@@ -1,5 +1,9 @@
 "use client";
 
+import { SlidersHorizontalIcon } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -9,9 +13,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { SlidersHorizontalIcon } from "lucide-react";
-import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+
 import { FilterSidebar } from "./filter-sidebar";
 
 import type { AnimeCollection } from "@/features/anime/types/anime";
@@ -49,12 +51,15 @@ export function MobileFilterDrawer({
         <SlidersHorizontalIcon className="size-4" />
         Filters
         {activeFilterCount > 0 && (
-            <span className="ml-1.5 flex size-5 items-center justify-center bg-signal text-[10px] font-semibold text-accent-foreground">
+          <span className="ml-1.5 flex size-5 items-center justify-center bg-signal text-[10px] font-semibold text-accent-foreground">
             {activeFilterCount}
           </span>
         )}
       </SheetTrigger>
-      <SheetContent side="left" className="w-[min(22rem,calc(100vw-2rem))] overflow-y-auto bg-background">
+      <SheetContent
+        side="left"
+        className="w-[min(22rem,calc(100vw-2rem))] overflow-y-auto bg-background"
+      >
         <SheetHeader className="border-b border-border-soft pb-4 text-left">
           <SheetTitle className="font-mono text-sm uppercase tracking-[0.14em]">Filters</SheetTitle>
           <SheetDescription>Refine results without leaving this view.</SheetDescription>

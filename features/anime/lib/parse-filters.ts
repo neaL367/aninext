@@ -1,7 +1,7 @@
 import type { AnimeFilters } from "@/features/anime/types/anime";
 
 export function parseFilters(
-  searchParams: Record<string, string | string[] | undefined>
+  searchParams: Record<string, string | string[] | undefined>,
 ): AnimeFilters {
   const filters: AnimeFilters = {};
 

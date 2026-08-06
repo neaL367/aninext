@@ -1,10 +1,12 @@
 "use client";
 
-import Link from "next/link";
-import type { Route } from "next";
-import { usePathname } from "next/navigation";
 import { CalendarDaysIcon, CompassIcon, SearchIcon, TrophyIcon } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 import { cn } from "@/lib/utils";
+
+import type { Route } from "next";
 
 const items: Array<{ href: Route; label: string; icon: typeof CompassIcon; prefetch?: boolean }> = [
   { href: "/", label: "Home", icon: CompassIcon },
@@ -37,10 +39,12 @@ export function SiteMobileNav() {
               aria-current={active ? "page" : undefined}
               className={cn(
                 "relative flex min-h-11 flex-col items-center justify-center gap-1 text-[0.63rem] font-medium transition-colors",
-                active ? "text-signal" : "text-muted-foreground hover:text-foreground"
+                active ? "text-signal" : "text-muted-foreground hover:text-foreground",
               )}
             >
-              {active && <span className="absolute top-0 h-px w-8 bg-foreground/40" aria-hidden="true" />}
+              {active && (
+                <span className="absolute top-0 h-px w-8 bg-foreground/40" aria-hidden="true" />
+              )}
               <Icon aria-hidden="true" className="size-4" strokeWidth={active ? 2 : 1.5} />
               {label}
             </Link>

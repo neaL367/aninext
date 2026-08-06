@@ -29,7 +29,16 @@ export const FILTER_TYPE_LABELS: Record<string, string> = {
   isAdult: "Content",
 };
 
-export const FILTER_ORDER = ["search", "genre", "format", "status", "season", "year", "country", "isAdult"];
+export const FILTER_ORDER = [
+  "search",
+  "genre",
+  "format",
+  "status",
+  "season",
+  "year",
+  "country",
+  "isAdult",
+];
 
 export function getYears(count: number = 30): number[] {
   const currentYear = new Date().getFullYear();

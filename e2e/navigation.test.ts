@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
 import { instant } from "@next/playwright";
+import { test, expect } from "@playwright/test";
 
 test.describe("collection pages", () => {
   test("trending is instant on initial page load", async ({ page, baseURL }) => {
@@ -9,7 +9,7 @@ test.describe("collection pages", () => {
         await page.goto("/anime/trending");
         await expect(page.getByRole("heading", { name: "Trending Anime" })).toBeVisible();
       },
-      { baseURL }
+      { baseURL },
     );
     await expect(page.getByRole("heading", { name: "Trending Anime" })).toBeVisible();
   });
@@ -35,7 +35,7 @@ test.describe("anime detail page", () => {
         await page.goto("/anime/21");
         await expect(page.locator("main")).toBeVisible();
       },
-      { baseURL }
+      { baseURL },
     );
     await expect(page.getByRole("heading", { name: "ONE PIECE" })).toBeVisible();
   });

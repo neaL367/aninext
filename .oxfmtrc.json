@@ -1,0 +1,13 @@
+{
+  "sortImports": {
+    "groups": [
+      ["value-builtin", "value-external"],
+      "value-internal",
+      ["value-parent", "value-sibling", "value-index"],
+      "type-import",
+      "unknown"
+    ]
+  },
+  "sortPackageJson": false,
+  "ignorePatterns": [".next/**", "out/**", "build/**"]
+}

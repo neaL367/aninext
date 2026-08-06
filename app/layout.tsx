@@ -1,15 +1,17 @@
-import type { Metadata, Viewport } from "next";
-import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { Toaster } from "@/components/ui/sonner";
-import { Providers } from "@/components/providers";
-import { SiteHeader, SiteHeaderFallback } from "@/components/site-header";
-import { SiteFooter } from "@/components/site-footer";
-import { SiteMobileNav } from "@/components/site-mobile-nav";
-import { ScrollToTop } from "@/components/scroll-to-top";
+import { Suspense } from "react";
+
 import { OfflineBanner } from "@/components/offline-banner";
+import { Providers } from "@/components/providers";
+import { ScrollToTop } from "@/components/scroll-to-top";
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader, SiteHeaderFallback } from "@/components/site-header";
+import { SiteMobileNav } from "@/components/site-mobile-nav";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { SearchCommand } from "@/features/anime/components/browse/search-command";
+
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -55,13 +57,19 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               >
                 Skip to content
               </a>
-              <Suspense fallback={<SiteHeaderFallback />}><SiteHeader /></Suspense>
-              <Suspense fallback={null}><ScrollToTop /></Suspense>
+              <Suspense fallback={<SiteHeaderFallback />}>
+                <SiteHeader />
+              </Suspense>
+              <Suspense fallback={null}>
+                <ScrollToTop />
+              </Suspense>
               <main id="main-content" className="min-w-0 flex-1 pb-20 md:pb-0">
                 {children}
               </main>
               <SiteFooter />
-              <Suspense fallback={null}><SiteMobileNav /></Suspense>
+              <Suspense fallback={null}>
+                <SiteMobileNav />
+              </Suspense>
             </div>
           </TooltipProvider>
           <Toaster position="top-right" />

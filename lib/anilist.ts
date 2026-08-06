@@ -30,7 +30,7 @@ async function track<T>(p: Promise<T>): Promise<T> {
 export async function anilistFetch<T>(
   query: string,
   variables: Record<string, unknown>,
-  retries = 2
+  retries = 2,
 ): Promise<T> {
   await throttle();
 
@@ -44,42 +44,28 @@ export async function anilistFetch<T>(
         },
         body: JSON.stringify({ query, variables }),
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-      })
+      }),
     );
 
     if (res.status === 429) {
       if (remaining <= 0) {
         const retryAfter = Number(
-          res.headers.get("Retry-After") ??
-            res.headers.get("X-RateLimit-Reset") ??
-            30
+          res.headers.get("Retry-After") ?? res.headers.get("X-RateLimit-Reset") ?? 30,
         );
-        throw new AniListError(
-          "AniList rate limit hit",
-          "rate_limited",
-          retryAfter
-        );
+        throw new AniListError("AniList rate limit hit", "rate_limited", retryAfter);
       }
       const retryAfter = Number(
-        res.headers.get("Retry-After") ??
-          res.headers.get("X-RateLimit-Reset") ??
-          5
+        res.headers.get("Retry-After") ?? res.headers.get("X-RateLimit-Reset") ?? 5,
       );
       const backoff = Math.min(retryAfter * 1000, 10_000);
       await wait(backoff);
       return attempt(remaining - 1);
     }
     if (res.status === 403) {
-      throw new AniListError(
-        "AniList API temporarily unavailable",
-        "outage"
-      );
+      throw new AniListError("AniList API temporarily unavailable", "outage");
     }
     if (!res.ok) {
-      throw new AniListError(
-        `AniList request failed (${res.status})`,
-        "network"
-      );
+      throw new AniListError(`AniList request failed (${res.status})`, "network");
     }
 
     const json = (await res.json()) as {

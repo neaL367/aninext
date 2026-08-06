@@ -1,14 +1,8 @@
 "use client";
-import type { Route } from "next";
-
+import { CalendarIcon, ClockIcon, StarIcon, TrendingUpIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import {
-  CalendarIcon,
-  ClockIcon,
-  StarIcon,
-  TrendingUpIcon,
-} from "lucide-react";
+
 import {
   Command,
   CommandDialog,
@@ -20,7 +14,9 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { COLLECTION_NAV_ITEMS } from "@/features/anime/lib/collection-config";
+
 import type { AnimeCollection } from "@/features/anime/types/anime";
+import type { Route } from "next";
 
 const COLLECTION_ICONS: Record<AnimeCollection, React.ReactNode> = {
   trending: <TrendingUpIcon />,

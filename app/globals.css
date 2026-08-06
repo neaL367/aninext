@@ -22,24 +22,24 @@
   --secondary-foreground: oklch(0.2 0.005 285);
   --muted: oklch(0.94 0.004 285);
   --muted-foreground: oklch(0.42 0.01 285);
-  --accent: #0070F3;
-  --accent-foreground: #FFFFFF;
-  --destructive: #EE0000;
-  --destructive-foreground: #FFFFFF;
+  --accent: #0070f3;
+  --accent-foreground: #ffffff;
+  --destructive: #ee0000;
+  --destructive-foreground: #ffffff;
   --border: oklch(0.145 0.005 285 / 0.18);
   --border-soft: oklch(0.145 0.005 285 / 0.12);
   --input: oklch(0.145 0.005 285 / 0.14);
-  --ring: color-mix(in srgb, #0070F3 40%, transparent);
-  --glow: color-mix(in srgb, #0070F3 12%, transparent);
-  --hero-glow: color-mix(in srgb, #0070F3 15%, transparent);
-  --section-accent: #0070F3;
-  --signal: #0070F3;
-  --signal-strong: #0056CC;
-  --signal-soft: color-mix(in srgb, #0070F3 8%, transparent);
-  --score-high: #10B981;
-  --score-mid: #F59E0B;
+  --ring: color-mix(in srgb, #0070f3 40%, transparent);
+  --glow: color-mix(in srgb, #0070f3 12%, transparent);
+  --hero-glow: color-mix(in srgb, #0070f3 15%, transparent);
+  --section-accent: #0070f3;
+  --signal: #0070f3;
+  --signal-strong: #0056cc;
+  --signal-soft: color-mix(in srgb, #0070f3 8%, transparent);
+  --score-high: #10b981;
+  --score-mid: #f59e0b;
   --score-low: oklch(0.55 0.01 285);
-  --live-badge: #EF4444;
+  --live-badge: #ef4444;
   --paper: oklch(0.92 0.005 285);
 }
 
@@ -60,24 +60,24 @@
   --secondary-foreground: oklch(0.9 0.002 285);
   --muted: oklch(0.14 0.006 285);
   --muted-foreground: oklch(0.62 0.008 285);
-  --accent: #3291FF;
+  --accent: #3291ff;
   --accent-foreground: #000000;
-  --destructive: #FF4444;
+  --destructive: #ff4444;
   --destructive-foreground: #000000;
   --border: oklch(0.96 0.002 285 / 0.14);
   --border-soft: oklch(0.96 0.002 285 / 0.08);
   --input: oklch(0.96 0.002 285 / 0.16);
-  --ring: color-mix(in srgb, #3291FF 50%, transparent);
-  --glow: color-mix(in srgb, #3291FF 12%, transparent);
-  --hero-glow: color-mix(in srgb, #3291FF 16%, transparent);
-  --section-accent: #3291FF;
-  --signal: #3291FF;
-  --signal-strong: #0070F3;
-  --signal-soft: color-mix(in srgb, #3291FF 10%, transparent);
-  --score-high: #34D399;
-  --score-mid: #FBBF24;
+  --ring: color-mix(in srgb, #3291ff 50%, transparent);
+  --glow: color-mix(in srgb, #3291ff 12%, transparent);
+  --hero-glow: color-mix(in srgb, #3291ff 16%, transparent);
+  --section-accent: #3291ff;
+  --signal: #3291ff;
+  --signal-strong: #0070f3;
+  --signal-soft: color-mix(in srgb, #3291ff 10%, transparent);
+  --score-high: #34d399;
+  --score-mid: #fbbf24;
   --score-low: oklch(0.64 0.025 78);
-  --live-badge: #F87171;
+  --live-badge: #f87171;
   --paper: oklch(0.93 0.002 285);
 }
 
@@ -137,8 +137,16 @@
   body {
     @apply bg-background text-foreground;
     background-image:
-      radial-gradient(circle at 15% -10%, color-mix(in srgb, var(--signal) 9%, transparent), transparent 32rem),
-      radial-gradient(circle at 90% 10%, color-mix(in srgb, var(--paper) 5%, transparent), transparent 28rem);
+      radial-gradient(
+        circle at 15% -10%,
+        color-mix(in srgb, var(--signal) 9%, transparent),
+        transparent 32rem
+      ),
+      radial-gradient(
+        circle at 90% 10%,
+        color-mix(in srgb, var(--paper) 5%, transparent),
+        transparent 28rem
+      );
     scrollbar-gutter: stable;
     scrollbar-color: var(--border) var(--background);
     scrollbar-width: thin;
@@ -183,7 +191,17 @@
   }
 
   .paper-grid {
-    background-image: linear-gradient(to right, color-mix(in srgb, var(--foreground) 6%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, var(--foreground) 6%, transparent) 1px, transparent 1px);
+    background-image:
+      linear-gradient(
+        to right,
+        color-mix(in srgb, var(--foreground) 6%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--foreground) 6%, transparent) 1px,
+        transparent 1px
+      );
     background-size: 32px 32px;
   }
 
@@ -215,8 +233,12 @@
   }
 
   @keyframes shimmer {
-    0% { background-position: 180% 0; }
-    100% { background-position: -80% 0; }
+    0% {
+      background-position: 180% 0;
+    }
+    100% {
+      background-position: -80% 0;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTransition, useMemo, useCallback } from "react";
+
 import { formatFilterValue } from "../lib/filter-constants";
 
 export interface ActiveFilter {
@@ -30,7 +31,7 @@ export function useFilters() {
         router.replace(`?${params.toString()}`, { scroll: false });
       });
     },
-    [searchParams, router]
+    [searchParams, router],
   );
 
   const removeFilter = useCallback(
@@ -47,7 +48,7 @@ export function useFilters() {
         router.replace(`?${params.toString()}`, { scroll: false });
       });
     },
-    [searchParams, router]
+    [searchParams, router],
   );
 
   const clearAll = useCallback(() => {
@@ -60,17 +61,16 @@ export function useFilters() {
     const filters: ActiveFilter[] = [];
     const search = searchParams.get("search");
     if (search) filters.push({ key: "search", label: search });
-    searchParams.getAll("genre").forEach((g) =>
-      filters.push({ key: "genre", label: g, value: g })
-    );
-    searchParams.getAll("format").forEach((f) =>
-      filters.push({ key: "format", label: formatFilterValue(f), value: f })
-    );
-    searchParams.getAll("status").forEach((s) =>
-      filters.push({ key: "status", label: formatFilterValue(s), value: s })
-    );
+    searchParams.getAll("genre").forEach((g) => filters.push({ key: "genre", label: g, value: g }));
+    searchParams
+      .getAll("format")
+      .forEach((f) => filters.push({ key: "format", label: formatFilterValue(f), value: f }));
+    searchParams
+      .getAll("status")
+      .forEach((s) => filters.push({ key: "status", label: formatFilterValue(s), value: s }));
     const season = searchParams.get("season");
-    if (season) filters.push({ key: "season", label: season.charAt(0) + season.slice(1).toLowerCase() });
+    if (season)
+      filters.push({ key: "season", label: season.charAt(0) + season.slice(1).toLowerCase() });
     const year = searchParams.get("year");
     if (year) filters.push({ key: "year", label: year });
     const country = searchParams.get("country");

@@ -1,21 +1,25 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
-import { Empty, EmptyHeader, EmptyTitle, EmptyMedia } from "@/components/ui/empty";
 import { LinkIcon } from "lucide-react";
-import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
-import type { RelationEdge } from "@/features/anime/types/anime";
-import { getTitle, getCover } from "@/features/anime/lib/media-helpers";
 import Link from "next/link";
-import type { Route } from "next";
+
 import { ImageWithLoading } from "@/components/image-with-loading";
+import { Empty, EmptyHeader, EmptyTitle, EmptyMedia } from "@/components/ui/empty";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
+import { getTitle, getCover } from "@/features/anime/lib/media-helpers";
+
+import type { RelationEdge } from "@/features/anime/types/anime";
+import type { Route } from "next";
 
 export function AnimeRelations({ edges }: { edges: RelationEdge[] }) {
   if (edges.length === 0) {
     return (
       <Empty>
         <EmptyHeader>
-          <EmptyMedia variant="icon"><LinkIcon /></EmptyMedia>
+          <EmptyMedia variant="icon">
+            <LinkIcon />
+          </EmptyMedia>
           <EmptyTitle>No related anime</EmptyTitle>
         </EmptyHeader>
       </Empty>
@@ -24,7 +28,9 @@ export function AnimeRelations({ edges }: { edges: RelationEdge[] }) {
 
   return (
     <div>
-      <p className="mb-3 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted-foreground">{edges.length} titles · scroll to browse</p>
+      <p className="mb-3 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted-foreground">
+        {edges.length} titles · scroll to browse
+      </p>
       <div className="max-h-[360px] overflow-y-auto scrollbar-thin divide-y divide-border border-y border-border">
         {edges.map((edge, i) => {
           const title = getTitle(edge.node.title);
@@ -32,19 +38,37 @@ export function AnimeRelations({ edges }: { edges: RelationEdge[] }) {
           const color = edge.node.coverImage.color;
           return (
             <AnimePreviewCard key={`${edge.node.id}-${i}`} media={edge.node}>
-              <Link href={`/anime/${edge.node.id}` as Route<string>} className="group flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+              <Link
+                href={`/anime/${edge.node.id}` as Route<string>}
+                className="group flex items-center gap-3 py-3 first:pt-0 last:pb-0"
+              >
                 <div className="relative h-14 w-10 shrink-0 overflow-hidden border border-border bg-surface-2">
                   {cover ? (
-                    <ImageWithLoading src={cover} alt={title} fill sizes="48px" className="object-cover" />
+                    <ImageWithLoading
+                      src={cover}
+                      alt={title}
+                      fill
+                      sizes="48px"
+                      className="object-cover"
+                    />
                   ) : (
-                    <div className="flex h-full items-center justify-center p-1" style={color ? { backgroundColor: `${color}35` } : undefined}>
-                      <span className="line-clamp-3 text-center font-mono text-[0.5rem] uppercase text-muted-foreground">{title}</span>
+                    <div
+                      className="flex h-full items-center justify-center p-1"
+                      style={color ? { backgroundColor: `${color}35` } : undefined}
+                    >
+                      <span className="line-clamp-3 text-center font-mono text-[0.5rem] uppercase text-muted-foreground">
+                        {title}
+                      </span>
                     </div>
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="line-clamp-2 text-sm font-medium leading-snug group-hover:text-accent">{title}</p>
-                  <p className="mt-1 font-mono text-[0.6rem] uppercase tracking-[0.06em] text-muted-foreground">{edge.relationType.replaceAll("_", " ")}</p>
+                  <p className="line-clamp-2 text-sm font-medium leading-snug group-hover:text-accent">
+                    {title}
+                  </p>
+                  <p className="mt-1 font-mono text-[0.6rem] uppercase tracking-[0.06em] text-muted-foreground">
+                    {edge.relationType.replaceAll("_", " ")}
+                  </p>
                 </div>
               </Link>
             </AnimePreviewCard>

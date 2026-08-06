@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
-import type { AnimeCollection } from "@/features/anime/types/anime";
 import { getCurrentSeason } from "./season";
+
+import type { AnimeCollection } from "@/features/anime/types/anime";
+import type { Metadata } from "next";
 
 export interface CollectionConfig {
   title: string;
@@ -20,8 +21,7 @@ export const COLLECTIONS: Record<AnimeCollection, CollectionConfig> = {
   trending: {
     title: "Trending Anime — AniNext",
     heading: "Trending Anime",
-    description:
-      "See what anime is trending right now based on community activity.",
+    description: "See what anime is trending right now based on community activity.",
     pageHeading: "Trending Anime",
     pageDescription: "What everyone's watching right now",
     navLabel: "Trending",
@@ -42,8 +42,7 @@ export const COLLECTIONS: Record<AnimeCollection, CollectionConfig> = {
   top100: {
     title: "Top 100 Anime of All Time — AniNext",
     heading: "Top 100 Anime",
-    description:
-      "The 100 highest-rated anime of all time, ranked by user scores.",
+    description: "The 100 highest-rated anime of all time, ranked by user scores.",
     pageHeading: "Top 100 Anime",
     pageDescription: "Highest rated of all time",
     navLabel: "Top 100",
@@ -64,8 +63,7 @@ export const COLLECTIONS: Record<AnimeCollection, CollectionConfig> = {
   alltimepopular: {
     title: "Most Popular Anime — AniNext",
     heading: "Most Popular Anime",
-    description:
-      "The most popular anime of all time by community engagement.",
+    description: "The most popular anime of all time by community engagement.",
     pageHeading: "All-Time Popular",
     pageDescription: "The most beloved anime ever made",
     navLabel: "All-Time",
@@ -98,9 +96,7 @@ export const COLLECTION_NAV_ITEMS = COLLECTION_ORDER.map((id) => ({
   label: COLLECTIONS[id].navLabel,
 }));
 
-export function getCollectionMetadata(
-  collection: AnimeCollection
-): Metadata {
+export function getCollectionMetadata(collection: AnimeCollection): Metadata {
   const c = COLLECTIONS[collection];
   return {
     title: c.title,

@@ -1,9 +1,8 @@
 "use client";
 
+import { ChevronDownIcon } from "lucide-react";
 import { use, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Switch } from "@/components/ui/switch";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,9 +13,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { ChevronDownIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { FilterButton } from "./filter-button";
+
 import { useFilters } from "../../hooks/use-filters";
 import {
   FILTER_FORMATS,
@@ -27,10 +28,19 @@ import {
   getYears,
   formatFilterValue,
 } from "../../lib/filter-constants";
+import { FilterButton } from "./filter-button";
 
 import type { AnimeCollection } from "@/features/anime/types/anime";
 
-export function FilterSidebar({ genresPromise, mobile = false, collection }: { genresPromise: Promise<string[]>; mobile?: boolean; collection?: AnimeCollection }) {
+export function FilterSidebar({
+  genresPromise,
+  mobile = false,
+  collection,
+}: {
+  genresPromise: Promise<string[]>;
+  mobile?: boolean;
+  collection?: AnimeCollection;
+}) {
   const allGenres = use(genresPromise);
   const {
     isPending,
@@ -55,10 +65,15 @@ export function FilterSidebar({ genresPromise, mobile = false, collection }: { g
   const yearDefault = collection === "seasonal" || !!currentYear;
 
   return (
-    <aside className={cn(mobile ? "flex w-full" : "hidden w-full lg:flex", "flex-col")} data-pending={isPending ? "" : undefined}>
+    <aside
+      className={cn(mobile ? "flex w-full" : "hidden w-full lg:flex", "flex-col")}
+      data-pending={isPending ? "" : undefined}
+    >
       <div className="mb-3 flex items-center justify-between border-b border-border-soft pb-3">
         <div className="flex items-center gap-2">
-          <span className="font-mono text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-foreground">Filters</span>
+          <span className="font-mono text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-foreground">
+            Filters
+          </span>
           {activeCount > 0 && (
             <span className="flex size-5 items-center justify-center rounded-full bg-accent font-mono text-[0.6rem] font-semibold text-accent-foreground">
               {activeCount}
@@ -87,7 +102,9 @@ export function FilterSidebar({ genresPromise, mobile = false, collection }: { g
                   key={genre}
                   active={active}
                   onClick={() => {
-                    const next = active ? currentGenres.filter((g) => g !== genre) : [...currentGenres, genre];
+                    const next = active
+                      ? currentGenres.filter((g) => g !== genre)
+                      : [...currentGenres, genre];
                     updateFilter("genre", next.length ? next : undefined);
                   }}
                 >
@@ -107,7 +124,9 @@ export function FilterSidebar({ genresPromise, mobile = false, collection }: { g
                   key={format}
                   active={active}
                   onClick={() => {
-                    const next = active ? currentFormats.filter((f) => f !== format) : [...currentFormats, format];
+                    const next = active
+                      ? currentFormats.filter((f) => f !== format)
+                      : [...currentFormats, format];
                     updateFilter("format", next.length ? next : undefined);
                   }}
                 >
@@ -127,7 +146,9 @@ export function FilterSidebar({ genresPromise, mobile = false, collection }: { g
                   key={status}
                   active={active}
                   onClick={() => {
-                    const next = active ? currentStatuses.filter((s) => s !== status) : [...currentStatuses, status];
+                    const next = active
+                      ? currentStatuses.filter((s) => s !== status)
+                      : [...currentStatuses, status];
                     updateFilter("status", next.length ? next : undefined);
                   }}
                 >
@@ -144,7 +165,11 @@ export function FilterSidebar({ genresPromise, mobile = false, collection }: { g
               Any
             </FilterButton>
             {FILTER_SEASONS.map((s) => (
-              <FilterButton key={s.value} active={currentSeason === s.value} onClick={() => updateFilter("season", s.value)}>
+              <FilterButton
+                key={s.value}
+                active={currentSeason === s.value}
+                onClick={() => updateFilter("season", s.value)}
+              >
                 {s.label}
               </FilterButton>
             ))}
@@ -157,7 +182,11 @@ export function FilterSidebar({ genresPromise, mobile = false, collection }: { g
               Any
             </FilterButton>
             {getYears().map((y) => (
-              <FilterButton key={y} active={currentYear === String(y)} onClick={() => updateFilter("year", String(y))}>
+              <FilterButton
+                key={y}
+                active={currentYear === String(y)}
+                onClick={() => updateFilter("year", String(y))}
+              >
                 {y}
               </FilterButton>
             ))}
@@ -166,11 +195,18 @@ export function FilterSidebar({ genresPromise, mobile = false, collection }: { g
 
         <FilterSection label="Origin" count={currentCountry ? 1 : 0}>
           <div className="flex flex-wrap gap-1.5">
-            <FilterButton active={!currentCountry} onClick={() => updateFilter("country", undefined)}>
+            <FilterButton
+              active={!currentCountry}
+              onClick={() => updateFilter("country", undefined)}
+            >
               All
             </FilterButton>
             {FILTER_COUNTRIES.map((country) => (
-              <FilterButton key={country.value} active={currentCountry === country.value} onClick={() => updateFilter("country", country.value)}>
+              <FilterButton
+                key={country.value}
+                active={currentCountry === country.value}
+                onClick={() => updateFilter("country", country.value)}
+              >
                 {country.label}
               </FilterButton>
             ))}
@@ -178,25 +214,41 @@ export function FilterSidebar({ genresPromise, mobile = false, collection }: { g
         </FilterSection>
 
         <div className="border-b border-border-soft py-3">
-          <button type="button" onClick={() => setAdultOpen(!adultOpen)} className="flex w-full items-center gap-2 text-left">
-            <ChevronDownIcon className={cn("size-3.5 transition-transform", adultOpen && "rotate-180")} />
-            <span className="font-mono text-[0.65rem] font-medium text-foreground">Adult content</span>
-            {isAdult && <span className="ml-auto rounded-sm bg-live-badge/10 px-1.5 py-0.5 font-mono text-[0.6rem] font-medium text-live-badge">Enabled</span>}
+          <button
+            type="button"
+            onClick={() => setAdultOpen(!adultOpen)}
+            className="flex w-full items-center gap-2 text-left"
+          >
+            <ChevronDownIcon
+              className={cn("size-3.5 transition-transform", adultOpen && "rotate-180")}
+            />
+            <span className="font-mono text-[0.65rem] font-medium text-foreground">
+              Adult content
+            </span>
+            {isAdult && (
+              <span className="ml-auto rounded-sm bg-live-badge/10 px-1.5 py-0.5 font-mono text-[0.6rem] font-medium text-live-badge">
+                Enabled
+              </span>
+            )}
           </button>
           {adultOpen && (
             <div className="mt-3 space-y-3">
               <p className="text-xs leading-5 text-muted-foreground">
-                This includes mature themes and graphic material. You must be 18 years or older to view adult content.
+                This includes mature themes and graphic material. You must be 18 years or older to
+                view adult content.
               </p>
               <div className="flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">Enable adult content</span>
-                <Switch checked={isAdult} onCheckedChange={(checked: boolean) => {
-                  if (checked) {
-                    setConfirmOpen(true);
-                  } else {
-                    updateFilter("isAdult", undefined);
-                  }
-                }} />
+                <Switch
+                  checked={isAdult}
+                  onCheckedChange={(checked: boolean) => {
+                    if (checked) {
+                      setConfirmOpen(true);
+                    } else {
+                      updateFilter("isAdult", undefined);
+                    }
+                  }}
+                />
               </div>
             </div>
           )}
@@ -208,15 +260,18 @@ export function FilterSidebar({ genresPromise, mobile = false, collection }: { g
           <AlertDialogHeader>
             <AlertDialogTitle>Age confirmation</AlertDialogTitle>
             <AlertDialogDescription>
-              This content is intended for mature audiences and may include graphic material. You must be 18 years or older to view adult content.
+              This content is intended for mature audiences and may include graphic material. You
+              must be 18 years or older to view adult content.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => {
-              setConfirmOpen(false);
-              updateFilter("isAdult", "true");
-            }}>
+            <AlertDialogAction
+              onClick={() => {
+                setConfirmOpen(false);
+                updateFilter("isAdult", "true");
+              }}
+            >
               I am 18 or older
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -226,13 +281,27 @@ export function FilterSidebar({ genresPromise, mobile = false, collection }: { g
   );
 }
 
-function FilterSection({ label, children, defaultOpen = false, count }: { label: string; children: React.ReactNode; defaultOpen?: boolean; count?: number }) {
+function FilterSection({
+  label,
+  children,
+  defaultOpen = false,
+  count,
+}: {
+  label: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+  count?: number;
+}) {
   const [toggled, setToggled] = useState<boolean | null>(null);
   const open = toggled ?? ((count ?? 0) > 0 ? true : defaultOpen);
 
   return (
     <div className="border-b border-border-soft py-3">
-      <button type="button" onClick={() => setToggled(!open)} className="flex w-full items-center gap-2 text-left">
+      <button
+        type="button"
+        onClick={() => setToggled(!open)}
+        className="flex w-full items-center gap-2 text-left"
+      >
         <ChevronDownIcon className={cn("size-3.5 transition-transform", open && "rotate-180")} />
         <span className="font-mono text-[0.65rem] font-medium text-foreground">{label}</span>
         {count !== undefined && count > 0 && (
@@ -245,5 +314,13 @@ function FilterSection({ label, children, defaultOpen = false, count }: { label:
 }
 
 export function FilterSidebarSkeleton() {
-  return <aside className="hidden w-full flex-col gap-1 lg:flex">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="border-b border-border py-2"><Skeleton className="h-5 w-20 rounded" /></div>)}</aside>;
+  return (
+    <aside className="hidden w-full flex-col gap-1 lg:flex">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i} className="border-b border-border py-2">
+          <Skeleton className="h-5 w-20 rounded" />
+        </div>
+      ))}
+    </aside>
+  );
 }

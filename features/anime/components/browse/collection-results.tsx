@@ -1,5 +1,7 @@
-import { BrowsePageResults } from "./browse-page-shell";
 import { parseFilters } from "@/features/anime/lib/parse-filters";
+
+import { BrowsePageResults } from "./browse-page-shell";
+
 import type { AnimeCollection } from "@/features/anime/types/anime";
 
 export async function CollectionResults({

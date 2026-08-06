@@ -1,6 +1,7 @@
-import type { Media } from "@/features/anime/types/anime";
-import { MediaCard, MediaCardSkeleton } from "@/features/anime/components/home/media-card";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
+import { MediaCard, MediaCardSkeleton } from "@/features/anime/components/home/media-card";
+
+import type { Media } from "@/features/anime/types/anime";
 
 export function MediaGrid({ items, rankStart }: { items: Media[]; rankStart?: number }) {
   return (
@@ -8,7 +9,13 @@ export function MediaGrid({ items, rankStart }: { items: Media[]; rankStart?: nu
       {items.map((item, i) => (
         <div key={item.id} role="listitem">
           <AnimePreviewCard media={item}>
-            <MediaCard media={item} rank={rankStart !== undefined ? rankStart + i : undefined} viewTransition vtIndex={(rankStart ?? 0) + i} priority={i === 0} />
+            <MediaCard
+              media={item}
+              rank={rankStart !== undefined ? rankStart + i : undefined}
+              viewTransition
+              vtIndex={(rankStart ?? 0) + i}
+              priority={i === 0}
+            />
           </AnimePreviewCard>
         </div>
       ))}

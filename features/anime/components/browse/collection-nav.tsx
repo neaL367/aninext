@@ -1,18 +1,23 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { ArrowUpRightIcon } from "lucide-react";
+import { usePathname } from "next/navigation";
+
 import { HoverPrefetchLink } from "@/components/hover-prefetch-link";
-import type { AnimeCollection } from "@/features/anime/types/anime";
 import { COLLECTION_NAV_ITEMS } from "@/features/anime/lib/collection-config";
 import { cn } from "@/lib/utils";
+
+import type { AnimeCollection } from "@/features/anime/types/anime";
 
 export function CollectionNav() {
   const pathname = usePathname();
   const active = pathname.split("/")[2] as AnimeCollection;
 
   return (
-    <nav className="flex items-center gap-1 overflow-x-auto border-b border-border-soft scrollbar-none" aria-label="Anime collections">
+    <nav
+      className="flex items-center gap-1 overflow-x-auto border-b border-border-soft scrollbar-none"
+      aria-label="Anime collections"
+    >
       {COLLECTION_NAV_ITEMS.map(({ id, label }) => {
         const isActive = id === active || (id === "trending" && pathname === "/anime");
         return (
@@ -22,7 +27,7 @@ export function CollectionNav() {
             prefetch={id === "seasonal" ? false : undefined}
             className={cn(
               "group relative flex shrink-0 items-center gap-2 px-3 pb-3 pt-1 text-sm transition-colors",
-              isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+              isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
             )}
           >
             {label}

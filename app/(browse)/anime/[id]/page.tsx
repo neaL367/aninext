@@ -1,10 +1,19 @@
 import { Suspense } from "react";
-import type { Metadata } from "next";
-import { ErrorBoundary } from "@/components/error-boundary";
-import { DetailSection, DetailSectionSkeleton } from "@/features/anime/components/detail/detail-section";
-import { getAnimeDetail } from "@/features/anime/anime-queries";
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+import { ErrorBoundary } from "@/components/error-boundary";
+import { getAnimeDetail } from "@/features/anime/anime-queries";
+import {
+  DetailSection,
+  DetailSectionSkeleton,
+} from "@/features/anime/components/detail/detail-section";
+
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
   const { id } = await params;
   try {
     const detail = await getAnimeDetail(Number(id));
@@ -15,7 +24,11 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     return {
       title,
       description,
-      openGraph: { title, description, images: media.bannerImage ? [{ url: media.bannerImage }] : [] },
+      openGraph: {
+        title,
+        description,
+        images: media.bannerImage ? [{ url: media.bannerImage }] : [],
+      },
       alternates: { canonical: `/anime/${id}` },
     };
   } catch {

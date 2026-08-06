@@ -1,13 +1,27 @@
-import Link from "next/link";
-import Image from "next/image";
-import type { Route } from "next";
-import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
-import { getAiringWeek } from "@/features/anime/anime-queries";
-import type { AiringScheduleNode } from "@/features/anime/types/anime";
-import { formatFormat, fromAiringTimestamp, getTitle, localDateStr } from "@/features/anime/lib/media-helpers";
 import { CalendarIcon, ExternalLinkIcon } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+
 import { ImageWithLoading } from "@/components/image-with-loading";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
+import { getAiringWeek } from "@/features/anime/anime-queries";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
+import {
+  formatFormat,
+  fromAiringTimestamp,
+  getTitle,
+  localDateStr,
+} from "@/features/anime/lib/media-helpers";
+
+import type { AiringScheduleNode } from "@/features/anime/types/anime";
+import type { Route } from "next";
 
 function currentBlockName(): string {
   const hour = new Date().getHours();
@@ -31,7 +45,20 @@ export async function AiringTimeline({ day }: { day: string }) {
   const start = Math.floor(date.setHours(0, 0, 0, 0) / 1000);
   const schedules = await getAiringWeek(start, start + 86400);
 
-  if (schedules.length === 0) return <Empty><EmptyHeader><EmptyMedia variant="icon"><CalendarIcon /></EmptyMedia><EmptyTitle>Nothing airing today</EmptyTitle></EmptyHeader><EmptyContent><EmptyDescription>Choose another day to scan the week.</EmptyDescription></EmptyContent></Empty>;
+  if (schedules.length === 0)
+    return (
+      <Empty>
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <CalendarIcon />
+          </EmptyMedia>
+          <EmptyTitle>Nothing airing today</EmptyTitle>
+        </EmptyHeader>
+        <EmptyContent>
+          <EmptyDescription>Choose another day to scan the week.</EmptyDescription>
+        </EmptyContent>
+      </Empty>
+    );
 
   const grouped = groupByTimeBlock(schedules);
   const now = Date.now() / 1000;
@@ -46,8 +73,22 @@ export async function AiringTimeline({ day }: { day: string }) {
         return (
           <section key={block}>
             <div className="mb-4 flex items-center gap-3">
-              <span className={isActive ? "flex size-2 animate-pulse rounded-full bg-live-badge" : "flex size-2 rounded-full bg-accent"} />
-              <h2 className={isActive ? "text-sm font-semibold uppercase tracking-[0.1em] text-live-badge" : "text-sm font-semibold uppercase tracking-[0.1em] text-foreground"}>{block}</h2>
+              <span
+                className={
+                  isActive
+                    ? "flex size-2 animate-pulse rounded-full bg-live-badge"
+                    : "flex size-2 rounded-full bg-accent"
+                }
+              />
+              <h2
+                className={
+                  isActive
+                    ? "text-sm font-semibold uppercase tracking-[0.1em] text-live-badge"
+                    : "text-sm font-semibold uppercase tracking-[0.1em] text-foreground"
+                }
+              >
+                {block}
+              </h2>
               {isActive && <span className="font-mono text-xs text-live-badge">now</span>}
               <span className="font-mono text-xs text-muted-foreground">{items.length}</span>
             </div>
@@ -62,34 +103,65 @@ export async function AiringTimeline({ day }: { day: string }) {
                 return (
                   <AnimePreviewCard key={`${item.media.id}-${index}`} media={item.media}>
                     <article className="group flex gap-4 border border-border p-4 transition-colors hover:border-accent/50 hover:bg-surface-1/40">
-                      <Link href={`/anime/${item.media.id}` as Route<string>} className="relative h-[88px] w-[66px] shrink-0 overflow-hidden bg-surface-2">
+                      <Link
+                        href={`/anime/${item.media.id}` as Route<string>}
+                        className="relative h-[88px] w-[66px] shrink-0 overflow-hidden bg-surface-2"
+                      >
                         {item.media.coverImage.medium ? (
-                          <ImageWithLoading src={item.media.coverImage.medium} alt={title} fill sizes="66px" className="object-cover transition-transform duration-300 group-hover:scale-[1.05]" />
+                          <ImageWithLoading
+                            src={item.media.coverImage.medium}
+                            alt={title}
+                            fill
+                            sizes="66px"
+                            className="object-cover transition-transform duration-300 group-hover:scale-[1.05]"
+                          />
                         ) : (
-                          <div className="flex h-full items-center justify-center p-1 text-center font-mono text-[0.5rem] text-muted-foreground">{title}</div>
+                          <div className="flex h-full items-center justify-center p-1 text-center font-mono text-[0.5rem] text-muted-foreground">
+                            {title}
+                          </div>
                         )}
                       </Link>
                       <div className="flex min-w-0 flex-1 flex-col justify-between">
                         <div>
-                          <Link href={`/anime/${item.media.id}` as Route<string>} className="line-clamp-2 text-sm font-medium leading-snug hover:text-accent">{title}</Link>
-                          <p className="mt-1 font-mono text-xs text-muted-foreground">Ep {item.episode} {item.media.format ? `· ${formatFormat(item.media.format)}` : ""}</p>
+                          <Link
+                            href={`/anime/${item.media.id}` as Route<string>}
+                            className="line-clamp-2 text-sm font-medium leading-snug hover:text-accent"
+                          >
+                            {title}
+                          </Link>
+                          <p className="mt-1 font-mono text-xs text-muted-foreground">
+                            Ep {item.episode}{" "}
+                            {item.media.format ? `· ${formatFormat(item.media.format)}` : ""}
+                          </p>
                         </div>
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-2">
                             {isLive ? (
                               <span className="flex items-center gap-1 font-mono text-xs text-live-badge">
-                                <span className="size-1.5 animate-pulse rounded-full bg-live-badge" />Live
+                                <span className="size-1.5 animate-pulse rounded-full bg-live-badge" />
+                                Live
                               </span>
                             ) : isClose ? (
-                              <span className="flex items-center gap-1 font-mono text-xs text-live-badge">Soon</span>
+                              <span className="flex items-center gap-1 font-mono text-xs text-live-badge">
+                                Soon
+                              </span>
                             ) : (
-                              <time dateTime={time.toISOString()} className="font-mono text-xs tabular-nums text-muted-foreground">
-                                {time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+                              <time
+                                dateTime={time.toISOString()}
+                                className="font-mono text-xs tabular-nums text-muted-foreground"
+                              >
+                                {time.toLocaleTimeString("en-US", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
                               </time>
                             )}
                           </div>
                           {(() => {
-                            const streamingLinks = item.media?.externalLinks?.filter((link) => link.type === "STREAMING") ?? [];
+                            const streamingLinks =
+                              item.media?.externalLinks?.filter(
+                                (link) => link.type === "STREAMING",
+                              ) ?? [];
                             if (streamingLinks.length > 0) {
                               return (
                                 <div className="flex shrink-0 items-center gap-1">
@@ -106,7 +178,14 @@ export async function AiringTimeline({ day }: { day: string }) {
                                         title={link.site}
                                       >
                                         {favicon ? (
-                                          <Image src={favicon} alt="" width={14} height={14} className="size-3.5" unoptimized />
+                                          <Image
+                                            src={favicon}
+                                            alt=""
+                                            width={14}
+                                            height={14}
+                                            className="size-3.5"
+                                            unoptimized
+                                          />
                                         ) : (
                                           <ExternalLinkIcon className="size-3 text-muted-foreground" />
                                         )}
@@ -117,7 +196,11 @@ export async function AiringTimeline({ day }: { day: string }) {
                               );
                             }
                             return (
-                              <Link href={`/anime/${item.media.id}` as Route<string>} className="shrink-0 text-muted-foreground hover:text-accent" aria-label={`Open ${title}`}>
+                              <Link
+                                href={`/anime/${item.media.id}` as Route<string>}
+                                className="shrink-0 text-muted-foreground hover:text-accent"
+                                aria-label={`Open ${title}`}
+                              >
                                 <ExternalLinkIcon className="size-3.5" />
                               </Link>
                             );
@@ -137,7 +220,12 @@ export async function AiringTimeline({ day }: { day: string }) {
 }
 
 function groupByTimeBlock(schedules: AiringScheduleNode[]): Record<string, AiringScheduleNode[]> {
-  const blocks: Record<string, AiringScheduleNode[]> = { "Morning": [], "Afternoon": [], "Evening": [], "Night": [] };
+  const blocks: Record<string, AiringScheduleNode[]> = {
+    Morning: [],
+    Afternoon: [],
+    Evening: [],
+    Night: [],
+  };
   for (const item of schedules) {
     const hour = fromAiringTimestamp(item.airingAt).getHours();
     if (hour >= 6 && hour < 12) blocks["Morning"].push(item);

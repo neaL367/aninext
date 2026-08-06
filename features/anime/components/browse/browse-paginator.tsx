@@ -1,10 +1,13 @@
 "use client";
 
 import { Suspense, use, useEffect, useState, useTransition, type ReactNode } from "react";
+
 import { Crossfade } from "@/components/crossfade";
-import { InfiniteScrollSentinel } from "./infinite-scroll-sentinel";
+
 import { BrowseGrid } from "./browse-grid";
 import { renderBrowsePage, type BrowsePage } from "./browse-page-action";
+import { InfiniteScrollSentinel } from "./infinite-scroll-sentinel";
+
 import type { AnimeCollection, AnimeFilters } from "@/features/anime/types/anime";
 
 export function BrowsePaginator({

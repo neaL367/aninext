@@ -1,9 +1,11 @@
-import type { AnimeCollection, AnimeFilters } from "@/features/anime/types/anime";
 import { buildFilterHash } from "@/features/anime/lib/parse-filters";
-import { MediaGridSkeleton } from "./media-grid";
-import { BrowsePaginator } from "./browse-paginator";
+
 import { renderBrowsePage } from "./browse-page-action";
+import { BrowsePaginator } from "./browse-paginator";
 import { EmptySearch, EmptyFilters, EmptyUpcoming } from "./empty-states";
+import { MediaGridSkeleton } from "./media-grid";
+
+import type { AnimeCollection, AnimeFilters } from "@/features/anime/types/anime";
 
 export async function AnimeResults({
   collection,
@@ -26,14 +28,16 @@ export async function AnimeResults({
   );
 }
 
-function getEmptyComponent(
-  collection: AnimeCollection,
-  filters: AnimeFilters
-) {
+function getEmptyComponent(collection: AnimeCollection, filters: AnimeFilters) {
   if (filters.search) {
     return <EmptySearch />;
   }
-  if (filters.genre?.length || filters.format?.length || filters.status?.length || filters.country) {
+  if (
+    filters.genre?.length ||
+    filters.format?.length ||
+    filters.status?.length ||
+    filters.country
+  ) {
     return <EmptyFilters />;
   }
   if (collection === "upcoming") {

@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { catchError, type ErrorInfo } from "next/error";
-import { Button } from "@/components/ui/button";
 import { AlertTriangleIcon } from "lucide-react";
+import { catchError, type ErrorInfo } from "next/error";
+import { useEffect, useState } from "react";
+
+import { Button } from "@/components/ui/button";
 import { AniListError } from "@/lib/anilist-errors";
 
 const KIND_COPY: Record<AniListError["kind"], { title: string; body: string }> = {
@@ -49,10 +50,7 @@ function RateLimitCountdown({ seconds, onTick }: { seconds: number; onTick: () =
   return <p className="font-mono text-xs text-muted-foreground">Retrying in {remaining}s</p>;
 }
 
-function ErrorFallback(
-  props: { title: string },
-  { error, retry }: ErrorInfo
-) {
+function ErrorFallback(props: { title: string }, { error, retry }: ErrorInfo) {
   const err = error as Error;
   const anilistErr = err instanceof AniListError ? err : null;
   const copy = anilistErr ? KIND_COPY[anilistErr.kind] : null;

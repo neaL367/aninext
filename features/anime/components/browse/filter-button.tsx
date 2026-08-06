@@ -1,7 +1,8 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { XIcon } from "lucide-react";
+
+import { cn } from "@/lib/utils";
 
 export function FilterButton({
   active,
@@ -22,7 +23,7 @@ export function FilterButton({
         active
           ? "border-accent bg-accent/10 text-accent"
           : "border-border-soft bg-surface-1/50 text-muted-foreground hover:border-accent/40 hover:text-foreground",
-        className
+        className,
       )}
     >
       {children}
@@ -43,7 +44,7 @@ export function FilterChip({
     <span
       className={cn(
         "group inline-flex items-center gap-1.5 rounded-sm border border-border-soft bg-surface-1/50 px-2 py-0.5 font-mono text-[0.65rem] transition-colors hover:border-accent/60 hover:bg-accent/5 hover:text-accent",
-        className
+        className,
       )}
     >
       <span className="leading-none">{label}</span>

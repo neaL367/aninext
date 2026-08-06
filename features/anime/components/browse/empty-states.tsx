@@ -1,3 +1,5 @@
+import { SearchIcon, FilterIcon, CalendarIcon, InboxIcon } from "lucide-react";
+
 import {
   Empty,
   EmptyContent,
@@ -6,7 +8,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { SearchIcon, FilterIcon, CalendarIcon, InboxIcon } from "lucide-react";
 
 export function EmptySearch() {
   return (
@@ -54,9 +55,7 @@ export function EmptyUpcoming() {
         <EmptyTitle>No upcoming anime announced</EmptyTitle>
       </EmptyHeader>
       <EmptyContent>
-        <EmptyDescription>
-          Check back later for new announcements.
-        </EmptyDescription>
+        <EmptyDescription>Check back later for new announcements.</EmptyDescription>
       </EmptyContent>
     </Empty>
   );
@@ -72,9 +71,7 @@ export function EmptyGeneric() {
         <EmptyTitle>Nothing here yet</EmptyTitle>
       </EmptyHeader>
       <EmptyContent>
-        <EmptyDescription>
-          There&apos;s nothing to display at the moment.
-        </EmptyDescription>
+        <EmptyDescription>There&apos;s nothing to display at the moment.</EmptyDescription>
       </EmptyContent>
     </Empty>
   );

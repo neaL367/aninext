@@ -1,10 +1,13 @@
 import "server-only";
 import { cacheTag, cacheLife } from "next/cache";
+
 import { anilistFetch } from "@/lib/anilist";
+
 import { ANIME_CACHE } from "./anime-cache";
 import { COLLECTIONS } from "./lib/collection-config";
-import { buildFilterHash } from "./lib/parse-filters";
 import { localDateStr, fromAiringTimestamp } from "./lib/media-helpers";
+import { buildFilterHash } from "./lib/parse-filters";
+
 import type {
   AnimeCollection,
   AnimeFilters,
@@ -69,7 +72,7 @@ export async function getBrowseCollection(
   collection: AnimeCollection,
   filters: AnimeFilters,
   page: number,
-  perPage = 25
+  perPage = 25,
 ) {
   "use cache";
   const hash = buildFilterHash(filters);
@@ -241,7 +244,7 @@ export async function getAnimeDetail(id: number) {
         }
       }
     }`,
-    { id }
+    { id },
   );
 
   const m = data.Media;

@@ -4,7 +4,7 @@
 
 **Architecture target**: `next-beats` feature-sliced RSC pattern — pages compose, features own data, route props become plain values at the boundary.
 
-**Scope**: The full consumer-facing site — homepage, five browse collections, anime detail, airing schedule. **Read-only.** No auth, no user accounts, no favorites, no watchlist, no mutations of any kind. Every Server Function in this document exists to *render a page of results*, never to write data. If personalization is added later, it's a new phase with its own design, not a deferred stub living in this one.
+**Scope**: The full consumer-facing site — homepage, five browse collections, anime detail, airing schedule. **Read-only.** No auth, no user accounts, no favorites, no watchlist, no mutations of any kind. Every Server Function in this document exists to _render a page of results_, never to write data. If personalization is added later, it's a new phase with its own design, not a deferred stub living in this one.
 
 **Conscious MVP deferrals** (see §3.22): multi-genre filtering (`genre_in`), tag-based filtering (`tag`/`tag_in`), and studio filtering (requires the `Studio.media` connection, not a direct `Media` filter arg). Each has a stated migration path.
 
@@ -14,9 +14,9 @@
 
 One domain folder, not one folder per page section:
 
-| Concept | Feature Folder |
-|---|---|
-| Anime (list, detail, search, airing) | `features/anime/` |
+| Concept                                                      | Feature Folder                                                                               |
+| ------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| Anime (list, detail, search, airing)                         | `features/anime/`                                                                            |
 | Characters, Staff, Studios, Genres, Reviews, Recommendations | folded into `features/anime/` — they're all facets of one anime record, not separate domains |
 
 Everything anime-related — queries, cache tags, types, components — lives under `features/anime/`. There is no `anime-actions.ts`: with no mutations in scope, there's nothing to put in it. The one `'use server'` function in the codebase (browse pagination, §3.8) is colocated next to the component that calls it, following the same pattern AniList-adjacent reference apps use for render-only Server Functions.
@@ -115,13 +115,13 @@ types/
 
 ```ts
 // next.config.ts
-import type { NextConfig } from 'next';
+import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  cacheComponents: true,      // required for 'use cache' / cacheTag / cacheLife and for Instant Navigations
-  partialPrefetching: true,   // shared per-route shell prefetching
+  cacheComponents: true, // required for 'use cache' / cacheTag / cacheLife and for Instant Navigations
+  partialPrefetching: true, // shared per-route shell prefetching
   images: {
-    remotePatterns: [{ hostname: 's4.anilist.co', protocol: 'https' }],
+    remotePatterns: [{ hostname: "s4.anilist.co", protocol: "https" }],
   },
 };
 
@@ -154,8 +154,8 @@ cacheLife: {
 **Error boundaries.** `components/error-boundary.tsx` is built on the stable `catchError` API, not a third-party error-boundary library, because it's the only mechanism that doesn't swallow `notFound()`/`redirect()` calls thrown from Server Components beneath it, and it exposes a retry function:
 
 ```tsx
-'use client';
-import { catchError, type ErrorInfo } from 'next/error';
+"use client";
+import { catchError, type ErrorInfo } from "next/error";
 
 export function boundary(title: string) {
   return catchError<{ title: string }>((props, info: ErrorInfo) => (
@@ -168,10 +168,14 @@ export function boundary(title: string) {
 
 ```tsx
 // components/crossfade.tsx
-import { ViewTransition } from 'react';
+import { ViewTransition } from "react";
 
 export function Crossfade({ children }: { children: React.ReactNode }) {
-  return <ViewTransition enter="auto" default="none">{children}</ViewTransition>;
+  return (
+    <ViewTransition enter="auto" default="none">
+      {children}
+    </ViewTransition>
+  );
 }
 ```
 
@@ -181,20 +185,35 @@ export function Crossfade({ children }: { children: React.ReactNode }) {
 
 ```tsx
 // components/hover-prefetch-link.tsx
-'use client';
-import Link from 'next/link';
-import { useState, type ComponentProps } from 'react';
+"use client";
+import Link from "next/link";
+import { useState, type ComponentProps } from "react";
 
-export function HoverPrefetchLink({ href, onMouseEnter, onFocus, onTouchStart, ...props }: ComponentProps<typeof Link>) {
+export function HoverPrefetchLink({
+  href,
+  onMouseEnter,
+  onFocus,
+  onTouchStart,
+  ...props
+}: ComponentProps<typeof Link>) {
   const [intent, setIntent] = useState(false);
   return (
     <Link
       {...props}
       href={href}
       prefetch={intent ? true : null}
-      onMouseEnter={e => { setIntent(true); onMouseEnter?.(e); }}
-      onFocus={e => { setIntent(true); onFocus?.(e); }}
-      onTouchStart={e => { setIntent(true); onTouchStart?.(e); }}
+      onMouseEnter={(e) => {
+        setIntent(true);
+        onMouseEnter?.(e);
+      }}
+      onFocus={(e) => {
+        setIntent(true);
+        onFocus?.(e);
+      }}
+      onTouchStart={(e) => {
+        setIntent(true);
+        onTouchStart?.(e);
+      }}
     />
   );
 }
@@ -244,12 +263,31 @@ Entirely server. The only interactivity on this page is `<Link>` navigation, whi
 Each row is its own cached query, sharing the exact same variables and `cacheTag`/`cacheLife` the corresponding `/anime/*` route uses (see §3.7) — the homepage doesn't duplicate query logic, it calls `getBrowseCollection('trending', {}, 1)` etc. with `perPage: 10` instead of the full grid page size:
 
 ```graphql
-query HomeSection($sort: [MediaSort], $season: MediaSeason, $seasonYear: Int, $status: MediaStatus) {
+query HomeSection(
+  $sort: [MediaSort]
+  $season: MediaSeason
+  $seasonYear: Int
+  $status: MediaStatus
+) {
   Page(page: 1, perPage: 10) {
-    media(type: ANIME, sort: $sort, season: $season, seasonYear: $seasonYear, status: $status, isAdult: false) {
+    media(
+      type: ANIME
+      sort: $sort
+      season: $season
+      seasonYear: $seasonYear
+      status: $status
+      isAdult: false
+    ) {
       id
-      title { romaji english userPreferred }
-      coverImage { extraLarge large }
+      title {
+        romaji
+        english
+        userPreferred
+      }
+      coverImage {
+        extraLarge
+        large
+      }
       bannerImage
       averageScore
       popularity
@@ -331,20 +369,20 @@ Covered by §1.1 — no page-specific additions.
 
 ### 3.1 Route Map
 
-| Route | Collection | AniList `sort` | Fixed args | Redirect source |
-|---|---|---|---|---|
-| `/anime/trending` | Trending Now | `[TRENDING_DESC]` | `type: ANIME, isAdult: false` | `/anime` → 308 |
-| `/anime/popular` | Popular This Season | `[POPULARITY_DESC]` | `type: ANIME, season: <current>, seasonYear: <current>, isAdult: false` | — |
-| `/anime/top100` | Top 100 | `[SCORE_DESC]` | `type: ANIME, isAdult: false` | — |
-| `/anime/upcoming` | Upcoming | `[POPULARITY_DESC]` | `type: ANIME, status: NOT_YET_RELEASED, isAdult: false` | — |
-| `/anime/alltimepopular` | All-Time Popular | `[POPULARITY_DESC]` | `type: ANIME, isAdult: false` | — |
+| Route                   | Collection          | AniList `sort`      | Fixed args                                                              | Redirect source |
+| ----------------------- | ------------------- | ------------------- | ----------------------------------------------------------------------- | --------------- |
+| `/anime/trending`       | Trending Now        | `[TRENDING_DESC]`   | `type: ANIME, isAdult: false`                                           | `/anime` → 308  |
+| `/anime/popular`        | Popular This Season | `[POPULARITY_DESC]` | `type: ANIME, season: <current>, seasonYear: <current>, isAdult: false` | —               |
+| `/anime/top100`         | Top 100             | `[SCORE_DESC]`      | `type: ANIME, isAdult: false`                                           | —               |
+| `/anime/upcoming`       | Upcoming            | `[POPULARITY_DESC]` | `type: ANIME, status: NOT_YET_RELEASED, isAdult: false`                 | —               |
+| `/anime/alltimepopular` | All-Time Popular    | `[POPULARITY_DESC]` | `type: ANIME, isAdult: false`                                           | —               |
 
 ```tsx
 // app/(browse)/anime/page.tsx
-import { permanentRedirect } from 'next/navigation';
+import { permanentRedirect } from "next/navigation";
 
 export default function AnimeIndexPage() {
-  permanentRedirect('/anime/trending');
+  permanentRedirect("/anime/trending");
 }
 ```
 
@@ -362,17 +400,17 @@ export default function AnimeIndexPage() {
 /anime/alltimepopular?country=JP
 ```
 
-| Param | Type | AniList arg | Notes |
-|---|---|---|---|
-| `genre` | string | `genre` | Single genre (radio-style UI). Multi-select (`genre_in`) deferred — §3.22. |
-| `format` | string, repeatable | `format_in: [MediaFormat]` | UI is checkboxes, so this maps to the **list** arg, not singular `format` — multiple `?format=` values collect into one `format_in` array. |
-| `status` | string, repeatable | `status_in: [MediaStatus]` | Same reasoning as `format` — checkboxes map to `_in`. |
-| `year` | number | `seasonYear` | Only meaningful alongside `season` per AniList's own docs ("Requires season argument"). |
-| `season` | string | `season` | `WINTER \| SPRING \| SUMMER \| FALL` |
-| `country` | string | `countryOfOrigin` | ISO 3166-1 alpha-2 (`JP`, `KR`, `CN`) — AniList's `CountryCode` enum. |
-| `search` | string | `search` | Free text, scoped within the collection's other args. |
-| `isAdult` | boolean | `isAdult` | Default `false` on every collection. |
-| `page` | number | — | See §3.8 — **not** forwarded to AniList as a page-1-through-N URL; it exists only to seed the client accumulator on a fresh load, not for classic pagination. |
+| Param     | Type               | AniList arg                | Notes                                                                                                                                                         |
+| --------- | ------------------ | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `genre`   | string             | `genre`                    | Single genre (radio-style UI). Multi-select (`genre_in`) deferred — §3.22.                                                                                    |
+| `format`  | string, repeatable | `format_in: [MediaFormat]` | UI is checkboxes, so this maps to the **list** arg, not singular `format` — multiple `?format=` values collect into one `format_in` array.                    |
+| `status`  | string, repeatable | `status_in: [MediaStatus]` | Same reasoning as `format` — checkboxes map to `_in`.                                                                                                         |
+| `year`    | number             | `seasonYear`               | Only meaningful alongside `season` per AniList's own docs ("Requires season argument").                                                                       |
+| `season`  | string             | `season`                   | `WINTER \| SPRING \| SUMMER \| FALL`                                                                                                                          |
+| `country` | string             | `countryOfOrigin`          | ISO 3166-1 alpha-2 (`JP`, `KR`, `CN`) — AniList's `CountryCode` enum.                                                                                         |
+| `search`  | string             | `search`                   | Free text, scoped within the collection's other args.                                                                                                         |
+| `isAdult` | boolean            | `isAdult`                  | Default `false` on every collection.                                                                                                                          |
+| `page`    | number             | —                          | See §3.8 — **not** forwarded to AniList as a page-1-through-N URL; it exists only to seed the client accumulator on a fresh load, not for classic pagination. |
 
 **Studio filtering** is deferred — AniList's `Media` query has no `studio` filter arg. See §3.22 for the `Studio.media` migration path.
 
@@ -411,23 +449,23 @@ export default function AnimeIndexPage() {
 
 ```tsx
 // app/(browse)/anime/trending/page.tsx
-import { Suspense } from 'react';
-import type { Metadata } from 'next';
-import { ErrorBoundary } from '@/components/error-boundary';
-import { AnimeResults, AnimeResultsSkeleton } from '@/features/anime/components/anime-results';
-import { CollectionNav } from '@/features/anime/components/collection-nav';
-import { FilterSidebar } from '@/features/anime/components/filter-sidebar';
-import { SearchBar } from '@/features/anime/components/search-bar';
-import { parseFilters } from '@/features/anime/lib/parse-filters';
-import { getCollectionMetadata } from '@/features/anime/lib/collection-config';
+import { Suspense } from "react";
+import type { Metadata } from "next";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { AnimeResults, AnimeResultsSkeleton } from "@/features/anime/components/anime-results";
+import { CollectionNav } from "@/features/anime/components/collection-nav";
+import { FilterSidebar } from "@/features/anime/components/filter-sidebar";
+import { SearchBar } from "@/features/anime/components/search-bar";
+import { parseFilters } from "@/features/anime/lib/parse-filters";
+import { getCollectionMetadata } from "@/features/anime/lib/collection-config";
 
-export const prefetch = 'allow-runtime';
+export const prefetch = "allow-runtime";
 
 export function generateMetadata(): Metadata {
-  return getCollectionMetadata('trending');
+  return getCollectionMetadata("trending");
 }
 
-export default function TrendingPage({ searchParams }: PageProps<'/anime/trending'>) {
+export default function TrendingPage({ searchParams }: PageProps<"/anime/trending">) {
   return (
     <>
       <CollectionNav active="trending" />
@@ -437,7 +475,7 @@ export default function TrendingPage({ searchParams }: PageProps<'/anime/trendin
         <FilterSidebar collection="trending" />
         <ErrorBoundary title="Results failed to load">
           <Suspense fallback={<AnimeResultsSkeleton count={20} />}>
-            {searchParams.then(sp => (
+            {searchParams.then((sp) => (
               <AnimeResults collection="trending" filters={parseFilters(sp)} />
             ))}
           </Suspense>
@@ -452,18 +490,18 @@ All five route files are this same ~25 lines with only the `collection` string a
 
 ### 3.6 Server / Client Boundary
 
-| Component | Boundary | How it gets URL state |
-|---|---|---|
-| Collection `page.tsx` | Server | `searchParams.then()`, passed only into `AnimeResults` |
-| `CollectionNav` | Client | `usePathname()` for active-tab styling — doesn't need search params at all |
-| `SearchBar` | Client | `useSearchParams()` + `useSyncSearchParamToInput` (syncs uncontrolled input from the URL on mount/soft-nav), writes via `router.replace(..., { scroll: false })` inside `useTransition` |
-| `FilterSidebar` | Client | `useSearchParams()` directly — reads current filter state itself, writes the same way as `SearchBar` |
-| `ActiveFilters` | Client | `useSearchParams()`, removes one param at a time via `router.replace` |
-| `AnimeResults` | Server (async) | Receives already-parsed `AnimeFilters`, fetches page 1 |
-| `BrowsePaginator` / `InfiniteScrollSentinel` | Client | See §3.8 |
-| `MediaCard` | Server (parent) ↦ Client only for the hover-intent wrapper | `HoverPrefetchLink` |
+| Component                                    | Boundary                                                   | How it gets URL state                                                                                                                                                                   |
+| -------------------------------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Collection `page.tsx`                        | Server                                                     | `searchParams.then()`, passed only into `AnimeResults`                                                                                                                                  |
+| `CollectionNav`                              | Client                                                     | `usePathname()` for active-tab styling — doesn't need search params at all                                                                                                              |
+| `SearchBar`                                  | Client                                                     | `useSearchParams()` + `useSyncSearchParamToInput` (syncs uncontrolled input from the URL on mount/soft-nav), writes via `router.replace(..., { scroll: false })` inside `useTransition` |
+| `FilterSidebar`                              | Client                                                     | `useSearchParams()` directly — reads current filter state itself, writes the same way as `SearchBar`                                                                                    |
+| `ActiveFilters`                              | Client                                                     | `useSearchParams()`, removes one param at a time via `router.replace`                                                                                                                   |
+| `AnimeResults`                               | Server (async)                                             | Receives already-parsed `AnimeFilters`, fetches page 1                                                                                                                                  |
+| `BrowsePaginator` / `InfiniteScrollSentinel` | Client                                                     | See §3.8                                                                                                                                                                                |
+| `MediaCard`                                  | Server (parent) ↦ Client only for the hover-intent wrapper | `HoverPrefetchLink`                                                                                                                                                                     |
 
-This is the one substantive fix from the previous draft: `FilterSidebar` used to receive `searchParams` as a prop from the server page — that both violated the "components get parsed values, not raw route props" rule *and* was inconsistent with §3.11/§3.12 describing it as rendering instantly with no Suspense boundary (consuming an unresolved promise prop in a Client Component needs `use()`, which needs Suspense above it). Every client component that needs the current filter state now reads it directly via `useSearchParams()`, matching how `next16-social-media`'s `Search` and `FeedTabs` components do it — no prop threading, no boundary mismatch.
+This is the one substantive fix from the previous draft: `FilterSidebar` used to receive `searchParams` as a prop from the server page — that both violated the "components get parsed values, not raw route props" rule _and_ was inconsistent with §3.11/§3.12 describing it as rendering instantly with no Suspense boundary (consuming an unresolved promise prop in a Client Component needs `use()`, which needs Suspense above it). Every client component that needs the current filter state now reads it directly via `useSearchParams()`, matching how `next16-social-media`'s `Search` and `FeedTabs` components do it — no prop threading, no boundary mismatch.
 
 ### 3.7 AniList Query Plan
 
@@ -471,12 +509,24 @@ One query builder, branching on collection config:
 
 ```graphql
 query BrowseCollection(
-  $page: Int, $perPage: Int, $sort: [MediaSort], $season: MediaSeason, $seasonYear: Int,
-  $status: MediaStatus, $statusIn: [MediaStatus], $formatIn: [MediaFormat],
-  $genre: String, $country: CountryCode, $search: String, $isAdult: Boolean
+  $page: Int
+  $perPage: Int
+  $sort: [MediaSort]
+  $season: MediaSeason
+  $seasonYear: Int
+  $status: MediaStatus
+  $statusIn: [MediaStatus]
+  $formatIn: [MediaFormat]
+  $genre: String
+  $country: CountryCode
+  $search: String
+  $isAdult: Boolean
 ) {
   Page(page: $page, perPage: $perPage) {
-    pageInfo { hasNextPage total }
+    pageInfo {
+      hasNextPage
+      total
+    }
     media(
       type: ANIME
       sort: $sort
@@ -491,8 +541,15 @@ query BrowseCollection(
       isAdult: $isAdult
     ) {
       id
-      title { romaji english userPreferred }
-      coverImage { extraLarge large }
+      title {
+        romaji
+        english
+        userPreferred
+      }
+      coverImage {
+        extraLarge
+        large
+      }
       bannerImage
       averageScore
       popularity
@@ -517,8 +574,28 @@ query BrowseByStudio($studioName: String, $page: Int, $perPage: Int, $sort: [Med
     id
     name
     media(sort: $sort, page: $page, perPage: $perPage, type: ANIME) {
-      pageInfo { hasNextPage total }
-      nodes { id title { romaji english userPreferred } coverImage { extraLarge large } averageScore popularity format episodes status genres }
+      pageInfo {
+        hasNextPage
+        total
+      }
+      nodes {
+        id
+        title {
+          romaji
+          english
+          userPreferred
+        }
+        coverImage {
+          extraLarge
+          large
+        }
+        averageScore
+        popularity
+        format
+        episodes
+        status
+        genres
+      }
     }
   }
 }
@@ -532,12 +609,12 @@ The naive version of this (client fetches JSON, re-renders `MediaCard` on the cl
 
 ```tsx
 // features/anime/components/browse-page-action.tsx
-'use server';
+"use server";
 
-import type { ReactNode } from 'react';
-import { MediaGrid } from '@/features/anime/components/media-grid';
-import { getBrowseCollection } from '@/features/anime/anime-queries';
-import type { AnimeCollection, AnimeFilters } from '@/features/anime/types/anime';
+import type { ReactNode } from "react";
+import { MediaGrid } from "@/features/anime/components/media-grid";
+import { getBrowseCollection } from "@/features/anime/anime-queries";
+import type { AnimeCollection, AnimeFilters } from "@/features/anime/types/anime";
 
 export type BrowsePage = { node: ReactNode; hasMore: boolean };
 
@@ -547,34 +624,46 @@ export async function renderBrowsePage(
   page: number,
 ): Promise<BrowsePage> {
   const { items, hasNextPage } = await getBrowseCollection(collection, filters, page);
-  const capped = collection === 'top100' ? page * 25 <= 100 : true;
+  const capped = collection === "top100" ? page * 25 <= 100 : true;
   return { hasMore: hasNextPage && capped, node: <MediaGrid.Items items={items} /> };
 }
 ```
 
 ```tsx
 // features/anime/components/browse-paginator.tsx
-'use client';
-import { Suspense, use, useState, useTransition, type ReactNode } from 'react';
-import { Crossfade } from '@/components/crossfade';
-import type { BrowsePage } from './browse-page-action';
+"use client";
+import { Suspense, use, useState, useTransition, type ReactNode } from "react";
+import { Crossfade } from "@/components/crossfade";
+import type { BrowsePage } from "./browse-page-action";
 
 export function BrowsePaginator({
-  initialPage, renderPage, skeleton,
-}: { initialPage: Promise<BrowsePage>; renderPage: (page: number) => Promise<BrowsePage>; skeleton: ReactNode }) {
+  initialPage,
+  renderPage,
+  skeleton,
+}: {
+  initialPage: Promise<BrowsePage>;
+  renderPage: (page: number) => Promise<BrowsePage>;
+  skeleton: ReactNode;
+}) {
   const [pages, setPages] = useState([initialPage]);
   const [isPending, startTransition] = useTransition();
 
   function loadMore() {
     const next = renderPage(pages.length + 1);
-    startTransition(() => setPages(prev => [...prev, next]));
+    startTransition(() => setPages((prev) => [...prev, next]));
   }
 
   return (
     <>
       {pages.map((page, i) => (
         <Suspense key={i} fallback={skeleton}>
-          {i === 0 ? <PageContent page={page} /> : <Crossfade><PageContent page={page} /></Crossfade>}
+          {i === 0 ? (
+            <PageContent page={page} />
+          ) : (
+            <Crossfade>
+              <PageContent page={page} />
+            </Crossfade>
+          )}
         </Suspense>
       ))}
       <InfiniteScrollSentinel onIntersect={loadMore} disabled={isPending} />
@@ -596,16 +685,16 @@ function PageContent({ page }: { page: Promise<BrowsePage> }) {
 
 ### 3.9 Cache Architecture
 
-| Collection | cacheTag (base) | cacheLife | Rationale |
-|---|---|---|---|
-| Trending | `anime:browse:trending:{hash}` | `trending` (~60s stale) | Changes hour to hour. |
-| Popular | `anime:browse:popular:{hash}` | `home` (~5min stale) | Seasonal; stable for weeks but should track the season. |
-| Top 100 | `anime:browse:top100:{hash}` | `static` (~1hr stale) | Evergreen; high scores move glacially. |
-| Upcoming | `anime:browse:upcoming:{hash}` | `home` (~5min stale) | New announcements trickle in. |
-| All-Time Popular | `anime:browse:alltimepopular:{hash}` | `home` (~5min stale) | Very slow-moving, but benefits from more frequent refresh than Top 100. |
-| Genre list | `anime:genres` | `static` | Effectively static. |
+| Collection       | cacheTag (base)                      | cacheLife               | Rationale                                                               |
+| ---------------- | ------------------------------------ | ----------------------- | ----------------------------------------------------------------------- |
+| Trending         | `anime:browse:trending:{hash}`       | `trending` (~60s stale) | Changes hour to hour.                                                   |
+| Popular          | `anime:browse:popular:{hash}`        | `home` (~5min stale)    | Seasonal; stable for weeks but should track the season.                 |
+| Top 100          | `anime:browse:top100:{hash}`         | `static` (~1hr stale)   | Evergreen; high scores move glacially.                                  |
+| Upcoming         | `anime:browse:upcoming:{hash}`       | `home` (~5min stale)    | New announcements trickle in.                                           |
+| All-Time Popular | `anime:browse:alltimepopular:{hash}` | `home` (~5min stale)    | Very slow-moving, but benefits from more frequent refresh than Top 100. |
+| Genre list       | `anime:genres`                       | `static`                | Effectively static.                                                     |
 
-`hash` is a deterministic, sorted string of the *user-controlled* filter values only — the fixed per-collection args aren't part of it, since they're already encoded in the tag's `{collection}` segment (e.g., `anime:browse:trending:format=TV;genre=Action`, `anime:browse:trending:` with no suffix for the unfiltered view). Every `getBrowseCollection` call in `anime-queries.ts` sets `cacheTag('anime')`, `cacheTag('anime:browse:' + collection)`, and `cacheTag(scopedTag)` — global, collection, and scoped — so a manual `updateTag('anime:browse:trending')` (if ever needed from an admin tool) invalidates every filtered variant of Trending without touching Top 100.
+`hash` is a deterministic, sorted string of the _user-controlled_ filter values only — the fixed per-collection args aren't part of it, since they're already encoded in the tag's `{collection}` segment (e.g., `anime:browse:trending:format=TV;genre=Action`, `anime:browse:trending:` with no suffix for the unfiltered view). Every `getBrowseCollection` call in `anime-queries.ts` sets `cacheTag('anime')`, `cacheTag('anime:browse:' + collection)`, and `cacheTag(scopedTag)` — global, collection, and scoped — so a manual `updateTag('anime:browse:trending')` (if ever needed from an admin tool) invalidates every filtered variant of Trending without touching Top 100.
 
 **No app-level mutations invalidate these tags** — this is a read-only site, so `cacheLife` expiry is the only invalidation path. There is no `updateTag()` call anywhere in `features/anime/`.
 
@@ -613,15 +702,15 @@ function PageContent({ page }: { page: Promise<BrowsePage> }) {
 
 - `CollectionNav`'s five tab links: `HoverPrefetchLink` — these are exactly the "sidebar with twenty chat links" case from Next.js's own Partial Prefetching writeup, except with five links instead of twenty. Default `prefetch="auto"` already gives each of the five route templates a shared shell; `HoverPrefetchLink` upgrades to `prefetch={true}` on hover/focus/touch-intent, which pulls in the `'use cache'`-marked collection data itself (not just the shell) for whichever tab the user is actually about to click.
 - `MediaCard` links to `/anime/[id]`: plain `<Link>`, default `prefetch="auto"`. Because Partial Prefetching shares one shell per route template, a 40-card grid doesn't multiply into 40 prefetch requests — it's already just the one `/anime/[id]` shell, prefetched once. There's no need to gate this behind hover the way the previous draft did; that concern was solving a problem 16.3 already solves for you.
-- Collection routes export `prefetch = 'allow-runtime'` (§3.5) so a hovered `CollectionNav` link can prefetch the *specific filtered/unfiltered result set* the user is about to land on, not just the shell. Per Next.js's own docs, this trades some extra server load for that deeper prefetch — acceptable here since it's scoped to five nav links, not the whole grid.
+- Collection routes export `prefetch = 'allow-runtime'` (§3.5) so a hovered `CollectionNav` link can prefetch the _specific filtered/unfiltered result set_ the user is about to land on, not just the shell. Per Next.js's own docs, this trades some extra server load for that deeper prefetch — acceptable here since it's scoped to five nav links, not the whole grid.
 - Filter/search changes trigger `router.replace`, not a prefetch — they're not "about to navigate," they're already navigating.
 
 ### 3.11–3.12 Streaming & Suspense
 
-| Boundary | Fallback |
-|---|---|
-| `AnimeResults` (page 1) | `AnimeResultsSkeleton` — grid of card skeletons matching real breakpoints |
-| Pages 2+ (`BrowsePaginator`) | Same skeleton, wrapped in `Crossfade` |
+| Boundary                                      | Fallback                                                                                 |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `AnimeResults` (page 1)                       | `AnimeResultsSkeleton` — grid of card skeletons matching real breakpoints                |
+| Pages 2+ (`BrowsePaginator`)                  | Same skeleton, wrapped in `Crossfade`                                                    |
 | `CollectionNav`, `SearchBar`, `FilterSidebar` | None needed — all client-rendered from `useSearchParams()`, no server fetch, no boundary |
 
 ### 3.13 State Management
@@ -639,17 +728,17 @@ Initial: `AnimeResultsSkeleton` with 20 placeholders. Load more: one skeleton pa
 
 - `ErrorBoundary` around `AnimeResults` — a failed AniList call takes down the grid, not the header/filters.
 - Rate limiting (AniList: 90 req/min, 429 with `X-RateLimit-Remaining`/`Retry-After`): `lib/anilist.ts` classifies this distinctly from a generic failure so the boundary can say "We're fetching a lot of anime data — try again in a moment" instead of a bare error.
-- Empty search: *"No anime found matching '[search]' in [collection]."* + Clear Filters.
-- Empty filters: *"No anime match these filters in [collection]."* + Clear All.
-- Empty Upcoming: *"No upcoming anime announced yet. Check back soon!"* — a legitimate between-season state, not an error.
+- Empty search: _"No anime found matching '[search]' in [collection]."_ + Clear Filters.
+- Empty filters: _"No anime match these filters in [collection]."_ + Clear All.
+- Empty Upcoming: _"No upcoming anime announced yet. Check back soon!"_ — a legitimate between-season state, not an error.
 
 ### 3.17 Responsive Behavior
 
-| Breakpoint | Layout |
-|---|---|
-| Mobile (<768px) | Single column. `CollectionNav`: horizontal scroll tabs. Filters: bottom-sheet drawer. |
-| Tablet (768–1024px) | 2-column grid. Filters: collapsible panel. |
-| Desktop (>1024px) | 3–5 column grid. Filters: fixed 240px sidebar. |
+| Breakpoint          | Layout                                                                                |
+| ------------------- | ------------------------------------------------------------------------------------- |
+| Mobile (<768px)     | Single column. `CollectionNav`: horizontal scroll tabs. Filters: bottom-sheet drawer. |
+| Tablet (768–1024px) | 2-column grid. Filters: collapsible panel.                                            |
+| Desktop (>1024px)   | 3–5 column grid. Filters: fixed 240px sidebar.                                        |
 
 ### 3.18 Accessibility Checklist
 
@@ -674,19 +763,19 @@ export function getCollectionMetadata(collection: AnimeCollection): Metadata {
   return {
     title: c.title,
     description: c.description,
-    openGraph: { title: c.title, description: c.description, type: 'website' },
+    openGraph: { title: c.title, description: c.description, type: "website" },
     alternates: { canonical: `/anime/${collection}` },
   };
 }
 ```
 
-| Collection | Title | Description |
-|---|---|---|
-| Trending | "Trending Anime — AniNext" | "See what anime is trending right now based on community activity." |
-| Popular | "Popular Anime This Season — AniNext" | "The most popular anime airing this season." |
-| Top 100 | "Top 100 Anime of All Time — AniNext" | "The 100 highest-rated anime of all time, ranked by user scores." |
-| Upcoming | "Upcoming Anime — AniNext" | "The most anticipated upcoming anime." |
-| All-Time Popular | "Most Popular Anime — AniNext" | "The most popular anime of all time by community engagement." |
+| Collection       | Title                                 | Description                                                         |
+| ---------------- | ------------------------------------- | ------------------------------------------------------------------- |
+| Trending         | "Trending Anime — AniNext"            | "See what anime is trending right now based on community activity." |
+| Popular          | "Popular Anime This Season — AniNext" | "The most popular anime airing this season."                        |
+| Top 100          | "Top 100 Anime of All Time — AniNext" | "The 100 highest-rated anime of all time, ranked by user scores."   |
+| Upcoming         | "Upcoming Anime — AniNext"            | "The most anticipated upcoming anime."                              |
+| All-Time Popular | "Most Popular Anime — AniNext"        | "The most popular anime of all time by community engagement."       |
 
 - [ ] Every route exports collection-specific `generateMetadata`
 - [ ] Canonical is the bare collection path; **filtered URLs (with query params) also canonicalize to the bare path** to avoid duplicate indexing of every filter combination
@@ -705,14 +794,14 @@ export function getCollectionMetadata(collection: AnimeCollection): Metadata {
 ### 3.21 Animation Opportunities
 
 - Card → detail: `view-transition-name: browse-card-{id}` on the cover image (shared with the homepage's cards, §2.19).
-- New pages appended by `BrowsePaginator`: wrapped in `Crossfade` (§3.8) — only the *newly appended* page crossfades, not the whole grid.
+- New pages appended by `BrowsePaginator`: wrapped in `Crossfade` (§3.8) — only the _newly appended_ page crossfades, not the whole grid.
 - Collection switch and filter change: full navigation / `router.replace`, which is already a clean break — no extra transition needed on top.
 
 ### 3.22 Future Extensibility
 
 - **Multi-genre**: swap `genre` → `genre_in: [String]` once the sidebar goes from radio to checkboxes for genre.
 - **Tag filters**: add `tag` / `tag_in` (AniList media tags, distinct from genres) — same shape as format/status.
-- **Studio filter**: implement the `Studio.media` branch sketched in §3.7. The blocker isn't missing data, it's UX — resolving a studio *name* to the right `Studio` node needs its own type-ahead (AniList's `Studio(search: ...)` returns a best-effort match, not a guaranteed unique result).
+- **Studio filter**: implement the `Studio.media` branch sketched in §3.7. The blocker isn't missing data, it's UX — resolving a studio _name_ to the right `Studio` node needs its own type-ahead (AniList's `Studio(search: ...)` returns a best-effort match, not a guaranteed unique result).
 - **Sort by date**: `START_DATE_DESC` / `END_DATE_DESC` as additional collection variants.
 - **New collections**: one `collection-config.ts` entry + one route folder — additive by design (§3.5).
 
@@ -762,8 +851,17 @@ All server components, each async and independently fetching. No client componen
 query AnimeHero($id: Int) {
   Media(id: $id, type: ANIME) {
     id
-    title { romaji english native userPreferred }
-    coverImage { extraLarge large color }
+    title {
+      romaji
+      english
+      native
+      userPreferred
+    }
+    coverImage {
+      extraLarge
+      large
+      color
+    }
     bannerImage
     description(asHtml: false)
     averageScore
@@ -778,8 +876,18 @@ query AnimeHero($id: Int) {
     seasonYear
     genres
     source
-    studios(isMain: true) { nodes { id name siteUrl } }
-    nextAiringEpisode { episode airingAt timeUntilAiring }
+    studios(isMain: true) {
+      nodes {
+        id
+        name
+        siteUrl
+      }
+    }
+    nextAiringEpisode {
+      episode
+      airingAt
+      timeUntilAiring
+    }
   }
 }
 ```
@@ -788,11 +896,29 @@ query AnimeHero($id: Int) {
 query AnimeCharacters($id: Int, $page: Int) {
   Media(id: $id) {
     characters(page: $page, perPage: 12, sort: [ROLE, RELEVANCE]) {
-      pageInfo { hasNextPage }
+      pageInfo {
+        hasNextPage
+      }
       edges {
         role
-        voiceActors(language: JAPANESE) { id name { full } image { medium } }
-        node { id name { full } image { medium } }
+        voiceActors(language: JAPANESE) {
+          id
+          name {
+            full
+          }
+          image {
+            medium
+          }
+        }
+        node {
+          id
+          name {
+            full
+          }
+          image {
+            medium
+          }
+        }
       }
     }
   }
@@ -803,7 +929,18 @@ query AnimeCharacters($id: Int, $page: Int) {
 query AnimeStaff($id: Int, $page: Int) {
   Media(id: $id) {
     staff(page: $page, perPage: 10) {
-      edges { role node { id name { full } image { medium } } }
+      edges {
+        role
+        node {
+          id
+          name {
+            full
+          }
+          image {
+            medium
+          }
+        }
+      }
     }
   }
 }
@@ -815,7 +952,17 @@ query AnimeRelations($id: Int) {
     relations {
       edges {
         relationType(version: 2)
-        node { id title { userPreferred } coverImage { large } format status }
+        node {
+          id
+          title {
+            userPreferred
+          }
+          coverImage {
+            large
+          }
+          format
+          status
+        }
       }
     }
   }
@@ -826,7 +973,18 @@ query AnimeRelations($id: Int) {
 query AnimeRecommendations($id: Int, $page: Int) {
   Media(id: $id) {
     recommendations(page: $page, perPage: 8, sort: [RATING_DESC]) {
-      nodes { mediaRecommendation { id title { userPreferred } coverImage { large } averageScore } }
+      nodes {
+        mediaRecommendation {
+          id
+          title {
+            userPreferred
+          }
+          coverImage {
+            large
+          }
+          averageScore
+        }
+      }
     }
   }
 }
@@ -836,7 +994,17 @@ query AnimeRecommendations($id: Int, $page: Int) {
 query AnimeReviews($id: Int, $page: Int) {
   Media(id: $id) {
     reviews(page: $page, perPage: 5, sort: [RATING_DESC]) {
-      nodes { id summary score user { name avatar { medium } } }
+      nodes {
+        id
+        summary
+        score
+        user {
+          name
+          avatar {
+            medium
+          }
+        }
+      }
     }
   }
 }
@@ -846,7 +1014,10 @@ query AnimeReviews($id: Int, $page: Int) {
 query AnimeAiringSchedule($id: Int) {
   Media(id: $id) {
     airingSchedule(notYetAired: true, perPage: 25) {
-      nodes { episode airingAt }
+      nodes {
+        episode
+        airingAt
+      }
     }
   }
 }
@@ -862,15 +1033,15 @@ Every section below the hero is its **own** query hitting `Media(id: $id) { <one
 
 ### 4.7 Cache Architecture
 
-| Section | cacheTag | cacheLife |
-|---|---|---|
-| Hero | `anime:detail:{id}` | `home` |
-| Characters | `anime:characters:{id}` | `static` |
-| Staff | `anime:staff:{id}` | `static` |
-| Relations | `anime:sub:{id}:relations` | `static` |
-| Recommendations | `anime:sub:{id}:recs` | `home` |
-| Reviews | `anime:sub:{id}:reviews` | `home` |
-| Airing schedule | `anime:sub:{id}:airing` | `trending` |
+| Section         | cacheTag                   | cacheLife  |
+| --------------- | -------------------------- | ---------- |
+| Hero            | `anime:detail:{id}`        | `home`     |
+| Characters      | `anime:characters:{id}`    | `static`   |
+| Staff           | `anime:staff:{id}`         | `static`   |
+| Relations       | `anime:sub:{id}:relations` | `static`   |
+| Recommendations | `anime:sub:{id}:recs`      | `home`     |
+| Reviews         | `anime:sub:{id}:reviews`   | `home`     |
+| Airing schedule | `anime:sub:{id}:airing`    | `trending` |
 
 Per-ID tagging means a future need to force-refresh one title's data (e.g., after a correction) never has to touch any other title's cache.
 
@@ -967,8 +1138,12 @@ query AiringWeek($start: Int, $end: Int) {
       airingAt
       media {
         id
-        title { userPreferred }
-        coverImage { medium }
+        title {
+          userPreferred
+        }
+        coverImage {
+          medium
+        }
         format
       }
     }
@@ -1037,41 +1212,46 @@ Covered by §1.1.
 ### 6.1 GraphQL Client (`lib/anilist.ts`)
 
 ```ts
-import 'server-only';
+import "server-only";
 
-const ENDPOINT = 'https://graphql.anilist.co';
+const ENDPOINT = "https://graphql.anilist.co";
 
 export class AniListError extends Error {
   constructor(
     message: string,
-    public kind: 'rate_limited' | 'outage' | 'graphql' | 'network',
+    public kind: "rate_limited" | "outage" | "graphql" | "network",
     public retryAfterSeconds?: number,
   ) {
     super(message);
   }
 }
 
-export async function anilistFetch<T>(query: string, variables: Record<string, unknown>): Promise<T> {
+export async function anilistFetch<T>(
+  query: string,
+  variables: Record<string, unknown>,
+): Promise<T> {
   const res = await fetch(ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify({ query, variables }),
   });
 
   if (res.status === 429) {
-    const retryAfter = Number(res.headers.get('Retry-After') ?? res.headers.get('X-RateLimit-Reset') ?? 30);
-    throw new AniListError('AniList rate limit hit', 'rate_limited', retryAfter);
+    const retryAfter = Number(
+      res.headers.get("Retry-After") ?? res.headers.get("X-RateLimit-Reset") ?? 30,
+    );
+    throw new AniListError("AniList rate limit hit", "rate_limited", retryAfter);
   }
-  if (res.status === 403) throw new AniListError('AniList API temporarily unavailable', 'outage');
-  if (!res.ok) throw new AniListError(`AniList request failed (${res.status})`, 'network');
+  if (res.status === 403) throw new AniListError("AniList API temporarily unavailable", "outage");
+  if (!res.ok) throw new AniListError(`AniList request failed (${res.status})`, "network");
 
   const json = await res.json();
-  if (json.errors?.length) throw new AniListError(json.errors[0].message, 'graphql');
+  if (json.errors?.length) throw new AniListError(json.errors[0].message, "graphql");
   return json.data as T;
 }
 ```
 
-AniList's public GraphQL endpoint has no API key; the rate limit is 90 requests/minute with burst limiting on top, and a 429 carries `X-RateLimit-Remaining`/`Retry-After`. Because every read in `anime-queries.ts` is `'use cache'`, the number of *actual* requests this client makes is bounded by cache misses across all users, not by traffic — the 90/min ceiling is realistically only a concern for the first visitor after a `cacheLife` expiry on a popular route, which the `rate_limited`/`outage` classification (§3.15) exists to degrade gracefully from.
+AniList's public GraphQL endpoint has no API key; the rate limit is 90 requests/minute with burst limiting on top, and a 429 carries `X-RateLimit-Remaining`/`Retry-After`. Because every read in `anime-queries.ts` is `'use cache'`, the number of _actual_ requests this client makes is bounded by cache misses across all users, not by traffic — the 90/min ceiling is realistically only a concern for the first visitor after a `cacheLife` expiry on a popular route, which the `rate_limited`/`outage` classification (§3.15) exists to degrade gracefully from.
 
 ### 6.2 Fragment Definitions
 
@@ -1081,12 +1261,13 @@ A shared `MediaCardFields` fragment (id, title, coverImage, bannerImage, average
 
 ```ts
 export const ANIME_CACHE = {
-  genres: 'anime:genres' as const,
-  browseCollection: (collection: string, hash: string) => `anime:browse:${collection}:${hash}` as const,
+  genres: "anime:genres" as const,
+  browseCollection: (collection: string, hash: string) =>
+    `anime:browse:${collection}:${hash}` as const,
   detail: (id: number) => `anime:detail:${id}` as const,
   characters: (id: number) => `anime:characters:${id}` as const,
   staff: (id: number) => `anime:staff:${id}` as const,
-  subSection: (id: number, section: 'relations' | 'recs' | 'reviews' | 'airing') =>
+  subSection: (id: number, section: "relations" | "recs" | "reviews" | "airing") =>
     `anime:sub:${id}:${section}` as const,
   airingDay: (date: string) => `anime:airing:day:${date}` as const,
   airingWeek: (monday: string) => `anime:airing:week:${monday}` as const,
@@ -1098,9 +1279,22 @@ No `favorites` / `watchlist` / `user-*` entries — there is nothing in this cod
 ### 6.4 Type Definitions (`features/anime/types/anime.ts`)
 
 ```ts
-export interface MediaTitle { romaji?: string; english?: string; native?: string; userPreferred?: string }
-export interface MediaCoverImage { extraLarge?: string; large?: string; medium?: string }
-export interface Studio { id: number; name: string; siteUrl?: string }
+export interface MediaTitle {
+  romaji?: string;
+  english?: string;
+  native?: string;
+  userPreferred?: string;
+}
+export interface MediaCoverImage {
+  extraLarge?: string;
+  large?: string;
+  medium?: string;
+}
+export interface Studio {
+  id: number;
+  name: string;
+  siteUrl?: string;
+}
 
 export interface Media {
   id: number;
@@ -1122,18 +1316,18 @@ export interface Media {
   studios?: { nodes: Studio[] };
 }
 
-export type AnimeCollection = 'trending' | 'popular' | 'top100' | 'upcoming' | 'alltimepopular';
+export type AnimeCollection = "trending" | "popular" | "top100" | "upcoming" | "alltimepopular";
 
 export interface AnimeFilters {
   genre?: string;
-  format?: string[];      // → format_in
-  status?: string[];      // → status_in
+  format?: string[]; // → format_in
+  status?: string[]; // → status_in
   season?: string;
   year?: number;
-  country?: string;       // → countryOfOrigin
+  country?: string; // → countryOfOrigin
   search?: string;
   isAdult?: boolean;
-  studio?: string;        // deferred, see §3.22
+  studio?: string; // deferred, see §3.22
 }
 ```
 

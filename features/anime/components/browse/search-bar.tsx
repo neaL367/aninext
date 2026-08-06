@@ -1,8 +1,8 @@
 "use client";
 
+import { SearchIcon, XIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
-import { SearchIcon, XIcon } from "lucide-react";
 
 export function SearchBar() {
   const router = useRouter();
@@ -35,11 +35,18 @@ export function SearchBar() {
         aria-label="Search anime"
       />
       {searchValue ? (
-        <button type="button" onClick={handleClear} className="rounded-sm p-1 text-muted-foreground hover:text-foreground" aria-label="Clear search">
+        <button
+          type="button"
+          onClick={handleClear}
+          className="rounded-sm p-1 text-muted-foreground hover:text-foreground"
+          aria-label="Clear search"
+        >
           <XIcon className="size-4" />
         </button>
       ) : (
-        <span className="hidden font-mono text-[0.6rem] uppercase tracking-[0.12em] text-muted-foreground sm:inline">Enter query</span>
+        <span className="hidden font-mono text-[0.6rem] uppercase tracking-[0.12em] text-muted-foreground sm:inline">
+          Enter query
+        </span>
       )}
     </label>
   );

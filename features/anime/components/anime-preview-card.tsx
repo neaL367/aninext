@@ -1,10 +1,12 @@
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import type { Media } from "@/features/anime/types/anime";
-import { scoreColor } from "@/features/anime/lib/score";
-import { formatFormat, formatStatus, getMediaTitle } from "@/features/anime/lib/media-helpers";
-import { ImageWithLoading } from "@/components/image-with-loading";
-import { cn } from "@/lib/utils";
 import { CalendarIcon, FilmIcon, PlayIcon, TvIcon } from "lucide-react";
+
+import { ImageWithLoading } from "@/components/image-with-loading";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { formatFormat, formatStatus, getMediaTitle } from "@/features/anime/lib/media-helpers";
+import { scoreColor } from "@/features/anime/lib/score";
+import { cn } from "@/lib/utils";
+
+import type { Media } from "@/features/anime/types/anime";
 
 export function AnimePreviewCard({ media, children }: { media: Media; children: React.ReactNode }) {
   const title = getMediaTitle(media);
@@ -23,21 +25,42 @@ export function AnimePreviewCard({ media, children }: { media: Media; children: 
       >
         {media.bannerImage ? (
           <div className="relative h-32 w-full overflow-hidden">
-            <ImageWithLoading src={media.bannerImage} alt="" fill sizes="352px" className="object-cover" />
+            <ImageWithLoading
+              src={media.bannerImage}
+              alt=""
+              fill
+              sizes="352px"
+              className="object-cover"
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-card via-card/60 to-transparent" />
             {media.averageScore && (
               <div className="absolute right-3 top-3 flex items-center gap-1 rounded-sm bg-black/70 px-2 py-1 backdrop-blur-sm">
-                <span className={cn("font-mono text-xs font-bold tabular-nums", scoreColor(media.averageScore))}>
+                <span
+                  className={cn(
+                    "font-mono text-xs font-bold tabular-nums",
+                    scoreColor(media.averageScore),
+                  )}
+                >
                   ★ {(media.averageScore / 10).toFixed(1)}
                 </span>
               </div>
             )}
           </div>
         ) : (
-          <div className="relative h-16 w-full" style={color ? { background: `linear-gradient(135deg, ${color}40, var(--card))` } : undefined}>
+          <div
+            className="relative h-16 w-full"
+            style={
+              color ? { background: `linear-gradient(135deg, ${color}40, var(--card))` } : undefined
+            }
+          >
             {media.averageScore && (
               <div className="absolute right-3 top-3 flex items-center gap-1 rounded-sm bg-black/70 px-2 py-1 backdrop-blur-sm">
-                <span className={cn("font-mono text-xs font-bold tabular-nums", scoreColor(media.averageScore))}>
+                <span
+                  className={cn(
+                    "font-mono text-xs font-bold tabular-nums",
+                    scoreColor(media.averageScore),
+                  )}
+                >
                   ★ {(media.averageScore / 10).toFixed(1)}
                 </span>
               </div>
@@ -46,7 +69,9 @@ export function AnimePreviewCard({ media, children }: { media: Media; children: 
         )}
 
         <div className="space-y-3 p-4">
-          <h3 className="line-clamp-2 text-base font-semibold leading-snug tracking-tight">{title}</h3>
+          <h3 className="line-clamp-2 text-base font-semibold leading-snug tracking-tight">
+            {title}
+          </h3>
 
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
             {media.format && (
@@ -62,12 +87,14 @@ export function AnimePreviewCard({ media, children }: { media: Media; children: 
               </span>
             )}
             {media.status && (
-              <span className={cn(
-                "inline-flex items-center gap-1 rounded-sm border px-1.5 py-0.5 font-mono text-[0.65rem] uppercase tracking-wide",
-                media.status === "RELEASING"
-                  ? "border-live-badge/30 bg-live-badge/10 text-live-badge"
-                  : "border-border-soft bg-surface-1 text-muted-foreground"
-              )}>
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1 rounded-sm border px-1.5 py-0.5 font-mono text-[0.65rem] uppercase tracking-wide",
+                  media.status === "RELEASING"
+                    ? "border-live-badge/30 bg-live-badge/10 text-live-badge"
+                    : "border-border-soft bg-surface-1 text-muted-foreground",
+                )}
+              >
                 <PlayIcon className="size-3" />
                 {formatStatus(media.status)}
               </span>
@@ -81,13 +108,18 @@ export function AnimePreviewCard({ media, children }: { media: Media; children: 
           </div>
 
           {description && (
-            <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">{description}</p>
+            <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+              {description}
+            </p>
           )}
 
           {media.genres.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
               {media.genres.slice(0, 4).map((genre) => (
-                <span key={genre} className="rounded-sm border border-border-soft bg-surface-1/50 px-2 py-0.5 font-mono text-[0.6rem] uppercase tracking-wider text-muted-foreground">
+                <span
+                  key={genre}
+                  className="rounded-sm border border-border-soft bg-surface-1/50 px-2 py-0.5 font-mono text-[0.6rem] uppercase tracking-wider text-muted-foreground"
+                >
                   {genre}
                 </span>
               ))}

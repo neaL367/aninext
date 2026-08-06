@@ -1,11 +1,22 @@
-import { Empty, EmptyHeader, EmptyTitle, EmptyMedia } from "@/components/ui/empty";
 import { UsersIcon } from "lucide-react";
-import type { CharacterEdge } from "@/features/anime/types/anime";
+
 import { ImageWithLoading } from "@/components/image-with-loading";
+import { Empty, EmptyHeader, EmptyTitle, EmptyMedia } from "@/components/ui/empty";
+
+import type { CharacterEdge } from "@/features/anime/types/anime";
 
 export async function AnimeCharacters({ edges }: { edges: CharacterEdge[] }) {
   if (edges.length === 0) {
-    return <Empty><EmptyHeader><EmptyMedia variant="icon"><UsersIcon /></EmptyMedia><EmptyTitle>No characters available</EmptyTitle></EmptyHeader></Empty>;
+    return (
+      <Empty>
+        <EmptyHeader>
+          <EmptyMedia variant="icon">
+            <UsersIcon />
+          </EmptyMedia>
+          <EmptyTitle>No characters available</EmptyTitle>
+        </EmptyHeader>
+      </Empty>
+    );
   }
 
   return (
@@ -13,26 +24,51 @@ export async function AnimeCharacters({ edges }: { edges: CharacterEdge[] }) {
       {edges.map((edge, index) => {
         const voiceActor = edge.voiceActors?.[0];
         return (
-          <article key={`${edge.node.id}-${index}`} className="group flex items-center gap-4 border border-border p-3 transition-colors hover:border-accent/40 hover:bg-surface-1/40">
+          <article
+            key={`${edge.node.id}-${index}`}
+            className="group flex items-center gap-4 border border-border p-3 transition-colors hover:border-accent/40 hover:bg-surface-1/40"
+          >
             <div className="relative h-[72px] w-[54px] shrink-0 overflow-hidden bg-surface-2">
               {edge.node.image.medium ? (
-                <ImageWithLoading src={edge.node.image.medium} alt={edge.node.name.full} fill sizes="54px" className="object-cover" />
+                <ImageWithLoading
+                  src={edge.node.image.medium}
+                  alt={edge.node.name.full}
+                  fill
+                  sizes="54px"
+                  className="object-cover"
+                />
               ) : (
-                <div className="flex h-full items-center justify-center p-1 text-center font-mono text-[0.5rem] uppercase text-muted-foreground">{edge.node.name.full}</div>
+                <div className="flex h-full items-center justify-center p-1 text-center font-mono text-[0.5rem] uppercase text-muted-foreground">
+                  {edge.node.name.full}
+                </div>
               )}
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">{edge.node.name.full}</p>
-              <p className="mt-0.5 font-mono text-xs uppercase tracking-[0.06em] text-muted-foreground">{edge.role}</p>
+              <p className="mt-0.5 font-mono text-xs uppercase tracking-[0.06em] text-muted-foreground">
+                {edge.role}
+              </p>
             </div>
             {voiceActor && (
               <div className="flex shrink-0 items-center gap-2 border-l border-border pl-3">
                 <div className="relative size-9 shrink-0 overflow-hidden rounded-full bg-surface-2">
-                  {voiceActor.image.medium && <ImageWithLoading src={voiceActor.image.medium} alt={voiceActor.name.full} fill sizes="36px" className="object-cover" />}
+                  {voiceActor.image.medium && (
+                    <ImageWithLoading
+                      src={voiceActor.image.medium}
+                      alt={voiceActor.name.full}
+                      fill
+                      sizes="36px"
+                      className="object-cover"
+                    />
+                  )}
                 </div>
                 <div className="hidden sm:block sm:min-w-0 sm:max-w-[120px]">
-                  <p className="truncate text-xs font-medium text-foreground">{voiceActor.name.full}</p>
-                  <p className="truncate font-mono text-[0.55rem] uppercase tracking-[0.04em] text-muted-foreground">VA</p>
+                  <p className="truncate text-xs font-medium text-foreground">
+                    {voiceActor.name.full}
+                  </p>
+                  <p className="truncate font-mono text-[0.55rem] uppercase tracking-[0.04em] text-muted-foreground">
+                    VA
+                  </p>
                 </div>
               </div>
             )}

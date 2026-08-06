@@ -1,10 +1,12 @@
 "use client";
 
-import Link from "next/link";
-import type { Route } from "next";
-import { usePathname } from "next/navigation";
 import { SearchIcon } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 import { cn } from "@/lib/utils";
+
+import type { Route } from "next";
 
 const navItems: Array<{ href: Route; label: string; prefetch?: boolean }> = [
   { href: "/anime/trending", label: "Discover" },
@@ -28,8 +30,12 @@ export function SiteHeader() {
             A
           </span>
           <span className="hidden leading-none sm:block">
-            <span className="block font-mono text-[0.68rem] font-semibold tracking-[0.24em]">ANINEXT</span>
-            <span className="mt-1 block text-[0.58rem] uppercase tracking-[0.18em] text-muted-foreground">Discover anime</span>
+            <span className="block font-mono text-[0.68rem] font-semibold tracking-[0.24em]">
+              ANINEXT
+            </span>
+            <span className="mt-1 block text-[0.58rem] uppercase tracking-[0.18em] text-muted-foreground">
+              Discover anime
+            </span>
           </span>
         </Link>
 
@@ -41,11 +47,18 @@ export function SiteHeader() {
               prefetch={item.prefetch}
               className={cn(
                 "group flex items-center gap-2 px-3 py-2 text-sm transition-colors",
-                isActive(item.href) ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                isActive(item.href)
+                  ? "text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               <span>{item.label}</span>
-              <span className={cn("h-px w-0 bg-foreground/30 transition-all group-hover:w-4", isActive(item.href) && "w-4")} />
+              <span
+                className={cn(
+                  "h-px w-0 bg-foreground/30 transition-all group-hover:w-4",
+                  isActive(item.href) && "w-4",
+                )}
+              />
             </Link>
           ))}
         </nav>
@@ -58,7 +71,9 @@ export function SiteHeader() {
           >
             <SearchIcon className="size-3.5" />
             <span className="hidden sm:inline">Find a title</span>
-            <kbd className="hidden border-l border-border pl-2 font-mono text-[0.62rem] text-muted-foreground sm:inline">/</kbd>
+            <kbd className="hidden border-l border-border pl-2 font-mono text-[0.62rem] text-muted-foreground sm:inline">
+              /
+            </kbd>
           </button>
         </div>
       </div>
@@ -68,7 +83,10 @@ export function SiteHeader() {
 
 export function SiteHeaderFallback() {
   return (
-    <header className="sticky top-0 z-50 border-b border-border-soft bg-background/90 backdrop-blur-xl" aria-hidden>
+    <header
+      className="sticky top-0 z-50 border-b border-border-soft bg-background/90 backdrop-blur-xl"
+      aria-hidden
+    >
       <div className="mx-auto min-h-16 w-full max-w-[1680px] px-4 sm:px-7 lg:px-10" />
     </header>
   );

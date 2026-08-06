@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
+
 import { cn } from "@/lib/utils";
 
 export function ImageWithLoading({
@@ -41,7 +42,7 @@ export function ImageWithLoading({
       className={cn(
         "transition-opacity duration-300",
         loaded ? "opacity-100" : "opacity-0",
-        className
+        className,
       )}
     />
   );
