@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { AlertTriangleIcon } from "lucide-react";
+import { useEffect } from "react";
+
+import { Button } from "@/components/ui/button";
 
 export default function GlobalError({
   error,
@@ -21,9 +22,7 @@ export default function GlobalError({
         <AlertTriangleIcon className="size-5 text-destructive" />
       </div>
       <h1 className="text-lg font-semibold">Something went wrong</h1>
-      <p className="max-w-sm text-sm text-muted-foreground">
-        {error.message}
-      </p>
+      <p className="max-w-sm text-sm text-muted-foreground">{error.message}</p>
       <Button onClick={() => reset()} variant="outline" size="sm">
         Try again
       </Button>
