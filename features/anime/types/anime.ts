@@ -108,16 +108,6 @@ export interface RecommendationNode {
   mediaRecommendation: Media;
 }
 
-export interface ReviewNode {
-  id: number;
-  summary: string;
-  score: number;
-  user: {
-    name: string;
-    avatar: { medium: string };
-  };
-}
-
 export interface AiringScheduleNode {
   episode: number;
   airingAt: number;

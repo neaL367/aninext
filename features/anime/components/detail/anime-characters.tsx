@@ -1,13 +1,10 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Empty, EmptyHeader, EmptyTitle, EmptyMedia } from "@/components/ui/empty";
 import { UsersIcon } from "lucide-react";
-import { getAnimeCharacters } from "@/features/anime/anime-queries";
 import type { CharacterEdge, PageInfo } from "@/features/anime/types/anime";
 import { ImageWithLoading } from "@/components/image-with-loading";
 
-export async function AnimeCharacters({ id, edges: edgesProp, pageInfo: pageInfoProp }: { id?: number; edges?: CharacterEdge[]; pageInfo?: PageInfo }) {
-  const edges = edgesProp ?? (await getAnimeCharacters(id!)).edges;
-
+export async function AnimeCharacters({ edges, pageInfo }: { edges: CharacterEdge[]; pageInfo: PageInfo }) {
   if (edges.length === 0) {
     return <Empty><EmptyHeader><EmptyMedia variant="icon"><UsersIcon /></EmptyMedia><EmptyTitle>No characters available</EmptyTitle></EmptyHeader></Empty>;
   }

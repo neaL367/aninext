@@ -14,7 +14,6 @@ import type {
   StaffEdge,
   RelationEdge,
   RecommendationNode,
-  ReviewNode,
   AiringScheduleNode,
 } from "./types/anime";
 
@@ -169,56 +168,9 @@ const CHARACTERS_SUBFIELDS = `
   }
 `;
 
-const CHARACTERS_QUERY = `
-  query AnimeCharacters($id: Int, $page: Int) {
-    Media(id: $id) {
-      characters(page: $page, perPage: 12, sort: [ROLE, RELEVANCE]) {
-        ${CHARACTERS_SUBFIELDS}
-      }
-    }
-  }
-`;
-
-export async function getAnimeCharacters(id: number, page = 1) {
-  "use cache";
-  cacheTag("anime", ANIME_CACHE.characters(id));
-  cacheLife({ stale: 3600, revalidate: 21600, expire: 604800 });
-
-  const data = await anilistFetch<{
-    Media: { characters: { pageInfo: PageInfo; edges: CharacterEdge[] } };
-  }>(CHARACTERS_QUERY, { id, page });
-
-  return {
-    edges: data.Media.characters.edges,
-    pageInfo: data.Media.characters.pageInfo,
-  };
-}
-
 const STAFF_SUBFIELDS = `
   edges { role node { id name { full } image { medium } } }
 `;
-
-const STAFF_QUERY = `
-  query AnimeStaff($id: Int, $page: Int) {
-    Media(id: $id) {
-      staff(page: $page, perPage: 10) {
-        ${STAFF_SUBFIELDS}
-      }
-    }
-  }
-`;
-
-export async function getAnimeStaff(id: number, page = 1) {
-  "use cache";
-  cacheTag("anime", ANIME_CACHE.staff(id));
-  cacheLife({ stale: 3600, revalidate: 21600, expire: 604800 });
-
-  const data = await anilistFetch<{
-    Media: { staff: { edges: StaffEdge[] } };
-  }>(STAFF_QUERY, { id, page });
-
-  return data.Media.staff.edges;
-}
 
 const RELATIONS_SUBFIELDS = `
   edges {
@@ -240,28 +192,6 @@ const RELATIONS_SUBFIELDS = `
   }
 `;
 
-const RELATIONS_QUERY = `
-  query AnimeRelations($id: Int) {
-    Media(id: $id) {
-      relations {
-        ${RELATIONS_SUBFIELDS}
-      }
-    }
-  }
-`;
-
-export async function getAnimeRelations(id: number) {
-  "use cache";
-  cacheTag("anime", ANIME_CACHE.subSection(id, "relations"));
-  cacheLife({ stale: 3600, revalidate: 21600, expire: 604800 });
-
-  const data = await anilistFetch<{
-    Media: { relations: { edges: RelationEdge[] } };
-  }>(RELATIONS_QUERY, { id });
-
-  return data.Media.relations.edges;
-}
-
 const RECOMMENDATIONS_SUBFIELDS = `
   nodes {
     mediaRecommendation {
@@ -281,54 +211,6 @@ const RECOMMENDATIONS_SUBFIELDS = `
   }
 `;
 
-const RECOMMENDATIONS_QUERY = `
-  query AnimeRecommendations($id: Int, $page: Int) {
-    Media(id: $id) {
-      recommendations(page: $page, perPage: 8, sort: [RATING_DESC]) {
-        ${RECOMMENDATIONS_SUBFIELDS}
-      }
-    }
-  }
-`;
-
-export async function getAnimeRecommendations(id: number, page = 1) {
-  "use cache";
-  cacheTag("anime", ANIME_CACHE.subSection(id, "recs"));
-  cacheLife({ stale: 300, revalidate: 900, expire: 86400 });
-
-  const data = await anilistFetch<{
-    Media: { recommendations: { nodes: RecommendationNode[] } };
-  }>(RECOMMENDATIONS_QUERY, { id, page });
-
-  return data.Media.recommendations.nodes;
-}
-
-const REVIEWS_SUBFIELDS = `
-  nodes { id summary score user { name avatar { medium } } }
-`;
-
-const REVIEWS_QUERY = `
-  query AnimeReviews($id: Int, $page: Int) {
-    Media(id: $id) {
-      reviews(page: $page, perPage: 5, sort: [RATING_DESC]) {
-        ${REVIEWS_SUBFIELDS}
-      }
-    }
-  }
-`;
-
-export async function getAnimeReviews(id: number, page = 1) {
-  "use cache";
-  cacheTag("anime", ANIME_CACHE.subSection(id, "reviews"));
-  cacheLife({ stale: 300, revalidate: 900, expire: 86400 });
-
-  const data = await anilistFetch<{
-    Media: { reviews: { nodes: ReviewNode[] } };
-  }>(REVIEWS_QUERY, { id, page });
-
-  return data.Media.reviews.nodes;
-}
-
 const AIRING_SCHEDULE_SUBFIELDS = `
   nodes { episode airingAt }
 `;
@@ -345,7 +227,7 @@ const AIRING_SCHEDULE_QUERY = `
 
 export async function getAnimeAiringSchedule(id: number) {
   "use cache";
-  cacheTag("anime", ANIME_CACHE.subSection(id, "airing"));
+  cacheTag("anime", ANIME_CACHE.airingSchedule(id));
   cacheLife({ stale: 60, revalidate: 300, expire: 3600 });
 
   const data = await anilistFetch<{
@@ -362,19 +244,7 @@ const AIRING_WEEK_QUERY = `
         episode
         airingAt
         media {
-          id
-          title { romaji english userPreferred }
-          coverImage { extraLarge large medium color }
-          bannerImage
-          description(asHtml: false)
-          averageScore
-          format
-          episodes
-          status
-          season
-          seasonYear
-          genres
-          studios(isMain: true) { nodes { id name } }
+          ${MEDIA_CARD_FIELDS}
           externalLinks { url site type }
         }
       }
@@ -405,7 +275,6 @@ export async function getAnimeDetail(id: number) {
       staff: { edges: StaffEdge[] };
       relations: { edges: RelationEdge[] };
       recommendations: { nodes: RecommendationNode[] };
-      reviews: { nodes: ReviewNode[] };
       airingSchedule: { nodes: AiringScheduleNode[] };
     };
   }>(
@@ -424,9 +293,6 @@ export async function getAnimeDetail(id: number) {
         recommendations(page: 1, perPage: 8, sort: [RATING_DESC]) {
           ${RECOMMENDATIONS_SUBFIELDS}
         }
-        reviews(page: 1, perPage: 5, sort: [RATING_DESC]) {
-          ${REVIEWS_SUBFIELDS}
-        }
         airingSchedule(notYetAired: true, perPage: 25) {
           ${AIRING_SCHEDULE_SUBFIELDS}
         }
@@ -442,7 +308,6 @@ export async function getAnimeDetail(id: number) {
     staff: m.staff.edges,
     relations: m.relations.edges,
     recommendations: m.recommendations.nodes,
-    reviews: m.reviews.nodes,
     airingSchedule: m.airingSchedule.nodes,
   };
 }

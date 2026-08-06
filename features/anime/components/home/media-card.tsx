@@ -26,6 +26,16 @@ export function MediaCard({
   const score = media.averageScore;
   const isReleasing = media.status === "RELEASING";
 
+  const coverImage = cover ? (
+    <ImageWithLoading
+      src={cover}
+      alt={`${title} cover`}
+      fill
+      sizes={size === "featured" ? "(min-width: 1024px) 42vw, 92vw" : "(min-width: 1280px) 16vw, (min-width: 768px) 24vw, 44vw"}
+      className="object-cover transition-transform duration-500 group-hover:scale-[1.035] motion-reduce:transform-none"
+    />
+  ) : null;
+
   return (
     <Link
       href={`/anime/${media.id}` as Route<string>}
@@ -42,25 +52,13 @@ export function MediaCard({
         )}
         style={!cover && color ? { background: `linear-gradient(135deg, ${color}55, var(--surface-2) 72%)` } : undefined}
       >
-        {cover ? (
+        {coverImage ? (
           viewTransition ? (
             <ViewTransition name={`anime-cover-grid-${media.id}-${vtIndex ?? 0}`} share="morph" default="none">
-              <ImageWithLoading
-                src={cover}
-                alt={`${title} cover`}
-                fill
-                sizes={size === "featured" ? "(min-width: 1024px) 42vw, 92vw" : "(min-width: 1280px) 16vw, (min-width: 768px) 24vw, 44vw"}
-                className="object-cover transition-transform duration-500 group-hover:scale-[1.035] motion-reduce:transform-none"
-              />
+              {coverImage}
             </ViewTransition>
           ) : (
-            <ImageWithLoading
-              src={cover}
-              alt={`${title} cover`}
-              fill
-              sizes={size === "featured" ? "(min-width: 1024px) 42vw, 92vw" : "(min-width: 1280px) 16vw, (min-width: 768px) 24vw, 44vw"}
-              className="object-cover transition-transform duration-500 group-hover:scale-[1.035] motion-reduce:transform-none"
-            />
+            coverImage
           )
         ) : (
           <div className="flex h-full items-center justify-center p-5 text-center">

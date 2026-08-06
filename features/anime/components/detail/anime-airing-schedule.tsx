@@ -1,10 +1,20 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { getAnimeAiringSchedule } from "@/features/anime/anime-queries";
 import { AnimeAiringScheduleClient } from "./anime-airing-schedule-client";
 
 export async function AnimeAiringScheduleAsync({ id }: { id: number }) {
+  const { getAnimeAiringSchedule } = await import("@/features/anime/anime-queries");
   const nodes = await getAnimeAiringSchedule(id);
-  return <AnimeAiringScheduleClient nodes={nodes} />;
+  if (nodes.length === 0) return null;
+
+  return (
+    <>
+      <p className="eyebrow text-accent">Schedule</p>
+      <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">Next episodes</h2>
+      <div className="mt-5">
+        <AnimeAiringScheduleClient nodes={nodes} />
+      </div>
+    </>
+  );
 }
 
 export function AnimeAiringScheduleSkeleton() {

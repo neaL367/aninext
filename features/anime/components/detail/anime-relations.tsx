@@ -11,12 +11,8 @@ import Link from "next/link";
 import type { Route } from "next";
 import { ImageWithLoading } from "@/components/image-with-loading";
 
-export function AnimeRelations({
-  edges: edgesProp,
-}: {
-  edges: RelationEdge[];
-}) {
-  if (edgesProp.length === 0) {
+export function AnimeRelations({ edges }: { edges: RelationEdge[] }) {
+  if (edges.length === 0) {
     return (
       <Empty>
         <EmptyHeader>
@@ -29,9 +25,9 @@ export function AnimeRelations({
 
   return (
     <div>
-      <p className="mb-3 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted-foreground">{edgesProp.length} titles · scroll to browse</p>
+      <p className="mb-3 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted-foreground">{edges.length} titles · scroll to browse</p>
       <div className="max-h-[360px] overflow-y-auto scrollbar-thin divide-y divide-border border-y border-border">
-        {edgesProp.map((edge, i) => {
+        {edges.map((edge, i) => {
           const title = getTitle(edge.node.title);
           const cover = getCover(edge.node.coverImage);
           const color = edge.node.coverImage.color;

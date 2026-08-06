@@ -1,4 +1,4 @@
-const SEASONS = ["WINTER", "SPRING", "SUMMER", "FALL"] as const;
+export const SEASONS = ["WINTER", "SPRING", "SUMMER", "FALL"] as const;
 
 function getSeasonInfo() {
   const now = new Date();

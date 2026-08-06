@@ -8,7 +8,7 @@ import { AnimeCharacters, AnimeCharactersSkeleton } from "@/features/anime/compo
 import { AnimeStaff, AnimeStaffSkeleton } from "@/features/anime/components/detail/anime-staff";
 import { AnimeRelations, AnimeRelationsSkeleton } from "@/features/anime/components/detail/anime-relations";
 import { AnimeRecommendations, AnimeRecommendationsSkeleton } from "@/features/anime/components/detail/anime-recommendations";
-import { AnimeAiringScheduleSkeleton } from "@/features/anime/components/detail/anime-airing-schedule";
+import { AnimeAiringScheduleSkeleton, AnimeAiringScheduleAsync } from "@/features/anime/components/detail/anime-airing-schedule";
 import { AnimeStreamingEpisodes, AnimeStreamingEpisodesSkeleton } from "@/features/anime/components/detail/anime-streaming-episodes";
 import { AnimeTrailer, AnimeTrailerSkeleton } from "@/features/anime/components/detail/anime-trailer";
 import { getAnimeHero, getAnimeDetail } from "@/features/anime/anime-queries";
@@ -79,7 +79,7 @@ async function DetailSection({ params }: { params: Promise<{ id: string }> }) {
               <section aria-label="Airing schedule">
                 <ErrorBoundary title="Schedule failed to load">
                   <Suspense fallback={<div className="mt-5"><AnimeAiringScheduleSkeleton /></div>}>
-                    <AiringScheduleSection id={Number(id)} />
+                    <AnimeAiringScheduleAsync id={Number(id)} />
                   </Suspense>
                 </ErrorBoundary>
               </section>
@@ -106,19 +106,6 @@ async function DetailSection({ params }: { params: Promise<{ id: string }> }) {
 
 function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) {
   return <div><p className="eyebrow text-accent">{eyebrow}</p><h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">{title}</h2></div>;
-}
-
-async function AiringScheduleSection({ id }: { id: number }) {
-  const { getAnimeAiringSchedule } = await import("@/features/anime/anime-queries");
-  const nodes = await getAnimeAiringSchedule(id);
-  if (nodes.length === 0) return null;
-  const { AnimeAiringScheduleClient } = await import("@/features/anime/components/detail/anime-airing-schedule-client");
-  return (
-    <>
-      <SectionHeading eyebrow="Schedule" title="Next episodes" />
-      <div className="mt-5"><AnimeAiringScheduleClient nodes={nodes} /></div>
-    </>
-  );
 }
 
 function DetailSkeleton() {
