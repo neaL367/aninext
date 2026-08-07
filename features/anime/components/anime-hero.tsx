@@ -1,4 +1,5 @@
-import { PlayIcon } from "lucide-react";
+import { ExternalLinkIcon, PlayIcon } from "lucide-react";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ViewTransition } from "react";
 
@@ -155,7 +156,7 @@ export function AnimeHero({ media }: { media: Media }) {
               )}
             </div>
 
-            <div className="pt-3 flex flex-wrap items-center gap-4">
+            <div className="pt-3 flex flex-wrap items-center gap-3">
               {media.trailer?.id && media.trailer.site === "youtube" && (
                 <a
                   href={`https://www.youtube.com/watch?v=${media.trailer.id}`}
@@ -166,12 +167,69 @@ export function AnimeHero({ media }: { media: Media }) {
                   <PlayIcon className="size-3.5 fill-current" /> Watch trailer
                 </a>
               )}
+
+              {(() => {
+                const streamingLinks =
+                  media.externalLinks?.filter(
+                    (link) =>
+                      link.url &&
+                      (link.type === "STREAMING" ||
+                        ["crunchyroll", "netflix", "hulu", "bilibili", "disney", "hidive", "prime", "amazon", "youtube", "funimation"].some(
+                          (s) => link.site?.toLowerCase().includes(s),
+                        )),
+                  ) ?? [];
+
+                if (streamingLinks.length === 0) return null;
+
+                return (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-mono text-[0.62rem] uppercase tracking-wider text-muted-foreground mr-1">
+                      Stream on:
+                    </span>
+                    {streamingLinks.slice(0, 5).map((link) => {
+                      const domain = getDomain(link.url);
+                      const favicon = domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=32` : "";
+                      return (
+                        <a
+                          key={link.url}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 rounded-md border border-border-soft bg-surface-1/80 px-3 py-1.5 font-mono text-xs font-medium text-foreground transition-all hover:border-signal hover:text-signal hover:bg-surface-1 shadow-sm"
+                        >
+                          {favicon ? (
+                            <Image
+                              src={favicon}
+                              alt=""
+                              width={14}
+                              height={14}
+                              className="size-3.5 rounded-sm"
+                              unoptimized
+                            />
+                          ) : (
+                            <ExternalLinkIcon className="size-3.5 text-muted-foreground" />
+                          )}
+                          <span>{link.site}</span>
+                        </a>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>
       </div>
     </section>
   );
+}
+
+function getDomain(url: string): string {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return "";
+  }
 }
 
 export function AnimeHeroSkeleton() {

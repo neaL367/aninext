@@ -45,6 +45,7 @@ export interface Media {
   };
   streamingEpisodes?: StreamingEpisode[];
   trailer?: Trailer;
+  externalLinks?: MediaExternalLink[];
 }
 
 export interface Trailer {

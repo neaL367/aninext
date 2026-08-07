@@ -277,6 +277,7 @@ const HERO_FIELDS = `
   nextAiringEpisode { episode airingAt timeUntilAiring }
   streamingEpisodes { title thumbnail url site }
   trailer { id site thumbnail }
+  externalLinks { url site type icon color }
 `;
 
 const CHARACTERS_SUBFIELDS = `
