@@ -46,26 +46,27 @@ export function HeroCarousel({ items }: { items: Media[] }) {
       return;
     }
 
-    startTimeRef.current = Date.now() - (progress / 100) * AUTOPLAY_INTERVAL;
+    const startTime = Date.now();
+    let animationFrameId: number;
 
-    const updateProgress = () => {
-      const elapsed = Date.now() - startTimeRef.current;
+    const loop = () => {
+      const elapsed = Date.now() - startTime;
       const pct = Math.min((elapsed / AUTOPLAY_INTERVAL) * 100, 100);
       setProgress(pct);
 
       if (elapsed >= AUTOPLAY_INTERVAL) {
         next();
       } else {
-        progressTimerRef.current = requestAnimationFrame(updateProgress);
+        animationFrameId = requestAnimationFrame(loop);
       }
     };
 
-    progressTimerRef.current = requestAnimationFrame(updateProgress);
+    animationFrameId = requestAnimationFrame(loop);
 
     return () => {
-      if (progressTimerRef.current) cancelAnimationFrame(progressTimerRef.current);
+      cancelAnimationFrame(animationFrameId);
     };
-  }, [current, isPlaying, isHovered, len, next, progress]);
+  }, [current, isPlaying, isHovered, len, next]);
 
   // Keyboard navigation (Left/Right arrows, Space bar)
   useEffect(() => {
@@ -201,7 +202,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
                 >
                   {isActive && (
                     <div
-                      className="absolute inset-y-0 left-0 bg-accent rounded-full transition-all duration-75"
+                      className="absolute inset-y-0 left-0 bg-signal rounded-full"
                       style={{ width: `${progress}%` }}
                     />
                   )}
