@@ -1,4 +1,7 @@
+"use client";
+
 import { CalendarIcon, FilmIcon, PlayIcon, TvIcon } from "lucide-react";
+import { useState } from "react";
 
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { MediaImage } from "@/components/ui/media-image";
@@ -21,20 +24,22 @@ export function AnimePreviewCard({
   media: Media;
   children: React.ReactElement;
 }) {
+  const [open, setOpen] = useState(false);
   const title = getMediaTitle(media);
   const color = media.coverImage.color;
   const studio = media.studios?.nodes[0]?.name;
   const description = stripHtml(media.description);
 
   return (
-    <HoverCard>
+    <HoverCard open={open} onOpenChange={setOpen}>
       <HoverCardTrigger render={children} />
-      <HoverCardContent
-        side="right"
-        align="start"
-        sideOffset={10}
-        className="w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-md border border-border-soft bg-card/95 p-0 shadow-2xl backdrop-blur-xl ring-1 ring-foreground/10 z-50 animate-in fade-in-0 zoom-in-95 duration-200"
-      >
+      {open && (
+        <HoverCardContent
+          side="right"
+          align="start"
+          sideOffset={10}
+          className="w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-md border border-border-soft bg-card/95 p-0 shadow-2xl backdrop-blur-xl ring-1 ring-foreground/10 z-50 animate-in fade-in-0 zoom-in-95 duration-200"
+        >
         {media.bannerImage ? (
           <div
             className="relative h-36 w-full overflow-hidden bg-card"
@@ -137,6 +142,7 @@ export function AnimePreviewCard({
           )}
         </div>
       </HoverCardContent>
+      )}
     </HoverCard>
   );
 }
