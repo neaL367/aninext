@@ -1,15 +1,16 @@
 import Link from "next/link";
 import { ViewTransition } from "react";
 
-import { ImageWithLoading } from "@/components/ui/image-with-loading";
+import { MediaImage } from "@/components/ui/media-image";
 import {
   formatFormat,
   formatStatus,
   getMediaCover,
   getMediaTitle,
 } from "@/features/anime/lib/media-helpers";
-import { scoreColor } from "@/features/anime/lib/score";
 import { cn } from "@/lib/utils";
+
+import { MediaScore } from "./media-score";
 
 import type { CoverTier } from "@/features/anime/lib/media-helpers";
 import type { Media } from "@/features/anime/types/anime";
@@ -37,7 +38,7 @@ export function MediaCard({
   const isReleasing = media.status === "RELEASING";
 
   const coverImage = cover ? (
-    <ImageWithLoading
+    <MediaImage
       src={cover}
       alt={`${title} cover`}
       fill
@@ -101,13 +102,8 @@ export function MediaCard({
         )}
 
         {score !== undefined && (
-          <span
-            className={cn(
-              "absolute right-3 top-3 rounded-sm bg-black/60 px-1.5 py-0.5 font-mono text-xs font-semibold tabular-nums backdrop-blur-sm",
-              scoreColor(score),
-            )}
-          >
-            {(score / 10).toFixed(1)}
+          <span className="absolute right-3 top-3 rounded-sm bg-black/60 px-1.5 py-0.5 font-mono text-xs font-semibold tabular-nums backdrop-blur-sm">
+            <MediaScore score={score} className="text-xs" />
           </span>
         )}
 

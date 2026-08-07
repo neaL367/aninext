@@ -1,39 +1,59 @@
+import {
+  FILTER_COUNTRIES,
+  FILTER_FORMATS,
+  FILTER_SEASONS,
+  FILTER_STATUSES,
+} from "./filter-constants";
+
 import type { AnimeFilters } from "@/features/anime/types/anime";
+
+function values(value: string | string[] | undefined): string[] {
+  if (Array.isArray(value)) return value.filter(Boolean);
+  return value ? [value] : [];
+}
+
+function isAllowed<T extends string>(value: string, options: readonly T[]): value is T {
+  return options.includes(value as T);
+}
 
 export function parseFilters(
   searchParams: Record<string, string | string[] | undefined>,
 ): AnimeFilters {
   const filters: AnimeFilters = {};
 
-  const genre = searchParams.genre;
-  if (genre) {
-    filters.genre = Array.isArray(genre) ? genre : [genre];
-  }
+  const genre = values(searchParams.genre);
+  if (genre.length) filters.genre = genre;
 
-  const format = searchParams.format;
-  if (format) {
-    filters.format = Array.isArray(format) ? format : [format];
-  }
+  const format = values(searchParams.format).filter((value) => isAllowed(value, FILTER_FORMATS));
+  if (format.length) filters.format = format;
 
-  const status = searchParams.status;
-  if (status) {
-    filters.status = Array.isArray(status) ? status : [status];
-  }
+  const status = values(searchParams.status).filter((value) => isAllowed(value, FILTER_STATUSES));
+  if (status.length) filters.status = status;
 
   const season = searchParams.season;
-  if (typeof season === "string") filters.season = season;
+  if (
+    typeof season === "string" &&
+    isAllowed(
+      season,
+      FILTER_SEASONS.map(({ value }) => value),
+    )
+  ) {
+    filters.season = season;
+  }
 
   const year = searchParams.year;
   if (typeof year === "string") {
     const y = Number(year);
-    if (!isNaN(y)) filters.year = y;
+    if (Number.isInteger(y)) filters.year = y;
   }
 
   const country = searchParams.country;
-  if (typeof country === "string") filters.country = country;
+  if (typeof country === "string" && FILTER_COUNTRIES.some(({ value }) => value === country)) {
+    filters.country = country;
+  }
 
   const search = searchParams.search;
-  if (typeof search === "string") filters.search = search;
+  if (typeof search === "string" && search.trim()) filters.search = search.trim();
 
   const isAdult = searchParams.isAdult;
   if (isAdult === "true") filters.isAdult = true;
@@ -44,13 +64,17 @@ export function parseFilters(
 
 export function buildFilterHash(filters: AnimeFilters): string {
   const parts: string[] = [];
-  if (filters.genre?.length) parts.push(`genre=${filters.genre.join(",")}`);
-  if (filters.format?.length) parts.push(`format=${filters.format.join(",")}`);
-  if (filters.status?.length) parts.push(`status=${filters.status.join(",")}`);
-  if (filters.season) parts.push(`season=${filters.season}`);
+  const addList = (key: string, list?: string[]) => {
+    if (list?.length) parts.push(`${key}=${list.slice().sort().map(encodeURIComponent).join(",")}`);
+  };
+
+  addList("genre", filters.genre);
+  addList("format", filters.format);
+  addList("status", filters.status);
+  if (filters.season) parts.push(`season=${encodeURIComponent(filters.season)}`);
   if (filters.year) parts.push(`year=${filters.year}`);
-  if (filters.country) parts.push(`country=${filters.country}`);
-  if (filters.search) parts.push(`search=${filters.search}`);
+  if (filters.country) parts.push(`country=${encodeURIComponent(filters.country)}`);
+  if (filters.search) parts.push(`search=${encodeURIComponent(filters.search)}`);
   if (filters.isAdult !== undefined) parts.push(`isAdult=${filters.isAdult}`);
   return parts.sort().join(";");
 }

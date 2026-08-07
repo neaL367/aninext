@@ -63,7 +63,7 @@ export function BrowsePageShell({
           </Suspense>
         </div>
 
-        <div className="mt-10 grid gap-10 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-12">
+        <div className="mt-10 grid gap-10 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-12">
           <aside className="hidden lg:block">
             <div className="sticky top-24">
               <p className="eyebrow mb-5">Filters</p>
@@ -80,7 +80,7 @@ export function BrowsePageShell({
                 <SearchBar />
               </Suspense>
             </div>
-            <ErrorBoundary title="Results failed to load">{children}</ErrorBoundary>
+            <Crossfade>{children}</Crossfade>
           </div>
         </div>
       </div>

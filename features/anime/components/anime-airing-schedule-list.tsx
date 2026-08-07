@@ -1,5 +1,3 @@
-"use client";
-
 import { fromAiringTimestamp } from "@/features/anime/lib/media-helpers";
 
 import type { AiringScheduleNode } from "@/features/anime/types/anime";
@@ -14,12 +12,18 @@ export function AnimeAiringScheduleList({ nodes }: { nodes: AiringScheduleNode[]
       <p className="mb-3 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted-foreground">
         {nodes.length} episodes · scroll
       </p>
-      <div className="max-h-[260px] overflow-y-auto scrollbar-thin divide-y divide-border border-y border-border">
+      <div
+        tabIndex={0}
+        role="list"
+        aria-label="Upcoming episodes"
+        className="max-h-[260px] overflow-y-auto scrollbar-thin divide-y divide-border border-y border-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+      >
         {nodes.map((node) => {
           const date = fromAiringTimestamp(node.airingAt);
           return (
             <div
               key={node.episode}
+              role="listitem"
               className="flex items-center justify-between gap-4 py-2.5 first:pt-0 last:pb-0"
             >
               <span className="flex items-center gap-2 text-sm font-medium">

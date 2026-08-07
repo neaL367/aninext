@@ -1,10 +1,8 @@
-"use client";
-
 import { LinkIcon } from "lucide-react";
 import Link from "next/link";
 
 import { Empty, EmptyHeader, EmptyTitle, EmptyMedia } from "@/components/ui/empty";
-import { ImageWithLoading } from "@/components/ui/image-with-loading";
+import { MediaImage } from "@/components/ui/media-image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 import { getTitle, getCover } from "@/features/anime/lib/media-helpers";
@@ -31,7 +29,12 @@ export function AnimeRelations({ edges }: { edges: RelationEdge[] }) {
       <p className="mb-3 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted-foreground">
         {edges.length} titles · scroll to browse
       </p>
-      <div className="max-h-[360px] overflow-y-auto scrollbar-thin divide-y divide-border border-y border-border">
+      <div
+        tabIndex={0}
+        role="list"
+        aria-label="Related anime"
+        className="max-h-[360px] overflow-y-auto scrollbar-thin divide-y divide-border border-y border-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+      >
         {edges.map((edge, i) => {
           const title = getTitle(edge.node.title);
           const cover = getCover(edge.node.coverImage);
@@ -40,6 +43,7 @@ export function AnimeRelations({ edges }: { edges: RelationEdge[] }) {
             <AnimePreviewCard key={`${edge.node.id}-${i}`} media={edge.node}>
               <Link
                 href={`/anime/${edge.node.id}` as Route<string>}
+                role="listitem"
                 className="group flex items-center gap-3 py-3 first:pt-0 last:pb-0"
               >
                 <div
@@ -47,7 +51,7 @@ export function AnimeRelations({ edges }: { edges: RelationEdge[] }) {
                   style={color ? { backgroundColor: color } : undefined}
                 >
                   {cover ? (
-                    <ImageWithLoading
+                    <MediaImage
                       src={cover}
                       alt={title}
                       fill

@@ -25,6 +25,7 @@ export function CollectionNav() {
             key={id}
             href={`/anime/${id}`}
             prefetch={id === "seasonal" ? false : undefined}
+            aria-current={isActive ? "page" : undefined}
             className={cn(
               "group relative flex shrink-0 items-center gap-2 px-3 pb-3 pt-1 text-sm transition-colors",
               isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",

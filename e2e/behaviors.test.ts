@@ -13,6 +13,40 @@ test.describe("infinite scroll pagination", () => {
       .poll(async () => page.locator('[role="listitem"]').count(), { timeout: 15000 })
       .toBeGreaterThan(initial);
   });
+
+  test("stops top 100 pagination at the collection cap", async ({ page }) => {
+    await page.goto("/anime/top100");
+    const results = page.locator('[role="listitem"]');
+    const sentinel = page.locator('[aria-label="Load more anime"]');
+    await expect(results.first()).toBeVisible({ timeout: 15_000 });
+
+    let previousCount = await results.count();
+    for (let i = 0; i < 10; i += 1) {
+      const didScroll = await page.evaluate(() => {
+        const element = document.querySelector('[aria-label="Load more anime"]');
+        if (!element) return false;
+        element.scrollIntoView({ block: "end" });
+        return true;
+      });
+      if (!didScroll) break;
+
+      await expect
+        .poll(
+          async () => {
+            const count = await results.count();
+            if ((await sentinel.count()) === 0) return "done";
+            if (count > previousCount) return "loaded";
+            return "pending";
+          },
+          { timeout: 15_000 },
+        )
+        .toMatch(/loaded|done/);
+      previousCount = await results.count();
+    }
+
+    expect(await results.count()).toBeLessThanOrEqual(100);
+    await expect(page.getByText("End of results")).toBeVisible();
+  });
 });
 
 test.describe("hover preview card", () => {

@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-
-import { ImageWithLoading } from "@/components/ui/image-with-loading";
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 
 import { HeroInfo } from "./hero-info";
 
@@ -19,6 +18,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
   }, [current]);
 
   useEffect(() => {
+    if (items.length < 2) return;
     let timer: ReturnType<typeof setInterval>;
 
     const tick = () => {
@@ -69,7 +69,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
               }}
             >
               {image && isMounted ? (
-                <ImageWithLoading
+                <Image
                   src={image}
                   alt=""
                   fill
@@ -92,8 +92,13 @@ export function HeroCarousel({ items }: { items: Media[] }) {
           );
         })}
         <div className="pointer-events-none absolute inset-0 hidden bg-gradient-to-r from-surface-1/90 via-surface-1/50 to-transparent lg:block" />
-        <div className="absolute bottom-4 right-4 z-10 font-mono text-xs tabular-nums tracking-[0.1em] text-white/60">
-          {String(current + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
+        <div className="absolute bottom-4 right-4 z-10">
+          <div
+            className="font-mono text-xs tabular-nums tracking-[0.1em] text-white/70"
+            aria-live="polite"
+          >
+            {String(current + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
+          </div>
         </div>
       </div>
 

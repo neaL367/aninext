@@ -6,7 +6,7 @@ import { MediaCard, MediaCardSkeleton } from "@/features/anime/components/media-
 
 import type { RecommendationNode } from "@/features/anime/types/anime";
 
-export async function AnimeRecommendations({ nodes }: { nodes: RecommendationNode[] }) {
+export function AnimeRecommendations({ nodes }: { nodes: RecommendationNode[] }) {
   if (nodes.length === 0) {
     return (
       <Empty>

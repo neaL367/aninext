@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDownIcon } from "lucide-react";
-import { use, useState } from "react";
+import { memo, use, useCallback, useMemo, useState } from "react";
 
 import {
   AlertDialog,
@@ -18,19 +18,46 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
-import { useFilters } from "../hooks/use-filters";
+import { useFilters, type FilterController } from "../hooks/use-filters";
 import {
-  FILTER_FORMATS,
-  FILTER_STATUSES,
-  FILTER_COUNTRIES,
-  FILTER_SEASONS,
   FILTER_ADULT_GENRES,
-  getYears,
+  FILTER_COUNTRIES,
+  FILTER_FORMATS,
+  FILTER_SEASONS,
+  FILTER_STATUSES,
   formatFilterValue,
+  getYears,
 } from "../lib/filter-constants";
-import { FilterButton } from "./filter-button";
+import { FilterOptionGrid } from "./filter-button";
 
 import type { AnimeCollection } from "@/features/anime/types/anime";
+
+type OptionFilterKey = "genre" | "format" | "status" | "season" | "year" | "country";
+
+type FilterOptionSectionProps = {
+  filterKey: OptionFilterKey;
+  label: string;
+  options: readonly { value: string; label: string }[];
+  selected: readonly string[];
+  defaultOpen?: boolean;
+  scroll?: boolean;
+  multiple: boolean;
+  updateFilter: (key: OptionFilterKey, value: string | string[] | undefined) => void;
+};
+
+const FORMAT_OPTIONS = FILTER_FORMATS.map((value) => ({
+  value,
+  label: formatFilterValue(value),
+}));
+
+const STATUS_OPTIONS = FILTER_STATUSES.map((value) => ({
+  value,
+  label: formatFilterValue(value),
+}));
+
+const SEASON_OPTIONS = [{ value: "", label: "Any" }, ...FILTER_SEASONS];
+
+const COUNTRY_OPTIONS = [{ value: "", label: "Any" }, ...FILTER_COUNTRIES];
 
 export function FilterSidebar({
   genresPromise,
@@ -39,222 +66,339 @@ export function FilterSidebar({
 }: {
   genresPromise: Promise<string[]>;
   mobile?: boolean;
-  collection?: AnimeCollection;
+  collection: AnimeCollection;
+}) {
+  const filters = useFilters();
+
+  return (
+    <FilterSidebarContent
+      genresPromise={genresPromise}
+      mobile={mobile}
+      collection={collection}
+      filters={filters}
+    />
+  );
+}
+
+export function FilterSidebarContent({
+  genresPromise,
+  mobile = false,
+  collection,
+  filters,
+}: {
+  genresPromise: Promise<string[]>;
+  mobile?: boolean;
+  collection: AnimeCollection;
+  filters: FilterController;
 }) {
   const allGenres = use(genresPromise);
-  const {
-    isPending,
-    updateFilter,
-    clearAll,
-    activeCount,
-    currentGenres,
-    currentFormats,
-    currentStatuses,
-    currentSeason,
-    currentYear,
-    currentCountry,
-    isAdult,
-  } = useFilters();
-
+  const { state, isPending, updateFilter, clearAll, facetCount } = filters;
   const [adultOpen, setAdultOpen] = useState(false);
-  const [confirmOpen, setConfirmOpen] = useState(false);
+  const setAdultContent = useCallback(
+    (enabled: boolean) => updateFilter("isAdult", enabled ? "true" : undefined),
+    [updateFilter],
+  );
 
-  const genres = isAdult ? allGenres : allGenres.filter((g) => !FILTER_ADULT_GENRES.includes(g));
+  const genres = useMemo(
+    () =>
+      (state.isAdult
+        ? allGenres
+        : allGenres.filter(
+            (genre) => !FILTER_ADULT_GENRES.some((adultGenre) => adultGenre === genre),
+          )
+      ).map((value) => ({ value, label: value })),
+    [allGenres, state.isAdult],
+  );
+  const years = useMemo(
+    () => [
+      { value: "", label: "Any" },
+      ...getYears().map((value) => ({ value: String(value), label: String(value) })),
+    ],
+    [],
+  );
 
-  const seasonDefault = collection === "seasonal" || !!currentSeason;
-  const yearDefault = collection === "seasonal" || !!currentYear;
+  const sections: Array<{
+    key: OptionFilterKey;
+    label: string;
+    options: readonly { value: string; label: string }[];
+    selected: readonly string[];
+    defaultOpen?: boolean;
+    scroll?: boolean;
+  }> = [
+    {
+      key: "genre",
+      label: "Genre",
+      options: genres,
+      selected: state.genre,
+      defaultOpen: true,
+      scroll: true,
+    },
+    {
+      key: "format",
+      label: "Format",
+      options: FORMAT_OPTIONS,
+      selected: state.format,
+    },
+    {
+      key: "status",
+      label: "Status",
+      options: STATUS_OPTIONS,
+      selected: state.status,
+    },
+    {
+      key: "season",
+      label: "Season",
+      options: SEASON_OPTIONS,
+      selected: [state.season],
+      defaultOpen: collection === "seasonal" || Boolean(state.season),
+    },
+    {
+      key: "year",
+      label: "Year",
+      options: years,
+      selected: [state.year],
+      defaultOpen: collection === "seasonal" || Boolean(state.year),
+      scroll: true,
+    },
+    {
+      key: "country",
+      label: "Origin",
+      options: COUNTRY_OPTIONS,
+      selected: [state.country],
+    },
+  ];
 
   return (
     <aside
-      className={cn(mobile ? "flex w-full" : "hidden w-full lg:flex", "flex-col")}
+      className={cn(
+        mobile ? "flex w-full" : "hidden w-full lg:flex",
+        "flex-col transition-opacity data-[pending]:opacity-60",
+      )}
       data-pending={isPending ? "" : undefined}
     >
-      <div className="mb-3 flex items-center justify-between border-b border-border-soft pb-3">
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-foreground">
-            Filters
-          </span>
-          {activeCount > 0 && (
-            <span className="flex size-5 items-center justify-center rounded-full bg-accent font-mono text-[0.6rem] font-semibold text-accent-foreground">
-              {activeCount}
-            </span>
-          )}
-        </div>
-        {activeCount > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={clearAll}
-            className="h-6 rounded-none px-2 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted-foreground hover:text-foreground"
-          >
-            Reset
-          </Button>
-        )}
-      </div>
-
-      <div className="space-y-0">
-        <FilterSection label="Genre" defaultOpen count={currentGenres.length}>
-          <div className="flex flex-wrap gap-1.5">
-            {genres.map((genre) => {
-              const active = currentGenres.includes(genre);
-              return (
-                <FilterButton
-                  key={genre}
-                  active={active}
-                  onClick={() => {
-                    const next = active
-                      ? currentGenres.filter((g) => g !== genre)
-                      : [...currentGenres, genre];
-                    updateFilter("genre", next.length ? next : undefined);
-                  }}
-                >
-                  {genre}
-                </FilterButton>
-              );
-            })}
-          </div>
-        </FilterSection>
-
-        <FilterSection label="Format" count={currentFormats.length}>
-          <div className="flex flex-wrap gap-1.5">
-            {FILTER_FORMATS.map((format) => {
-              const active = currentFormats.includes(format);
-              return (
-                <FilterButton
-                  key={format}
-                  active={active}
-                  onClick={() => {
-                    const next = active
-                      ? currentFormats.filter((f) => f !== format)
-                      : [...currentFormats, format];
-                    updateFilter("format", next.length ? next : undefined);
-                  }}
-                >
-                  {formatFilterValue(format)}
-                </FilterButton>
-              );
-            })}
-          </div>
-        </FilterSection>
-
-        <FilterSection label="Status" count={currentStatuses.length}>
-          <div className="flex flex-wrap gap-1.5">
-            {FILTER_STATUSES.map((status) => {
-              const active = currentStatuses.includes(status);
-              return (
-                <FilterButton
-                  key={status}
-                  active={active}
-                  onClick={() => {
-                    const next = active
-                      ? currentStatuses.filter((s) => s !== status)
-                      : [...currentStatuses, status];
-                    updateFilter("status", next.length ? next : undefined);
-                  }}
-                >
-                  {formatFilterValue(status)}
-                </FilterButton>
-              );
-            })}
-          </div>
-        </FilterSection>
-
-        <FilterSection label="Season" defaultOpen={seasonDefault} count={currentSeason ? 1 : 0}>
-          <div className="flex flex-wrap gap-1.5">
-            <FilterButton active={!currentSeason} onClick={() => updateFilter("season", undefined)}>
-              Any
-            </FilterButton>
-            {FILTER_SEASONS.map((s) => (
-              <FilterButton
-                key={s.value}
-                active={currentSeason === s.value}
-                onClick={() => updateFilter("season", s.value)}
-              >
-                {s.label}
-              </FilterButton>
-            ))}
-          </div>
-        </FilterSection>
-
-        <FilterSection label="Year" defaultOpen={yearDefault} count={currentYear ? 1 : 0}>
-          <div className="flex flex-wrap gap-1.5">
-            <FilterButton active={!currentYear} onClick={() => updateFilter("year", undefined)}>
-              Any
-            </FilterButton>
-            {getYears().map((y) => (
-              <FilterButton
-                key={y}
-                active={currentYear === String(y)}
-                onClick={() => updateFilter("year", String(y))}
-              >
-                {y}
-              </FilterButton>
-            ))}
-          </div>
-        </FilterSection>
-
-        <FilterSection label="Origin" count={currentCountry ? 1 : 0}>
-          <div className="flex flex-wrap gap-1.5">
-            <FilterButton
-              active={!currentCountry}
-              onClick={() => updateFilter("country", undefined)}
+      {mobile ? (
+        facetCount > 0 && (
+          <div className="mb-3 flex justify-end">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearAll}
+              className="h-8 rounded-none px-2 font-mono text-[0.62rem] uppercase tracking-[0.1em] text-muted-foreground"
             >
-              All
-            </FilterButton>
-            {FILTER_COUNTRIES.map((country) => (
-              <FilterButton
-                key={country.value}
-                active={currentCountry === country.value}
-                onClick={() => updateFilter("country", country.value)}
-              >
-                {country.label}
-              </FilterButton>
-            ))}
+              Reset filters
+            </Button>
           </div>
-        </FilterSection>
-
-        <div className="border-b border-border-soft py-3">
-          <button
-            type="button"
-            onClick={() => setAdultOpen(!adultOpen)}
-            className="flex w-full items-center gap-2 text-left"
-          >
-            <ChevronDownIcon
-              className={cn("size-3.5 transition-transform", adultOpen && "rotate-180")}
-            />
-            <span className="font-mono text-[0.65rem] font-medium text-foreground">
-              Adult content
+        )
+      ) : (
+        <div className="mb-3 flex items-center justify-between border-b border-border-soft pb-3">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-foreground">
+              Filters
             </span>
-            {isAdult && (
-              <span className="ml-auto rounded-sm bg-live-badge/10 px-1.5 py-0.5 font-mono text-[0.6rem] font-medium text-live-badge">
-                Enabled
+            {facetCount > 0 && (
+              <span className="flex size-5 items-center justify-center rounded-full bg-accent font-mono text-[0.6rem] font-semibold text-accent-foreground">
+                {facetCount}
               </span>
             )}
-          </button>
-          {adultOpen && (
-            <div className="mt-3 space-y-3">
-              <p className="text-xs leading-5 text-muted-foreground">
-                This includes mature themes and graphic material. You must be 18 years or older to
-                view adult content.
-              </p>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Enable adult content</span>
-                <Switch
-                  checked={isAdult}
-                  onCheckedChange={(checked: boolean) => {
-                    if (checked) {
-                      setConfirmOpen(true);
-                    } else {
-                      updateFilter("isAdult", undefined);
-                    }
-                  }}
-                />
-              </div>
-            </div>
+          </div>
+          {facetCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearAll}
+              className="h-8 rounded-none px-2 font-mono text-[0.62rem] uppercase tracking-[0.1em] text-muted-foreground hover:text-foreground"
+            >
+              Reset
+            </Button>
           )}
         </div>
+      )}
+
+      <div className="flex flex-col">
+        {sections.map((section) => (
+          <FilterOptionSection
+            key={section.key}
+            filterKey={section.key}
+            label={section.label}
+            options={section.options}
+            selected={section.selected}
+            defaultOpen={section.defaultOpen}
+            scroll={section.scroll}
+            multiple={
+              section.key === "genre" || section.key === "format" || section.key === "status"
+            }
+            updateFilter={updateFilter}
+          />
+        ))}
+        <AdultContentFilter
+          enabled={state.isAdult}
+          open={adultOpen}
+          onOpenChange={setAdultOpen}
+          onChange={setAdultContent}
+        />
       </div>
 
+      {mobile && facetCount > 0 && (
+        <p className="mt-4 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted-foreground">
+          {facetCount} active {facetCount === 1 ? "filter" : "filters"}
+        </p>
+      )}
+    </aside>
+  );
+}
+
+const FilterOptionSection = memo(function FilterOptionSection({
+  filterKey,
+  label,
+  options,
+  selected,
+  defaultOpen = false,
+  scroll = false,
+  multiple,
+  updateFilter,
+}: FilterOptionSectionProps) {
+  const count = multiple ? selected.length : Number(Boolean(selected[0]));
+  const onToggle = useCallback(
+    (value: string) => {
+      if (!multiple) {
+        updateFilter(filterKey, value || undefined);
+        return;
+      }
+      const next = selected.includes(value)
+        ? selected.filter((item) => item !== value)
+        : [...selected, value];
+      updateFilter(filterKey, next.length ? next : undefined);
+    },
+    [filterKey, multiple, selected, updateFilter],
+  );
+
+  return (
+    <FilterSection id={filterKey} label={label} defaultOpen={defaultOpen} count={count}>
+      <FilterOptionGrid options={options} selected={selected} onToggle={onToggle} scroll={scroll} />
+    </FilterSection>
+  );
+}, areFilterOptionsEqual);
+
+function areFilterOptionsEqual(previous: FilterOptionSectionProps, next: FilterOptionSectionProps) {
+  return (
+    previous.filterKey === next.filterKey &&
+    previous.label === next.label &&
+    previous.defaultOpen === next.defaultOpen &&
+    previous.scroll === next.scroll &&
+    previous.multiple === next.multiple &&
+    previous.updateFilter === next.updateFilter &&
+    sameOptions(previous.options, next.options) &&
+    sameValues(previous.selected, next.selected)
+  );
+}
+
+function sameOptions(
+  previous: readonly { value: string; label: string }[],
+  next: readonly { value: string; label: string }[],
+) {
+  return (
+    previous.length === next.length &&
+    previous.every(
+      (option, index) => option.value === next[index]?.value && option.label === next[index]?.label,
+    )
+  );
+}
+
+function sameValues(previous: readonly string[], next: readonly string[]) {
+  return previous.length === next.length && previous.every((value, index) => value === next[index]);
+}
+
+function FilterSection({
+  id,
+  label,
+  children,
+  defaultOpen = false,
+  count,
+}: {
+  id: string;
+  label: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+  count?: number;
+}) {
+  const [toggled, setToggled] = useState<boolean | null>(null);
+  const open = toggled ?? ((count ?? 0) > 0 ? true : defaultOpen);
+  const contentId = `filter-${id}-content`;
+
+  return (
+    <section className="border-b border-border-soft py-3">
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls={contentId}
+        onClick={() => setToggled(!open)}
+        className="flex min-h-9 w-full items-center gap-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+      >
+        <ChevronDownIcon className={cn("size-3.5 transition-transform", open && "rotate-180")} />
+        <span className="font-mono text-[0.68rem] font-medium uppercase tracking-[0.08em] text-foreground">
+          {label}
+        </span>
+        {count !== undefined && count > 0 && (
+          <span className="ml-auto font-mono text-[0.62rem] text-accent">{count}</span>
+        )}
+      </button>
+      {open && (
+        <div id={contentId} className="pt-3">
+          {children}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function AdultContentFilter({
+  enabled,
+  open,
+  onOpenChange,
+  onChange,
+}: {
+  enabled: boolean;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onChange: (enabled: boolean) => void;
+}) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  return (
+    <section className="border-b border-border-soft py-3">
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={() => onOpenChange(!open)}
+        className="flex min-h-9 w-full items-center gap-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+      >
+        <ChevronDownIcon className={cn("size-3.5 transition-transform", open && "rotate-180")} />
+        <span className="font-mono text-[0.68rem] font-medium uppercase tracking-[0.08em] text-foreground">
+          Adult content
+        </span>
+        {enabled && (
+          <span className="ml-auto rounded-sm bg-live-badge/10 px-1.5 py-0.5 font-mono text-[0.6rem] font-medium text-live-badge">
+            Enabled
+          </span>
+        )}
+      </button>
+      {open && (
+        <div className="flex flex-col gap-3 pt-3">
+          <p className="text-xs leading-5 text-muted-foreground">
+            Includes mature themes and graphic material. Age confirmation required.
+          </p>
+          <div className="flex min-h-9 items-center justify-between gap-4">
+            <span className="text-xs text-muted-foreground">Show adult content</span>
+            <Switch
+              checked={enabled}
+              onCheckedChange={(checked: boolean) => {
+                if (checked) setConfirmOpen(true);
+                else onChange(false);
+              }}
+            />
+          </div>
+        </div>
+      )}
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -269,7 +413,7 @@ export function FilterSidebar({
             <AlertDialogAction
               onClick={() => {
                 setConfirmOpen(false);
-                updateFilter("isAdult", "true");
+                onChange(true);
               }}
             >
               I am 18 or older
@@ -277,48 +421,16 @@ export function FilterSidebar({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </aside>
-  );
-}
-
-function FilterSection({
-  label,
-  children,
-  defaultOpen = false,
-  count,
-}: {
-  label: string;
-  children: React.ReactNode;
-  defaultOpen?: boolean;
-  count?: number;
-}) {
-  const [toggled, setToggled] = useState<boolean | null>(null);
-  const open = toggled ?? ((count ?? 0) > 0 ? true : defaultOpen);
-
-  return (
-    <div className="border-b border-border-soft py-3">
-      <button
-        type="button"
-        onClick={() => setToggled(!open)}
-        className="flex w-full items-center gap-2 text-left"
-      >
-        <ChevronDownIcon className={cn("size-3.5 transition-transform", open && "rotate-180")} />
-        <span className="font-mono text-[0.65rem] font-medium text-foreground">{label}</span>
-        {count !== undefined && count > 0 && (
-          <span className="ml-auto font-mono text-[0.6rem] text-accent">{count}</span>
-        )}
-      </button>
-      {open && <div className="mt-3">{children}</div>}
-    </div>
+    </section>
   );
 }
 
 export function FilterSidebarSkeleton() {
   return (
-    <aside className="hidden w-full flex-col gap-1 lg:flex">
-      {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="border-b border-border py-2">
-          <Skeleton className="h-5 w-20 rounded" />
+    <aside className="hidden w-full flex-col gap-2 lg:flex">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} className="border-b border-border-soft py-3">
+          <Skeleton className="h-5 w-24 rounded" />
         </div>
       ))}
     </aside>

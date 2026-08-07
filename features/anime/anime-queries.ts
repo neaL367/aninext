@@ -4,7 +4,7 @@ import { cacheTag, cacheLife } from "next/cache";
 import { anilistFetch } from "@/lib/anilist";
 
 import { ANIME_CACHE } from "./anime-cache";
-import { COLLECTIONS } from "./lib/collection-config";
+import { getCollectionConfig } from "./lib/collection-config";
 import { localDateStr, fromAiringTimestamp } from "./lib/media-helpers";
 import { buildFilterHash } from "./lib/parse-filters";
 
@@ -73,12 +73,13 @@ export async function getBrowseCollection(
   filters: AnimeFilters,
   page: number,
   perPage = 25,
+  currentSeason?: { season: string; seasonYear: number },
 ) {
   "use cache: remote";
   const hash = buildFilterHash(filters);
   cacheTag("anime", `anime:browse:${collection}`, ANIME_CACHE.browseCollection(collection, hash));
 
-  const config = COLLECTIONS[collection];
+  const config = getCollectionConfig(collection, currentSeason);
   // custom profiles (next.config cacheLife) aren't part of the builtin union
   cacheLife(config.cacheLife as Parameters<typeof cacheLife>[0]);
 
@@ -126,110 +127,6 @@ export async function getGenres() {
   return data.GenreCollection;
 }
 
-const HOME_SECTION_PER_PAGE: Record<string, number> = {
-  trending: 14,
-  popular: 5,
-  top100: 14,
-  upcoming: 7,
-  alltimepopular: 7,
-};
-
-const HOME_COLLECTION_ALIASES = (Object.keys(HOME_SECTION_PER_PAGE) as AnimeCollection[])
-  .map((key) => {
-    const c = COLLECTIONS[key];
-    const args = [
-      `sort: [${c.sort.join(", ")}]`,
-      c.status ? `status: ${c.status}` : null,
-      c.season ? `season: ${c.season}` : null,
-      c.seasonYear ? `seasonYear: ${c.seasonYear}` : null,
-      "isAdult: false",
-    ]
-      .filter(Boolean)
-      .join(", ");
-    return `${key}: Page(page: 1, perPage: ${HOME_SECTION_PER_PAGE[key]}) {
-      media(type: ANIME, ${args}) {
-        ${MEDIA_CARD_FIELDS}
-      }
-    }`;
-  })
-  .join("\n");
-
-const HOME_QUERY = `
-  query HomeData($start: Int, $end: Int) {
-    hero: Page(page: 1, perPage: 5) {
-      media(type: ANIME, sort: [TRENDING_DESC], isAdult: false) {
-        ${MEDIA_CARD_FIELDS}
-      }
-    }
-    ${HOME_COLLECTION_ALIASES}
-    airing: Page(perPage: 50) {
-      airingSchedules(airingAt_greater: $start, airingAt_lesser: $end, sort: [TIME]) {
-        episode
-        airingAt
-        media {
-          ${MEDIA_CARD_FIELDS}
-          externalLinks { url site type }
-        }
-      }
-    }
-    genres: GenreCollection
-  }
-`;
-
-type HomeData = {
-  hero: { media: Media[] };
-  trending: { media: Media[] };
-  popular: { media: Media[] };
-  top100: { media: Media[] };
-  upcoming: { media: Media[] };
-  alltimepopular: { media: Media[] };
-  airing: { airingSchedules: AiringScheduleNode[] };
-  genres: string[];
-};
-
-export async function getHomeData(start: number, end: number, season: string, seasonYear: number) {
-  "use cache: remote";
-  cacheTag("anime", ANIME_CACHE.home);
-  cacheLife("home" as Parameters<typeof cacheLife>[0]);
-
-  const data = await anilistFetch<HomeData>(HOME_QUERY, { start, end });
-
-  return {
-    hero: data.hero.media,
-    trending: data.trending.media,
-    popular: data.popular.media,
-    top100: data.top100.media,
-    upcoming: data.upcoming.media,
-    alltimepopular: data.alltimepopular.media,
-    airing: data.airing.airingSchedules,
-    genres: data.genres,
-  };
-}
-
-const META_FIELDS = `
-  id
-  title { english romaji userPreferred }
-  bannerImage
-  description(asHtml: false)
-`;
-
-export async function getAnimeMeta(id: number) {
-  "use cache: remote";
-  cacheTag("anime", ANIME_CACHE.detail(id));
-  cacheLife({ stale: 300, revalidate: 900, expire: 86400 });
-
-  const data = await anilistFetch<{ Media: Media }>(
-    `query AnimeMeta($id: Int) {
-      Media(id: $id, type: ANIME) {
-        ${META_FIELDS}
-      }
-    }`,
-    { id },
-  );
-
-  return data.Media;
-}
-
 const HERO_FIELDS = `
   id
   title { romaji english native userPreferred }
@@ -259,7 +156,7 @@ export async function getAnimeHero(id: number) {
   cacheTag("anime", ANIME_CACHE.detail(id));
   cacheLife({ stale: 300, revalidate: 900, expire: 86400 });
 
-  const data = await anilistFetch<{ Media: Media }>(
+  const data = await anilistFetch<{ Media: Media | null }>(
     `query AnimeHero($id: Int) {
       Media(id: $id, type: ANIME) {
         ${HERO_FIELDS}
@@ -322,7 +219,7 @@ const AIRING_WEEK_QUERY = `
 export async function getAiringWeek(start: number, end: number) {
   "use cache: remote";
   const date = localDateStr(fromAiringTimestamp(start));
-  cacheTag("anime", ANIME_CACHE.airingDay(date, start));
+  cacheTag("anime", ANIME_CACHE.airingWeek(date));
   cacheLife({ stale: 180, revalidate: 900, expire: 3600 });
 
   const data = await anilistFetch<{
@@ -343,23 +240,22 @@ export async function getAiringDay(day: string, start: number, end: number) {
 
   return data.Page.airingSchedules;
 }
-export async function getAnimeDetail(id: number) {
+export async function getAnimeDetailSections(id: number) {
   "use cache: remote";
-  cacheTag("anime", ANIME_CACHE.detail(id));
+  cacheTag("anime", ANIME_CACHE.detail(id), ANIME_CACHE.detailSections(id));
   cacheLife({ stale: 300, revalidate: 900, expire: 86400 });
 
   const data = await anilistFetch<{
-    Media: Media & {
-      characters: { edges: CharacterEdge[] };
-      staff: { edges: StaffEdge[] };
-      relations: { edges: RelationEdge[] };
-      recommendations: { nodes: RecommendationNode[] };
-      airingSchedule: { nodes: AiringScheduleNode[] };
-    };
+    Media: {
+      characters?: { edges?: CharacterEdge[] | null } | null;
+      staff?: { edges?: StaffEdge[] | null } | null;
+      relations?: { edges?: RelationEdge[] | null } | null;
+      recommendations?: { nodes?: RecommendationNode[] | null } | null;
+      airingSchedule?: { nodes?: AiringScheduleNode[] | null } | null;
+    } | null;
   }>(
     `query AnimeDetail($id: Int) {
       Media(id: $id, type: ANIME) {
-        ${HERO_FIELDS}
         characters(page: 1, perPage: 12, sort: [ROLE, RELEVANCE]) {
           ${CHARACTERS_SUBFIELDS}
         }
@@ -381,12 +277,13 @@ export async function getAnimeDetail(id: number) {
   );
 
   const m = data.Media;
+  if (!m) return null;
+
   return {
-    media: m as Media,
-    characters: { edges: m.characters.edges },
-    staff: m.staff.edges,
-    relations: m.relations.edges,
-    recommendations: m.recommendations.nodes,
-    airingSchedule: m.airingSchedule.nodes,
+    characters: { edges: m.characters?.edges ?? [] },
+    staff: m.staff?.edges ?? [],
+    relations: m.relations?.edges ?? [],
+    recommendations: m.recommendations?.nodes ?? [],
+    airingSchedule: m.airingSchedule?.nodes ?? [],
   };
 }

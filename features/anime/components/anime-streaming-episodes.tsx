@@ -1,14 +1,13 @@
-"use client";
-
 import { ExternalLinkIcon, PlayIcon } from "lucide-react";
 import Image from "next/image";
 
 import { Empty, EmptyHeader, EmptyTitle, EmptyMedia } from "@/components/ui/empty";
+import { isSafeExternalUrl } from "@/features/anime/lib/media-helpers";
 
-import type { Media } from "@/features/anime/types/anime";
+import type { Media, StreamingEpisode } from "@/features/anime/types/anime";
 
 export function AnimeStreamingEpisodes({ media }: { media: Media }) {
-  const episodes = media.streamingEpisodes;
+  const episodes = media.streamingEpisodes?.filter(hasSafeStreamingUrl);
 
   if (!episodes || episodes.length === 0)
     return (
@@ -58,6 +57,12 @@ export function AnimeStreamingEpisodes({ media }: { media: Media }) {
       </div>
     </div>
   );
+}
+
+function hasSafeStreamingUrl(
+  episode: StreamingEpisode,
+): episode is StreamingEpisode & { url: string } {
+  return isSafeExternalUrl(episode.url);
 }
 
 export function AnimeStreamingEpisodesSkeleton() {

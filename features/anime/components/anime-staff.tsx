@@ -1,12 +1,12 @@
 import { UserIcon } from "lucide-react";
 
 import { Empty, EmptyHeader, EmptyTitle, EmptyMedia } from "@/components/ui/empty";
-import { ImageWithLoading } from "@/components/ui/image-with-loading";
+import { MediaImage } from "@/components/ui/media-image";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import type { StaffEdge } from "@/features/anime/types/anime";
 
-export async function AnimeStaff({ edges }: { edges: StaffEdge[] }) {
+export function AnimeStaff({ edges }: { edges: StaffEdge[] }) {
   if (edges.length === 0)
     return (
       <Empty>
@@ -27,14 +27,18 @@ export async function AnimeStaff({ edges }: { edges: StaffEdge[] }) {
           className="flex items-center gap-3 py-3 first:pt-0 last:pb-0"
         >
           <div className="relative size-9 shrink-0 overflow-hidden rounded-full bg-surface-2">
-            {edge.node.image.medium && (
-              <ImageWithLoading
+            {edge.node.image.medium ? (
+              <MediaImage
                 src={edge.node.image.medium}
                 alt={edge.node.name.full}
                 fill
                 sizes="36px"
                 className="object-cover"
               />
+            ) : (
+              <span className="flex size-full items-center justify-center font-mono text-xs text-muted-foreground">
+                {edge.node.name.full.charAt(0)}
+              </span>
             )}
           </div>
           <div className="min-w-0">

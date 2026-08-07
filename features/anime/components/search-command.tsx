@@ -78,6 +78,7 @@ export function SearchCommand() {
     >
       <Command>
         <CommandInput
+          aria-label="Search anime or choose a collection"
           placeholder="Search anime or choose a collection..."
           value={query}
           onValueChange={setQuery}

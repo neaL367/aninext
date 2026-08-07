@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { ErrorBoundary } from "@/components/ui/error-boundary";
-import { getAnimeDetail } from "@/features/anime/anime-queries";
+import { getAnimeDetailSections, getAnimeHero } from "@/features/anime/anime-queries";
 
 import { AnimeAiringSchedule, AnimeAiringScheduleSkeleton } from "./anime-airing-schedule";
 import { AnimeCharacters, AnimeCharactersSkeleton } from "./anime-characters";
@@ -11,17 +10,22 @@ import { AnimeStaff, AnimeStaffSkeleton } from "./anime-staff";
 import { AnimeStreamingEpisodes, AnimeStreamingEpisodesSkeleton } from "./anime-streaming-episodes";
 import { AnimeTrailer, AnimeTrailerSkeleton } from "./anime-trailer";
 import { GenreList } from "./genre-pills";
+import { SectionHeader } from "./section-header";
 
 export async function AnimeDetail({ id }: { id: number }) {
-  const detail = await getAnimeDetail(id);
-  if (!detail.media) notFound();
+  const [media, detail] = await Promise.all([getAnimeHero(id), getAnimeDetailSections(id)]);
+  if (!media || !detail) notFound();
 
-  const { media, characters, staff, relations, recommendations, airingSchedule } = detail;
+  const { characters, staff, relations, recommendations, airingSchedule } = detail;
 
   return (
     <div className="mx-auto w-full max-w-[1680px] px-4 sm:px-7 lg:px-10">
       <section className="border-b border-border-soft py-12">
-        <SectionHeading eyebrow="Watch" title="Choose your next scene" />
+        <SectionHeader
+          eyebrow="Watch"
+          eyebrowClassName="text-accent"
+          title="Choose your next scene"
+        />
         <div className="mt-7 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           <AnimeTrailer media={media} />
           <AnimeStreamingEpisodes media={media} />
@@ -31,14 +35,22 @@ export async function AnimeDetail({ id }: { id: number }) {
       <div className="grid gap-16 py-12 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-16">
         <main className="min-w-0">
           <section aria-label="Characters">
-            <SectionHeading eyebrow="Cast" title="Characters and voices" />
+            <SectionHeader
+              eyebrow="Cast"
+              eyebrowClassName="text-accent"
+              title="Characters and voices"
+            />
             <div className="mt-7">
               <AnimeCharacters edges={characters.edges} />
             </div>
           </section>
 
           <section aria-label="More like this" className="border-t border-border-soft pt-12 mt-12">
-            <SectionHeading eyebrow="Continue" title="More like this" />
+            <SectionHeader
+              eyebrow="Continue"
+              eyebrowClassName="text-accent"
+              title="More like this"
+            />
             <div className="mt-7">
               <AnimeRecommendations nodes={recommendations} />
             </div>
@@ -48,24 +60,22 @@ export async function AnimeDetail({ id }: { id: number }) {
         <aside className="min-w-0 lg:border-l lg:border-border-soft lg:pl-8">
           <div className="space-y-12">
             <section aria-label="Airing schedule">
-              <ErrorBoundary title="Schedule failed to load">
-                <AnimeAiringSchedule nodes={airingSchedule} />
-              </ErrorBoundary>
+              <AnimeAiringSchedule nodes={airingSchedule} />
             </section>
             <section aria-label="Related anime">
-              <SectionHeading eyebrow="Universe" title="Related" />
+              <SectionHeader eyebrow="Universe" eyebrowClassName="text-accent" title="Related" />
               <div className="mt-5">
                 <AnimeRelations edges={relations} />
               </div>
             </section>
             <section aria-label="Staff">
-              <SectionHeading eyebrow="Credits" title="Staff" />
+              <SectionHeader eyebrow="Credits" eyebrowClassName="text-accent" title="Staff" />
               <div className="mt-5">
                 <AnimeStaff edges={staff} />
               </div>
             </section>
             <section aria-label="Genres">
-              <SectionHeading eyebrow="Topics" title="Genres" />
+              <SectionHeader eyebrow="Topics" eyebrowClassName="text-accent" title="Genres" />
               <div className="mt-5">
                 <GenreList genres={media.genres} />
               </div>
@@ -73,15 +83,6 @@ export async function AnimeDetail({ id }: { id: number }) {
           </div>
         </aside>
       </div>
-    </div>
-  );
-}
-
-function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) {
-  return (
-    <div>
-      <p className="eyebrow text-accent">{eyebrow}</p>
-      <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">{title}</h2>
     </div>
   );
 }

@@ -27,7 +27,9 @@ export async function AiringDayView({ day }: { day?: string }) {
 
       <div className="mt-10">
         <ErrorBoundary title="Schedule failed to load">
-          <AiringTimeline day={day} />
+          <Suspense fallback={<AiringTimelineSkeleton />}>
+            <AiringTimeline day={day} />
+          </Suspense>
         </ErrorBoundary>
       </div>
     </>

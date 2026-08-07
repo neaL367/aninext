@@ -2,7 +2,7 @@ import { PlayIcon } from "lucide-react";
 import { notFound } from "next/navigation";
 import { ViewTransition } from "react";
 
-import { ImageWithLoading } from "@/components/ui/image-with-loading";
+import { MediaImage } from "@/components/ui/media-image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAnimeHero } from "@/features/anime/anime-queries";
 import {
@@ -10,6 +10,7 @@ import {
   formatStatus,
   getMediaCover,
   getMediaTitle,
+  stripHtml,
 } from "@/features/anime/lib/media-helpers";
 import { scoreColor } from "@/features/anime/lib/score";
 import { cn } from "@/lib/utils";
@@ -28,20 +29,13 @@ export function AnimeHero({ media }: { media: Media }) {
   const banner = media.bannerImage;
   const color = media.coverImage.color;
   const studio = media.studios?.nodes[0]?.name;
-  const description = media.description?.replace(/<[^>]*>/g, "").trim();
+  const description = stripHtml(media.description);
 
   return (
     <section className="relative">
       <div className="relative h-[360px] overflow-hidden border-b border-border-soft sm:h-[440px]">
         {banner ? (
-          <ImageWithLoading
-            src={banner}
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
+          <MediaImage src={banner} alt="" fill priority sizes="100vw" className="object-cover" />
         ) : (
           <div
             className="absolute inset-0"
@@ -66,7 +60,7 @@ export function AnimeHero({ media }: { media: Media }) {
             >
               {cover ? (
                 <ViewTransition name={`anime-cover-${media.id}`} share="morph" default="none">
-                  <ImageWithLoading
+                  <MediaImage
                     src={cover}
                     alt={`${title} cover`}
                     fill

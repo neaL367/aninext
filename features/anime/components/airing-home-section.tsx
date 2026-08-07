@@ -1,12 +1,14 @@
 "use client";
 
 import { ArrowRightIcon } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";
 
 import { HoverPrefetchLink } from "@/components/ui/hover-prefetch-link";
-import { ImageWithLoading } from "@/components/ui/image-with-loading";
-import { fromAiringTimestamp, getTitle } from "@/features/anime/lib/media-helpers";
+import { fromAiringTimestamp, getAiringPhase, getTitle } from "@/features/anime/lib/media-helpers";
+
+import { SectionHeader } from "./section-header";
 
 import type { AiringScheduleNode } from "@/features/anime/types/anime";
 import type { Route } from "next";
@@ -27,43 +29,41 @@ export function AiringHomeSection({ schedules }: { schedules: AiringScheduleNode
   );
 
   if (todaySchedules.length === 0) return null;
+  const now = Date.now() / 1000;
 
   return (
     <section>
-      <div className="mb-5 flex items-end justify-between gap-5">
-        <div>
-          <p className="eyebrow">Today</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-[-0.035em] sm:text-3xl">
-            Airing now
-          </h2>
-          <p className="mt-1.5 max-w-xl text-sm text-muted-foreground">
-            Catch the latest episodes as they land.
-          </p>
-        </div>
-        <HoverPrefetchLink
-          href="/airing"
-          className="group flex items-center gap-2 border-b border-border-soft pb-1 font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted-foreground hover:border-accent hover:text-accent"
-        >
-          Full schedule{" "}
-          <ArrowRightIcon className="size-3 transition-transform group-hover:translate-x-1" />
-        </HoverPrefetchLink>
-      </div>
+      <SectionHeader
+        eyebrow="Today"
+        title="Airing now"
+        description="Catch the latest episodes as they land."
+        action={
+          <HoverPrefetchLink
+            href="/airing"
+            className="group flex items-center gap-2 border-b border-border-soft pb-1 font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted-foreground hover:border-accent hover:text-accent"
+          >
+            Full schedule{" "}
+            <ArrowRightIcon className="size-3 transition-transform group-hover:translate-x-1" />
+          </HoverPrefetchLink>
+        }
+      />
       <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {todaySchedules.map((item, index) => {
           if (!item.media) return null;
           const title = getTitle(item.media.title);
           const time = fromAiringTimestamp(item.airingAt);
           // eslint-disable-next-line react-hooks/purity -- live countdown, recomputed per render
-          const now = Date.now();
-          const diff = item.airingAt * 1000 - now;
-          const minutes = Math.floor(diff / 60000);
+          const phase = getAiringPhase(item.airingAt, now);
+          const minutes = Math.floor((item.airingAt - now) / 60);
           const countdown =
-            minutes > 60
-              ? `${Math.floor(minutes / 60)}h ${minutes % 60}m`
-              : minutes > 0
-                ? `${minutes}m`
-                : "Airing";
-          const isClose = minutes > 0 && minutes < 60;
+            phase === "live"
+              ? "Airing"
+              : phase === "aired"
+                ? "Aired"
+                : minutes > 60
+                  ? `${Math.floor(minutes / 60)}h ${minutes % 60}m`
+                  : `${Math.max(minutes, 0)}m`;
+          const isClose = phase === "upcoming" && minutes < 60;
           const color = item.media.coverImage.color;
 
           return (
@@ -77,7 +77,7 @@ export function AiringHomeSection({ schedules }: { schedules: AiringScheduleNode
                 style={color ? { backgroundColor: color } : undefined}
               >
                 {item.media.coverImage.medium ? (
-                  <ImageWithLoading
+                  <Image
                     src={item.media.coverImage.medium}
                     alt={title}
                     fill

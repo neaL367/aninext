@@ -2,56 +2,91 @@
 
 import { SearchIcon, XIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
+
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+  InputGroupText,
+} from "@/components/ui/input-group";
 
 export function SearchBar() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [value, setValue] = useState(searchParams.get("search") ?? "");
 
-  const debouncedUpdate = useDebouncedCallback((value: string) => {
-    const params = new URLSearchParams(searchParams);
-    if (value) params.set("search", value);
-    else params.delete("search");
-    router.replace(`?${params.toString()}`, { scroll: false });
-  }, 300);
+  const updateSearch = useCallback(
+    (nextValue: string) => {
+      const params = new URLSearchParams(window.location.search);
+      if (nextValue.trim()) params.set("search", nextValue.trim());
+      else params.delete("search");
+      const query = params.toString();
+      router.replace(query ? `?${query}` : "?", { scroll: false });
+    },
+    [router],
+  );
+  const debouncedUpdate = useDebouncedCallback(updateSearch, 300);
 
-  function handleClear() {
-    const params = new URLSearchParams(searchParams);
-    params.delete("search");
-    router.replace(`?${params.toString()}`, { scroll: false });
+  useEffect(() => {
+    setValue(searchParams.get("search") ?? "");
+  }, [searchParams]);
+
+  useEffect(() => {
+    return () => debouncedUpdate.cancel();
+  }, [debouncedUpdate]);
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    debouncedUpdate.flush();
   }
 
-  const searchValue = searchParams.get("search") ?? "";
+  function handleClear() {
+    setValue("");
+    debouncedUpdate.cancel();
+    updateSearch("");
+  }
 
   return (
-    <label className="group flex h-12 items-center gap-3 border-b border-border-soft bg-surface-1/40 px-3 transition-colors focus-within:border-signal">
-      <SearchIcon className="size-4 shrink-0 text-muted-foreground group-focus-within:text-signal" />
-      <input
-        type="search"
-        placeholder="Search by title or genre..."
-        defaultValue={searchValue}
-        onChange={(e) => debouncedUpdate(e.target.value)}
-        className="min-w-0 flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
-        aria-label="Search anime"
-      />
-      {searchValue ? (
-        <button
-          type="button"
-          onClick={handleClear}
-          className="rounded-sm p-1 text-muted-foreground hover:text-foreground"
-          aria-label="Clear search"
-        >
-          <XIcon className="size-4" />
-        </button>
-      ) : (
-        <span className="hidden font-mono text-[0.6rem] uppercase tracking-[0.12em] text-muted-foreground sm:inline">
-          Enter query
-        </span>
-      )}
-    </label>
+    <form role="search" aria-label="Search anime" onSubmit={handleSubmit}>
+      <InputGroup className="h-12 rounded-none border-border-soft bg-surface-1/40 focus-within:border-signal">
+        <InputGroupAddon align="inline-start" className="pl-3">
+          <SearchIcon className="size-4 text-muted-foreground" aria-hidden="true" />
+        </InputGroupAddon>
+        <InputGroupInput
+          type="search"
+          value={value}
+          placeholder="Search anime titles..."
+          onChange={(event) => {
+            const nextValue = event.target.value;
+            setValue(nextValue);
+            debouncedUpdate(nextValue);
+          }}
+          aria-label="Search anime"
+        />
+        {value ? (
+          <InputGroupButton
+            type="button"
+            size="icon-sm"
+            variant="ghost"
+            onClick={handleClear}
+            aria-label="Clear search"
+            title="Clear search"
+          >
+            <XIcon />
+          </InputGroupButton>
+        ) : (
+          <InputGroupText className="hidden pr-3 font-mono text-[0.6rem] uppercase tracking-[0.12em] sm:flex">
+            Enter to search
+          </InputGroupText>
+        )}
+      </InputGroup>
+    </form>
   );
 }
 
 export function SearchBarFallback() {
-  return <div className="h-12 border-b border-border-soft bg-surface-1/40" />;
+  return <div className="h-12 border border-border-soft bg-surface-1/40" />;
 }

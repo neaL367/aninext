@@ -13,6 +13,9 @@ export function ActiveFilters() {
 
   return (
     <div
+      role="region"
+      aria-label="Active filters"
+      aria-live="polite"
       className="flex flex-col gap-3 border-b border-border-soft py-4"
       data-pending={isPending ? "" : undefined}
     >

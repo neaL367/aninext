@@ -45,6 +45,7 @@ export function SiteHeader() {
               key={item.href}
               href={item.href}
               prefetch={item.prefetch}
+              aria-current={isActive(item.href) ? "page" : undefined}
               className={cn(
                 "group flex items-center gap-2 px-3 py-2 text-sm transition-colors",
                 isActive(item.href)
@@ -67,12 +68,14 @@ export function SiteHeader() {
           <button
             type="button"
             onClick={() => document.dispatchEvent(new CustomEvent("open-search"))}
+            aria-label="Search anime"
+            aria-keyshortcuts="Control+K Meta+K"
             className="group flex h-9 items-center gap-2 border border-border bg-surface-1/60 px-3 text-sm text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
           >
-            <SearchIcon className="size-3.5" />
+            <SearchIcon aria-hidden="true" className="size-3.5" />
             <span className="hidden sm:inline">Find a title</span>
             <kbd className="hidden border-l border-border pl-2 font-mono text-[0.62rem] text-muted-foreground sm:inline">
-              /
+              Ctrl/Cmd K
             </kbd>
           </button>
         </div>

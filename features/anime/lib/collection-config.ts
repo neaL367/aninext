@@ -36,7 +36,6 @@ export const COLLECTIONS: Record<AnimeCollection, CollectionConfig> = {
     pageDescription: "The most watched shows right now",
     navLabel: "Popular",
     sort: ["POPULARITY_DESC"],
-    ...getCurrentSeason(),
     cacheLife: "home",
   },
   top100: {
@@ -95,6 +94,14 @@ export const COLLECTION_NAV_ITEMS = COLLECTION_ORDER.map((id) => ({
   id,
   label: COLLECTIONS[id].navLabel,
 }));
+
+export function getCollectionConfig(
+  collection: AnimeCollection,
+  currentSeason = getCurrentSeason(),
+): CollectionConfig {
+  const config = COLLECTIONS[collection];
+  return collection === "popular" ? { ...config, ...currentSeason } : config;
+}
 
 export function getCollectionMetadata(collection: AnimeCollection): Metadata {
   const c = COLLECTIONS[collection];

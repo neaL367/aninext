@@ -19,8 +19,7 @@ export function SiteMobileNav() {
 
   const isActive = (href: Route) => {
     if (href === "/") return pathname === "/";
-    if (href === "/airing") return pathname.startsWith("/airing");
-    return pathname.startsWith("/anime");
+    return pathname === href || pathname.startsWith(`${href}/`);
   };
 
   return (

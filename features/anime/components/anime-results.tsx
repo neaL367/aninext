@@ -1,4 +1,4 @@
-import { renderBrowsePage } from "@/features/anime/anime-actions";
+import { renderBrowsePage } from "@/features/anime/components/browse-page-action";
 import { buildFilterHash } from "@/features/anime/lib/parse-filters";
 
 import { BrowsePaginator } from "./browse-paginator";
@@ -7,6 +7,9 @@ import { MediaGridSkeleton } from "./media-grid";
 
 import type { AnimeCollection, AnimeFilters } from "@/features/anime/types/anime";
 
+const BROWSE_PAGE_SIZE = 12;
+const TOP100_PAGE_SIZE = 20;
+
 export async function AnimeResults({
   collection,
   filters,
@@ -14,7 +17,8 @@ export async function AnimeResults({
   collection: AnimeCollection;
   filters: AnimeFilters;
 }) {
-  const firstPagePromise = renderBrowsePage(collection, filters, 1, 12);
+  const pageSize = collection === "top100" ? TOP100_PAGE_SIZE : BROWSE_PAGE_SIZE;
+  const firstPagePromise = renderBrowsePage(collection, filters, 1, pageSize);
 
   return (
     <BrowsePaginator
@@ -22,7 +26,8 @@ export async function AnimeResults({
       initialPage={firstPagePromise}
       collection={collection}
       filters={filters}
-      skeleton={<MediaGridSkeleton count={12} />}
+      pageSize={pageSize}
+      skeleton={<MediaGridSkeleton count={pageSize} />}
       emptyComponent={getEmptyComponent(collection, filters)}
     />
   );

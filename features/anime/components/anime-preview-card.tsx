@@ -1,22 +1,34 @@
 import { CalendarIcon, FilmIcon, PlayIcon, TvIcon } from "lucide-react";
 
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { ImageWithLoading } from "@/components/ui/image-with-loading";
-import { formatFormat, formatStatus, getMediaTitle } from "@/features/anime/lib/media-helpers";
-import { scoreColor } from "@/features/anime/lib/score";
+import { MediaImage } from "@/components/ui/media-image";
+import {
+  formatFormat,
+  formatStatus,
+  getMediaTitle,
+  stripHtml,
+} from "@/features/anime/lib/media-helpers";
 import { cn } from "@/lib/utils";
+
+import { MediaScore } from "./media-score";
 
 import type { Media } from "@/features/anime/types/anime";
 
-export function AnimePreviewCard({ media, children }: { media: Media; children: React.ReactNode }) {
+export function AnimePreviewCard({
+  media,
+  children,
+}: {
+  media: Media;
+  children: React.ReactElement;
+}) {
   const title = getMediaTitle(media);
   const color = media.coverImage.color;
   const studio = media.studios?.nodes[0]?.name;
-  const description = media.description?.replace(/<[^>]*>/g, "").trim();
+  const description = stripHtml(media.description);
 
   return (
     <HoverCard>
-      <HoverCardTrigger>{children}</HoverCardTrigger>
+      <HoverCardTrigger render={children} />
       <HoverCardContent
         side="right"
         align="start"
@@ -28,23 +40,16 @@ export function AnimePreviewCard({ media, children }: { media: Media; children: 
             className="relative h-32 w-full overflow-hidden"
             style={color ? { backgroundColor: color } : undefined}
           >
-            <ImageWithLoading
+            <MediaImage
               src={media.bannerImage}
               alt=""
               fill
               sizes="352px"
               className="object-cover"
             />
-            {media.averageScore && (
+            {media.averageScore !== undefined && (
               <div className="absolute right-3 top-3 flex items-center gap-1 rounded-sm bg-black/70 px-2 py-1 backdrop-blur-sm">
-                <span
-                  className={cn(
-                    "font-mono text-xs font-bold tabular-nums",
-                    scoreColor(media.averageScore),
-                  )}
-                >
-                  ★ {(media.averageScore / 10).toFixed(1)}
-                </span>
+                <MediaScore score={media.averageScore} star className="text-xs font-bold" />
               </div>
             )}
           </div>
@@ -55,16 +60,9 @@ export function AnimePreviewCard({ media, children }: { media: Media; children: 
               color ? { background: `linear-gradient(135deg, ${color}40, var(--card))` } : undefined
             }
           >
-            {media.averageScore && (
+            {media.averageScore !== undefined && (
               <div className="absolute right-3 top-3 flex items-center gap-1 rounded-sm bg-black/70 px-2 py-1 backdrop-blur-sm">
-                <span
-                  className={cn(
-                    "font-mono text-xs font-bold tabular-nums",
-                    scoreColor(media.averageScore),
-                  )}
-                >
-                  ★ {(media.averageScore / 10).toFixed(1)}
-                </span>
+                <MediaScore score={media.averageScore} star className="text-xs font-bold" />
               </div>
             )}
           </div>

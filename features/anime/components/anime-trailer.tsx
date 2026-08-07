@@ -1,6 +1,6 @@
 import { PlayIcon } from "lucide-react";
 
-import { ImageWithLoading } from "@/components/ui/image-with-loading";
+import { MediaImage } from "@/components/ui/media-image";
 
 import type { Media } from "@/features/anime/types/anime";
 
@@ -24,7 +24,7 @@ export function AnimeTrailer({ media }: { media: Media }) {
       rel="noopener noreferrer"
       className="group relative block aspect-video overflow-hidden border border-border-soft bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
     >
-      <ImageWithLoading
+      <MediaImage
         src={thumbnail}
         alt="Trailer thumbnail"
         fill

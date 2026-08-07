@@ -29,6 +29,7 @@ export function AiringCalendar({ currentDay }: { currentDay: string }) {
             key={day}
             href={`/airing?day=${day}`}
             prefetch={isSelected ? false : undefined}
+            aria-current={isSelected ? "date" : undefined}
             className={cn(
               "group relative flex min-h-20 flex-col justify-between border-r border-border-soft px-2 py-3 transition-colors last:border-r-0 sm:min-h-24 sm:px-4 sm:py-4",
               isSelected ? "bg-signal-soft text-foreground" : "hover:bg-surface-1",

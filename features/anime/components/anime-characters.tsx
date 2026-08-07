@@ -1,11 +1,11 @@
 import { UsersIcon } from "lucide-react";
 
 import { Empty, EmptyHeader, EmptyTitle, EmptyMedia } from "@/components/ui/empty";
-import { ImageWithLoading } from "@/components/ui/image-with-loading";
+import { MediaImage } from "@/components/ui/media-image";
 
 import type { CharacterEdge } from "@/features/anime/types/anime";
 
-export async function AnimeCharacters({ edges }: { edges: CharacterEdge[] }) {
+export function AnimeCharacters({ edges }: { edges: CharacterEdge[] }) {
   if (edges.length === 0) {
     return (
       <Empty>
@@ -30,7 +30,7 @@ export async function AnimeCharacters({ edges }: { edges: CharacterEdge[] }) {
           >
             <div className="relative h-[72px] w-[54px] shrink-0 overflow-hidden bg-surface-2">
               {edge.node.image.medium ? (
-                <ImageWithLoading
+                <MediaImage
                   src={edge.node.image.medium}
                   alt={edge.node.name.full}
                   fill
@@ -52,17 +52,21 @@ export async function AnimeCharacters({ edges }: { edges: CharacterEdge[] }) {
             {voiceActor && (
               <div className="flex shrink-0 items-center gap-2 border-l border-border pl-3">
                 <div className="relative size-9 shrink-0 overflow-hidden rounded-full bg-surface-2">
-                  {voiceActor.image.medium && (
-                    <ImageWithLoading
+                  {voiceActor.image.medium ? (
+                    <MediaImage
                       src={voiceActor.image.medium}
                       alt={voiceActor.name.full}
                       fill
                       sizes="36px"
                       className="object-cover"
                     />
+                  ) : (
+                    <span className="flex size-full items-center justify-center font-mono text-xs text-muted-foreground">
+                      {voiceActor.name.full.charAt(0)}
+                    </span>
                   )}
                 </div>
-                <div className="hidden sm:block sm:min-w-0 sm:max-w-[120px]">
+                <div className="min-w-0 max-w-[96px]">
                   <p className="truncate text-xs font-medium text-foreground">
                     {voiceActor.name.full}
                   </p>

@@ -1,9 +1,6 @@
-"use client";
-
 import { CalendarIcon, ExternalLinkIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState, useTransition } from "react";
 
 import {
   Empty,
@@ -13,47 +10,38 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { ImageWithLoading } from "@/components/ui/image-with-loading";
-import { getAiringDayData } from "@/features/anime/anime-actions";
+import { MediaImage } from "@/components/ui/media-image";
+import { getAiringDay } from "@/features/anime/anime-queries";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 import {
   formatFormat,
   fromAiringTimestamp,
+  getAiringPhase,
   getTitle,
+  isSafeExternalUrl,
   localDateStr,
 } from "@/features/anime/lib/media-helpers";
 
 import type { AiringScheduleNode } from "@/features/anime/types/anime";
 import type { Route } from "next";
 
-export function AiringTimeline({ day }: { day: string }) {
-  const [state, setState] = useState<{ day: string; schedules: AiringScheduleNode[] } | null>(null);
-  const [error, setError] = useState<unknown>(null);
-  const [, startTransition] = useTransition();
+export async function AiringTimeline({ day }: { day: string }) {
+  const bounds = getAiringDayBounds(day);
+  if (!bounds) throw new Error("Invalid airing day");
 
-  useEffect(() => {
-    let cancelled = false;
-    const start = Math.floor(new Date(`${day}T00:00:00`).getTime() / 1000);
-    const end = start + 86400;
+  const schedules = await getAiringDay(day, bounds.start, bounds.end);
+  return <AiringTimelineList day={day} schedules={schedules} />;
+}
 
-    startTransition(async () => {
-      try {
-        const schedules = await getAiringDayData(day, start, end);
-        if (!cancelled) setState({ day, schedules });
-      } catch (err) {
-        if (!cancelled) setError(err);
-      }
-    });
+function getAiringDayBounds(day: string): { start: number; end: number } | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return null;
 
-    return () => {
-      cancelled = true;
-    };
-  }, [day]);
+  const date = new Date(`${day}T00:00:00`);
+  if (!Number.isFinite(date.getTime()) || localDateStr(date) !== day) return null;
 
-  if (error) throw error;
-  if (!state || state.day !== day) return <AiringTimelineSkeleton />;
-
-  return <AiringTimelineList day={day} schedules={state.schedules} />;
+  const start = Math.floor(date.getTime() / 1000);
+  if (!Number.isSafeInteger(start)) return null;
+  return { start, end: start + 86400 };
 }
 
 function AiringTimelineList({ day, schedules }: { day: string; schedules: AiringScheduleNode[] }) {
@@ -108,9 +96,8 @@ function AiringTimelineList({ day, schedules }: { day: string; schedules: Airing
                 if (!item.media) return null;
                 const title = getTitle(item.media.title);
                 const time = fromAiringTimestamp(item.airingAt);
-                const diff = item.airingAt - now;
-                const isClose = diff > 0 && diff < 3600;
-                const isLive = diff <= 0 && diff > -1800;
+                const phase = getAiringPhase(item.airingAt, now);
+                const isClose = phase === "upcoming" && item.airingAt - now < 3600;
                 const color = item.media.coverImage.color;
                 return (
                   <AnimePreviewCard key={`${item.media.id}-${index}`} media={item.media}>
@@ -121,7 +108,7 @@ function AiringTimelineList({ day, schedules }: { day: string; schedules: Airing
                         style={color ? { backgroundColor: color } : undefined}
                       >
                         {item.media.coverImage.medium ? (
-                          <ImageWithLoading
+                          <MediaImage
                             src={item.media.coverImage.medium}
                             alt={title}
                             fill
@@ -149,7 +136,7 @@ function AiringTimelineList({ day, schedules }: { day: string; schedules: Airing
                         </div>
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-2">
-                            {isLive ? (
+                            {phase === "live" ? (
                               <span className="flex items-center gap-1 font-mono text-xs text-live-badge">
                                 <span className="size-1.5 animate-pulse rounded-full bg-live-badge" />
                                 Live
@@ -158,6 +145,8 @@ function AiringTimelineList({ day, schedules }: { day: string; schedules: Airing
                               <span className="flex items-center gap-1 font-mono text-xs text-live-badge">
                                 Soon
                               </span>
+                            ) : phase === "aired" ? (
+                              <span className="font-mono text-xs text-muted-foreground">Aired</span>
                             ) : (
                               <time
                                 dateTime={time.toISOString()}
@@ -173,7 +162,7 @@ function AiringTimelineList({ day, schedules }: { day: string; schedules: Airing
                           {(() => {
                             const streamingLinks =
                               item.media?.externalLinks?.filter(
-                                (link) => link.type === "STREAMING",
+                                (link) => link.type === "STREAMING" && isSafeExternalUrl(link.url),
                               ) ?? [];
                             if (streamingLinks.length > 0) {
                               return (

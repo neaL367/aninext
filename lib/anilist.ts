@@ -4,9 +4,10 @@ import { AniListError } from "./anilist-errors";
 const ENDPOINT = "https://graphql.anilist.co";
 const REQUEST_TIMEOUT_MS = 15_000;
 
-const activeRequests: Promise<unknown>[] = [];
 const MAX_CONCURRENT = 4;
 const BUDGET_HOLD_THRESHOLD = 5;
+let activeRequestCount = 0;
+const requestQueue: (() => void)[] = [];
 
 const rateBudget = {
   remaining: Infinity,
@@ -22,34 +23,64 @@ function jitter(ms: number) {
 }
 
 function updateBudget(headers: Headers) {
-  const remaining = Number(headers.get("X-RateLimit-Remaining"));
-  const reset = Number(headers.get("X-RateLimit-Reset"));
-  if (Number.isFinite(remaining)) rateBudget.remaining = remaining;
-  if (Number.isFinite(reset) && reset > 0) rateBudget.resetAt = Date.now() + reset * 1000;
+  const remainingHeader = headers.get("X-RateLimit-Remaining");
+  const resetHeader = headers.get("X-RateLimit-Reset");
+  const remaining = remainingHeader === null ? NaN : Number(remainingHeader);
+  const reset = resetHeader === null ? NaN : Number(resetHeader);
+
+  if (Number.isFinite(remaining) && remaining >= 0) rateBudget.remaining = remaining;
+  if (Number.isFinite(reset) && reset > 0) rateBudget.resetAt = reset * 1000;
 }
 
 async function respectBudget() {
   while (rateBudget.remaining <= BUDGET_HOLD_THRESHOLD) {
     const hold = rateBudget.resetAt - Date.now();
-    if (hold <= 0) break;
+    if (hold <= 0) {
+      rateBudget.remaining = Infinity;
+      rateBudget.resetAt = 0;
+      break;
+    }
     await wait(Math.min(hold, 3_000));
-    if (hold > 3_000) break;
   }
 }
 
-async function throttle() {
-  while (activeRequests.length >= MAX_CONCURRENT) {
-    await Promise.race(activeRequests);
+function retryAfterSeconds(headers: Headers, fallback: number) {
+  const retryAfterHeader = headers.get("Retry-After");
+  const retryAfter = retryAfterHeader === null ? NaN : Number(retryAfterHeader);
+  if (Number.isFinite(retryAfter) && retryAfter >= 0) return retryAfter;
+
+  const resetHeader = headers.get("X-RateLimit-Reset");
+  const reset = resetHeader === null ? NaN : Number(resetHeader);
+  if (Number.isFinite(reset) && reset > 0) {
+    return Math.max(0, Math.ceil(reset - Date.now() / 1000));
   }
+  return fallback;
 }
 
-async function track<T>(p: Promise<T>): Promise<T> {
-  activeRequests.push(p);
+function toNetworkError(error: unknown): AniListError {
+  if (error instanceof AniListError) return error;
+
+  const timedOut =
+    error instanceof Error && (error.name === "AbortError" || error.name === "TimeoutError");
+  return new AniListError(
+    timedOut ? "AniList request timed out" : "AniList request failed",
+    "network",
+  );
+}
+
+async function track<T>(run: () => Promise<T>): Promise<T> {
+  if (activeRequestCount >= MAX_CONCURRENT) {
+    await new Promise<void>((resolve) => requestQueue.push(resolve));
+  } else {
+    activeRequestCount += 1;
+  }
+
   try {
-    return await p;
+    return await run();
   } finally {
-    const idx = activeRequests.indexOf(p);
-    if (idx !== -1) void activeRequests.splice(idx, 1);
+    const next = requestQueue.shift();
+    if (next) next();
+    else activeRequestCount -= 1;
   }
 }
 
@@ -58,32 +89,34 @@ export async function anilistFetch<T>(
   variables: Record<string, unknown>,
   retries = 2,
 ): Promise<T> {
-  await throttle();
-  await respectBudget();
-
   const attempt = async (remaining: number): Promise<T> => {
-    const res = await track(
-      fetch(ENDPOINT, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({ query, variables }),
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-      }),
-    );
+    await respectBudget();
+
+    let res: Response;
+    try {
+      res = await track(() =>
+        fetch(ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({ query, variables }),
+          signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        }),
+      );
+    } catch (error) {
+      throw toNetworkError(error);
+    }
+
+    updateBudget(res.headers);
 
     if (res.status === 429) {
       if (remaining <= 0) {
-        const retryAfter = Number(
-          res.headers.get("Retry-After") ?? res.headers.get("X-RateLimit-Reset") ?? 30,
-        );
+        const retryAfter = retryAfterSeconds(res.headers, 30);
         throw new AniListError("AniList rate limit hit", "rate_limited", retryAfter);
       }
-      const retryAfter = Number(
-        res.headers.get("Retry-After") ?? res.headers.get("X-RateLimit-Reset") ?? 5,
-      );
+      const retryAfter = retryAfterSeconds(res.headers, 5);
       const backoff = Math.min(jitter(retryAfter * 1000), 10_000);
       await wait(backoff);
       return attempt(remaining - 1);
@@ -95,12 +128,12 @@ export async function anilistFetch<T>(
       throw new AniListError(`AniList request failed (${res.status})`, "network");
     }
 
-    updateBudget(res.headers);
-
-    const json = (await res.json()) as {
-      errors?: { message: string }[];
-      data?: T | null;
-    };
+    let json: { errors?: { message: string }[]; data?: T | null };
+    try {
+      json = (await res.json()) as { errors?: { message: string }[]; data?: T | null };
+    } catch (error) {
+      throw toNetworkError(error);
+    }
     if (json.errors?.length) {
       throw new AniListError(json.errors[0].message, "graphql");
     }

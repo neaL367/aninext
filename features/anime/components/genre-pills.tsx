@@ -5,7 +5,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { FILTER_ADULT_GENRES } from "@/features/anime/lib/filter-constants";
 
 export function GenreExplorer({ genres }: { genres: string[] }) {
-  const visibleGenres = genres.filter((g) => !FILTER_ADULT_GENRES.includes(g));
+  const visibleGenres = genres.filter(
+    (g) => !FILTER_ADULT_GENRES.some((adultGenre) => adultGenre === g),
+  );
 
   return (
     <section className="grid gap-8 border-y border-border-soft py-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16 lg:py-14">
