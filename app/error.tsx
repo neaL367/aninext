@@ -22,7 +22,15 @@ export default function GlobalError({
         <AlertTriangleIcon className="size-5 text-destructive" />
       </div>
       <h1 className="text-lg font-semibold">Something went wrong</h1>
-      <p className="max-w-sm text-sm text-muted-foreground">{error.message}</p>
+      <p className="max-w-sm text-sm text-muted-foreground">
+        This section failed to load. Try again — if it keeps failing, the data source may be
+        temporarily unavailable.
+      </p>
+      {error.digest && (
+        <p className="font-mono text-[0.6rem] uppercase tracking-[0.12em] text-muted-foreground/60">
+          Reference {error.digest}
+        </p>
+      )}
       <Button onClick={() => reset()} variant="outline" size="sm">
         Try again
       </Button>

@@ -58,7 +58,9 @@ export function BrowsePageShell({
           </Suspense>
         </div>
         <Suspense fallback={<MobileFilterDrawerFallback />}>
-          <MobileFilterDrawer genresPromise={getGenres()} collection={collection} />
+          <ErrorBoundary title="Filters failed to load">
+            <MobileFilterDrawerBoundary collection={collection} />
+          </ErrorBoundary>
         </Suspense>
       </div>
 
@@ -67,7 +69,9 @@ export function BrowsePageShell({
           <div className="sticky top-24">
             <p className="eyebrow mb-5">Filters</p>
             <Suspense fallback={<FilterSidebarSkeleton />}>
-              <FilterSidebar genresPromise={getGenres()} collection={collection} />
+              <ErrorBoundary title="Filters failed to load">
+                <FilterSidebarBoundary collection={collection} />
+              </ErrorBoundary>
             </Suspense>
           </div>
         </aside>
@@ -88,6 +92,14 @@ export function BrowsePageShell({
 
 function SearchBarFallback() {
   return <div className="h-12 border-b border-border-soft bg-surface-1/40" />;
+}
+
+async function FilterSidebarBoundary({ collection }: { collection: AnimeCollection }) {
+  return <FilterSidebar genresPromise={getGenres()} collection={collection} />;
+}
+
+async function MobileFilterDrawerBoundary({ collection }: { collection: AnimeCollection }) {
+  return <MobileFilterDrawer genresPromise={getGenres()} collection={collection} />;
 }
 
 function MobileFilterDrawerFallback() {
