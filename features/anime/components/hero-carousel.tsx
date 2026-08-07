@@ -170,7 +170,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
       </div>
 
       {/* Seamless Bottom Gradient Overlay matching Page Background */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/4 z-15 bg-gradient-to-t from-background via-background/40 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-4/5 z-15 bg-gradient-to-t from-background via-background/70 via-50% to-transparent" />
 
       {/* Foreground Content Positioned Bottom-Left Aligned with Main Width Layout */}
       <div className="absolute inset-x-0 bottom-0 z-20 pb-14 sm:pb-16 lg:pb-18">

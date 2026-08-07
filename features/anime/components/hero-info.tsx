@@ -11,17 +11,17 @@ export function HeroInfo({ media, rank }: { media: Media; rank?: number }) {
   const description = stripHtml(media.description);
 
   return (
-    <div className="space-y-4 max-w-3xl">
+    <div className="space-y-3.5 max-w-3xl">
       {/* Eyebrow & Badge */}
       <div
         className="animate-stagger-up flex flex-wrap items-center gap-3 font-mono text-xs uppercase tracking-[0.14em]"
         style={{ animationDelay: "0ms" }}
       >
-        <span className="eyebrow text-accent">
+        <span className="eyebrow text-accent drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]">
           {rank ? `Rank #${rank}` : "Featured"}
         </span>
         {media.status === "RELEASING" && (
-          <span className="text-live-badge font-semibold">
+          <span className="text-live-badge font-semibold drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]">
             · Airing Now
           </span>
         )}
@@ -29,7 +29,7 @@ export function HeroInfo({ media, rank }: { media: Media; rank?: number }) {
 
       {/* Main Title */}
       <h1
-        className="animate-stagger-up line-clamp-2 text-4xl sm:text-5xl lg:text-6xl font-semibold leading-[0.98] tracking-[-0.055em] text-foreground drop-shadow-md"
+        className="animate-stagger-up line-clamp-2 text-3xl sm:text-5xl lg:text-6xl font-semibold leading-[0.98] tracking-[-0.055em] text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.95)]"
         style={{ animationDelay: "70ms" }}
       >
         {title}
@@ -37,14 +37,14 @@ export function HeroInfo({ media, rank }: { media: Media; rank?: number }) {
 
       {/* Metadata Row */}
       <div
-        className="animate-stagger-up flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-muted-foreground"
+        className="animate-stagger-up flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-neutral-300 drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)]"
         style={{ animationDelay: "140ms" }}
       >
         {media.averageScore && (
-          <span className="inline-flex items-center gap-1.5 font-semibold text-foreground">
+          <span className="inline-flex items-center gap-1.5 font-semibold text-white">
             <StarIcon className="size-3.5 fill-accent text-accent" />
             {(media.averageScore / 10).toFixed(1)}
-            <span className="font-normal text-muted-foreground">/ 10</span>
+            <span className="font-normal text-neutral-400">/ 10</span>
           </span>
         )}
         {media.format && <span>{formatFormat(media.format)}</span>}
@@ -54,7 +54,7 @@ export function HeroInfo({ media, rank }: { media: Media; rank?: number }) {
       {/* Synopsis Description */}
       {description && (
         <p
-          className="animate-stagger-up line-clamp-2 max-w-2xl text-sm leading-relaxed text-muted-foreground"
+          className="animate-stagger-up line-clamp-2 max-w-2xl text-xs sm:text-sm leading-relaxed text-neutral-200 drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)] font-normal"
           style={{ animationDelay: "210ms" }}
         >
           {description}
@@ -63,14 +63,14 @@ export function HeroInfo({ media, rank }: { media: Media; rank?: number }) {
 
       {/* Genre Chips & Actions */}
       <div
-        className="animate-stagger-up flex flex-wrap items-center gap-4 pt-2"
+        className="animate-stagger-up flex flex-wrap items-center gap-4 pt-1"
         style={{ animationDelay: "280ms" }}
       >
         <div className="flex flex-wrap gap-2">
           {media.genres.slice(0, 4).map((genre) => (
             <span
               key={genre}
-              className="border border-border-soft px-2.5 py-1 font-mono text-[0.62rem] uppercase tracking-[0.1em] text-muted-foreground bg-surface-1/80 backdrop-blur-sm"
+              className="border border-white/20 px-2.5 py-1 font-mono text-[0.62rem] uppercase tracking-[0.1em] text-neutral-200 bg-black/60 backdrop-blur-md shadow-sm"
             >
               {genre}
             </span>
@@ -79,7 +79,7 @@ export function HeroInfo({ media, rank }: { media: Media; rank?: number }) {
         <div className="flex items-center gap-4">
           <Link
             href={`/anime/${media.id}` as Route<string>}
-            className="inline-flex items-center gap-2 border-b border-accent pb-1 font-mono text-xs uppercase tracking-[0.1em] font-medium text-accent hover:text-foreground transition-colors"
+            className="inline-flex items-center gap-2 border-b border-accent pb-1 font-mono text-xs uppercase tracking-[0.1em] font-medium text-accent hover:text-white transition-colors drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]"
           >
             Explore Anime <ArrowUpRightIcon className="size-3.5" />
           </Link>
@@ -88,7 +88,7 @@ export function HeroInfo({ media, rank }: { media: Media; rank?: number }) {
               href={`https://www.youtube.com/watch?v=${media.trailer.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 border-b border-border-soft pb-1 font-mono text-xs uppercase tracking-[0.1em] text-muted-foreground hover:text-foreground transition-colors"
+              className="inline-flex items-center gap-1.5 border-b border-white/30 pb-1 font-mono text-xs uppercase tracking-[0.1em] text-neutral-300 hover:text-white transition-colors drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]"
             >
               <PlayIcon className="size-3 fill-current" /> Trailer
             </a>
