@@ -157,7 +157,13 @@ function AiringTimelineList({ day, schedules }: { day: string; schedules: Airing
                           {(() => {
                             const streamingLinks =
                               item.media?.externalLinks?.filter(
-                                (link) => link.type === "STREAMING" && isSafeExternalUrl(link.url),
+                                (link) =>
+                                  link.url &&
+                                  isSafeExternalUrl(link.url) &&
+                                  (link.type === "STREAMING" ||
+                                    ["crunchyroll", "netflix", "hulu", "bilibili", "disney", "hidive", "prime", "amazon", "youtube", "funimation"].some(
+                                      (s) => link.site?.toLowerCase().includes(s),
+                                    )),
                               ) ?? [];
                             if (streamingLinks.length > 0) {
                               return (

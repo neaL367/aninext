@@ -190,7 +190,7 @@ const HOME_SECONDARY_BATCH_QUERY = `
         airingAt
         media {
           ${MEDIA_CARD_FIELDS}
-          externalLinks { url site type }
+          externalLinks { url site type icon color }
         }
       }
     }
@@ -399,7 +399,7 @@ const AIRING_WEEK_QUERY = `
         airingAt
         media {
           ${MEDIA_CARD_FIELDS}
-          externalLinks { url site type }
+          externalLinks { url site type icon color }
         }
       }
     }
