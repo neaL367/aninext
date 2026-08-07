@@ -26,8 +26,8 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className="home-page">
-      <Crossfade>
+    <Crossfade>
+      <div className="home-page">
         <ErrorBoundary title="Featured anime failed to load">
           <Suspense fallback={<HeroCarouselSkeleton />}>
             <HeroSection />
@@ -77,7 +77,7 @@ export default function HomePage() {
             </Suspense>
           </ErrorBoundary>
         </div>
-      </Crossfade>
-    </div>
+      </div>
+    </Crossfade>
   );
 }

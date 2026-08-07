@@ -279,16 +279,24 @@
   }
 }
 
-::view-transition-group(.page-enter) {
+::view-transition-new(.page-enter) {
   animation-name: page-enter;
   animation-duration: 400ms;
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   animation-fill-mode: both;
 }
 
-::view-transition-group(.page-exit) {
+::view-transition-old(.page-exit) {
   animation-name: page-exit;
   animation-duration: 200ms;
   animation-timing-function: ease;
   animation-fill-mode: both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(.page-enter),
+  ::view-transition-group(.page-exit),
+  ::view-transition-group(.morph) {
+    animation: none;
+  }
 }
