@@ -12,16 +12,11 @@ export function HeroInfo({ media, rank }: { media: Media; rank?: number }) {
 
   return (
     <div className="space-y-4 max-w-3xl">
-      {/* Eyebrow & Status */}
+      {/* Eyebrow */}
       <div className="animate-stagger-up flex items-center gap-3 font-mono text-xs uppercase tracking-[0.14em]">
         <p className="eyebrow">
           {rank ? `Ranked #${rank}` : "Featured selection"}
         </p>
-        {media.status === "RELEASING" && (
-          <span className="font-mono text-[0.62rem] uppercase tracking-[0.14em] text-live-badge font-semibold">
-            · Airing now
-          </span>
-        )}
       </div>
 
       {/* Main Title */}
@@ -32,7 +27,7 @@ export function HeroInfo({ media, rank }: { media: Media; rank?: number }) {
         {title}
       </h1>
 
-      {/* Metadata Row */}
+      {/* Metadata Row Below Title */}
       <div
         className="animate-stagger-up flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-muted-foreground"
         style={{ animationDelay: "140ms" }}
@@ -46,6 +41,19 @@ export function HeroInfo({ media, rank }: { media: Media; rank?: number }) {
         )}
         {media.format && <span>{formatFormat(media.format)}</span>}
         {media.episodes && <span>{media.episodes} episodes</span>}
+        {media.season && media.seasonYear && (
+          <span>{media.season} {media.seasonYear}</span>
+        )}
+        {media.status === "RELEASING" ? (
+          <span className="inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/15 px-2 py-0.5 font-mono text-[0.65rem] font-bold uppercase text-destructive">
+            <span className="size-1.5 rounded-full bg-destructive animate-pulse" />
+            Airing now
+          </span>
+        ) : media.status ? (
+          <span className="rounded-md border border-border-soft bg-surface-1 px-2 py-0.5 font-mono text-[0.65rem] text-muted-foreground uppercase">
+            {media.status.replaceAll("_", " ")}
+          </span>
+        ) : null}
       </div>
 
       {/* Synopsis Description */}
