@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeftIcon, ChevronRightIcon, PauseIcon, PlayIcon } from "lucide-react";
+import { PauseIcon, PlayIcon } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -121,7 +121,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
   return (
     <section
       aria-label="Featured anime hero carousel"
-      className="relative w-full h-[calc(100vh-64px)] min-h-[640px] max-h-[1080px] overflow-hidden bg-background select-none cursor-grab active:cursor-grabbing"
+      className="relative w-full h-[460px] sm:h-[540px] lg:h-[580px] overflow-hidden bg-background select-none cursor-grab active:cursor-grabbing"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
         setIsHovered(false);
@@ -171,45 +171,22 @@ export function HeroCarousel({ items }: { items: Media[] }) {
         })}
       </div>
 
-      {/* Multi-Layer Cinematic Gradient Overlay for Maximum Legibility */}
+      {/* Multi-Layer Gradient Overlay for Legibility */}
       <div className="pointer-events-none absolute inset-0 z-15 bg-gradient-to-t from-background via-background/60 to-transparent" />
       <div className="pointer-events-none absolute inset-0 z-15 bg-gradient-to-b from-background/70 via-transparent to-transparent" />
       <div className="pointer-events-none absolute inset-0 z-15 bg-gradient-to-r from-background/80 via-background/30 to-transparent" />
 
-      {/* Glassmorphic Side Navigation Arrows */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          prevSlide();
-        }}
-        className="group absolute left-4 sm:left-8 top-1/2 -translate-y-1/2 z-30 flex size-12 items-center justify-center rounded-full border border-white/15 bg-black/40 text-white/80 backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-white/40 hover:bg-black/60 hover:text-white active:scale-95 shadow-xl"
-        aria-label="Previous slide"
-      >
-        <ChevronLeftIcon className="size-6 transition-transform group-hover:-translate-x-0.5" />
-      </button>
-
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          next();
-        }}
-        className="group absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 z-30 flex size-12 items-center justify-center rounded-full border border-white/15 bg-black/40 text-white/80 backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-white/40 hover:bg-black/60 hover:text-white active:scale-95 shadow-xl"
-        aria-label="Next slide"
-      >
-        <ChevronRightIcon className="size-6 transition-transform group-hover:translate-x-0.5" />
-      </button>
-
       {/* Foreground Content Positioned Bottom-Left Aligned with Main Width Layout */}
-      <div className="absolute inset-x-0 bottom-0 z-20 pb-16 sm:pb-20 lg:pb-24">
+      <div className="absolute inset-x-0 bottom-0 z-20 pb-14 sm:pb-16 lg:pb-18">
         <div className="mx-auto w-full max-w-[1680px] px-4 sm:px-7 lg:px-10">
           <HeroInfo key={media.id} media={media} rank={current + 1} />
         </div>
       </div>
 
-      {/* Cinematic Animated Progress Bar & Indicator Controls */}
-      <div className="absolute bottom-6 sm:bottom-8 inset-x-0 z-30">
+      {/* Slide Progress Indicators & Controls */}
+      <div className="absolute bottom-5 sm:bottom-6 inset-x-0 z-30">
         <div className="mx-auto w-full max-w-[1680px] px-4 sm:px-7 lg:px-10 flex items-center justify-between gap-6">
-          {/* Animated Expanding Slide Progress Pills */}
+          {/* Expanding Progress Pills */}
           <div className="flex items-center gap-2">
             {items.map((item, index) => {
               const isActive = index === current;
@@ -220,8 +197,8 @@ export function HeroCarousel({ items }: { items: Media[] }) {
                     e.stopPropagation();
                     goTo(index);
                   }}
-                  className={`group relative h-2 rounded-full overflow-hidden transition-all duration-500 ${
-                    isActive ? "w-16 bg-white/30" : "w-4 bg-white/20 hover:bg-white/40"
+                  className={`group relative h-1.5 rounded-full overflow-hidden transition-all duration-500 ${
+                    isActive ? "w-14 bg-foreground/30" : "w-3 bg-foreground/20 hover:bg-foreground/40"
                   }`}
                   aria-label={`Go to slide ${index + 1}`}
                 >
@@ -237,16 +214,16 @@ export function HeroCarousel({ items }: { items: Media[] }) {
           </div>
 
           {/* Controls: Play/Pause Toggle & Counter */}
-          <div className="flex items-center gap-4 text-white/80 font-mono text-xs tracking-widest">
+          <div className="flex items-center gap-3 text-muted-foreground font-mono text-xs tracking-widest">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 setIsPlaying((p) => !p);
               }}
-              className="flex size-8 items-center justify-center rounded-full border border-white/20 bg-black/40 backdrop-blur-md hover:bg-white/20 hover:text-white transition-colors"
+              className="flex size-7 items-center justify-center rounded-full border border-border-soft bg-surface-1/80 backdrop-blur-sm hover:text-foreground transition-colors"
               aria-label={isPlaying ? "Pause slideshow" : "Play slideshow"}
             >
-              {isPlaying ? <PauseIcon className="size-3.5" /> : <PlayIcon className="size-3.5 fill-current" />}
+              {isPlaying ? <PauseIcon className="size-3" /> : <PlayIcon className="size-3 fill-current" />}
             </button>
             <span className="tabular-nums">
               {String(current + 1).padStart(2, "0")} / {String(len).padStart(2, "0")}
@@ -260,15 +237,15 @@ export function HeroCarousel({ items }: { items: Media[] }) {
 
 export function HeroCarouselSkeleton() {
   return (
-    <div className="relative w-full h-[calc(100vh-64px)] min-h-[640px] max-h-[1080px] overflow-hidden bg-background">
+    <div className="relative w-full h-[460px] sm:h-[540px] lg:h-[580px] overflow-hidden bg-background">
       <div className="absolute inset-0 w-full h-full shimmer" />
-      <div className="absolute inset-x-0 bottom-0 z-20 pb-16 sm:pb-20 lg:pb-24">
+      <div className="absolute inset-x-0 bottom-0 z-20 pb-14 sm:pb-16 lg:pb-18">
         <div className="mx-auto w-full max-w-[1680px] px-4 sm:px-7 lg:px-10">
           <div className="space-y-4 max-w-2xl">
-            <div className="shimmer h-4 w-28 rounded-full" />
-            <div className="shimmer h-16 w-3/4 rounded-lg" />
-            <div className="shimmer h-5 w-1/2 rounded" />
-            <div className="shimmer h-16 w-full rounded-lg" />
+            <div className="shimmer h-4 w-24 rounded-full" />
+            <div className="shimmer h-12 w-3/4 rounded-lg" />
+            <div className="shimmer h-4 w-1/2 rounded" />
+            <div className="shimmer h-12 w-full rounded-lg" />
           </div>
         </div>
       </div>
