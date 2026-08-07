@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [{ hostname: "s4.anilist.co", protocol: "https" }],
   },
   cacheLife: {
-    trending: { stale: 60, revalidate: 300, expire: 3600 },
+    trending: { stale: 300, revalidate: 900, expire: 3600 },
     home: { stale: 300, revalidate: 900, expire: 86400 },
     static: { stale: 3600, revalidate: 21600, expire: 604800 },
   },

@@ -6,9 +6,35 @@ const REQUEST_TIMEOUT_MS = 15_000;
 
 const activeRequests: Promise<unknown>[] = [];
 const MAX_CONCURRENT = 4;
+const BUDGET_HOLD_THRESHOLD = 5;
+
+const rateBudget = {
+  remaining: Infinity,
+  resetAt: 0,
+};
 
 function wait(ms: number) {
   return new Promise<void>((r) => setTimeout(r, ms));
+}
+
+function jitter(ms: number) {
+  return Math.round(ms * (0.6 + Math.random() * 0.8));
+}
+
+function updateBudget(headers: Headers) {
+  const remaining = Number(headers.get("X-RateLimit-Remaining"));
+  const reset = Number(headers.get("X-RateLimit-Reset"));
+  if (Number.isFinite(remaining)) rateBudget.remaining = remaining;
+  if (Number.isFinite(reset) && reset > 0) rateBudget.resetAt = Date.now() + reset * 1000;
+}
+
+async function respectBudget() {
+  while (rateBudget.remaining <= BUDGET_HOLD_THRESHOLD) {
+    const hold = rateBudget.resetAt - Date.now();
+    if (hold <= 0) break;
+    await wait(Math.min(hold, 3_000));
+    if (hold > 3_000) break;
+  }
 }
 
 async function throttle() {
@@ -33,6 +59,7 @@ export async function anilistFetch<T>(
   retries = 2,
 ): Promise<T> {
   await throttle();
+  await respectBudget();
 
   const attempt = async (remaining: number): Promise<T> => {
     const res = await track(
@@ -57,7 +84,7 @@ export async function anilistFetch<T>(
       const retryAfter = Number(
         res.headers.get("Retry-After") ?? res.headers.get("X-RateLimit-Reset") ?? 5,
       );
-      const backoff = Math.min(retryAfter * 1000, 10_000);
+      const backoff = Math.min(jitter(retryAfter * 1000), 10_000);
       await wait(backoff);
       return attempt(remaining - 1);
     }
@@ -67,6 +94,8 @@ export async function anilistFetch<T>(
     if (!res.ok) {
       throw new AniListError(`AniList request failed (${res.status})`, "network");
     }
+
+    updateBudget(res.headers);
 
     const json = (await res.json()) as {
       errors?: { message: string }[];

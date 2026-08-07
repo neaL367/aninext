@@ -74,7 +74,7 @@ export async function getBrowseCollection(
   page: number,
   perPage = 25,
 ) {
-  "use cache";
+  "use cache: remote";
   const hash = buildFilterHash(filters);
   cacheTag("anime", `anime:browse:${collection}`, ANIME_CACHE.browseCollection(collection, hash));
 
@@ -118,12 +118,92 @@ const GENRE_QUERY = `
 `;
 
 export async function getGenres() {
-  "use cache";
+  "use cache: remote";
   cacheTag(ANIME_CACHE.genres);
-  cacheLife({ stale: 3600, revalidate: 21600, expire: 604800 });
+  cacheLife({ stale: 86400, revalidate: 604800, expire: 1209600 });
 
   const data = await anilistFetch<{ GenreCollection: string[] }>(GENRE_QUERY, {});
   return data.GenreCollection;
+}
+
+const HOME_SECTION_PER_PAGE: Record<string, number> = {
+  trending: 14,
+  popular: 5,
+  top100: 14,
+  upcoming: 7,
+  alltimepopular: 7,
+};
+
+const HOME_COLLECTION_ALIASES = (Object.keys(HOME_SECTION_PER_PAGE) as AnimeCollection[])
+  .map((key) => {
+    const c = COLLECTIONS[key];
+    const args = [
+      `sort: [${c.sort.join(", ")}]`,
+      c.status ? `status: ${c.status}` : null,
+      c.season ? `season: ${c.season}` : null,
+      c.seasonYear ? `seasonYear: ${c.seasonYear}` : null,
+      "isAdult: false",
+    ]
+      .filter(Boolean)
+      .join(", ");
+    return `${key}: Page(page: 1, perPage: ${HOME_SECTION_PER_PAGE[key]}) {
+      media(type: ANIME, ${args}) {
+        ${MEDIA_CARD_FIELDS}
+      }
+    }`;
+  })
+  .join("\n");
+
+const HOME_QUERY = `
+  query HomeData($start: Int, $end: Int) {
+    hero: Page(page: 1, perPage: 5) {
+      media(type: ANIME, sort: [TRENDING_DESC], isAdult: false) {
+        ${MEDIA_CARD_FIELDS}
+      }
+    }
+    ${HOME_COLLECTION_ALIASES}
+    airing: Page(perPage: 50) {
+      airingSchedules(airingAt_greater: $start, airingAt_lesser: $end, sort: [TIME]) {
+        episode
+        airingAt
+        media {
+          ${MEDIA_CARD_FIELDS}
+          externalLinks { url site type }
+        }
+      }
+    }
+    genres: GenreCollection
+  }
+`;
+
+type HomeData = {
+  hero: { media: Media[] };
+  trending: { media: Media[] };
+  popular: { media: Media[] };
+  top100: { media: Media[] };
+  upcoming: { media: Media[] };
+  alltimepopular: { media: Media[] };
+  airing: { airingSchedules: AiringScheduleNode[] };
+  genres: string[];
+};
+
+export async function getHomeData(start: number, end: number, season: string, seasonYear: number) {
+  "use cache: remote";
+  cacheTag("anime", ANIME_CACHE.home);
+  cacheLife("home" as Parameters<typeof cacheLife>[0]);
+
+  const data = await anilistFetch<HomeData>(HOME_QUERY, { start, end });
+
+  return {
+    hero: data.hero.media,
+    trending: data.trending.media,
+    popular: data.popular.media,
+    top100: data.top100.media,
+    upcoming: data.upcoming.media,
+    alltimepopular: data.alltimepopular.media,
+    airing: data.airing.airingSchedules,
+    genres: data.genres,
+  };
 }
 
 const META_FIELDS = `
@@ -134,7 +214,7 @@ const META_FIELDS = `
 `;
 
 export async function getAnimeMeta(id: number) {
-  "use cache";
+  "use cache: remote";
   cacheTag("anime", ANIME_CACHE.detail(id));
   cacheLife({ stale: 300, revalidate: 900, expire: 86400 });
 
@@ -175,7 +255,7 @@ const HERO_FIELDS = `
 `;
 
 export async function getAnimeHero(id: number) {
-  "use cache";
+  "use cache: remote";
   cacheTag("anime", ANIME_CACHE.detail(id));
   cacheLife({ stale: 300, revalidate: 900, expire: 86400 });
 
@@ -240,10 +320,10 @@ const AIRING_WEEK_QUERY = `
 `;
 
 export async function getAiringWeek(start: number, end: number) {
-  "use cache";
+  "use cache: remote";
   const date = localDateStr(fromAiringTimestamp(start));
   cacheTag("anime", ANIME_CACHE.airingDay(date, start));
-  cacheLife({ stale: 60, revalidate: 300, expire: 3600 });
+  cacheLife({ stale: 180, revalidate: 900, expire: 3600 });
 
   const data = await anilistFetch<{
     Page: { airingSchedules: AiringScheduleNode[] };
@@ -253,9 +333,9 @@ export async function getAiringWeek(start: number, end: number) {
 }
 
 export async function getAiringDay(day: string, start: number, end: number) {
-  "use cache";
+  "use cache: remote";
   cacheTag("anime", ANIME_CACHE.airingDay(day, start));
-  cacheLife({ stale: 60, revalidate: 300, expire: 3600 });
+  cacheLife({ stale: 180, revalidate: 900, expire: 3600 });
 
   const data = await anilistFetch<{
     Page: { airingSchedules: AiringScheduleNode[] };
@@ -264,7 +344,7 @@ export async function getAiringDay(day: string, start: number, end: number) {
   return data.Page.airingSchedules;
 }
 export async function getAnimeDetail(id: number) {
-  "use cache";
+  "use cache: remote";
   cacheTag("anime", ANIME_CACHE.detail(id));
   cacheLife({ stale: 300, revalidate: 900, expire: 86400 });
 
