@@ -39,7 +39,7 @@ export function SectionRow({
           </HoverPrefetchLink>
         }
       />
-      <div className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 scrollbar-none md:grid md:grid-cols-5 md:gap-x-5 md:gap-y-8 md:overflow-visible lg:grid-cols-6 xl:grid-cols-7">
+      <div className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 scrollbar-none md:grid md:grid-cols-3 sm:grid-cols-2 md:gap-x-5 md:gap-y-8 md:overflow-visible lg:grid-cols-6 xl:grid-cols-6">
         {items.map((item, i) => (
           <div key={item.id} className="w-[148px] shrink-0 snap-start sm:w-[164px] md:w-auto">
             <AnimePreviewCard media={item}>

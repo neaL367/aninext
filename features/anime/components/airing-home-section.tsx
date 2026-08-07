@@ -24,7 +24,7 @@ export function AiringHomeSection({ schedules }: { schedules: AiringScheduleNode
   const today = useMemo(() => localDayBounds(), []);
 
   const todaySchedules = useMemo(
-    () => schedules.filter((s) => s.airingAt >= today.start && s.airingAt < today.end).slice(0, 7),
+    () => schedules.filter((s) => s.airingAt >= today.start && s.airingAt < today.end).slice(0, 6),
     [schedules, today],
   );
 
