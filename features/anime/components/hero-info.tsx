@@ -1,6 +1,6 @@
-import { ArrowUpRightIcon, PlayIcon, StarIcon } from "lucide-react";
-import Link from "next/link";
+import { ArrowRightIcon, PlayIcon, StarIcon } from "lucide-react";
 
+import { HoverPrefetchLink } from "@/components/ui/hover-prefetch-link";
 import { formatFormat, getMediaTitle, stripHtml } from "@/features/anime/lib/media-helpers";
 
 import type { Media } from "@/features/anime/types/anime";
@@ -11,25 +11,22 @@ export function HeroInfo({ media, rank }: { media: Media; rank?: number }) {
   const description = stripHtml(media.description);
 
   return (
-    <div className="space-y-3.5 max-w-3xl">
-      {/* Eyebrow & Badge */}
-      <div
-        className="animate-stagger-up flex flex-wrap items-center gap-3 font-mono text-xs uppercase tracking-[0.14em]"
-        style={{ animationDelay: "0ms" }}
-      >
-        <span className="eyebrow text-accent drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]">
-          {rank ? `Rank #${rank}` : "Featured"}
-        </span>
+    <div className="space-y-4 max-w-3xl">
+      {/* Eyebrow & Status */}
+      <div className="animate-stagger-up flex items-center gap-3 font-mono text-xs uppercase tracking-[0.14em]">
+        <p className="eyebrow">
+          {rank ? `Ranked #${rank}` : "Featured selection"}
+        </p>
         {media.status === "RELEASING" && (
-          <span className="text-live-badge font-semibold drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]">
-            · Airing Now
+          <span className="font-mono text-[0.62rem] uppercase tracking-[0.14em] text-live-badge font-semibold">
+            · Airing now
           </span>
         )}
       </div>
 
       {/* Main Title */}
       <h1
-        className="animate-stagger-up line-clamp-2 text-3xl sm:text-5xl lg:text-6xl font-semibold leading-[0.98] tracking-[-0.055em] text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.95)]"
+        className="animate-stagger-up line-clamp-2 text-3xl font-semibold tracking-[-0.055em] text-foreground sm:text-5xl lg:text-6xl"
         style={{ animationDelay: "70ms" }}
       >
         {title}
@@ -37,14 +34,14 @@ export function HeroInfo({ media, rank }: { media: Media; rank?: number }) {
 
       {/* Metadata Row */}
       <div
-        className="animate-stagger-up flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-neutral-300 drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)]"
+        className="animate-stagger-up flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-muted-foreground"
         style={{ animationDelay: "140ms" }}
       >
         {media.averageScore && (
-          <span className="inline-flex items-center gap-1.5 font-semibold text-white">
-            <StarIcon className="size-3.5 fill-accent text-accent" />
+          <span className="inline-flex items-center gap-1.5 font-semibold text-foreground">
+            <StarIcon className="size-3.5 fill-signal text-signal" />
             {(media.averageScore / 10).toFixed(1)}
-            <span className="font-normal text-neutral-400">/ 10</span>
+            <span className="font-normal text-muted-foreground">/ 10</span>
           </span>
         )}
         {media.format && <span>{formatFormat(media.format)}</span>}
@@ -54,7 +51,7 @@ export function HeroInfo({ media, rank }: { media: Media; rank?: number }) {
       {/* Synopsis Description */}
       {description && (
         <p
-          className="animate-stagger-up line-clamp-2 max-w-2xl text-xs sm:text-sm leading-relaxed text-neutral-200 drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)] font-normal"
+          className="animate-stagger-up line-clamp-2 max-w-2xl text-sm leading-6 text-muted-foreground"
           style={{ animationDelay: "210ms" }}
         >
           {description}
@@ -63,32 +60,33 @@ export function HeroInfo({ media, rank }: { media: Media; rank?: number }) {
 
       {/* Genre Chips & Actions */}
       <div
-        className="animate-stagger-up flex flex-wrap items-center gap-4 pt-1"
+        className="animate-stagger-up flex flex-wrap items-center gap-5 pt-2"
         style={{ animationDelay: "280ms" }}
       >
         <div className="flex flex-wrap gap-2">
           {media.genres.slice(0, 4).map((genre) => (
             <span
               key={genre}
-              className="border border-white/20 px-2.5 py-1 font-mono text-[0.62rem] uppercase tracking-[0.1em] text-neutral-200 bg-black/60 backdrop-blur-md shadow-sm"
+              className="border border-border-soft bg-surface-1 px-2.5 py-1 font-mono text-[0.62rem] uppercase tracking-[0.1em] text-muted-foreground"
             >
               {genre}
             </span>
           ))}
         </div>
         <div className="flex items-center gap-4">
-          <Link
+          <HoverPrefetchLink
             href={`/anime/${media.id}` as Route<string>}
-            className="inline-flex items-center gap-2 border-b border-accent pb-1 font-mono text-xs uppercase tracking-[0.1em] font-medium text-accent hover:text-white transition-colors drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]"
+            className="group flex items-center gap-2 border-b border-border-soft pb-1 font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:border-signal hover:text-signal"
           >
-            Explore Anime <ArrowUpRightIcon className="size-3.5" />
-          </Link>
+            Explore anime{" "}
+            <ArrowRightIcon className="size-3 transition-transform group-hover:translate-x-1" />
+          </HoverPrefetchLink>
           {media.trailer?.id && media.trailer.site === "youtube" && (
             <a
               href={`https://www.youtube.com/watch?v=${media.trailer.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 border-b border-white/30 pb-1 font-mono text-xs uppercase tracking-[0.1em] text-neutral-300 hover:text-white transition-colors drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]"
+              className="flex items-center gap-1.5 border-b border-border-soft pb-1 font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
             >
               <PlayIcon className="size-3 fill-current" /> Trailer
             </a>
