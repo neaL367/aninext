@@ -51,8 +51,9 @@ export function HeroCarousel({ items }: { items: Media[] }) {
   }, [items.length]);
 
   return (
-    <section aria-label="Featured anime" className="relative bg-surface-1 lg:min-h-[660px]">
-      <div className="relative h-[300px] overflow-hidden lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-[55%]">
+    <section aria-label="Featured anime" className="relative w-full overflow-hidden bg-surface-1 min-h-[480px] sm:min-h-[560px] lg:min-h-[660px]">
+      {/* Full width banner container without gradient overlays */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden">
         {items.map((item, i) => {
           const image = item.bannerImage ?? item.coverImage.extraLarge;
           const color = item.coverImage.color;
@@ -62,7 +63,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
           return (
             <div
               key={item.id}
-              className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+              className="absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out"
               style={{
                 opacity: isCurrent ? 1 : isPrev ? 0 : 0,
                 ...(color ? { backgroundColor: color } : {}),
@@ -74,12 +75,12 @@ export function HeroCarousel({ items }: { items: Media[] }) {
                   alt=""
                   fill
                   priority={i === 0}
-                  sizes="(min-width: 1024px) 55vw, 100vw"
+                  sizes="100vw"
                   className="object-cover"
                 />
               ) : (
                 <div
-                  className="absolute inset-0"
+                  className="absolute inset-0 w-full h-full"
                   style={{
                     background: color
                       ? `linear-gradient(135deg, ${color}80, var(--surface-2))`
@@ -87,26 +88,25 @@ export function HeroCarousel({ items }: { items: Media[] }) {
                   }}
                 />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-surface-1 via-transparent to-transparent" />
             </div>
           );
         })}
-        <div className="pointer-events-none absolute inset-0 hidden bg-gradient-to-l from-surface-1/90 via-surface-1/50 to-transparent lg:block" />
-        <div className="absolute bottom-4 left-4 z-10">
-          <div
-            className="font-mono text-xs tabular-nums tracking-[0.1em] text-white/70"
-            aria-live="polite"
-          >
-            {String(current + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
-          </div>
-        </div>
       </div>
 
-      <div className="mx-auto flex w-full max-w-[1680px] items-center px-4 sm:px-7 lg:min-h-[660px] lg:px-10">
-        <div className="py-8 sm:py-10 lg:ml-auto lg:max-w-[45%]">
-          <HeroInfo key={media.id} media={media} />
-          <div className="mt-6 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.1em] text-muted-foreground">
-            <span className="h-px w-8 bg-accent" /> Powered by AniList
+      {/* Main width layout aligned content with slide up animation on autoplay */}
+      <div className="relative z-10 mx-auto flex w-full max-w-[1680px] min-h-[480px] sm:min-h-[560px] lg:min-h-[660px] items-center px-4 sm:px-7 lg:px-10">
+        <div
+          key={media.id}
+          className="hero-slide-up my-8 max-w-xl lg:max-w-2xl rounded-2xl border border-white/10 bg-background/80 p-6 sm:p-8 backdrop-blur-md shadow-2xl"
+        >
+          <HeroInfo media={media} />
+          <div className="mt-6 flex items-center justify-between font-mono text-xs uppercase tracking-[0.1em] text-muted-foreground border-t border-border-soft/60 pt-4">
+            <div className="flex items-center gap-3">
+              <span className="h-px w-8 bg-accent" /> Powered by AniList
+            </div>
+            <div className="tabular-nums tracking-[0.1em] text-foreground font-semibold">
+              {String(current + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
+            </div>
           </div>
         </div>
       </div>
@@ -116,10 +116,10 @@ export function HeroCarousel({ items }: { items: Media[] }) {
 
 export function HeroCarouselSkeleton() {
   return (
-    <div className="bg-surface-1 relative">
-      <div className="h-[300px] shimmer lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-[55%]" />
-      <div className="mx-auto flex w-full max-w-[1680px] items-center px-4 sm:px-7 lg:min-h-[660px] lg:px-10">
-        <div className="py-8 sm:py-10 lg:ml-auto lg:max-w-[45%]">
+    <div className="relative w-full overflow-hidden bg-surface-1 min-h-[480px] sm:min-h-[560px] lg:min-h-[660px]">
+      <div className="absolute inset-0 w-full h-full shimmer" />
+      <div className="relative z-10 mx-auto flex w-full max-w-[1680px] min-h-[480px] sm:min-h-[560px] lg:min-h-[660px] items-center px-4 sm:px-7 lg:px-10">
+        <div className="my-8 w-full max-w-xl lg:max-w-2xl rounded-2xl border border-border-soft bg-background/80 p-6 sm:p-8">
           <div className="space-y-4">
             <div className="shimmer h-3 w-24 rounded" />
             <div className="shimmer h-3 w-20 rounded" />
