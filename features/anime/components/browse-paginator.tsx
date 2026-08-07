@@ -24,6 +24,8 @@ export function BrowsePaginator({
   const [isPending, startTransition] = useTransition();
   const [hasMore, setHasMore] = useState(true);
   const [hasItems, setHasItems] = useState(true);
+  const [firstResolved, setFirstResolved] = useState(false);
+  const autoAppended = useRef(false);
 
   function loadMore() {
     if (!hasMore) return;
@@ -35,6 +37,13 @@ export function BrowsePaginator({
     });
   }
 
+  useEffect(() => {
+    if (autoAppended.current) return;
+    if (!firstResolved || pages.length !== 1 || !hasMore) return;
+    autoAppended.current = true;
+    loadMore();
+  }, [firstResolved, pages.length, hasMore]);
+
   return (
     <>
       <div
@@ -45,7 +54,13 @@ export function BrowsePaginator({
         {pages.map((page, i) => (
           <Suspense key={i} fallback={skeleton}>
             {i === 0 ? (
-              <PageContent page={page} onResolved={setHasItems} />
+              <PageContent
+                page={page}
+                onResolved={(hasItems) => {
+                  setHasItems(hasItems);
+                  setFirstResolved(true);
+                }}
+              />
             ) : (
               <PageContent page={page} onResolved={() => undefined} />
             )}

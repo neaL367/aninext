@@ -12,8 +12,8 @@ export async function renderBrowsePage(
   collection: AnimeCollection,
   filters: AnimeFilters,
   page: number,
+  perPage = 25,
 ): Promise<BrowsePage> {
-  const perPage = 25;
   const { items, pageInfo } = await getBrowseCollection(collection, filters, page, perPage);
   const capped = collection === "top100" ? page * perPage <= 100 : true;
   const rankStart =

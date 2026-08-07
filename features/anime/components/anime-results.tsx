@@ -14,7 +14,7 @@ export async function AnimeResults({
   collection: AnimeCollection;
   filters: AnimeFilters;
 }) {
-  const firstPagePromise = renderBrowsePage(collection, filters, 1);
+  const firstPagePromise = renderBrowsePage(collection, filters, 1, 12);
 
   return (
     <BrowsePaginator
@@ -22,7 +22,7 @@ export async function AnimeResults({
       initialPage={firstPagePromise}
       collection={collection}
       filters={filters}
-      skeleton={<MediaGridSkeleton count={25} />}
+      skeleton={<MediaGridSkeleton count={12} />}
       emptyComponent={getEmptyComponent(collection, filters)}
     />
   );
