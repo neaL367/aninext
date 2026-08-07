@@ -83,7 +83,7 @@ export function FilterSidebar({
 export function FilterSidebarContent({
   genresPromise,
   mobile = false,
-  collection,
+  collection: _collection,
   filters,
 }: {
   genresPromise: Promise<string[]>;
@@ -130,7 +130,7 @@ export function FilterSidebarContent({
       label: "Genre",
       options: genres,
       selected: state.genre,
-      defaultOpen: true,
+      defaultOpen: false,
       scroll: true,
     },
     {
@@ -150,14 +150,14 @@ export function FilterSidebarContent({
       label: "Season",
       options: SEASON_OPTIONS,
       selected: [state.season],
-      defaultOpen: collection === "seasonal" || Boolean(state.season),
+      defaultOpen: Boolean(state.season),
     },
     {
       key: "year",
       label: "Year",
       options: years,
       selected: [state.year],
-      defaultOpen: collection === "seasonal" || Boolean(state.year),
+      defaultOpen: Boolean(state.year),
       scroll: true,
     },
     {
