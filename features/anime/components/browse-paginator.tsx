@@ -2,7 +2,6 @@
 
 import { Suspense, use, useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 
-import { Crossfade } from "@/components/ui/crossfade";
 import { Spinner } from "@/components/ui/spinner";
 import { renderBrowsePage, type BrowsePage } from "@/features/anime/anime-actions";
 
@@ -48,9 +47,7 @@ export function BrowsePaginator({
             {i === 0 ? (
               <PageContent page={page} onResolved={setHasItems} />
             ) : (
-              <Crossfade>
-                <PageContent page={page} onResolved={() => undefined} />
-              </Crossfade>
+              <PageContent page={page} onResolved={() => undefined} />
             )}
           </Suspense>
         ))}

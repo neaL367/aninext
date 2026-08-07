@@ -1,8 +1,10 @@
 import { PlayIcon } from "lucide-react";
+import { notFound } from "next/navigation";
 import { ViewTransition } from "react";
 
 import { ImageWithLoading } from "@/components/ui/image-with-loading";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getAnimeHero } from "@/features/anime/anime-queries";
 import {
   formatFormat,
   formatStatus,
@@ -13,6 +15,12 @@ import { scoreColor } from "@/features/anime/lib/score";
 import { cn } from "@/lib/utils";
 
 import type { Media } from "@/features/anime/types/anime";
+
+export async function AnimeHeroSection({ id }: { id: number }) {
+  const media = await getAnimeHero(id);
+  if (!media) notFound();
+  return <AnimeHero media={media} />;
+}
 
 export function AnimeHero({ media }: { media: Media }) {
   const title = getMediaTitle(media);

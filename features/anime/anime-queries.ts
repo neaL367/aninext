@@ -174,6 +174,23 @@ const HERO_FIELDS = `
   trailer { id site thumbnail }
 `;
 
+export async function getAnimeHero(id: number) {
+  "use cache";
+  cacheTag("anime", ANIME_CACHE.detail(id));
+  cacheLife({ stale: 300, revalidate: 900, expire: 86400 });
+
+  const data = await anilistFetch<{ Media: Media }>(
+    `query AnimeHero($id: Int) {
+      Media(id: $id, type: ANIME) {
+        ${HERO_FIELDS}
+      }
+    }`,
+    { id },
+  );
+
+  return data.Media;
+}
+
 const CHARACTERS_SUBFIELDS = `
   edges {
     role
