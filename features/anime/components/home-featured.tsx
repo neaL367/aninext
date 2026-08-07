@@ -1,7 +1,11 @@
 import { io } from "next/cache";
 
-import { getAiringWeek, getBrowseCollection, getGenres } from "@/features/anime/anime-queries";
-import { getCurrentSeason } from "@/features/anime/lib/season";
+import {
+  getGenres,
+  getHomePrimaryBatch,
+  getHomeSecondaryBatch,
+  getTop100Full,
+} from "@/features/anime/anime-queries";
 
 import { AiringHomeSection } from "./airing-home-section";
 import { FeatureMosaic } from "./feature-mosaic";
@@ -9,7 +13,7 @@ import { GenreExplorer } from "./genre-pills";
 import { HeroCarousel } from "./hero-carousel";
 import { SectionRow } from "./section-row";
 
-import type { AnimeCollection } from "@/features/anime/types/anime";
+import type { AnimeCollection, Media } from "@/features/anime/types/anime";
 import type { Route } from "next";
 
 export function HomeFeaturedShell({
@@ -30,8 +34,10 @@ export function HomeFeaturedShell({
 }
 
 export async function HomeHero() {
-  const { items } = await getBrowseCollection("trending", {}, 1, 5);
-  return items.length > 0 ? <HeroCarousel items={items} /> : null;
+  await io();
+  const { trending } = await getHomePrimaryBatch();
+  const heroItems = trending.slice(0, 5);
+  return heroItems.length > 0 ? <HeroCarousel items={heroItems} /> : null;
 }
 
 export async function HomeCollectionSection({
@@ -52,8 +58,23 @@ export async function HomeCollectionSection({
   mosaic?: boolean;
 }) {
   await io();
-  const currentSeason = collection === "popular" ? getCurrentSeason() : undefined;
-  const { items } = await getBrowseCollection(collection, {}, 1, perPage, currentSeason);
+  let items: Media[] = [];
+
+  if (collection === "trending" || collection === "popular") {
+    const batch = await getHomePrimaryBatch();
+    items = collection === "trending" ? batch.trending.slice(0, perPage) : batch.popular.slice(0, perPage);
+  } else if (collection === "top100") {
+    const top100 = await getTop100Full();
+    items = top100.slice(0, perPage);
+  } else if (collection === "upcoming" || collection === "alltimepopular") {
+    const now = Math.floor(Date.now() / 1000);
+    const bucket = Math.floor(now / 300) * 300;
+    const batch = await getHomeSecondaryBatch(bucket - 43_200, bucket + 129_600);
+    items =
+      collection === "upcoming"
+        ? batch.upcoming.slice(0, perPage)
+        : batch.alltimepopular.slice(0, perPage);
+  }
 
   if (mosaic) return <FeatureMosaic title={title} href={href} items={items} />;
 
@@ -70,14 +91,14 @@ export async function HomeCollectionSection({
 
 export async function HomeAiringSection() {
   await io();
-  // Cache bucket keeps this read stable while allowing schedule updates during the day.
   const now = Math.floor(Date.now() / 1000);
   const bucket = Math.floor(now / 300) * 300;
-  const schedules = await getAiringWeek(bucket - 43_200, bucket + 129_600);
-  return <AiringHomeSection schedules={schedules} />;
+  const { airingSchedules } = await getHomeSecondaryBatch(bucket - 43_200, bucket + 129_600);
+  return <AiringHomeSection schedules={airingSchedules} />;
 }
 
 export async function HomeGenreSection() {
   const genres = await getGenres();
   return <GenreExplorer genres={genres} />;
 }
+

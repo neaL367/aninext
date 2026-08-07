@@ -7,6 +7,7 @@ import { ANIME_CACHE } from "./anime-cache";
 import { getCollectionConfig } from "./lib/collection-config";
 import { localDateStr, fromAiringTimestamp } from "./lib/media-helpers";
 import { buildFilterHash } from "./lib/parse-filters";
+import { getCurrentSeason } from "./lib/season";
 
 import type {
   AnimeCollection,
@@ -80,7 +81,6 @@ export async function getBrowseCollection(
   cacheTag("anime", `anime:browse:${collection}`, ANIME_CACHE.browseCollection(collection, hash));
 
   const config = getCollectionConfig(collection, currentSeason);
-  // custom profiles (next.config cacheLife) aren't part of the builtin union
   cacheLife(config.cacheLife as Parameters<typeof cacheLife>[0]);
 
   const variables: Record<string, unknown> = {
@@ -112,6 +112,109 @@ export async function getBrowseCollection(
   };
 }
 
+const TOP100_FULL_QUERY = `
+  query Top100Full {
+    page1: Page(page: 1, perPage: 50) {
+      media(type: ANIME, sort: [SCORE_DESC], isAdult: false) {
+        ${MEDIA_CARD_FIELDS}
+      }
+    }
+    page2: Page(page: 2, perPage: 50) {
+      media(type: ANIME, sort: [SCORE_DESC], isAdult: false) {
+        ${MEDIA_CARD_FIELDS}
+      }
+    }
+  }
+`;
+
+export async function getTop100Full(): Promise<Media[]> {
+  "use cache: remote";
+  cacheTag("anime", "anime:top100:full");
+  cacheLife({ stale: 3600, revalidate: 21600, expire: 604800 });
+
+  const data = await anilistFetch<{
+    page1: { media: Media[] };
+    page2: { media: Media[] };
+  }>(TOP100_FULL_QUERY, {});
+
+  return [...data.page1.media, ...data.page2.media];
+}
+
+const HOME_PRIMARY_BATCH_QUERY = `
+  query HomePrimaryBatch($season: MediaSeason, $seasonYear: Int) {
+    trending: Page(page: 1, perPage: 14) {
+      media(type: ANIME, sort: [TRENDING_DESC], isAdult: false) {
+        ${MEDIA_CARD_FIELDS}
+      }
+    }
+    popular: Page(page: 1, perPage: 5) {
+      media(type: ANIME, sort: [POPULARITY_DESC], season: $season, seasonYear: $seasonYear, isAdult: false) {
+        ${MEDIA_CARD_FIELDS}
+      }
+    }
+  }
+`;
+
+export async function getHomePrimaryBatch() {
+  "use cache: remote";
+  cacheTag("anime", "anime:home:primary");
+  cacheLife("trending");
+
+  const current = getCurrentSeason();
+  const data = await anilistFetch<{
+    trending: { media: Media[] };
+    popular: { media: Media[] };
+  }>(HOME_PRIMARY_BATCH_QUERY, { season: current.season, seasonYear: current.seasonYear });
+
+  return {
+    trending: data.trending.media,
+    popular: data.popular.media,
+  };
+}
+
+const HOME_SECONDARY_BATCH_QUERY = `
+  query HomeSecondaryBatch($airingStart: Int, $airingEnd: Int) {
+    upcoming: Page(page: 1, perPage: 7) {
+      media(type: ANIME, status: NOT_YET_RELEASED, sort: [POPULARITY_DESC], isAdult: false) {
+        ${MEDIA_CARD_FIELDS}
+      }
+    }
+    alltimepopular: Page(page: 1, perPage: 7) {
+      media(type: ANIME, sort: [POPULARITY_DESC], isAdult: false) {
+        ${MEDIA_CARD_FIELDS}
+      }
+    }
+    airing: Page(perPage: 50) {
+      airingSchedules(airingAt_greater: $airingStart, airingAt_lesser: $airingEnd, sort: [TIME]) {
+        episode
+        airingAt
+        media {
+          ${MEDIA_CARD_FIELDS}
+          externalLinks { url site type }
+        }
+      }
+    }
+  }
+`;
+
+export async function getHomeSecondaryBatch(start: number, end: number) {
+  "use cache: remote";
+  cacheTag("anime", "anime:home:secondary");
+  cacheLife("home");
+
+  const data = await anilistFetch<{
+    upcoming: { media: Media[] };
+    alltimepopular: { media: Media[] };
+    airing: { airingSchedules: AiringScheduleNode[] };
+  }>(HOME_SECONDARY_BATCH_QUERY, { airingStart: start, airingEnd: end });
+
+  return {
+    upcoming: data.upcoming.media,
+    alltimepopular: data.alltimepopular.media,
+    airingSchedules: data.airing.airingSchedules,
+  };
+}
+
 const GENRE_QUERY = `
   query GenreCollection {
     GenreCollection
@@ -125,6 +228,31 @@ export async function getGenres() {
 
   const data = await anilistFetch<{ GenreCollection: string[] }>(GENRE_QUERY, {});
   return data.GenreCollection;
+}
+
+const META_FIELDS = `
+  id
+  title { romaji english native userPreferred }
+  coverImage { extraLarge large color }
+  bannerImage
+  description(asHtml: false)
+`;
+
+export async function getAnimeMeta(id: number) {
+  "use cache: remote";
+  cacheTag("anime", `anime:meta:${id}`);
+  cacheLife({ stale: 3600, revalidate: 21600, expire: 604800 });
+
+  const data = await anilistFetch<{ Media: Media | null }>(
+    `query AnimeMeta($id: Int) {
+      Media(id: $id, type: ANIME) {
+        ${META_FIELDS}
+      }
+    }`,
+    { id },
+  );
+
+  return data.Media;
 }
 
 const HERO_FIELDS = `
@@ -150,23 +278,6 @@ const HERO_FIELDS = `
   streamingEpisodes { title thumbnail url site }
   trailer { id site thumbnail }
 `;
-
-export async function getAnimeHero(id: number) {
-  "use cache: remote";
-  cacheTag("anime", ANIME_CACHE.detail(id));
-  cacheLife({ stale: 300, revalidate: 900, expire: 86400 });
-
-  const data = await anilistFetch<{ Media: Media | null }>(
-    `query AnimeHero($id: Int) {
-      Media(id: $id, type: ANIME) {
-        ${HERO_FIELDS}
-      }
-    }`,
-    { id },
-  );
-
-  return data.Media;
-}
 
 const CHARACTERS_SUBFIELDS = `
   edges {
@@ -200,6 +311,84 @@ const RECOMMENDATIONS_SUBFIELDS = `
 const AIRING_SCHEDULE_SUBFIELDS = `
   nodes { episode airingAt }
 `;
+
+const ANIME_FULL_DETAIL_QUERY = `
+  query AnimeFullDetail($id: Int) {
+    Media(id: $id, type: ANIME) {
+      ${HERO_FIELDS}
+      characters(page: 1, perPage: 12, sort: [ROLE, RELEVANCE]) {
+        ${CHARACTERS_SUBFIELDS}
+      }
+      staff(page: 1, perPage: 10) {
+        ${STAFF_SUBFIELDS}
+      }
+      relations {
+        ${RELATIONS_SUBFIELDS}
+      }
+      recommendations(page: 1, perPage: 8, sort: [RATING_DESC]) {
+        ${RECOMMENDATIONS_SUBFIELDS}
+      }
+      airingSchedule(notYetAired: true, perPage: 25) {
+        ${AIRING_SCHEDULE_SUBFIELDS}
+      }
+    }
+  }
+`;
+
+export interface AnimeFullDetailData {
+  media: Media;
+  characters: CharacterEdge[];
+  staff: StaffEdge[];
+  relations: RelationEdge[];
+  recommendations: RecommendationNode[];
+  airingSchedule: AiringScheduleNode[];
+}
+
+export async function getAnimeFullDetail(id: number): Promise<AnimeFullDetailData | null> {
+  "use cache: remote";
+  cacheTag("anime", ANIME_CACHE.detail(id));
+  cacheLife({ stale: 300, revalidate: 900, expire: 86400 });
+
+  const data = await anilistFetch<{
+    Media: (Media & {
+      characters?: { edges?: CharacterEdge[] | null } | null;
+      staff?: { edges?: StaffEdge[] | null } | null;
+      relations?: { edges?: RelationEdge[] | null } | null;
+      recommendations?: { nodes?: RecommendationNode[] | null } | null;
+      airingSchedule?: { nodes?: AiringScheduleNode[] | null } | null;
+    }) | null;
+  }>(ANIME_FULL_DETAIL_QUERY, { id });
+
+  const m = data.Media;
+  if (!m) return null;
+
+  return {
+    media: m,
+    characters: m.characters?.edges ?? [],
+    staff: m.staff?.edges ?? [],
+    relations: m.relations?.edges ?? [],
+    recommendations: m.recommendations?.nodes ?? [],
+    airingSchedule: m.airingSchedule?.nodes ?? [],
+  };
+}
+
+// Backward-compatible wrappers for existing component imports
+export async function getAnimeHero(id: number) {
+  const detail = await getAnimeFullDetail(id);
+  return detail?.media ?? null;
+}
+
+export async function getAnimeDetailSections(id: number) {
+  const detail = await getAnimeFullDetail(id);
+  if (!detail) return null;
+  return {
+    characters: { edges: detail.characters },
+    staff: detail.staff,
+    relations: detail.relations,
+    recommendations: detail.recommendations,
+    airingSchedule: detail.airingSchedule,
+  };
+}
 
 const AIRING_WEEK_QUERY = `
   query AiringWeek($start: Int, $end: Int) {
@@ -240,50 +429,4 @@ export async function getAiringDay(day: string, start: number, end: number) {
 
   return data.Page.airingSchedules;
 }
-export async function getAnimeDetailSections(id: number) {
-  "use cache: remote";
-  cacheTag("anime", ANIME_CACHE.detail(id), ANIME_CACHE.detailSections(id));
-  cacheLife({ stale: 300, revalidate: 900, expire: 86400 });
 
-  const data = await anilistFetch<{
-    Media: {
-      characters?: { edges?: CharacterEdge[] | null } | null;
-      staff?: { edges?: StaffEdge[] | null } | null;
-      relations?: { edges?: RelationEdge[] | null } | null;
-      recommendations?: { nodes?: RecommendationNode[] | null } | null;
-      airingSchedule?: { nodes?: AiringScheduleNode[] | null } | null;
-    } | null;
-  }>(
-    `query AnimeDetail($id: Int) {
-      Media(id: $id, type: ANIME) {
-        characters(page: 1, perPage: 12, sort: [ROLE, RELEVANCE]) {
-          ${CHARACTERS_SUBFIELDS}
-        }
-        staff(page: 1, perPage: 10) {
-          ${STAFF_SUBFIELDS}
-        }
-        relations {
-          ${RELATIONS_SUBFIELDS}
-        }
-        recommendations(page: 1, perPage: 8, sort: [RATING_DESC]) {
-          ${RECOMMENDATIONS_SUBFIELDS}
-        }
-        airingSchedule(notYetAired: true, perPage: 25) {
-          ${AIRING_SCHEDULE_SUBFIELDS}
-        }
-      }
-    }`,
-    { id },
-  );
-
-  const m = data.Media;
-  if (!m) return null;
-
-  return {
-    characters: { edges: m.characters?.edges ?? [] },
-    staff: m.staff?.edges ?? [],
-    relations: m.relations?.edges ?? [],
-    recommendations: m.recommendations?.nodes ?? [],
-    airingSchedule: m.airingSchedule?.nodes ?? [],
-  };
-}

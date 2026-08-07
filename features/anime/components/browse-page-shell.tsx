@@ -25,6 +25,7 @@ export function BrowsePageShell({
   children: React.ReactNode;
 }) {
   const config = COLLECTIONS[collection];
+  const genresPromise = getGenres();
 
   return (
     <Crossfade>
@@ -58,7 +59,7 @@ export function BrowsePageShell({
           </div>
           <Suspense fallback={<MobileFilterDrawerFallback />}>
             <ErrorBoundary title="Filters failed to load">
-              <MobileFilterDrawerBoundary collection={collection} />
+              <MobileFilterDrawerBoundary collection={collection} genresPromise={genresPromise} />
             </ErrorBoundary>
           </Suspense>
         </div>
@@ -69,7 +70,7 @@ export function BrowsePageShell({
               <p className="eyebrow mb-5">Filters</p>
               <Suspense fallback={<FilterSidebarSkeleton />}>
                 <ErrorBoundary title="Filters failed to load">
-                  <FilterSidebarBoundary collection={collection} />
+                  <FilterSidebarBoundary collection={collection} genresPromise={genresPromise} />
                 </ErrorBoundary>
               </Suspense>
             </div>
@@ -88,12 +89,24 @@ export function BrowsePageShell({
   );
 }
 
-async function FilterSidebarBoundary({ collection }: { collection: AnimeCollection }) {
-  return <FilterSidebar genresPromise={getGenres()} collection={collection} />;
+async function FilterSidebarBoundary({
+  collection,
+  genresPromise,
+}: {
+  collection: AnimeCollection;
+  genresPromise: Promise<string[]>;
+}) {
+  return <FilterSidebar genresPromise={genresPromise} collection={collection} />;
 }
 
-async function MobileFilterDrawerBoundary({ collection }: { collection: AnimeCollection }) {
-  return <MobileFilterDrawer genresPromise={getGenres()} collection={collection} />;
+async function MobileFilterDrawerBoundary({
+  collection,
+  genresPromise,
+}: {
+  collection: AnimeCollection;
+  genresPromise: Promise<string[]>;
+}) {
+  return <MobileFilterDrawer genresPromise={genresPromise} collection={collection} />;
 }
 
 export function BrowsePageResults({

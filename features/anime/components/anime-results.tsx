@@ -7,8 +7,8 @@ import { MediaGridSkeleton } from "./media-grid";
 
 import type { AnimeCollection, AnimeFilters } from "@/features/anime/types/anime";
 
-const BROWSE_PAGE_SIZE = 12;
-const TOP100_PAGE_SIZE = 20;
+const BROWSE_PAGE_SIZE = 25;
+const TOP100_PAGE_SIZE = 25;
 
 export async function AnimeResults({
   collection,

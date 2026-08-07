@@ -5,14 +5,15 @@ const ENDPOINT = "https://graphql.anilist.co";
 const REQUEST_TIMEOUT_MS = 15_000;
 
 const MAX_CONCURRENT = 4;
-const BUDGET_HOLD_THRESHOLD = 5;
 let activeRequestCount = 0;
 const requestQueue: (() => void)[] = [];
 
-const rateBudget = {
-  remaining: Infinity,
-  resetAt: 0,
-};
+// Sliding window rate limiter (30 requests / 60 seconds)
+const requestLog: number[] = [];
+const WINDOW_MS = 60_000;
+const REAL_LIMIT = 30;
+
+const inFlightMap = new Map<string, Promise<unknown>>();
 
 function wait(ms: number) {
   return new Promise<void>((r) => setTimeout(r, ms));
@@ -22,26 +23,18 @@ function jitter(ms: number) {
   return Math.round(ms * (0.6 + Math.random() * 0.8));
 }
 
-function updateBudget(headers: Headers) {
-  const remainingHeader = headers.get("X-RateLimit-Remaining");
-  const resetHeader = headers.get("X-RateLimit-Reset");
-  const remaining = remainingHeader === null ? NaN : Number(remainingHeader);
-  const reset = resetHeader === null ? NaN : Number(resetHeader);
-
-  if (Number.isFinite(remaining) && remaining >= 0) rateBudget.remaining = remaining;
-  if (Number.isFinite(reset) && reset > 0) rateBudget.resetAt = reset * 1000;
-}
-
-async function respectBudget() {
-  while (rateBudget.remaining <= BUDGET_HOLD_THRESHOLD) {
-    const hold = rateBudget.resetAt - Date.now();
-    if (hold <= 0) {
-      rateBudget.remaining = Infinity;
-      rateBudget.resetAt = 0;
-      break;
-    }
-    await wait(Math.min(hold, 3_000));
+async function respectLocalBudget(): Promise<void> {
+  const now = Date.now();
+  while (requestLog.length > 0 && now - (requestLog[0] ?? 0) > WINDOW_MS) {
+    requestLog.shift();
   }
+  if (requestLog.length >= REAL_LIMIT) {
+    const oldest = requestLog[0] ?? now;
+    const waitMs = WINDOW_MS - (now - oldest) + Math.floor(Math.random() * 50) + 10;
+    await wait(waitMs);
+    return respectLocalBudget();
+  }
+  requestLog.push(Date.now());
 }
 
 function retryAfterSeconds(headers: Headers, fallback: number) {
@@ -89,59 +82,71 @@ export async function anilistFetch<T>(
   variables: Record<string, unknown>,
   retries = 2,
 ): Promise<T> {
-  const attempt = async (remaining: number): Promise<T> => {
-    await respectBudget();
+  const key = `${query}:${JSON.stringify(variables)}`;
+  const existing = inFlightMap.get(key);
+  if (existing) {
+    return existing as Promise<T>;
+  }
 
-    let res: Response;
-    try {
-      res = await track(() =>
-        fetch(ENDPOINT, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({ query, variables }),
-          signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-        }),
-      );
-    } catch (error) {
-      throw toNetworkError(error);
-    }
+  const promise = (async (): Promise<T> => {
+    const attempt = async (remaining: number): Promise<T> => {
+      await respectLocalBudget();
 
-    updateBudget(res.headers);
-
-    if (res.status === 429) {
-      if (remaining <= 0) {
-        const retryAfter = retryAfterSeconds(res.headers, 30);
-        throw new AniListError("AniList rate limit hit", "rate_limited", retryAfter);
+      let res: Response;
+      try {
+        res = await track(() =>
+          fetch(ENDPOINT, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({ query, variables }),
+            signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+          }),
+        );
+      } catch (error) {
+        throw toNetworkError(error);
       }
-      const retryAfter = retryAfterSeconds(res.headers, 5);
-      const backoff = Math.min(jitter(retryAfter * 1000), 10_000);
-      await wait(backoff);
-      return attempt(remaining - 1);
-    }
-    if (res.status === 403) {
-      throw new AniListError("AniList API temporarily unavailable", "outage");
-    }
-    if (!res.ok) {
-      throw new AniListError(`AniList request failed (${res.status})`, "network");
-    }
 
-    let json: { errors?: { message: string }[]; data?: T | null };
-    try {
-      json = (await res.json()) as { errors?: { message: string }[]; data?: T | null };
-    } catch (error) {
-      throw toNetworkError(error);
-    }
-    if (json.errors?.length) {
-      throw new AniListError(json.errors[0].message, "graphql");
-    }
-    if (json.data == null) {
-      throw new AniListError("AniList returned an empty response", "outage");
-    }
-    return json.data;
-  };
+      if (res.status === 429) {
+        if (remaining <= 0) {
+          const retryAfter = retryAfterSeconds(res.headers, 30);
+          throw new AniListError("AniList rate limit hit", "rate_limited", retryAfter);
+        }
+        const retryAfter = retryAfterSeconds(res.headers, 5);
+        const backoff = Math.min(jitter(retryAfter * 1000), 10_000);
+        await wait(backoff);
+        return attempt(remaining - 1);
+      }
+      if (res.status === 403) {
+        throw new AniListError("AniList API temporarily unavailable", "outage");
+      }
+      if (!res.ok) {
+        throw new AniListError(`AniList request failed (${res.status})`, "network");
+      }
 
-  return attempt(retries);
+      let json: { errors?: { message: string }[]; data?: T | null };
+      try {
+        json = (await res.json()) as { errors?: { message: string }[]; data?: T | null };
+      } catch (error) {
+        throw toNetworkError(error);
+      }
+      if (json.errors?.length) {
+        throw new AniListError(json.errors[0].message, "graphql");
+      }
+      if (json.data == null) {
+        throw new AniListError("AniList returned an empty response", "outage");
+      }
+      return json.data;
+    };
+
+    return attempt(retries);
+  })().finally(() => {
+    inFlightMap.delete(key);
+  });
+
+  inFlightMap.set(key, promise);
+  return promise;
 }
+

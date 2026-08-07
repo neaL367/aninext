@@ -57,9 +57,14 @@ function BrowsePaginatorContent({
   const [hasMore, setHasMore] = useState(initialResult.hasMore);
   const [hasItems] = useState(initialResult.hasItems);
   const loadingRef = useRef(false);
+  const lastLoadRef = useRef(0);
 
   function loadMore() {
     if (!hasMore || loadingRef.current) return;
+    const now = Date.now();
+    if (now - lastLoadRef.current < 500) return;
+    lastLoadRef.current = now;
+
     const nextPage = pages.length + 1;
     if (collection === "top100" && nextPage * pageSize > 100) {
       setHasMore(false);

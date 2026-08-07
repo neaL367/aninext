@@ -2,7 +2,7 @@
 
 import { io } from "next/cache";
 
-import { getBrowseCollection } from "@/features/anime/anime-queries";
+import { getBrowseCollection, getTop100Full } from "@/features/anime/anime-queries";
 import { MediaGrid } from "@/features/anime/components/media-grid";
 import { getCurrentSeason } from "@/features/anime/lib/season";
 
@@ -19,6 +19,29 @@ export async function renderBrowsePage(
 ): Promise<BrowsePage> {
   await io();
   const isTop100 = collection === "top100";
+  const hasActiveFilters = Boolean(
+    filters.search ||
+      filters.genre?.length ||
+      filters.format?.length ||
+      filters.status?.length ||
+      filters.country ||
+      filters.season ||
+      filters.year,
+  );
+
+  if (isTop100 && !hasActiveFilters) {
+    const allTop100 = await getTop100Full();
+    const startIndex = (page - 1) * perPage;
+    const visibleItems = allTop100.slice(startIndex, startIndex + perPage);
+    const hasMore = startIndex + perPage < 100 && visibleItems.length === perPage;
+    const rankStart = startIndex + 1;
+    return {
+      hasMore,
+      hasItems: visibleItems.length > 0,
+      node: <MediaGrid items={visibleItems} rankStart={rankStart} priorityFirst={page === 1} />,
+    };
+  }
+
   if (isTop100 && page * perPage > 100) {
     return { hasMore: false, hasItems: false, node: <MediaGrid items={[]} /> };
   }
@@ -41,3 +64,4 @@ export async function renderBrowsePage(
     node: <MediaGrid items={visibleItems} rankStart={rankStart} priorityFirst={page === 1} />,
   };
 }
+
