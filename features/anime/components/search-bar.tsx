@@ -10,7 +10,6 @@ import {
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
-  InputGroupText,
 } from "@/components/ui/input-group";
 
 export function SearchBar() {
@@ -50,15 +49,16 @@ export function SearchBar() {
   }
 
   return (
-    <form role="search" aria-label="Search anime" onSubmit={handleSubmit}>
-      <InputGroup className="h-12 rounded-none border-border-soft bg-surface-1/40 focus-within:border-signal">
+    <form role="search" aria-label="Search anime" onSubmit={handleSubmit} className="w-full">
+      <InputGroup className="h-10 rounded-md border-border-soft bg-surface-1/80 transition-colors focus-within:border-signal">
         <InputGroupAddon align="inline-start" className="pl-3">
-          <SearchIcon className="size-4 text-muted-foreground" aria-hidden="true" />
+          <SearchIcon className="size-3.5 text-muted-foreground" aria-hidden="true" />
         </InputGroupAddon>
         <InputGroupInput
           type="search"
           value={value}
-          placeholder="Search anime titles..."
+          placeholder="Search anime..."
+          className="font-mono text-xs text-foreground placeholder:text-muted-foreground"
           onChange={(event) => {
             const nextValue = event.target.value;
             setValue(nextValue);
@@ -66,7 +66,7 @@ export function SearchBar() {
           }}
           aria-label="Search anime"
         />
-        {value ? (
+        {value && (
           <InputGroupButton
             type="button"
             size="icon-sm"
@@ -74,13 +74,10 @@ export function SearchBar() {
             onClick={handleClear}
             aria-label="Clear search"
             title="Clear search"
+            className="pr-2"
           >
-            <XIcon />
+            <XIcon className="size-3.5" />
           </InputGroupButton>
-        ) : (
-          <InputGroupText className="hidden pr-3 font-mono text-[0.6rem] uppercase tracking-[0.12em] sm:flex">
-            Enter to search
-          </InputGroupText>
         )}
       </InputGroup>
     </form>
@@ -88,5 +85,5 @@ export function SearchBar() {
 }
 
 export function SearchBarFallback() {
-  return <div className="h-12 border border-border-soft bg-surface-1/40" />;
+  return <div className="h-10 rounded-md border border-border-soft bg-surface-1/60 shimmer" />;
 }

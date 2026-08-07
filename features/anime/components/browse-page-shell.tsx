@@ -6,6 +6,7 @@ import { getGenres } from "@/features/anime/anime-queries";
 import { ActiveFilters, ActiveFiltersSkeleton } from "@/features/anime/components/active-filters";
 import { AnimeResults } from "@/features/anime/components/anime-results";
 import { CollectionNav } from "@/features/anime/components/collection-nav";
+import { FilterSidebar, FilterSidebarSkeleton } from "@/features/anime/components/filter-sidebar";
 import { MediaGridSkeleton } from "@/features/anime/components/media-grid";
 import {
   MobileFilterDrawer,
@@ -29,7 +30,7 @@ export function BrowsePageShell({
   return (
     <Crossfade>
       <div className="mx-auto w-full max-w-[1680px] px-4 py-8 sm:px-7 sm:py-12 lg:px-10 space-y-8">
-        <header className="space-y-6 border-b border-border-soft pb-8">
+        <header className="space-y-6">
           <div>
             <p className="eyebrow">
               Collection / {collection === "alltimepopular" ? "all time" : collection}
@@ -42,38 +43,60 @@ export function BrowsePageShell({
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-2">
-            <div className="min-w-0 flex-1">
-              <Suspense fallback={<nav className="h-9 border-b border-border-soft" aria-hidden />}>
-                <CollectionNav />
-              </Suspense>
-            </div>
-            <div className="w-full sm:w-72 shrink-0">
-              <Suspense fallback={<SearchBarFallback />}>
-                <SearchBar />
-              </Suspense>
-            </div>
+          <div className="pt-2">
+            <Suspense fallback={<nav className="h-9 border-b border-border-soft" aria-hidden />}>
+              <CollectionNav />
+            </Suspense>
           </div>
         </header>
 
-        {/* Collapsible Refine & Filters Toolbar */}
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between gap-4">
-            <Suspense fallback={<MobileFilterDrawerFallback />}>
-              <ErrorBoundary title="Filters failed to load">
-                <MobileFilterDrawerBoundary collection={collection} genresPromise={genresPromise} />
-              </ErrorBoundary>
+        <div className="flex items-center gap-3 lg:hidden">
+          <div className="min-w-0 flex-1">
+            <Suspense fallback={<SearchBarFallback />}>
+              <SearchBar />
             </Suspense>
           </div>
+          <Suspense fallback={<MobileFilterDrawerFallback />}>
+            <ErrorBoundary title="Filters failed to load">
+              <MobileFilterDrawerBoundary collection={collection} genresPromise={genresPromise} />
+            </ErrorBoundary>
+          </Suspense>
         </div>
 
-        {/* 100% Viewport Width Results Grid */}
-        <div className="min-w-0">
-          <Crossfade>{children}</Crossfade>
+        {/* Refined Desktop Grid: Sticky Left Filter Sidebar + Main Content */}
+        <div className="grid gap-10 lg:grid-cols-[250px_minmax(0,1fr)] lg:gap-12">
+          <aside className="hidden lg:block">
+            <div className="sticky top-24 space-y-6">
+              <div>
+                <Suspense fallback={<SearchBarFallback />}>
+                  <SearchBar />
+                </Suspense>
+              </div>
+              <Suspense fallback={<FilterSidebarSkeleton />}>
+                <ErrorBoundary title="Filters failed to load">
+                  <FilterSidebarBoundary collection={collection} genresPromise={genresPromise} />
+                </ErrorBoundary>
+              </Suspense>
+            </div>
+          </aside>
+
+          <div className="min-w-0">
+            <Crossfade>{children}</Crossfade>
+          </div>
         </div>
       </div>
     </Crossfade>
   );
+}
+
+async function FilterSidebarBoundary({
+  collection,
+  genresPromise,
+}: {
+  collection: AnimeCollection;
+  genresPromise: Promise<string[]>;
+}) {
+  return <FilterSidebar genresPromise={genresPromise} collection={collection} />;
 }
 
 async function MobileFilterDrawerBoundary({
