@@ -2,7 +2,7 @@ import { RadioIcon } from "lucide-react";
 import { Suspense } from "react";
 
 import { Crossfade } from "@/components/ui/crossfade";
-import { AiringContent, AiringContentSkeleton } from "@/features/anime/components/airing-content";
+import { AiringDayView, AiringDayViewSkeleton } from "@/features/anime/components/airing-day-view";
 
 import type { Metadata } from "next";
 
@@ -22,9 +22,9 @@ export default function AiringPage({ searchParams }: PageProps<"/airing">) {
           </p>
           <h1 className="mt-4 text-4xl font-semibold tracking-[-0.055em] sm:text-6xl">Schedule</h1>
         </header>
-        <Suspense fallback={<AiringContentSkeleton />}>
+        <Suspense fallback={<AiringDayViewSkeleton />}>
           {searchParams.then((sp) => (
-            <AiringContent day={typeof sp.day === "string" ? sp.day : undefined} />
+            <AiringDayView day={typeof sp.day === "string" ? sp.day : undefined} />
           ))}
         </Suspense>
       </div>

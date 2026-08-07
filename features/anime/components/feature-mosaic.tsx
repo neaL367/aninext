@@ -61,3 +61,10 @@ export function FeatureMosaicSkeleton() {
     </section>
   );
 }
+
+import { getBrowseCollection } from "@/features/anime/anime-queries";
+
+export async function PopularSection() {
+  const { items } = await getBrowseCollection("popular", {}, 1, 5);
+  return <FeatureMosaic title="Popular this season" href="/anime/popular" items={items} />;
+}

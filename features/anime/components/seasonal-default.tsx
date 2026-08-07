@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 
 import { getCurrentSeason } from "@/features/anime/lib/season";
 
-export function SeasonalSync({
+export function SeasonalDefault({
   urlSeason,
   urlYear,
   serverSeason,

@@ -13,7 +13,7 @@ import { AnimeStreamingEpisodes, AnimeStreamingEpisodesSkeleton } from "./anime-
 import { AnimeTrailer, AnimeTrailerSkeleton } from "./anime-trailer";
 import { GenreList } from "./genre-pills";
 
-export async function DetailSection({ id }: { id: number }) {
+export async function AnimeDetail({ id }: { id: number }) {
   const detail = await getAnimeDetail(id);
   if (!detail.media) notFound();
 
@@ -94,7 +94,7 @@ function SectionHeading({ eyebrow, title }: { eyebrow: string; title: string }) 
   );
 }
 
-export function DetailSectionSkeleton() {
+export function AnimeDetailSkeleton() {
   return (
     <>
       <AnimeHeroSkeleton />

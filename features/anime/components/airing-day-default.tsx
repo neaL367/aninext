@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 
 import { localDateStr } from "@/features/anime/lib/media-helpers";
 
-export function AiringDaySync({ urlDay, serverDay }: { urlDay: string; serverDay: string }) {
+export function AiringDayDefault({ urlDay, serverDay }: { urlDay: string; serverDay: string }) {
   const router = useRouter();
   const done = useRef(false);
 

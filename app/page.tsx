@@ -3,19 +3,18 @@ import { Suspense } from "react";
 import { Crossfade } from "@/components/ui/crossfade";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { AiringHomeSectionSkeleton } from "@/features/anime/components/airing-home-section";
-import { FeatureMosaicSkeleton } from "@/features/anime/components/feature-mosaic";
+import { AiringSection } from "@/features/anime/components/airing-section";
+import { FeatureMosaicSkeleton, PopularSection } from "@/features/anime/components/feature-mosaic";
 import { GenreExplorer, GenrePillsSkeleton } from "@/features/anime/components/genre-pills";
 import { HeroCarouselSkeleton } from "@/features/anime/components/hero-carousel";
+import { HeroSection } from "@/features/anime/components/hero-section";
 import {
-  HeroSection,
-  TrendingSection,
-  PopularSection,
-  AiringSection,
-  Top100Section,
-  UpcomingSection,
   AllTimePopularSection,
-} from "@/features/anime/components/home-sections";
-import { SectionRowSkeleton } from "@/features/anime/components/section-row";
+  SectionRowSkeleton,
+  Top100Section,
+  TrendingSection,
+  UpcomingSection,
+} from "@/features/anime/components/section-row";
 
 import type { Metadata } from "next";
 

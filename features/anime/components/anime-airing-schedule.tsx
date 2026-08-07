@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
-import { AnimeAiringScheduleClient } from "./anime-airing-schedule-client";
+import { AnimeAiringScheduleList } from "./anime-airing-schedule-list";
 
 import type { AiringScheduleNode } from "@/features/anime/types/anime";
 
@@ -12,7 +12,7 @@ export function AnimeAiringSchedule({ nodes }: { nodes: AiringScheduleNode[] }) 
       <p className="eyebrow text-accent">Schedule</p>
       <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">Next episodes</h2>
       <div className="mt-5">
-        <AnimeAiringScheduleClient nodes={nodes} />
+        <AnimeAiringScheduleList nodes={nodes} />
       </div>
     </>
   );

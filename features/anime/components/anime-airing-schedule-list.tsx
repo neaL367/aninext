@@ -4,7 +4,7 @@ import { fromAiringTimestamp } from "@/features/anime/lib/media-helpers";
 
 import type { AiringScheduleNode } from "@/features/anime/types/anime";
 
-export function AnimeAiringScheduleClient({ nodes }: { nodes: AiringScheduleNode[] }) {
+export function AnimeAiringScheduleList({ nodes }: { nodes: AiringScheduleNode[] }) {
   if (nodes.length === 0) {
     return null;
   }

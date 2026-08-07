@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { getCurrentSeason } from "@/features/anime/lib/season";
 
 import { BrowsePageResults } from "./browse-page-shell";
-import { SeasonalSync } from "./seasonal-sync";
+import { SeasonalDefault } from "./seasonal-default";
 
 import type { AnimeFilters } from "@/features/anime/types/anime";
 
@@ -34,7 +34,7 @@ export async function SeasonalResults({
 
   return (
     <>
-      <SeasonalSync
+      <SeasonalDefault
         urlSeason={season}
         urlYear={year}
         serverSeason={current.season}

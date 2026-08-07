@@ -6,10 +6,10 @@ import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { localDateStr } from "@/features/anime/lib/media-helpers";
 
 import { AiringCalendar, AiringCalendarSkeleton } from "./airing-calendar";
-import { AiringDaySync } from "./airing-day-sync";
+import { AiringDayDefault } from "./airing-day-default";
 import { AiringTimeline, AiringTimelineSkeleton } from "./airing-timeline";
 
-export async function AiringContent({ day }: { day?: string }) {
+export async function AiringDayView({ day }: { day?: string }) {
   await io();
 
   if (!day) {
@@ -20,7 +20,7 @@ export async function AiringContent({ day }: { day?: string }) {
 
   return (
     <>
-      <AiringDaySync urlDay={day} serverDay={serverDay} />
+      <AiringDayDefault urlDay={day} serverDay={serverDay} />
       <Suspense fallback={<AiringCalendarSkeleton />}>
         <AiringCalendar currentDay={day} />
       </Suspense>
@@ -34,7 +34,7 @@ export async function AiringContent({ day }: { day?: string }) {
   );
 }
 
-export function AiringContentSkeleton() {
+export function AiringDayViewSkeleton() {
   return (
     <>
       <AiringCalendarSkeleton />
