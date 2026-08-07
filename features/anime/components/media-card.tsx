@@ -63,19 +63,17 @@ export function MediaCard({
     >
       <div
         className={cn(
-          "relative overflow-hidden border border-border-soft bg-surface-1 transition-colors duration-300 group-hover:border-signal/60 motion-reduce:transform-none isolate transform-gpu",
+          "relative overflow-hidden rounded-md border border-border-soft bg-surface-2 transition-colors duration-300 group-hover:border-signal/60 motion-reduce:transform-none isolate transform-gpu",
           size === "featured" ? "aspect-[16/9]" : "aspect-[2/3]",
         )}
-        style={
-          color
-            ? cover
-              ? { backgroundColor: color }
-              : { background: `linear-gradient(135deg, ${color}55, var(--surface-2) 72%)` }
-            : undefined
-        }
+        style={{
+          background: color
+            ? `linear-gradient(135deg, ${color}22, var(--surface-2) 75%)`
+            : "var(--surface-2)",
+        }}
       >
         {coverImage ? (
-          viewTransition ? (
+          viewTransition && (priority || rank !== undefined && rank <= 6) ? (
             <ViewTransition name={`anime-cover-${media.id}`} share="morph" default="none">
               {coverImage}
             </ViewTransition>
@@ -143,7 +141,7 @@ export function MediaCardSkeleton({ size = "default" }: { size?: "default" | "fe
     <div className={cn("min-w-0", size === "featured" && "md:col-span-2")}>
       <div
         className={cn(
-          "shimmer border border-border-soft",
+          "shimmer rounded-md border border-border-soft",
           size === "featured" ? "aspect-[16/9]" : "aspect-[2/3]",
         )}
       />
