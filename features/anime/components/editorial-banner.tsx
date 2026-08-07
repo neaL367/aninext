@@ -42,8 +42,8 @@ export function EditorialBanner({ item }: { item: Media }) {
 
           <div className="relative z-10 p-8 sm:p-12 max-w-2xl space-y-4 flex flex-col justify-center h-full min-h-[320px] sm:min-h-[380px]">
             <div className="flex items-center gap-3 font-mono text-xs">
-              <span className="bg-signal px-2.5 py-0.5 font-bold uppercase tracking-widest text-white">
-                Rockstar Masterpiece Break
+              <span className="bg-foreground text-background px-2.5 py-0.5 font-bold uppercase tracking-widest">
+                Masterpiece Feature
               </span>
               {item.averageScore && (
                 <span className="flex items-center gap-1 font-bold text-foreground">

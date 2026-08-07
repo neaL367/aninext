@@ -65,11 +65,11 @@ export function TrendingShowcase({ items }: { items: Media[] }) {
 
               <div className="pointer-events-none absolute inset-0 p-6 sm:p-8 flex flex-col justify-end space-y-3 z-10">
                 <div className="flex items-center gap-2 font-mono text-xs pointer-events-auto">
-                  <span className="bg-signal px-2 py-0.5 font-bold uppercase tracking-wider text-white">
+                  <span className="bg-foreground text-background px-2 py-0.5 font-bold uppercase tracking-wider">
                     #01 Trending
                   </span>
                   {heroItem.status === "RELEASING" && (
-                    <span className="bg-live-badge px-2 py-0.5 font-semibold text-white uppercase tracking-wider text-[0.65rem]">
+                    <span className="bg-destructive/15 border border-destructive/30 px-2 py-0.5 font-semibold text-destructive uppercase tracking-wider text-[0.65rem]">
                       Airing Now
                     </span>
                   )}
@@ -123,12 +123,12 @@ export function TrendingShowcase({ items }: { items: Media[] }) {
                   )}
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
 
-                  <span className="pointer-events-none absolute top-2 left-2 bg-black/60 px-1.5 py-0.5 font-mono text-[0.65rem] font-bold text-white backdrop-blur-sm border border-white/20">
+                  <span className="pointer-events-none absolute top-2 left-2 bg-background/80 px-1.5 py-0.5 font-mono text-[0.65rem] font-bold text-foreground backdrop-blur-md border border-border-soft">
                     #{String(idx + 2).padStart(2, "0")}
                   </span>
 
                   {item.averageScore && (
-                    <span className="pointer-events-none absolute top-2 right-2 bg-black/60 px-1.5 py-0.5 font-mono text-[0.65rem] font-bold text-signal backdrop-blur-sm">
+                    <span className="pointer-events-none absolute top-2 right-2 bg-background/80 px-1.5 py-0.5 font-mono text-[0.65rem] font-bold text-signal backdrop-blur-md border border-border-soft">
                       {(item.averageScore / 10).toFixed(1)}
                     </span>
                   )}

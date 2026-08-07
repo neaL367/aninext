@@ -44,41 +44,41 @@
 }
 
 .dark {
-  --background: oklch(0.04 0 0);
-  --foreground: oklch(0.96 0.002 285);
-  --surface-1: oklch(0.065 0.002 285);
-  --surface-2: oklch(0.1 0.004 285);
-  --surface-3: oklch(0.15 0.006 285);
-  --card: oklch(0.075 0.003 285);
-  --card-foreground: oklch(0.96 0.002 285);
-  --card-hover: oklch(0.11 0.005 285);
-  --popover: oklch(0.1 0.004 285);
-  --popover-foreground: oklch(0.96 0.002 285);
-  --primary: oklch(0.96 0.002 285);
-  --primary-foreground: oklch(0.04 0 0);
-  --secondary: oklch(0.14 0.006 285);
-  --secondary-foreground: oklch(0.9 0.002 285);
-  --muted: oklch(0.14 0.006 285);
-  --muted-foreground: oklch(0.62 0.008 285);
-  --accent: #3291ff;
-  --accent-foreground: #000000;
-  --destructive: #ff4444;
-  --destructive-foreground: #000000;
-  --border: oklch(0.96 0.002 285 / 0.14);
-  --border-soft: oklch(0.96 0.002 285 / 0.08);
-  --input: oklch(0.96 0.002 285 / 0.16);
-  --ring: color-mix(in srgb, #3291ff 50%, transparent);
-  --glow: color-mix(in srgb, #3291ff 12%, transparent);
-  --hero-glow: color-mix(in srgb, #3291ff 16%, transparent);
-  --section-accent: #3291ff;
-  --signal: #3291ff;
-  --signal-strong: #0070f3;
-  --signal-soft: color-mix(in srgb, #3291ff 10%, transparent);
-  --score-high: #34d399;
-  --score-mid: #fbbf24;
-  --score-low: oklch(0.64 0.025 78);
-  --live-badge: #f87171;
-  --paper: oklch(0.93 0.002 285);
+  --background: oklch(0 0 0);
+  --foreground: oklch(0.98 0 0);
+  --surface-1: oklch(0.06 0 0);
+  --surface-2: oklch(0.1 0 0);
+  --surface-3: oklch(0.15 0 0);
+  --card: oklch(0.06 0 0);
+  --card-foreground: oklch(0.98 0 0);
+  --card-hover: oklch(0.11 0 0);
+  --popover: oklch(0.06 0 0);
+  --popover-foreground: oklch(0.98 0 0);
+  --primary: oklch(0.98 0 0);
+  --primary-foreground: oklch(0 0 0);
+  --secondary: oklch(0.12 0 0);
+  --secondary-foreground: oklch(0.9 0 0);
+  --muted: oklch(0.12 0 0);
+  --muted-foreground: oklch(0.6 0 0);
+  --accent: #0070f3;
+  --accent-foreground: #ffffff;
+  --destructive: #ee0000;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.14);
+  --border-soft: rgba(255, 255, 255, 0.09);
+  --input: rgba(255, 255, 255, 0.14);
+  --ring: color-mix(in srgb, #0070f3 50%, transparent);
+  --glow: color-mix(in srgb, #0070f3 12%, transparent);
+  --hero-glow: color-mix(in srgb, #0070f3 16%, transparent);
+  --section-accent: #0070f3;
+  --signal: #0070f3;
+  --signal-strong: #0056cc;
+  --signal-soft: color-mix(in srgb, #0070f3 10%, transparent);
+  --score-high: #0070f3;
+  --score-mid: #f59e0b;
+  --score-low: oklch(0.64 0 0);
+  --live-badge: #ee0000;
+  --paper: oklch(0.95 0 0);
 }
 
 @theme inline {

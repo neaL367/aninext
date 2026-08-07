@@ -29,9 +29,9 @@ export function Top100Podium({
   const remaining = items.slice(3, 11);
 
   const podiumColors = [
-    { border: "border-amber-400/60", badge: "bg-amber-400 text-black", label: "#01" },
-    { border: "border-slate-300/60", badge: "bg-slate-300 text-black", label: "#02" },
-    { border: "border-amber-700/60", badge: "bg-amber-700 text-white", label: "#03" },
+    { border: "border-foreground/40", badge: "bg-foreground text-background", label: "#01" },
+    { border: "border-border-soft", badge: "bg-surface-2 text-foreground border border-border-soft", label: "#02" },
+    { border: "border-border-soft", badge: "bg-surface-2 text-foreground border border-border-soft", label: "#03" },
   ];
 
   return (
