@@ -181,11 +181,23 @@ export function HeroCarousel({ items }: { items: Media[] }) {
         </div>
       </div>
 
-      {/* Slide Progress Indicators & Controls */}
-      <div className="absolute bottom-5 sm:bottom-6 inset-x-0 z-30">
-        <div className="mx-auto w-full max-w-[1680px] px-4 sm:px-7 lg:px-10 flex items-center justify-between gap-6">
-          {/* Expanding Progress Pills */}
-          <div className="flex items-center gap-2">
+      {/* Unified Glassmorphic Controls Capsule */}
+      <div className="absolute bottom-5 sm:bottom-7 right-4 sm:right-7 lg:right-10 z-30">
+        <div className="flex items-center gap-3 rounded-full border border-border-soft bg-background/90 p-2 backdrop-blur-xl shadow-2xl isolate">
+          {/* Play / Pause Toggle Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsPlaying((p) => !p);
+            }}
+            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-signal text-white hover:bg-signal-strong transition-all hover:scale-105 active:scale-95 shadow-md"
+            aria-label={isPlaying ? "Pause slideshow" : "Play slideshow"}
+          >
+            {isPlaying ? <PauseIcon className="size-4 fill-current" /> : <PlayIcon className="size-4 fill-current ml-0.5" />}
+          </button>
+
+          {/* Full Rounded Circular Slide Buttons */}
+          <div className="flex items-center gap-1.5">
             {items.map((item, index) => {
               const isActive = index === current;
               return (
@@ -195,37 +207,33 @@ export function HeroCarousel({ items }: { items: Media[] }) {
                     e.stopPropagation();
                     goTo(index);
                   }}
-                  className={`group relative h-1.5 rounded-full overflow-hidden transition-all duration-500 ${
-                    isActive ? "w-14 bg-foreground/30" : "w-3 bg-foreground/20 hover:bg-foreground/40"
+                  className={`group relative flex size-7 sm:size-8 items-center justify-center rounded-full font-mono text-xs font-semibold transition-all duration-300 ${
+                    isActive
+                      ? "border border-signal text-signal bg-signal/15 shadow-sm scale-110"
+                      : "border border-border-soft text-muted-foreground bg-surface-1/60 hover:border-foreground/40 hover:text-foreground"
                   }`}
                   aria-label={`Go to slide ${index + 1}`}
                 >
+                  {/* Circular progress fill for active slide */}
                   {isActive && (
-                    <div
-                      className="absolute inset-y-0 left-0 bg-signal rounded-full"
-                      style={{ width: `${progress}%` }}
+                    <span
+                      className="absolute inset-0 rounded-full border-2 border-signal transition-all opacity-80"
+                      style={{
+                        clipPath: `inset(0 ${100 - progress}% 0 0)`,
+                      }}
                     />
                   )}
+                  <span className="relative z-10">{String(index + 1).padStart(2, "0")}</span>
                 </button>
               );
             })}
           </div>
 
-          {/* Controls: Play/Pause Toggle & Counter */}
-          <div className="flex items-center gap-3 text-muted-foreground font-mono text-xs tracking-widest">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsPlaying((p) => !p);
-              }}
-              className="flex size-7 items-center justify-center rounded-full border border-border-soft bg-surface-1/80 backdrop-blur-sm hover:text-foreground transition-colors"
-              aria-label={isPlaying ? "Pause slideshow" : "Play slideshow"}
-            >
-              {isPlaying ? <PauseIcon className="size-3" /> : <PlayIcon className="size-3 fill-current" />}
-            </button>
-            <span className="tabular-nums">
-              {String(current + 1).padStart(2, "0")} / {String(len).padStart(2, "0")}
-            </span>
+          {/* Slide Counter */}
+          <div className="pl-2 border-l border-border-soft pr-2 font-mono text-xs font-bold text-foreground tracking-wider tabular-nums">
+            <span className="text-signal">{String(current + 1).padStart(2, "0")}</span>
+            <span className="text-muted-foreground/60 mx-1">/</span>
+            <span className="text-muted-foreground">{String(len).padStart(2, "0")}</span>
           </div>
         </div>
       </div>
