@@ -1,6 +1,9 @@
+"use client";
+
 import { CalendarIcon, ExternalLinkIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState, useTransition } from "react";
 
 import {
   Empty,
@@ -11,7 +14,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { ImageWithLoading } from "@/components/ui/image-with-loading";
-import { getAiringWeek } from "@/features/anime/anime-queries";
+import { getAiringDayData } from "@/features/anime/anime-actions";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 import {
   formatFormat,
@@ -23,28 +26,37 @@ import {
 import type { AiringScheduleNode } from "@/features/anime/types/anime";
 import type { Route } from "next";
 
-function currentBlockName(): string {
-  const hour = new Date().getHours();
-  if (hour >= 6 && hour < 12) return "Morning";
-  if (hour >= 12 && hour < 18) return "Afternoon";
-  if (hour >= 18 && hour < 24) return "Evening";
-  return "Night";
+export function AiringTimeline({ day }: { day: string }) {
+  const [state, setState] = useState<{ day: string; schedules: AiringScheduleNode[] } | null>(null);
+  const [error, setError] = useState<unknown>(null);
+  const [, startTransition] = useTransition();
+
+  useEffect(() => {
+    let cancelled = false;
+    const start = Math.floor(new Date(`${day}T00:00:00`).getTime() / 1000);
+    const end = start + 86400;
+
+    startTransition(async () => {
+      try {
+        const schedules = await getAiringDayData(day, start, end);
+        if (!cancelled) setState({ day, schedules });
+      } catch (err) {
+        if (!cancelled) setError(err);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [day]);
+
+  if (error) throw error;
+  if (!state || state.day !== day) return <AiringTimelineSkeleton />;
+
+  return <AiringTimelineList day={day} schedules={state.schedules} />;
 }
 
-function getFaviconUrl(url: string): string {
-  try {
-    const domain = new URL(url).hostname;
-    return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
-  } catch {
-    return "";
-  }
-}
-
-export async function AiringTimeline({ day }: { day: string }) {
-  const date = new Date(day);
-  const start = Math.floor(date.setHours(0, 0, 0, 0) / 1000);
-  const schedules = await getAiringWeek(start, start + 86400);
-
+function AiringTimelineList({ day, schedules }: { day: string; schedules: AiringScheduleNode[] }) {
   if (schedules.length === 0)
     return (
       <Empty>
@@ -62,8 +74,7 @@ export async function AiringTimeline({ day }: { day: string }) {
 
   const grouped = groupByTimeBlock(schedules);
   const now = Date.now() / 1000;
-  const today = localDateStr();
-  const isToday = day === today;
+  const isToday = day === localDateStr();
   const activeBlock = isToday ? currentBlockName() : null;
 
   return (
@@ -219,6 +230,23 @@ export async function AiringTimeline({ day }: { day: string }) {
       })}
     </div>
   );
+}
+
+function currentBlockName(): string {
+  const hour = new Date().getHours();
+  if (hour >= 6 && hour < 12) return "Morning";
+  if (hour >= 12 && hour < 18) return "Afternoon";
+  if (hour >= 18 && hour < 24) return "Evening";
+  return "Night";
+}
+
+function getFaviconUrl(url: string): string {
+  try {
+    const domain = new URL(url).hostname;
+    return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+  } catch {
+    return "";
+  }
 }
 
 function groupByTimeBlock(schedules: AiringScheduleNode[]): Record<string, AiringScheduleNode[]> {

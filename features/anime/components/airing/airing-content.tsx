@@ -6,6 +6,7 @@ import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { localDateStr } from "@/features/anime/lib/media-helpers";
 
 import { AiringCalendar, AiringCalendarSkeleton } from "./airing-calendar";
+import { AiringDaySync } from "./airing-day-sync";
 import { AiringTimeline, AiringTimelineSkeleton } from "./airing-timeline";
 
 export async function AiringContent({ day }: { day?: string }) {
@@ -15,17 +16,18 @@ export async function AiringContent({ day }: { day?: string }) {
     redirect(`/airing?day=${localDateStr()}`);
   }
 
+  const serverDay = localDateStr();
+
   return (
     <>
+      <AiringDaySync urlDay={day} serverDay={serverDay} />
       <Suspense fallback={<AiringCalendarSkeleton />}>
         <AiringCalendar currentDay={day} />
       </Suspense>
 
       <div className="mt-10">
         <ErrorBoundary title="Schedule failed to load">
-          <Suspense fallback={<AiringTimelineSkeleton />}>
-            <AiringTimeline day={day} />
-          </Suspense>
+          <AiringTimeline day={day} />
         </ErrorBoundary>
       </div>
     </>

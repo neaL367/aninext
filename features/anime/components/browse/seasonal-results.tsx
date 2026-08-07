@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getCurrentSeason } from "@/features/anime/lib/season";
 
 import { BrowsePageResults } from "./browse-page-shell";
+import { SeasonalSync } from "./seasonal-sync";
 
 import type { AnimeFilters } from "@/features/anime/types/anime";
 
@@ -18,8 +19,9 @@ export async function SeasonalResults({
 }) {
   await io();
 
+  const current = getCurrentSeason();
+
   if (!season || !year) {
-    const current = getCurrentSeason();
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(filters)) {
       if (Array.isArray(value)) value.forEach((item) => params.append(key, item));
@@ -30,5 +32,15 @@ export async function SeasonalResults({
     redirect(`/anime/seasonal?${params.toString()}`);
   }
 
-  return <BrowsePageResults collection="seasonal" filters={filters} />;
+  return (
+    <>
+      <SeasonalSync
+        urlSeason={season}
+        urlYear={year}
+        serverSeason={current.season}
+        serverYear={current.seasonYear}
+      />
+      <BrowsePageResults collection="seasonal" filters={filters} />
+    </>
+  );
 }

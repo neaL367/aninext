@@ -1,6 +1,6 @@
 "use server";
 
-import { getBrowseCollection } from "@/features/anime/anime-queries";
+import { getAiringDay, getBrowseCollection } from "@/features/anime/anime-queries";
 import { MediaGrid } from "@/features/anime/components/browse/media-grid";
 
 import type { AnimeCollection, AnimeFilters } from "@/features/anime/types/anime";
@@ -23,4 +23,8 @@ export async function renderBrowsePage(
     hasItems: items.length > 0,
     node: <MediaGrid items={items} rankStart={rankStart} />,
   };
+}
+
+export async function getAiringDayData(day: string, start: number, end: number) {
+  return getAiringDay(day, start, end);
 }

@@ -225,7 +225,19 @@ const AIRING_WEEK_QUERY = `
 export async function getAiringWeek(start: number, end: number) {
   "use cache";
   const date = localDateStr(fromAiringTimestamp(start));
-  cacheTag("anime", ANIME_CACHE.airingDay(date));
+  cacheTag("anime", ANIME_CACHE.airingDay(date, start));
+  cacheLife({ stale: 60, revalidate: 300, expire: 3600 });
+
+  const data = await anilistFetch<{
+    Page: { airingSchedules: AiringScheduleNode[] };
+  }>(AIRING_WEEK_QUERY, { start, end });
+
+  return data.Page.airingSchedules;
+}
+
+export async function getAiringDay(day: string, start: number, end: number) {
+  "use cache";
+  cacheTag("anime", ANIME_CACHE.airingDay(day, start));
   cacheLife({ stale: 60, revalidate: 300, expire: 3600 });
 
   const data = await anilistFetch<{

@@ -3,6 +3,7 @@ export const ANIME_CACHE = {
   browseCollection: (collection: string, hash: string) =>
     `anime:browse:${collection}:${hash}` as const,
   detail: (id: number) => `anime:detail:${id}` as const,
-  airingDay: (date: string) => `anime:airing:day:${date}` as const,
+  airingDay: (date: string, windowStart: number) =>
+    `anime:airing:day:${date}:${windowStart}` as const,
   airingWeek: (monday: string) => `anime:airing:week:${monday}` as const,
 } as const;
