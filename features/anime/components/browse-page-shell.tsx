@@ -6,7 +6,6 @@ import { getGenres } from "@/features/anime/anime-queries";
 import { ActiveFilters, ActiveFiltersSkeleton } from "@/features/anime/components/active-filters";
 import { AnimeResults } from "@/features/anime/components/anime-results";
 import { CollectionNav } from "@/features/anime/components/collection-nav";
-import { FilterSidebar, FilterSidebarSkeleton } from "@/features/anime/components/filter-sidebar";
 import { MediaGridSkeleton } from "@/features/anime/components/media-grid";
 import {
   MobileFilterDrawer,
@@ -29,74 +28,52 @@ export function BrowsePageShell({
 
   return (
     <Crossfade>
-      <div className="mx-auto w-full max-w-[1680px] px-4 py-8 sm:px-7 sm:py-12 lg:px-10">
-        <header>
-          <div className="flex flex-col justify-between gap-6 border-b border-border-soft pb-8 sm:flex-row sm:items-end">
-            <div>
-              <p className="eyebrow">
-                Collection / {collection === "alltimepopular" ? "all time" : collection}
-              </p>
-              <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-[-0.055em] sm:text-6xl">
-                {config.pageHeading}
-              </h1>
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-muted-foreground">
-                {config.pageDescription}
-              </p>
-            </div>
+      <div className="mx-auto w-full max-w-[1680px] px-4 py-8 sm:px-7 sm:py-12 lg:px-10 space-y-8">
+        <header className="space-y-6 border-b border-border-soft pb-8">
+          <div>
+            <p className="eyebrow">
+              Collection / {collection === "alltimepopular" ? "all time" : collection}
+            </p>
+            <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-[-0.055em] text-foreground sm:text-6xl">
+              {config.pageHeading}
+            </h1>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+              {config.pageDescription}
+            </p>
           </div>
-          <div className="mt-6">
-            <Suspense fallback={<nav className="h-9 border-b border-border-soft" aria-hidden />}>
-              <CollectionNav />
-            </Suspense>
-          </div>
-        </header>
 
-        <div className="mt-8 flex items-center gap-3 lg:hidden">
-          <div className="min-w-0 flex-1">
-            <Suspense fallback={<SearchBarFallback />}>
-              <SearchBar />
-            </Suspense>
-          </div>
-          <Suspense fallback={<MobileFilterDrawerFallback />}>
-            <ErrorBoundary title="Filters failed to load">
-              <MobileFilterDrawerBoundary collection={collection} genresPromise={genresPromise} />
-            </ErrorBoundary>
-          </Suspense>
-        </div>
-
-        <div className="mt-10 grid gap-10 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-12">
-          <aside className="hidden lg:block">
-            <div className="sticky top-24">
-              <p className="eyebrow mb-5">Filters</p>
-              <Suspense fallback={<FilterSidebarSkeleton />}>
-                <ErrorBoundary title="Filters failed to load">
-                  <FilterSidebarBoundary collection={collection} genresPromise={genresPromise} />
-                </ErrorBoundary>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-2">
+            <div className="min-w-0 flex-1">
+              <Suspense fallback={<nav className="h-9 border-b border-border-soft" aria-hidden />}>
+                <CollectionNav />
               </Suspense>
             </div>
-          </aside>
-          <div className="min-w-0">
-            <div className="mb-6 hidden lg:block">
+            <div className="w-full sm:w-72 shrink-0">
               <Suspense fallback={<SearchBarFallback />}>
                 <SearchBar />
               </Suspense>
             </div>
-            <Crossfade>{children}</Crossfade>
           </div>
+        </header>
+
+        {/* Collapsible Refine & Filters Toolbar */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between gap-4">
+            <Suspense fallback={<MobileFilterDrawerFallback />}>
+              <ErrorBoundary title="Filters failed to load">
+                <MobileFilterDrawerBoundary collection={collection} genresPromise={genresPromise} />
+              </ErrorBoundary>
+            </Suspense>
+          </div>
+        </div>
+
+        {/* 100% Viewport Width Results Grid */}
+        <div className="min-w-0">
+          <Crossfade>{children}</Crossfade>
         </div>
       </div>
     </Crossfade>
   );
-}
-
-async function FilterSidebarBoundary({
-  collection,
-  genresPromise,
-}: {
-  collection: AnimeCollection;
-  genresPromise: Promise<string[]>;
-}) {
-  return <FilterSidebar genresPromise={genresPromise} collection={collection} />;
 }
 
 async function MobileFilterDrawerBoundary({

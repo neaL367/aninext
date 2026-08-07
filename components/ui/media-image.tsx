@@ -10,6 +10,7 @@ export function MediaImage({
   className,
   priority,
   loading,
+  unoptimized,
 }: {
   src: string;
   alt: string;
@@ -18,6 +19,7 @@ export function MediaImage({
   className?: string;
   priority?: boolean;
   loading?: "lazy" | "eager";
+  unoptimized?: boolean;
 }) {
   return (
     <Image
@@ -27,6 +29,7 @@ export function MediaImage({
       sizes={sizes}
       priority={priority}
       loading={loading ?? (priority ? "eager" : undefined)}
+      unoptimized={unoptimized}
       className={cn(className)}
     />
   );

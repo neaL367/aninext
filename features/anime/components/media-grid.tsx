@@ -14,18 +14,22 @@ export function MediaGrid({
 }) {
   return (
     <>
-      {items.map((item, i) => (
-        <div key={item.id} role="listitem">
-          <AnimePreviewCard media={item}>
-            <MediaCard
-              media={item}
-              rank={rankStart !== undefined ? rankStart + i : undefined}
-              viewTransition
-              priority={priorityFirst && i === 0}
-            />
-          </AnimePreviewCard>
-        </div>
-      ))}
+      {items.map((item, i) => {
+        const isFeatured = (i === 0 || i === 12) && !rankStart;
+        return (
+          <div key={item.id} role="listitem" className={isFeatured ? "col-span-2 md:col-span-2" : undefined}>
+            <AnimePreviewCard media={item}>
+              <MediaCard
+                media={item}
+                size={isFeatured ? "featured" : "default"}
+                rank={rankStart !== undefined ? rankStart + i : undefined}
+                viewTransition
+                priority={priorityFirst && i === 0}
+              />
+            </AnimePreviewCard>
+          </div>
+        );
+      })}
     </>
   );
 }
