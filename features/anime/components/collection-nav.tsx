@@ -2,6 +2,7 @@
 
 import { ArrowUpRightIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { ViewTransition } from "react";
 
 import { HoverPrefetchLink } from "@/components/ui/hover-prefetch-link";
 import { COLLECTION_NAV_ITEMS } from "@/features/anime/lib/collection-config";
@@ -31,7 +32,11 @@ export function CollectionNav() {
             )}
           >
             {label}
-            {isActive && <span className="absolute inset-x-3 -bottom-px h-px bg-signal" />}
+            {isActive && (
+              <ViewTransition name="collection-nav-active" share="morph" default="none">
+                <span className="absolute inset-x-3 -bottom-px h-px bg-signal" />
+              </ViewTransition>
+            )}
             <ArrowUpRightIcon className="size-3 opacity-0 transition-opacity group-hover:opacity-100" />
           </HoverPrefetchLink>
         );
