@@ -196,8 +196,8 @@ export function HeroCarousel({ items }: { items: Media[] }) {
             {isPlaying ? <PauseIcon className="size-4 fill-current" /> : <PlayIcon className="size-4 fill-current ml-0.5" />}
           </button>
 
-          {/* Full Rounded Circular Slide Buttons */}
-          <div className="flex items-center gap-1.5">
+          {/* Slide Indicators: Full Rounded Circles for Inactive, Progress Pill for Active */}
+          <div className="flex items-center gap-2 px-1">
             {items.map((item, index) => {
               const isActive = index === current;
               return (
@@ -207,23 +207,19 @@ export function HeroCarousel({ items }: { items: Media[] }) {
                     e.stopPropagation();
                     goTo(index);
                   }}
-                  className={`group relative flex size-7 sm:size-8 items-center justify-center rounded-full font-mono text-xs font-semibold transition-all duration-300 ${
+                  className={`group relative transition-all duration-300 ${
                     isActive
-                      ? "border border-signal text-signal bg-signal/15 shadow-sm scale-110"
-                      : "border border-border-soft text-muted-foreground bg-surface-1/60 hover:border-foreground/40 hover:text-foreground"
+                      ? "w-12 sm:w-14 h-3 rounded-full bg-foreground/20 overflow-hidden"
+                      : "size-3 rounded-full bg-foreground/30 hover:bg-foreground/60"
                   }`}
                   aria-label={`Go to slide ${index + 1}`}
                 >
-                  {/* Circular progress fill for active slide */}
                   {isActive && (
-                    <span
-                      className="absolute inset-0 rounded-full border-2 border-signal transition-all opacity-80"
-                      style={{
-                        clipPath: `inset(0 ${100 - progress}% 0 0)`,
-                      }}
+                    <div
+                      className="absolute inset-y-0 left-0 bg-signal rounded-full"
+                      style={{ width: `${progress}%` }}
                     />
                   )}
-                  <span className="relative z-10">{String(index + 1).padStart(2, "0")}</span>
                 </button>
               );
             })}
