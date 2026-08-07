@@ -181,55 +181,57 @@ export function HeroCarousel({ items }: { items: Media[] }) {
         </div>
       </div>
 
-      {/* Unified Glassmorphic Controls Capsule */}
-      <div className="absolute bottom-5 sm:bottom-7 right-4 sm:right-7 lg:right-10 z-30">
-        <div className="flex items-center gap-3 rounded-full border border-border-soft bg-background/90 p-2 backdrop-blur-xl shadow-2xl isolate">
-          {/* Play / Pause Toggle Button */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsPlaying((p) => !p);
-            }}
-            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-signal text-white hover:bg-signal-strong transition-all hover:scale-105 active:scale-95 shadow-md"
-            aria-label={isPlaying ? "Pause slideshow" : "Play slideshow"}
-          >
-            {isPlaying ? <PauseIcon className="size-4 fill-current" /> : <PlayIcon className="size-4 fill-current ml-0.5" />}
-          </button>
+      {/* Carousel Controls Aligned with Page Layout */}
+      <div className="absolute bottom-5 sm:bottom-7 inset-x-0 z-30 pointer-events-none">
+        <div className="mx-auto flex w-full max-w-[1680px] items-center justify-end px-4 sm:px-7 lg:px-10">
+          <div className="pointer-events-auto flex items-center gap-3.5">
+            {/* Play / Pause Toggle Button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsPlaying((p) => !p);
+              }}
+              className="flex size-8 shrink-0 items-center justify-center rounded-full bg-signal text-white hover:bg-signal-strong transition-all hover:scale-105 active:scale-95 shadow-md"
+              aria-label={isPlaying ? "Pause slideshow" : "Play slideshow"}
+            >
+              {isPlaying ? <PauseIcon className="size-3.5 fill-current" /> : <PlayIcon className="size-3.5 fill-current ml-0.5" />}
+            </button>
 
-          {/* Slide Indicators: Full Rounded Circles for Inactive, Progress Pill for Active */}
-          <div className="flex items-center gap-2 px-1">
-            {items.map((item, index) => {
-              const isActive = index === current;
-              return (
-                <button
-                  key={item.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    goTo(index);
-                  }}
-                  className={`group relative transition-all duration-300 ${
-                    isActive
-                      ? "w-12 sm:w-14 h-3 rounded-full bg-foreground/20 overflow-hidden"
-                      : "size-3 rounded-full bg-foreground/30 hover:bg-foreground/60"
-                  }`}
-                  aria-label={`Go to slide ${index + 1}`}
-                >
-                  {isActive && (
-                    <div
-                      className="absolute inset-y-0 left-0 bg-signal rounded-full"
-                      style={{ width: `${progress}%` }}
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </div>
+            {/* Slide Indicators: Full Rounded Circles for Inactive, Progress Pill for Active */}
+            <div className="flex items-center gap-2">
+              {items.map((item, index) => {
+                const isActive = index === current;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      goTo(index);
+                    }}
+                    className={`group relative transition-all duration-300 ${
+                      isActive
+                        ? "w-12 sm:w-14 h-2.5 rounded-full bg-foreground/20 overflow-hidden"
+                        : "size-2.5 rounded-full bg-foreground/30 hover:bg-foreground/70"
+                    }`}
+                    aria-label={`Go to slide ${index + 1}`}
+                  >
+                    {isActive && (
+                      <div
+                        className="absolute inset-y-0 left-0 bg-signal rounded-full"
+                        style={{ width: `${progress}%` }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
 
-          {/* Slide Counter */}
-          <div className="pl-2 border-l border-border-soft pr-2 font-mono text-xs font-bold text-foreground tracking-wider tabular-nums">
-            <span className="text-signal">{String(current + 1).padStart(2, "0")}</span>
-            <span className="text-muted-foreground/60 mx-1">/</span>
-            <span className="text-muted-foreground">{String(len).padStart(2, "0")}</span>
+            {/* Slide Counter */}
+            <div className="font-mono text-xs font-bold text-foreground tracking-wider tabular-nums pl-1">
+              <span className="text-signal">{String(current + 1).padStart(2, "0")}</span>
+              <span className="text-muted-foreground/60 mx-1">/</span>
+              <span className="text-muted-foreground">{String(len).padStart(2, "0")}</span>
+            </div>
           </div>
         </div>
       </div>
