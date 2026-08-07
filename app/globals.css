@@ -334,6 +334,9 @@
 
 .animate-cinematic-scale {
   animation: cinematic-scale 7000ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 @keyframes stagger-up {

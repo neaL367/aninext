@@ -160,7 +160,8 @@ export function HeroCarousel({ items }: { items: Media[] }) {
                     fill
                     priority={i === 0 || isCurrent}
                     sizes="100vw"
-                    className="object-cover object-center"
+                    unoptimized
+                    className="object-cover object-center transform-gpu"
                   />
                 </div>
               )}
