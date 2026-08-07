@@ -12,7 +12,6 @@ import {
   getMediaTitle,
   stripHtml,
 } from "@/features/anime/lib/media-helpers";
-import { scoreColor } from "@/features/anime/lib/score";
 import { cn } from "@/lib/utils";
 
 import type { Media } from "@/features/anime/types/anime";
@@ -33,9 +32,9 @@ export function AnimeHero({ media }: { media: Media }) {
 
   return (
     <section className="relative">
-      <div className="relative h-[360px] overflow-hidden border-b border-border-soft sm:h-[440px]">
+      <div className="relative h-[380px] overflow-hidden border-b border-border-soft sm:h-[460px]">
         {banner ? (
-          <MediaImage src={banner} alt="" fill priority sizes="100vw" className="object-cover" />
+          <MediaImage src={banner} alt="" fill priority unoptimized sizes="100vw" className="object-cover transform-gpu" />
         ) : (
           <div
             className="absolute inset-0"
@@ -47,15 +46,15 @@ export function AnimeHero({ media }: { media: Media }) {
           />
         )}
         <div className="paper-grid absolute inset-0 opacity-20" aria-hidden="true" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/50 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-transparent to-transparent" />
       </div>
 
       <div className="relative mx-auto -mt-36 w-full max-w-[1680px] px-4 pb-8 sm:-mt-48 sm:px-7 sm:pb-12 lg:px-10">
         <div className="grid gap-7 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10">
           <div className="relative mx-auto w-44 shrink-0 self-end sm:mx-0 sm:w-52 lg:w-[220px]">
             <div
-              className="relative aspect-[2/3] overflow-hidden border border-white/25 bg-surface-2 shadow-2xl"
+              className="relative aspect-[2/3] overflow-hidden rounded-md border border-border-soft bg-surface-2 shadow-2xl isolate transform-gpu"
               style={color ? { backgroundColor: color } : undefined}
             >
               {cover ? (
@@ -66,7 +65,7 @@ export function AnimeHero({ media }: { media: Media }) {
                     fill
                     priority
                     sizes="220px"
-                    className="object-cover"
+                    className="object-cover transform-gpu"
                   />
                 </ViewTransition>
               ) : (
@@ -86,84 +85,85 @@ export function AnimeHero({ media }: { media: Media }) {
             </div>
           </div>
 
-          <div className="min-w-0 self-end">
-            <p className="eyebrow text-accent">Anime details</p>
-            <h1 className="mt-3 max-w-4xl text-4xl font-semibold leading-[0.98] tracking-[-0.055em] sm:text-6xl">
+          <div className="min-w-0 self-end space-y-4">
+            <p className="eyebrow text-signal">Anime details</p>
+            <h1 className="text-4xl font-semibold leading-[0.98] tracking-[-0.055em] text-foreground sm:text-6xl">
               {title}
             </h1>
             {media.title.native && (
-              <p className="mt-3 text-sm text-muted-foreground">{media.title.native}</p>
+              <p className="text-sm font-mono text-muted-foreground">{media.title.native}</p>
             )}
-            <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-muted-foreground">
+
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-muted-foreground pt-1">
               {media.averageScore && (
-                <span className={cn("text-base font-semibold", scoreColor(media.averageScore))}>
+                <span className="inline-flex items-center gap-1.5 rounded-md bg-surface-1/90 border border-border-soft px-2.5 py-1 text-xs font-bold text-signal backdrop-blur-md">
                   {(media.averageScore / 10).toFixed(1)}
-                  <span className="ml-1 text-xs font-normal text-muted-foreground">score</span>
+                  <span className="text-[0.65rem] font-normal text-muted-foreground">score</span>
                 </span>
               )}
-              {media.format && <span>{formatFormat(media.format)}</span>}
-              {media.episodes && <span>{media.episodes} episodes</span>}
-              {media.duration && <span>{media.duration} min</span>}
+              {media.format && <span className="rounded-md border border-border-soft bg-surface-1/60 px-2 py-1">{formatFormat(media.format)}</span>}
+              {media.episodes && <span className="rounded-md border border-border-soft bg-surface-1/60 px-2 py-1">{media.episodes} episodes</span>}
+              {media.duration && <span className="rounded-md border border-border-soft bg-surface-1/60 px-2 py-1">{media.duration} min</span>}
               {media.status && (
-                <span className={media.status === "RELEASING" ? "text-live-badge" : ""}>
+                <span className={cn("rounded-md border px-2 py-1 font-semibold", media.status === "RELEASING" ? "border-destructive/30 bg-destructive/15 text-destructive" : "border-border-soft bg-surface-1/60 text-muted-foreground")}>
                   {formatStatus(media.status)}
                 </span>
               )}
             </div>
-            <div className="mt-5 flex flex-wrap gap-2">
-              {media.genres.slice(0, 5).map((genre) => (
-                <span
-                  key={genre}
-                  className="border border-border-soft px-2 py-1 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted-foreground"
-                >
-                  {genre}
-                </span>
-              ))}
-            </div>
+
+            {media.genres.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {media.genres.slice(0, 5).map((genre) => (
+                  <span
+                    key={genre}
+                    className="rounded-md border border-border-soft bg-surface-1/80 px-2.5 py-0.5 font-mono text-[0.62rem] uppercase tracking-wider text-muted-foreground"
+                  >
+                    {genre}
+                  </span>
+                ))}
+              </div>
+            )}
+
             {description && (
-              <p className="mt-6 line-clamp-3 max-w-2xl text-sm leading-7 text-muted-foreground">
+              <p className="line-clamp-3 max-w-3xl text-xs sm:text-sm leading-relaxed text-muted-foreground font-normal pt-1">
                 {description}
               </p>
             )}
-            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground">
+
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground pt-2 font-mono">
               {studio && (
                 <span>
-                  <span className="font-medium text-foreground">{studio}</span>{" "}
-                  <span className="font-mono uppercase tracking-[0.06em]">Studio</span>
+                  <span className="font-semibold text-foreground">{studio}</span>{" "}
+                  <span className="text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">Studio</span>
                 </span>
               )}
               {media.source && (
                 <span>
-                  <span className="font-medium text-foreground">
+                  <span className="font-semibold text-foreground">
                     {media.source.replaceAll("_", " ")}
                   </span>{" "}
-                  <span className="font-mono uppercase tracking-[0.06em]">Source</span>
+                  <span className="text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">Source</span>
                 </span>
               )}
               {media.season && media.seasonYear && (
                 <span>
-                  <span className="font-medium text-foreground">
+                  <span className="font-semibold text-foreground">
                     {media.season} {media.seasonYear}
                   </span>{" "}
-                  <span className="font-mono uppercase tracking-[0.06em]">Season</span>
-                </span>
-              )}
-              {media.studios?.nodes[1]?.name && (
-                <span>
-                  <span className="font-medium text-foreground">{media.studios.nodes[1].name}</span>{" "}
-                  <span className="font-mono uppercase tracking-[0.06em]">Producer</span>
+                  <span className="text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">Season</span>
                 </span>
               )}
             </div>
-            <div className="mt-7 flex flex-wrap items-center gap-5">
+
+            <div className="pt-3 flex flex-wrap items-center gap-4">
               {media.trailer?.id && media.trailer.site === "youtube" && (
                 <a
                   href={`https://www.youtube.com/watch?v=${media.trailer.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 border-b border-signal pb-2 text-sm font-medium text-signal hover:text-paper"
+                  className="inline-flex items-center gap-2 rounded-md bg-signal hover:bg-signal-strong px-4 py-2 text-xs font-semibold text-white shadow-md transition-all hover:scale-105 active:scale-95"
                 >
-                  <PlayIcon className="size-4 fill-current" /> Watch trailer
+                  <PlayIcon className="size-3.5 fill-current" /> Watch trailer
                 </a>
               )}
             </div>
