@@ -10,6 +10,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { LocalTime } from "@/components/ui/local-time";
 import { MediaImage } from "@/components/ui/media-image";
 import { getAiringDay } from "@/features/anime/anime-queries";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
@@ -95,7 +96,6 @@ function AiringTimelineList({ day, schedules }: { day: string; schedules: Airing
               {items.map((item, index) => {
                 if (!item.media) return null;
                 const title = getTitle(item.media.title);
-                const time = fromAiringTimestamp(item.airingAt);
                 const phase = getAiringPhase(item.airingAt, now);
                 const isClose = phase === "upcoming" && item.airingAt - now < 3600;
                 const color = item.media.coverImage.color;
@@ -148,15 +148,10 @@ function AiringTimelineList({ day, schedules }: { day: string; schedules: Airing
                             ) : phase === "aired" ? (
                               <span className="font-mono text-xs text-muted-foreground">Aired</span>
                             ) : (
-                              <time
-                                dateTime={time.toISOString()}
+                              <LocalTime
+                                timestamp={item.airingAt}
                                 className="font-mono text-xs tabular-nums text-muted-foreground"
-                              >
-                                {time.toLocaleTimeString("en-US", {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}
-                              </time>
+                              />
                             )}
                           </div>
                           {(() => {

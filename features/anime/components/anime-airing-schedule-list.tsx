@@ -1,4 +1,4 @@
-import { fromAiringTimestamp } from "@/features/anime/lib/media-helpers";
+import { LocalTime } from "@/components/ui/local-time";
 
 import type { AiringScheduleNode } from "@/features/anime/types/anime";
 
@@ -19,7 +19,6 @@ export function AnimeAiringScheduleList({ nodes }: { nodes: AiringScheduleNode[]
         className="max-h-[260px] overflow-y-auto scrollbar-thin divide-y divide-border border-y border-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
       >
         {nodes.map((node) => {
-          const date = fromAiringTimestamp(node.airingAt);
           return (
             <div
               key={node.episode}
@@ -30,17 +29,11 @@ export function AnimeAiringScheduleList({ nodes }: { nodes: AiringScheduleNode[]
                 <span className="size-1.5 rounded-full bg-live-badge" />
                 Ep {node.episode}
               </span>
-              <time
-                dateTime={date.toISOString()}
+              <LocalTime
+                timestamp={node.airingAt}
+                format="date-time"
                 className="font-mono text-xs tabular-nums text-muted-foreground"
-              >
-                {date.toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                  hour: "numeric",
-                  minute: "2-digit",
-                })}
-              </time>
+              />
             </div>
           );
         })}
