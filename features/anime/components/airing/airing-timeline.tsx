@@ -100,12 +100,14 @@ export async function AiringTimeline({ day }: { day: string }) {
                 const diff = item.airingAt - now;
                 const isClose = diff > 0 && diff < 3600;
                 const isLive = diff <= 0 && diff > -1800;
+                const color = item.media.coverImage.color;
                 return (
                   <AnimePreviewCard key={`${item.media.id}-${index}`} media={item.media}>
                     <article className="group flex gap-4 border border-border p-4 transition-colors hover:border-accent/50 hover:bg-surface-1/40">
                       <Link
                         href={`/anime/${item.media.id}` as Route<string>}
                         className="relative h-[88px] w-[66px] shrink-0 overflow-hidden bg-surface-2"
+                        style={color ? { backgroundColor: color } : undefined}
                       >
                         {item.media.coverImage.medium ? (
                           <ImageWithLoading

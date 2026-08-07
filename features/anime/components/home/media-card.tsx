@@ -68,8 +68,10 @@ export function MediaCard({
           size === "featured" ? "aspect-[16/9]" : "aspect-[2/3]",
         )}
         style={
-          !cover && color
-            ? { background: `linear-gradient(135deg, ${color}55, var(--surface-2) 72%)` }
+          color
+            ? cover
+              ? { backgroundColor: color }
+              : { background: `linear-gradient(135deg, ${color}55, var(--surface-2) 72%)` }
             : undefined
         }
       >

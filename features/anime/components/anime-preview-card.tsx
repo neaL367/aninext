@@ -24,7 +24,10 @@ export function AnimePreviewCard({ media, children }: { media: Media; children: 
         className="w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-none border border-border-soft bg-card p-0 shadow-2xl ring-1 ring-foreground/10"
       >
         {media.bannerImage ? (
-          <div className="relative h-32 w-full overflow-hidden">
+          <div
+            className="relative h-32 w-full overflow-hidden"
+            style={color ? { backgroundColor: color } : undefined}
+          >
             <ImageWithLoading
               src={media.bannerImage}
               alt=""

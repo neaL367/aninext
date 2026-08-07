@@ -64,6 +64,7 @@ export function AiringHomeSection({ schedules }: { schedules: AiringScheduleNode
                 ? `${minutes}m`
                 : "Airing";
           const isClose = minutes > 0 && minutes < 60;
+          const color = item.media.coverImage.color;
 
           return (
             <Link
@@ -71,7 +72,10 @@ export function AiringHomeSection({ schedules }: { schedules: AiringScheduleNode
               href={`/anime/${item.media.id}` as Route<string>}
               className="group flex items-center gap-3 p-3 sm:gap-4 sm:p-4 border border-border transition-colors hover:border-accent/50 hover:bg-surface-1/50 overflow-hidden"
             >
-              <div className="relative h-[72px] w-[54px] shrink-0 overflow-hidden bg-surface-2">
+              <div
+                className="relative h-[72px] w-[54px] shrink-0 overflow-hidden bg-surface-2"
+                style={color ? { backgroundColor: color } : undefined}
+              >
                 {item.media.coverImage.medium ? (
                   <ImageWithLoading
                     src={item.media.coverImage.medium}

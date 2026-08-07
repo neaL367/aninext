@@ -8,10 +8,7 @@ export function getTitle(title: MediaTitle): string {
 
 export type CoverTier = "extraLarge" | "large" | "medium";
 
-export function getCover(
-  image: MediaCoverImage,
-  tier: CoverTier = "large",
-): string | undefined {
+export function getCover(image: MediaCoverImage, tier: CoverTier = "large"): string | undefined {
   return image[tier] ?? image.large ?? image.extraLarge;
 }
 

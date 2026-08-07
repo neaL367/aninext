@@ -42,7 +42,10 @@ export function AnimeRelations({ edges }: { edges: RelationEdge[] }) {
                 href={`/anime/${edge.node.id}` as Route<string>}
                 className="group flex items-center gap-3 py-3 first:pt-0 last:pb-0"
               >
-                <div className="relative h-14 w-10 shrink-0 overflow-hidden border border-border bg-surface-2">
+                <div
+                  className="relative h-14 w-10 shrink-0 overflow-hidden border border-border bg-surface-2"
+                  style={color ? { backgroundColor: color } : undefined}
+                >
                   {cover ? (
                     <ImageWithLoading
                       src={cover}

@@ -52,7 +52,10 @@ export function AnimeHero({ media }: { media: Media }) {
       <div className="relative mx-auto -mt-36 w-full max-w-[1680px] px-4 pb-8 sm:-mt-48 sm:px-7 sm:pb-12 lg:px-10">
         <div className="grid gap-7 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10">
           <div className="relative mx-auto w-44 shrink-0 self-end sm:mx-0 sm:w-52 lg:w-[220px]">
-            <div className="relative aspect-[2/3] overflow-hidden border border-white/25 bg-surface-2 shadow-2xl">
+            <div
+              className="relative aspect-[2/3] overflow-hidden border border-white/25 bg-surface-2 shadow-2xl"
+              style={color ? { backgroundColor: color } : undefined}
+            >
               {cover ? (
                 <ViewTransition name={`anime-cover-hero-${media.id}`} share="morph" default="none">
                   <ImageWithLoading

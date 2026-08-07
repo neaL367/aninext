@@ -63,7 +63,10 @@ export function HeroCarousel({ items }: { items: Media[] }) {
             <div
               key={item.id}
               className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
-              style={{ opacity: isCurrent ? 1 : isPrev ? 0 : 0 }}
+              style={{
+                opacity: isCurrent ? 1 : isPrev ? 0 : 0,
+                ...(color ? { backgroundColor: color } : {}),
+              }}
             >
               {image && isMounted ? (
                 <ImageWithLoading
