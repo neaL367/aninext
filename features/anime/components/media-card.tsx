@@ -66,11 +66,6 @@ export function MediaCard({
           "relative overflow-hidden rounded-md border border-border-soft bg-surface-2 transition-colors duration-300 group-hover:border-signal/60 motion-reduce:transform-none isolate transform-gpu",
           size === "featured" ? "aspect-[16/9]" : "aspect-[2/3]",
         )}
-        style={{
-          background: color
-            ? `linear-gradient(135deg, ${color}22, var(--surface-2) 75%)`
-            : "var(--surface-2)",
-        }}
       >
         {coverImage ? (
           viewTransition && (priority || rank !== undefined && rank <= 6) ? (
