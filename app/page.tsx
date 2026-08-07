@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 
-import { Crossfade } from "@/components/crossfade";
-import { ErrorBoundary } from "@/components/error-boundary";
+import { Crossfade } from "@/components/ui/crossfade";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { AiringHomeSectionSkeleton } from "@/features/anime/components/airing/airing-home-section";
 import { FeatureMosaicSkeleton } from "@/features/anime/components/home/feature-mosaic";
 import { GenreExplorer, GenrePillsSkeleton } from "@/features/anime/components/home/genre-pills";

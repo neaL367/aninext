@@ -1,7 +1,7 @@
 import { UserIcon } from "lucide-react";
 
-import { ImageWithLoading } from "@/components/image-with-loading";
 import { Empty, EmptyHeader, EmptyTitle, EmptyMedia } from "@/components/ui/empty";
+import { ImageWithLoading } from "@/components/ui/image-with-loading";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import type { StaffEdge } from "@/features/anime/types/anime";

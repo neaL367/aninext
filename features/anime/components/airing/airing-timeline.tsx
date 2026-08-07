@@ -2,7 +2,6 @@ import { CalendarIcon, ExternalLinkIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { ImageWithLoading } from "@/components/image-with-loading";
 import {
   Empty,
   EmptyContent,
@@ -11,6 +10,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
+import { ImageWithLoading } from "@/components/ui/image-with-loading";
 import { getAiringWeek } from "@/features/anime/anime-queries";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 import {

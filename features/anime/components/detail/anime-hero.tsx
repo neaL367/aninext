@@ -1,7 +1,7 @@
 import { PlayIcon } from "lucide-react";
 import { ViewTransition } from "react";
 
-import { ImageWithLoading } from "@/components/image-with-loading";
+import { ImageWithLoading } from "@/components/ui/image-with-loading";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   formatFormat,

@@ -51,3 +51,7 @@ export function SearchBar() {
     </label>
   );
 }
+
+export function SearchBarFallback() {
+  return <div className="h-12 border-b border-border-soft bg-surface-1/40" />;
+}

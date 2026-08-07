@@ -1,6 +1,6 @@
+import { renderBrowsePage } from "@/features/anime/anime-actions";
 import { buildFilterHash } from "@/features/anime/lib/parse-filters";
 
-import { renderBrowsePage } from "./browse-page-action";
 import { BrowsePaginator } from "./browse-paginator";
 import { EmptySearch, EmptyFilters, EmptyUpcoming } from "./empty-states";
 import { MediaGridSkeleton } from "./media-grid";
@@ -45,5 +45,3 @@ function getEmptyComponent(collection: AnimeCollection, filters: AnimeFilters) {
   }
   return <EmptySearch />;
 }
-
-export { MediaGridSkeleton as AnimeResultsSkeleton };

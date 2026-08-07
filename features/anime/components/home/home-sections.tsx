@@ -1,4 +1,4 @@
-import { connection } from "next/server";
+import { io } from "next/cache";
 
 import { getBrowseCollection, getAiringWeek } from "@/features/anime/anime-queries";
 
@@ -31,7 +31,7 @@ export async function PopularSection() {
 }
 
 export async function AiringSection() {
-  await connection();
+  await io();
   // eslint-disable-next-line react-hooks/purity -- streaming region, time-of-request is intended
   const now = Math.floor(Date.now() / 1000);
   const start = now - 43200;

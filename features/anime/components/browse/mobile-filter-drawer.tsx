@@ -71,3 +71,7 @@ export function MobileFilterDrawer({
     </Sheet>
   );
 }
+
+export function MobileFilterDrawerFallback() {
+  return <div className="h-10 w-24 border border-border-soft bg-surface-1/40" />;
+}

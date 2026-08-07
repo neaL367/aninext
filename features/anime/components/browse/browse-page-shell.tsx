@@ -1,20 +1,24 @@
 import { Suspense } from "react";
 
-import { Crossfade } from "@/components/crossfade";
-import { ErrorBoundary } from "@/components/error-boundary";
+import { Crossfade } from "@/components/ui/crossfade";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { getGenres } from "@/features/anime/anime-queries";
-import { ActiveFilters } from "@/features/anime/components/browse/active-filters";
 import {
-  AnimeResults,
-  AnimeResultsSkeleton,
-} from "@/features/anime/components/browse/anime-results";
+  ActiveFilters,
+  ActiveFiltersSkeleton,
+} from "@/features/anime/components/browse/active-filters";
+import { AnimeResults } from "@/features/anime/components/browse/anime-results";
 import { CollectionNav } from "@/features/anime/components/browse/collection-nav";
 import {
   FilterSidebar,
   FilterSidebarSkeleton,
 } from "@/features/anime/components/browse/filter-sidebar";
-import { MobileFilterDrawer } from "@/features/anime/components/browse/mobile-filter-drawer";
-import { SearchBar } from "@/features/anime/components/browse/search-bar";
+import { MediaGridSkeleton } from "@/features/anime/components/browse/media-grid";
+import {
+  MobileFilterDrawer,
+  MobileFilterDrawerFallback,
+} from "@/features/anime/components/browse/mobile-filter-drawer";
+import { SearchBar, SearchBarFallback } from "@/features/anime/components/browse/search-bar";
 import { COLLECTIONS } from "@/features/anime/lib/collection-config";
 
 import type { AnimeCollection } from "@/features/anime/types/anime";
@@ -90,39 +94,12 @@ export function BrowsePageShell({
   );
 }
 
-function SearchBarFallback() {
-  return <div className="h-12 border-b border-border-soft bg-surface-1/40" />;
-}
-
 async function FilterSidebarBoundary({ collection }: { collection: AnimeCollection }) {
   return <FilterSidebar genresPromise={getGenres()} collection={collection} />;
 }
 
 async function MobileFilterDrawerBoundary({ collection }: { collection: AnimeCollection }) {
   return <MobileFilterDrawer genresPromise={getGenres()} collection={collection} />;
-}
-
-function MobileFilterDrawerFallback() {
-  return <div className="h-10 w-24 border border-border-soft bg-surface-1/40" />;
-}
-
-function ActiveFiltersSkeleton() {
-  return (
-    <div className="flex flex-col gap-3 border-b border-border-soft py-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="shimmer h-3 w-12 rounded" />
-          <div className="shimmer size-5 rounded-full" />
-        </div>
-        <div className="shimmer h-3 w-14 rounded" />
-      </div>
-      <div className="flex flex-wrap gap-3">
-        <div className="shimmer h-5 w-20 rounded-full" />
-        <div className="shimmer h-5 w-28 rounded-full" />
-        <div className="shimmer h-5 w-16 rounded-full" />
-      </div>
-    </div>
-  );
 }
 
 export function BrowsePageResults({
@@ -138,7 +115,7 @@ export function BrowsePageResults({
         <ActiveFilters />
       </Suspense>
       <ErrorBoundary title="Results failed to load">
-        <Suspense fallback={<AnimeResultsSkeleton count={20} />}>
+        <Suspense fallback={<MediaGridSkeleton count={20} />}>
           <AnimeResults collection={collection} filters={filters} />
         </Suspense>
       </ErrorBoundary>

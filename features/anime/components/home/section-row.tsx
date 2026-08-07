@@ -1,6 +1,6 @@
 import { ArrowRightIcon } from "lucide-react";
 
-import { HoverPrefetchLink } from "@/components/hover-prefetch-link";
+import { HoverPrefetchLink } from "@/components/ui/hover-prefetch-link";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 
 import { MediaCard, MediaCardSkeleton } from "./media-card";

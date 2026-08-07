@@ -62,3 +62,22 @@ export function ActiveFilters() {
     </div>
   );
 }
+
+export function ActiveFiltersSkeleton() {
+  return (
+    <div className="flex flex-col gap-3 border-b border-border-soft py-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="shimmer h-3 w-12 rounded" />
+          <div className="shimmer size-5 rounded-full" />
+        </div>
+        <div className="shimmer h-3 w-14 rounded" />
+      </div>
+      <div className="flex flex-wrap gap-3">
+        <div className="shimmer h-5 w-20 rounded-full" />
+        <div className="shimmer h-5 w-28 rounded-full" />
+        <div className="shimmer h-5 w-16 rounded-full" />
+      </div>
+    </div>
+  );
+}

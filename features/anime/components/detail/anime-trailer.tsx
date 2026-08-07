@@ -1,6 +1,6 @@
 import { PlayIcon } from "lucide-react";
 
-import { ImageWithLoading } from "@/components/image-with-loading";
+import { ImageWithLoading } from "@/components/ui/image-with-loading";
 
 import type { Media } from "@/features/anime/types/anime";
 

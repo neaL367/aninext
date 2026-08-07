@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ViewTransition } from "react";
 
-import { ImageWithLoading } from "@/components/image-with-loading";
+import { ImageWithLoading } from "@/components/ui/image-with-loading";
 import {
   formatFormat,
   formatStatus,

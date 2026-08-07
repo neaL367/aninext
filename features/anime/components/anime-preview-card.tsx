@@ -1,7 +1,7 @@
 import { CalendarIcon, FilmIcon, PlayIcon, TvIcon } from "lucide-react";
 
-import { ImageWithLoading } from "@/components/image-with-loading";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { ImageWithLoading } from "@/components/ui/image-with-loading";
 import { formatFormat, formatStatus, getMediaTitle } from "@/features/anime/lib/media-helpers";
 import { scoreColor } from "@/features/anime/lib/score";
 import { cn } from "@/lib/utils";

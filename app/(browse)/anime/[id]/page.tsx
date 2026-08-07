@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
-import { ErrorBoundary } from "@/components/error-boundary";
+import { Crossfade } from "@/components/ui/crossfade";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { getAnimeMeta } from "@/features/anime/anime-queries";
 import {
   DetailSection,
@@ -38,11 +39,13 @@ export async function generateMetadata({
 export default function AnimeDetailPage({ params }: PageProps<"/anime/[id]">) {
   return (
     <ErrorBoundary title="Anime details failed to load">
-      <Suspense fallback={<DetailSectionSkeleton />}>
-        {params.then(({ id }) => (
-          <DetailSection id={Number(id)} />
-        ))}
-      </Suspense>
+      <Crossfade>
+        <Suspense fallback={<DetailSectionSkeleton />}>
+          {params.then(({ id }) => (
+            <DetailSection id={Number(id)} />
+          ))}
+        </Suspense>
+      </Crossfade>
     </ErrorBoundary>
   );
 }

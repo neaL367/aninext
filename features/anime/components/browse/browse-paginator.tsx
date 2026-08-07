@@ -1,12 +1,10 @@
 "use client";
 
-import { Suspense, use, useEffect, useState, useTransition, type ReactNode } from "react";
+import { Suspense, use, useEffect, useRef, useState, useTransition, type ReactNode } from "react";
 
-import { Crossfade } from "@/components/crossfade";
-
-import { BrowseGrid } from "./browse-grid";
-import { renderBrowsePage, type BrowsePage } from "./browse-page-action";
-import { InfiniteScrollSentinel } from "./infinite-scroll-sentinel";
+import { Crossfade } from "@/components/ui/crossfade";
+import { Spinner } from "@/components/ui/spinner";
+import { renderBrowsePage, type BrowsePage } from "@/features/anime/anime-actions";
 
 import type { AnimeCollection, AnimeFilters } from "@/features/anime/types/anime";
 
@@ -40,7 +38,11 @@ export function BrowsePaginator({
 
   return (
     <>
-      <BrowseGrid>
+      <div
+        className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-5 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6"
+        role="list"
+        aria-label="Anime results"
+      >
         {pages.map((page, i) => (
           <Suspense key={i} fallback={skeleton}>
             {i === 0 ? (
@@ -52,7 +54,7 @@ export function BrowsePaginator({
             )}
           </Suspense>
         ))}
-      </BrowseGrid>
+      </div>
       {!hasItems ? (
         emptyComponent
       ) : hasMore ? (
@@ -79,4 +81,46 @@ function PageContent({
   }, [onResolved, result.hasItems]);
   const { node } = result;
   return <>{node}</>;
+}
+
+function InfiniteScrollSentinel({
+  onLoadMore,
+  isLoading,
+}: {
+  onLoadMore: () => void;
+  isLoading: boolean;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const callbackRef = useRef(onLoadMore);
+
+  useEffect(() => {
+    callbackRef.current = onLoadMore;
+  });
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || isLoading) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          callbackRef.current();
+        }
+      },
+      { rootMargin: "600px" },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [isLoading]);
+
+  return (
+    <div
+      ref={ref}
+      className="flex items-center justify-center border-t border-border-soft py-8"
+      aria-label="Load more anime"
+    >
+      {isLoading && <Spinner className="size-5" />}
+    </div>
+  );
 }

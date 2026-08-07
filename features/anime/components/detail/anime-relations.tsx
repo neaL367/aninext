@@ -3,8 +3,8 @@
 import { LinkIcon } from "lucide-react";
 import Link from "next/link";
 
-import { ImageWithLoading } from "@/components/image-with-loading";
 import { Empty, EmptyHeader, EmptyTitle, EmptyMedia } from "@/components/ui/empty";
+import { ImageWithLoading } from "@/components/ui/image-with-loading";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 import { getTitle, getCover } from "@/features/anime/lib/media-helpers";

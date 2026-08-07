@@ -1,9 +1,10 @@
 import { Suspense } from "react";
 
-import { AnimeResultsSkeleton } from "@/features/anime/components/browse/anime-results";
 import { BrowsePageShell } from "@/features/anime/components/browse/browse-page-shell";
 import { CollectionResults } from "@/features/anime/components/browse/collection-results";
+import { MediaGridSkeleton } from "@/features/anime/components/browse/media-grid";
 import { getCollectionMetadata } from "@/features/anime/lib/collection-config";
+import { parseFilters } from "@/features/anime/lib/parse-filters";
 
 import type { Metadata } from "next";
 
@@ -14,8 +15,10 @@ export function generateMetadata(): Metadata {
 export default function Top100Page({ searchParams }: PageProps<"/anime/top100">) {
   return (
     <BrowsePageShell collection="top100">
-      <Suspense fallback={<AnimeResultsSkeleton count={20} />}>
-        <CollectionResults collection="top100" searchParams={searchParams} />
+      <Suspense fallback={<MediaGridSkeleton count={20} />}>
+        {searchParams.then((sp) => (
+          <CollectionResults collection="top100" filters={parseFilters(sp)} />
+        ))}
       </Suspense>
     </BrowsePageShell>
   );

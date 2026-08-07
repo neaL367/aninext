@@ -1,17 +1,13 @@
-import { parseFilters } from "@/features/anime/lib/parse-filters";
-
 import { BrowsePageResults } from "./browse-page-shell";
 
-import type { AnimeCollection } from "@/features/anime/types/anime";
+import type { AnimeCollection, AnimeFilters } from "@/features/anime/types/anime";
 
 export async function CollectionResults({
   collection,
-  searchParams,
+  filters,
 }: {
   collection: AnimeCollection;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
+  filters: AnimeFilters;
 }) {
-  const sp = await searchParams;
-  const filters = parseFilters(sp);
   return <BrowsePageResults collection={collection} filters={filters} />;
 }

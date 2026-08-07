@@ -3,7 +3,7 @@
 import { ArrowUpRightIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 
-import { HoverPrefetchLink } from "@/components/hover-prefetch-link";
+import { HoverPrefetchLink } from "@/components/ui/hover-prefetch-link";
 import { COLLECTION_NAV_ITEMS } from "@/features/anime/lib/collection-config";
 import { cn } from "@/lib/utils";
 

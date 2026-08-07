@@ -1,26 +1,34 @@
+import { io } from "next/cache";
 import { redirect } from "next/navigation";
-import { connection } from "next/server";
 
-import { parseFilters } from "@/features/anime/lib/parse-filters";
 import { getCurrentSeason } from "@/features/anime/lib/season";
 
 import { BrowsePageResults } from "./browse-page-shell";
 
-export async function SeasonalResults({
-  searchParams,
-}: Pick<PageProps<"/anime/seasonal">, "searchParams">) {
-  const sp = await searchParams;
-  await connection();
+import type { AnimeFilters } from "@/features/anime/types/anime";
 
-  if (!sp.season || !sp.year) {
+export async function SeasonalResults({
+  season,
+  year,
+  filters,
+}: {
+  season?: string;
+  year?: string;
+  filters: AnimeFilters;
+}) {
+  await io();
+
+  if (!season || !year) {
     const current = getCurrentSeason();
-    const params = new URLSearchParams(sp as Record<string, string>);
-    if (!sp.season) params.set("season", current.season);
-    if (!sp.year) params.set("year", String(current.seasonYear));
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(filters)) {
+      if (Array.isArray(value)) value.forEach((item) => params.append(key, item));
+      else if (value !== undefined) params.set(key, String(value));
+    }
+    params.set("season", season ?? current.season);
+    params.set("year", year ?? String(current.seasonYear));
     redirect(`/anime/seasonal?${params.toString()}`);
   }
-
-  const filters = parseFilters(sp);
 
   return <BrowsePageResults collection="seasonal" filters={filters} />;
 }

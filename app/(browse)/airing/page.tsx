@@ -1,7 +1,7 @@
 import { RadioIcon } from "lucide-react";
 import { Suspense } from "react";
 
-import { Crossfade } from "@/components/crossfade";
+import { Crossfade } from "@/components/ui/crossfade";
 import {
   AiringContent,
   AiringContentSkeleton,
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/airing" },
 };
 
-export default function AiringPage({ searchParams }: { searchParams: Promise<{ day?: string }> }) {
+export default function AiringPage({ searchParams }: PageProps<"/airing">) {
   return (
     <Crossfade>
       <div className="mx-auto w-full max-w-[1680px] px-4 py-8 sm:px-7 sm:py-12 lg:px-10 lg:py-16">
@@ -25,9 +25,10 @@ export default function AiringPage({ searchParams }: { searchParams: Promise<{ d
           </p>
           <h1 className="mt-4 text-4xl font-semibold tracking-[-0.055em] sm:text-6xl">Schedule</h1>
         </header>
-
         <Suspense fallback={<AiringContentSkeleton />}>
-          <AiringContent searchParams={searchParams} />
+          {searchParams.then((sp) => (
+            <AiringContent day={typeof sp.day === "string" ? sp.day : undefined} />
+          ))}
         </Suspense>
       </div>
     </Crossfade>

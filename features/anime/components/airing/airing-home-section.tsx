@@ -4,8 +4,8 @@ import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
 
-import { HoverPrefetchLink } from "@/components/hover-prefetch-link";
-import { ImageWithLoading } from "@/components/image-with-loading";
+import { HoverPrefetchLink } from "@/components/ui/hover-prefetch-link";
+import { ImageWithLoading } from "@/components/ui/image-with-loading";
 import { fromAiringTimestamp, getTitle } from "@/features/anime/lib/media-helpers";
 
 import type { AiringScheduleNode } from "@/features/anime/types/anime";

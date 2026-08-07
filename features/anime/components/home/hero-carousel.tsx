@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 
-import { ImageWithLoading } from "@/components/image-with-loading";
+import { ImageWithLoading } from "@/components/ui/image-with-loading";
 
 import { HeroInfo } from "./hero-content";
 
