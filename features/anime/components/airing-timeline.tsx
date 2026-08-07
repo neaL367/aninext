@@ -71,28 +71,28 @@ function AiringTimelineList({ day, schedules }: { day: string; schedules: Airing
       {Object.entries(grouped).map(([block, items]) => {
         const isActive = block === activeBlock;
         return (
-          <section key={block}>
-            <div className="mb-4 flex items-center gap-3">
+          <section key={block} className="space-y-4">
+            <div className="flex items-center gap-3 border-b border-border-soft pb-3">
               <span
                 className={
                   isActive
-                    ? "flex size-2 animate-pulse rounded-full bg-live-badge"
-                    : "flex size-2 rounded-full bg-accent"
+                    ? "flex size-2 animate-pulse rounded-full bg-destructive"
+                    : "flex size-2 rounded-full bg-signal"
                 }
               />
               <h2
                 className={
                   isActive
-                    ? "text-sm font-semibold uppercase tracking-[0.1em] text-live-badge"
-                    : "text-sm font-semibold uppercase tracking-[0.1em] text-foreground"
+                    ? "font-mono text-xs font-bold uppercase tracking-[0.12em] text-destructive"
+                    : "font-mono text-xs font-bold uppercase tracking-[0.12em] text-foreground"
                 }
               >
                 {block}
               </h2>
-              {isActive && <span className="font-mono text-xs text-live-badge">now</span>}
-              <span className="font-mono text-xs text-muted-foreground">{items.length}</span>
+              {isActive && <span className="font-mono text-[0.65rem] font-bold uppercase text-destructive bg-destructive/10 px-1.5 py-0.5 rounded border border-destructive/20">Now Airing</span>}
+              <span className="ml-auto font-mono text-xs text-muted-foreground">{items.length} {items.length === 1 ? "release" : "releases"}</span>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {items.map((item, index) => {
                 if (!item.media) return null;
                 const title = getTitle(item.media.title);
@@ -101,10 +101,10 @@ function AiringTimelineList({ day, schedules }: { day: string; schedules: Airing
                 const color = item.media.coverImage.color;
                 return (
                   <AnimePreviewCard key={`${item.media.id}-${index}`} media={item.media}>
-                    <article className="group flex gap-4 border border-border p-4 transition-colors hover:border-accent/50 hover:bg-surface-1/40">
+                    <article className="group flex gap-4 rounded-md border border-border-soft bg-surface-1/60 p-4 transition-colors hover:border-signal/60 hover:bg-surface-1 isolate transform-gpu">
                       <Link
                         href={`/anime/${item.media.id}` as Route<string>}
-                        className="relative h-[88px] w-[66px] shrink-0 overflow-hidden bg-surface-2"
+                        className="relative h-[96px] w-[70px] shrink-0 overflow-hidden rounded bg-surface-2"
                         style={color ? { backgroundColor: color } : undefined}
                       >
                         {item.media.coverImage.medium ? (
@@ -112,8 +112,8 @@ function AiringTimelineList({ day, schedules }: { day: string; schedules: Airing
                             src={item.media.coverImage.medium}
                             alt={title}
                             fill
-                            sizes="66px"
-                            className="object-cover transition-transform duration-300 group-hover:scale-[1.05]"
+                            sizes="70px"
+                            className="object-cover transition-transform duration-500 group-hover:scale-105 transform-gpu will-change-transform"
                           />
                         ) : (
                           <div className="flex h-full items-center justify-center p-1 text-center font-mono text-[0.5rem] text-muted-foreground">
@@ -125,32 +125,32 @@ function AiringTimelineList({ day, schedules }: { day: string; schedules: Airing
                         <div>
                           <Link
                             href={`/anime/${item.media.id}` as Route<string>}
-                            className="line-clamp-2 text-sm font-medium leading-snug hover:text-accent"
+                            className="line-clamp-2 text-sm font-semibold leading-snug text-foreground group-hover:text-signal transition-colors"
                           >
                             {title}
                           </Link>
-                          <p className="mt-1 font-mono text-xs text-muted-foreground">
+                          <p className="mt-1 font-mono text-[0.68rem] text-muted-foreground">
                             Ep {item.episode}{" "}
                             {item.media.format ? `· ${formatFormat(item.media.format)}` : ""}
                           </p>
                         </div>
-                        <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center justify-between gap-2 pt-2 border-t border-border-soft/60">
                           <div className="flex items-center gap-2">
                             {phase === "live" ? (
-                              <span className="flex items-center gap-1 font-mono text-xs text-live-badge">
-                                <span className="size-1.5 animate-pulse rounded-full bg-live-badge" />
+                              <span className="flex items-center gap-1.5 font-mono text-[0.68rem] font-bold text-destructive">
+                                <span className="size-1.5 animate-pulse rounded-full bg-destructive" />
                                 Live
                               </span>
                             ) : isClose ? (
-                              <span className="flex items-center gap-1 font-mono text-xs text-live-badge">
+                              <span className="flex items-center gap-1 font-mono text-[0.68rem] font-bold text-destructive">
                                 Soon
                               </span>
                             ) : phase === "aired" ? (
-                              <span className="font-mono text-xs text-muted-foreground">Aired</span>
+                              <span className="font-mono text-[0.68rem] text-muted-foreground">Aired</span>
                             ) : (
                               <LocalTime
                                 timestamp={item.airingAt}
-                                className="font-mono text-xs tabular-nums text-muted-foreground"
+                                className="font-mono text-[0.68rem] tabular-nums text-muted-foreground"
                               />
                             )}
                           </div>
@@ -170,7 +170,7 @@ function AiringTimelineList({ day, schedules }: { day: string; schedules: Airing
                                         href={link.url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex size-5 items-center justify-center rounded-sm border border-border-soft bg-surface-1 transition-colors hover:border-accent hover:bg-accent/10"
+                                        className="flex size-5.5 items-center justify-center rounded border border-border-soft bg-surface-1 transition-colors hover:border-signal hover:bg-signal/10"
                                         aria-label={`Watch on ${link.site}`}
                                         title={link.site}
                                       >
@@ -195,7 +195,7 @@ function AiringTimelineList({ day, schedules }: { day: string; schedules: Airing
                             return (
                               <Link
                                 href={`/anime/${item.media.id}` as Route<string>}
-                                className="shrink-0 text-muted-foreground hover:text-accent"
+                                className="shrink-0 text-muted-foreground hover:text-signal transition-colors"
                                 aria-label={`Open ${title}`}
                               >
                                 <ExternalLinkIcon className="size-3.5" />
