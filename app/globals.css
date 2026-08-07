@@ -323,3 +323,32 @@
   animation: hero-slide-up 650ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+@keyframes cinematic-scale {
+  from {
+    transform: scale(1.04);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.animate-cinematic-scale {
+  animation: cinematic-scale 7000ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes stagger-up {
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-stagger-up {
+  animation: stagger-up 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+
