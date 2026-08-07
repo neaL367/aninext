@@ -134,10 +134,9 @@ export function HeroCarousel({ items }: { items: Media[] }) {
       onMouseUp={handleMouseUp}
     >
       {/* Full-Bleed Media Layer with GPU Scale Interpolation */}
-      <div className="absolute inset-0 w-full h-full pointer-events-none">
+      <div className="absolute inset-0 w-full h-full pointer-events-none bg-background">
         {items.map((item, i) => {
           const image = item.bannerImage ?? item.coverImage.extraLarge;
-          const color = item.coverImage.color;
           const isCurrent = i === current;
           const isPrev = i === prev;
           const isAdjacent =
@@ -149,10 +148,9 @@ export function HeroCarousel({ items }: { items: Media[] }) {
           return (
             <div
               key={item.id}
-              className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
+              className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out bg-background ${
                 isCurrent ? "opacity-100 z-10" : "opacity-0 z-0"
               }`}
-              style={{ backgroundColor: color ?? "var(--surface-1)" }}
             >
               {image && (
                 <div className={`relative w-full h-full ${isCurrent ? "animate-cinematic-scale" : ""}`}>
@@ -171,10 +169,8 @@ export function HeroCarousel({ items }: { items: Media[] }) {
         })}
       </div>
 
-      {/* Multi-Layer Gradient Overlay for Legibility */}
-      <div className="pointer-events-none absolute inset-0 z-15 bg-gradient-to-t from-background via-background/60 to-transparent" />
-      <div className="pointer-events-none absolute inset-0 z-15 bg-gradient-to-b from-background/70 via-transparent to-transparent" />
-      <div className="pointer-events-none absolute inset-0 z-15 bg-gradient-to-r from-background/80 via-background/30 to-transparent" />
+      {/* Seamless Bottom Gradient Overlay matching Page Background */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/4 z-15 bg-gradient-to-t from-background via-background/40 to-transparent" />
 
       {/* Foreground Content Positioned Bottom-Left Aligned with Main Width Layout */}
       <div className="absolute inset-x-0 bottom-0 z-20 pb-14 sm:pb-16 lg:pb-18">
