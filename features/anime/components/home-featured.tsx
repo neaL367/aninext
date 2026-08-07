@@ -8,10 +8,14 @@ import {
 } from "@/features/anime/anime-queries";
 
 import { AiringHomeSection } from "./airing-home-section";
+import { EditorialBanner } from "./editorial-banner";
 import { FeatureMosaic } from "./feature-mosaic";
 import { GenreExplorer } from "./genre-pills";
 import { HeroCarousel } from "./hero-carousel";
 import { SectionRow } from "./section-row";
+import { Top100Podium } from "./top100-podium";
+import { TrendingShowcase } from "./trending-showcase";
+import { UpcomingReel } from "./upcoming-reel";
 
 import type { AnimeCollection, Media } from "@/features/anime/types/anime";
 import type { Route } from "next";
@@ -76,7 +80,24 @@ export async function HomeCollectionSection({
         : batch.alltimepopular.slice(0, perPage);
   }
 
-  if (mosaic) return <FeatureMosaic title={title} href={href} items={items} />;
+  if (collection === "trending") return <TrendingShowcase items={items} />;
+  if (collection === "popular" || mosaic) return <FeatureMosaic title={title} href={href} items={items} />;
+  if (collection === "top100") return <Top100Podium title={title} href={href} items={items} />;
+  if (collection === "upcoming") return <UpcomingReel title={title} href={href} items={items} description={description} />;
+  if (collection === "alltimepopular" && items.length > 0) {
+    return (
+      <div className="space-y-16">
+        <EditorialBanner item={items[0]} />
+        <SectionRow
+          title={title}
+          href={href}
+          items={items.slice(1)}
+          description={description}
+          showRank={showRank}
+        />
+      </div>
+    );
+  }
 
   return (
     <SectionRow
