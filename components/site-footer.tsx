@@ -13,14 +13,14 @@ const collections: Array<{ href: Route; label: string }> = [
 
 export function SiteFooter() {
   return (
-    <footer className="mt-16 border-t border-border-soft bg-surface-1/35 pb-20 md:pb-0">
+    <footer className="mt-16 border-t border-border-soft bg-surface-1/40 pb-20 md:pb-0">
       <div className="mx-auto grid w-full max-w-[1680px] gap-12 px-4 py-12 sm:px-7 lg:grid-cols-[1.5fr_1fr_1fr_1fr] lg:px-10 lg:py-16">
         <div>
           <Link href="/" className="group inline-flex items-center gap-3">
-            <span className="flex size-9 items-center justify-center bg-accent text-white text-sm font-bold group-hover:bg-accent/80">
+            <span className="flex size-8 items-center justify-center rounded-md bg-signal text-white text-sm font-bold shadow-sm transition-all group-hover:bg-signal-strong">
               A
             </span>
-            <span className="font-mono text-sm font-semibold tracking-[0.22em]">ANINEXT</span>
+            <span className="font-mono text-sm font-semibold tracking-[0.22em] text-foreground">ANINEXT</span>
           </Link>
           <p className="mt-6 max-w-sm text-sm leading-7 text-muted-foreground">
             A calmer way to find what is airing, rising, and worth your next evening.

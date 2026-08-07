@@ -26,14 +26,14 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-border-soft bg-background/90 backdrop-blur-xl">
       <div className="mx-auto flex min-h-16 w-full max-w-[1680px] items-center gap-6 px-4 sm:px-7 lg:px-10">
         <Link href="/" className="group flex shrink-0 items-center gap-3" aria-label="AniNext home">
-          <span className="flex size-9 items-center justify-center bg-accent text-white text-sm font-bold transition-colors group-hover:bg-accent/80">
+          <span className="flex size-8 items-center justify-center rounded-md bg-signal text-white text-sm font-bold shadow-sm transition-all group-hover:bg-signal-strong">
             A
           </span>
           <span className="hidden leading-none sm:block">
-            <span className="block font-mono text-[0.68rem] font-semibold tracking-[0.24em]">
+            <span className="block font-mono text-[0.68rem] font-semibold tracking-[0.24em] text-foreground">
               ANINEXT
             </span>
-            <span className="mt-1 block text-[0.58rem] uppercase tracking-[0.18em] text-muted-foreground">
+            <span className="mt-0.5 block text-[0.58rem] uppercase tracking-[0.18em] text-muted-foreground">
               Discover anime
             </span>
           </span>
@@ -47,19 +47,16 @@ export function SiteHeader() {
               prefetch={item.prefetch}
               aria-current={isActive(item.href) ? "page" : undefined}
               className={cn(
-                "group flex items-center gap-2 px-3 py-2 text-sm transition-colors",
+                "group relative flex items-center gap-2 px-3 py-2 text-xs font-mono uppercase tracking-wider transition-colors",
                 isActive(item.href)
-                  ? "text-foreground"
+                  ? "text-foreground font-semibold"
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
               <span>{item.label}</span>
-              <span
-                className={cn(
-                  "h-px w-0 bg-foreground/30 transition-all group-hover:w-4",
-                  isActive(item.href) && "w-4",
-                )}
-              />
+              {isActive(item.href) && (
+                <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-signal" />
+              )}
             </Link>
           ))}
         </nav>
@@ -70,11 +67,11 @@ export function SiteHeader() {
             onClick={() => document.dispatchEvent(new CustomEvent("open-search"))}
             aria-label="Search anime"
             aria-keyshortcuts="Control+K Meta+K"
-            className="group flex h-9 items-center gap-2 border border-border bg-surface-1/60 px-3 text-sm text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+            className="group flex h-9 items-center gap-2.5 rounded-md border border-border-soft bg-surface-1/80 px-3 font-mono text-xs text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground"
           >
-            <SearchIcon aria-hidden="true" className="size-3.5" />
+            <SearchIcon aria-hidden="true" className="size-3.5 text-muted-foreground group-hover:text-signal" />
             <span className="hidden sm:inline">Find a title</span>
-            <kbd className="hidden border-l border-border pl-2 font-mono text-[0.62rem] text-muted-foreground sm:inline">
+            <kbd className="hidden border-l border-border-soft pl-2 font-mono text-[0.62rem] text-muted-foreground sm:inline">
               Ctrl/Cmd K
             </kbd>
           </button>
