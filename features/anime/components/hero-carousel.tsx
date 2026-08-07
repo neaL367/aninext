@@ -52,7 +52,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
 
   return (
     <section aria-label="Featured anime" className="relative bg-surface-1 lg:min-h-[660px]">
-      <div className="relative h-[300px] overflow-hidden lg:absolute lg:inset-y-0 lg:right-0 lg:h-full lg:w-[55%]">
+      <div className="relative h-[300px] overflow-hidden lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-[55%]">
         {items.map((item, i) => {
           const image = item.bannerImage ?? item.coverImage.extraLarge;
           const color = item.coverImage.color;
@@ -91,8 +91,8 @@ export function HeroCarousel({ items }: { items: Media[] }) {
             </div>
           );
         })}
-        <div className="pointer-events-none absolute inset-0 hidden bg-gradient-to-r from-surface-1/90 via-surface-1/50 to-transparent lg:block" />
-        <div className="absolute bottom-4 right-4 z-10">
+        <div className="pointer-events-none absolute inset-0 hidden bg-gradient-to-l from-surface-1/90 via-surface-1/50 to-transparent lg:block" />
+        <div className="absolute bottom-4 left-4 z-10">
           <div
             className="font-mono text-xs tabular-nums tracking-[0.1em] text-white/70"
             aria-live="polite"
@@ -103,7 +103,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
       </div>
 
       <div className="mx-auto flex w-full max-w-[1680px] items-center px-4 sm:px-7 lg:min-h-[660px] lg:px-10">
-        <div className="py-8 sm:py-10 lg:max-w-[45%]">
+        <div className="py-8 sm:py-10 lg:ml-auto lg:max-w-[45%]">
           <HeroInfo key={media.id} media={media} />
           <div className="mt-6 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.1em] text-muted-foreground">
             <span className="h-px w-8 bg-accent" /> Powered by AniList
@@ -116,10 +116,10 @@ export function HeroCarousel({ items }: { items: Media[] }) {
 
 export function HeroCarouselSkeleton() {
   return (
-    <div className="bg-surface-1">
-      <div className="h-[300px] shimmer lg:absolute lg:inset-y-0 lg:right-0 lg:h-full lg:w-[55%]" />
+    <div className="bg-surface-1 relative">
+      <div className="h-[300px] shimmer lg:absolute lg:inset-y-0 lg:left-0 lg:h-full lg:w-[55%]" />
       <div className="mx-auto flex w-full max-w-[1680px] items-center px-4 sm:px-7 lg:min-h-[660px] lg:px-10">
-        <div className="py-8 sm:py-10 lg:max-w-[45%]">
+        <div className="py-8 sm:py-10 lg:ml-auto lg:max-w-[45%]">
           <div className="space-y-4">
             <div className="shimmer h-3 w-24 rounded" />
             <div className="shimmer h-3 w-20 rounded" />
