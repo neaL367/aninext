@@ -48,7 +48,7 @@ export function MediaCard({
           ? "(min-width: 1024px) 42vw, 92vw"
           : "(min-width: 1280px) 16vw, (min-width: 768px) 24vw, 44vw"
       }
-      className="object-cover transition-transform duration-500 group-hover:scale-[1.035] motion-reduce:transform-none"
+      className="object-cover transition-transform duration-500 group-hover:scale-[1.035] motion-reduce:transform-none transform-gpu will-change-transform"
     />
   ) : null;
 
@@ -63,7 +63,7 @@ export function MediaCard({
     >
       <div
         className={cn(
-          "relative overflow-hidden border border-border-soft bg-surface-1 transition-[border-color,transform] duration-300 group-hover:-translate-y-1 group-hover:border-signal/55 motion-reduce:transform-none",
+          "relative overflow-hidden border border-border-soft bg-surface-1 transition-[border-color,transform] duration-300 group-hover:-translate-y-1 group-hover:border-signal/55 motion-reduce:transform-none isolate transform-gpu",
           size === "featured" ? "aspect-[16/9]" : "aspect-[2/3]",
         )}
         style={
@@ -94,7 +94,7 @@ export function MediaCard({
 
         {rank !== undefined && rank <= 100 && (
           <span
-            className="absolute left-3 top-3 flex size-8 items-center justify-center border border-white/35 font-mono text-xs font-semibold text-white backdrop-blur-sm"
+            className="pointer-events-none absolute left-3 top-3 flex size-8 items-center justify-center border border-white/35 font-mono text-xs font-semibold text-white backdrop-blur-sm"
             style={{ backgroundColor: color ?? "var(--signal-strong)" }}
           >
             {String(rank).padStart(2, "0")}
@@ -102,19 +102,19 @@ export function MediaCard({
         )}
 
         {score !== undefined && (
-          <span className="absolute right-3 top-3 rounded-sm bg-black/60 px-1.5 py-0.5 font-mono text-xs font-semibold tabular-nums backdrop-blur-sm">
+          <span className="pointer-events-none absolute right-3 top-3 rounded-sm bg-black/60 px-1.5 py-0.5 font-mono text-xs font-semibold tabular-nums backdrop-blur-sm">
             <MediaScore score={score} className="text-xs" />
           </span>
         )}
 
         {isReleasing && rank === undefined && (
-          <span className="absolute left-3 top-3 flex items-center gap-1.5 bg-live-badge px-2 py-1 font-mono text-[0.6rem] font-semibold uppercase tracking-[0.12em] text-white">
+          <span className="pointer-events-none absolute left-3 top-3 flex items-center gap-1.5 bg-live-badge px-2 py-1 font-mono text-[0.6rem] font-semibold uppercase tracking-[0.12em] text-white">
             <span className="size-1.5 animate-pulse rounded-full bg-white" />
             Live
           </span>
         )}
 
-        <div className="absolute inset-x-0 bottom-0 p-3.5">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3.5">
           <p className="line-clamp-2 text-sm font-semibold leading-snug text-white">{title}</p>
         </div>
       </div>

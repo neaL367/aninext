@@ -54,7 +54,7 @@ export function FeatureMosaic({
           <AnimePreviewCard media={heroItem}>
             <Link
               href={`/anime/${heroItem.id}` as Route<string>}
-              className="group relative block h-full min-h-[380px] overflow-hidden border border-border-soft bg-surface-1 transition-all duration-300 hover:-translate-y-1 hover:border-signal/60"
+              className="group relative block h-full min-h-[380px] overflow-hidden border border-border-soft bg-surface-1 transition-all duration-300 hover:-translate-y-1 hover:border-signal/60 isolate transform-gpu"
             >
               {heroCover && (
                 <MediaImage
@@ -63,23 +63,23 @@ export function FeatureMosaic({
                   fill
                   priority
                   sizes="(min-width: 1024px) 40vw, 100vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                  className="object-cover transition-transform duration-700 group-hover:scale-[1.03] transform-gpu will-change-transform"
                 />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
 
-              <span className="absolute top-3 left-3 bg-signal px-2 py-0.5 font-mono text-[0.65rem] font-bold uppercase tracking-wider text-white">
+              <span className="pointer-events-none absolute top-3 left-3 bg-signal px-2 py-0.5 font-mono text-[0.65rem] font-bold uppercase tracking-wider text-white">
                 Featured Highlight
               </span>
 
               {heroItem.averageScore && (
-                <span className="absolute top-3 right-3 bg-black/70 px-2 py-0.5 font-mono text-xs font-semibold text-signal backdrop-blur-md border border-white/10">
+                <span className="pointer-events-none absolute top-3 right-3 bg-black/70 px-2 py-0.5 font-mono text-xs font-semibold text-signal backdrop-blur-md border border-white/10">
                   <StarIcon className="inline size-3 mr-1 fill-signal" />
                   {(heroItem.averageScore / 10).toFixed(1)}
                 </span>
               )}
 
-              <div className="absolute inset-x-0 bottom-0 p-6 space-y-2">
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 p-6 space-y-2">
                 <h3 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground line-clamp-2 leading-snug">
                   {heroTitle}
                 </h3>

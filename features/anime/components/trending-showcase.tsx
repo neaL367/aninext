@@ -49,7 +49,7 @@ export function TrendingShowcase({ items }: { items: Media[] }) {
           <AnimePreviewCard media={heroItem}>
             <Link
               href={`/anime/${heroItem.id}` as Route<string>}
-              className="group relative block h-full min-h-[380px] sm:min-h-[440px] overflow-hidden border border-border-soft bg-surface-1 transition-all duration-300 hover:border-signal/60"
+              className="group relative block h-full min-h-[380px] sm:min-h-[440px] overflow-hidden border border-border-soft bg-surface-1 transition-all duration-300 hover:border-signal/60 isolate transform-gpu"
             >
               {heroCover && (
                 <MediaImage
@@ -58,13 +58,13 @@ export function TrendingShowcase({ items }: { items: Media[] }) {
                   fill
                   priority
                   sizes="(min-width: 1024px) 58vw, 100vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                  className="object-cover transition-transform duration-700 group-hover:scale-[1.03] transform-gpu will-change-transform"
                 />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
 
-              <div className="absolute inset-0 p-6 sm:p-8 flex flex-col justify-end space-y-3 z-10">
-                <div className="flex items-center gap-2 font-mono text-xs">
+              <div className="pointer-events-none absolute inset-0 p-6 sm:p-8 flex flex-col justify-end space-y-3 z-10">
+                <div className="flex items-center gap-2 font-mono text-xs pointer-events-auto">
                   <span className="bg-signal px-2 py-0.5 font-bold uppercase tracking-wider text-white">
                     #01 Trending
                   </span>
@@ -75,11 +75,11 @@ export function TrendingShowcase({ items }: { items: Media[] }) {
                   )}
                 </div>
 
-                <h3 className="text-2xl sm:text-4xl font-semibold tracking-[-0.04em] text-foreground line-clamp-2 leading-tight">
+                <h3 className="text-2xl sm:text-4xl font-semibold tracking-[-0.04em] text-foreground line-clamp-2 leading-tight pointer-events-auto">
                   {heroTitle}
                 </h3>
 
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-xs text-muted-foreground">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-xs text-muted-foreground pointer-events-auto">
                   {heroItem.averageScore && (
                     <span className="flex items-center gap-1 font-semibold text-foreground">
                       <StarIcon className="size-3.5 fill-signal text-signal" />
@@ -92,7 +92,7 @@ export function TrendingShowcase({ items }: { items: Media[] }) {
                 </div>
 
                 {heroDescription && (
-                  <p className="line-clamp-2 text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-xl">
+                  <p className="line-clamp-2 text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-xl pointer-events-auto">
                     {heroDescription}
                   </p>
                 )}
@@ -110,7 +110,7 @@ export function TrendingShowcase({ items }: { items: Media[] }) {
               <AnimePreviewCard key={item.id} media={item}>
                 <Link
                   href={`/anime/${item.id}` as Route<string>}
-                  className="group relative block overflow-hidden border border-border-soft bg-surface-1 transition-all duration-300 hover:-translate-y-1 hover:border-signal/50 aspect-[16/9]"
+                  className="group relative block overflow-hidden border border-border-soft bg-surface-1 transition-all duration-300 hover:-translate-y-1 hover:border-signal/50 aspect-[16/9] isolate transform-gpu"
                 >
                   {image && (
                     <MediaImage
@@ -118,22 +118,22 @@ export function TrendingShowcase({ items }: { items: Media[] }) {
                       alt={title}
                       fill
                       sizes="(min-width: 1024px) 18vw, 44vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105 transform-gpu will-change-transform"
                     />
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
 
-                  <span className="absolute top-2 left-2 bg-black/60 px-1.5 py-0.5 font-mono text-[0.65rem] font-bold text-white backdrop-blur-sm border border-white/20">
+                  <span className="pointer-events-none absolute top-2 left-2 bg-black/60 px-1.5 py-0.5 font-mono text-[0.65rem] font-bold text-white backdrop-blur-sm border border-white/20">
                     #{String(idx + 2).padStart(2, "0")}
                   </span>
 
                   {item.averageScore && (
-                    <span className="absolute top-2 right-2 bg-black/60 px-1.5 py-0.5 font-mono text-[0.65rem] font-bold text-signal backdrop-blur-sm">
+                    <span className="pointer-events-none absolute top-2 right-2 bg-black/60 px-1.5 py-0.5 font-mono text-[0.65rem] font-bold text-signal backdrop-blur-sm">
                       {(item.averageScore / 10).toFixed(1)}
                     </span>
                   )}
 
-                  <div className="absolute bottom-2 inset-x-2">
+                  <div className="pointer-events-none absolute bottom-2 inset-x-2">
                     <p className="line-clamp-1 font-semibold text-xs text-white leading-tight">
                       {title}
                     </p>

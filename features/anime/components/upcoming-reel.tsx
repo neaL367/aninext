@@ -55,7 +55,7 @@ export function UpcomingReel({
             <AnimePreviewCard key={item.id} media={item}>
               <Link
                 href={`/anime/${item.id}` as Route<string>}
-                className="group relative block overflow-hidden border border-border-soft bg-surface-1 transition-all duration-300 hover:-translate-y-1 hover:border-signal/50 aspect-[16/10]"
+                className="group relative block overflow-hidden border border-border-soft bg-surface-1 transition-all duration-300 hover:-translate-y-1 hover:border-signal/50 aspect-[16/10] isolate transform-gpu"
               >
                 {banner && (
                   <MediaImage
@@ -63,16 +63,16 @@ export function UpcomingReel({
                     alt={itemTitle}
                     fill
                     sizes="(min-width: 1024px) 22vw, 44vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105 transform-gpu will-change-transform"
                   />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
 
-                <span className="absolute top-3 left-3 bg-surface-1/90 px-2 py-0.5 font-mono text-[0.62rem] font-bold uppercase tracking-wider text-signal backdrop-blur-md border border-border-soft">
+                <span className="pointer-events-none absolute top-3 left-3 bg-surface-1/90 px-2 py-0.5 font-mono text-[0.62rem] font-bold uppercase tracking-wider text-signal backdrop-blur-md border border-border-soft">
                   {seasonYear}
                 </span>
 
-                <div className="absolute bottom-3 inset-x-3 space-y-1">
+                <div className="pointer-events-none absolute bottom-3 inset-x-3 space-y-1">
                   <h4 className="font-semibold text-sm text-foreground line-clamp-1 leading-snug group-hover:text-signal transition-colors">
                     {itemTitle}
                   </h4>

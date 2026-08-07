@@ -26,7 +26,7 @@ export function EditorialBanner({ item }: { item: Media }) {
       <AnimePreviewCard media={item}>
         <Link
           href={`/anime/${item.id}` as Route<string>}
-          className="group relative block min-h-[320px] sm:min-h-[380px] w-full overflow-hidden"
+          className="group relative block min-h-[320px] sm:min-h-[380px] w-full overflow-hidden isolate transform-gpu"
         >
           {banner && (
             <MediaImage
@@ -34,11 +34,11 @@ export function EditorialBanner({ item }: { item: Media }) {
               alt={title}
               fill
               sizes="100vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
+              className="object-cover transition-transform duration-700 group-hover:scale-105 transform-gpu will-change-transform"
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background via-background/70 to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
 
           <div className="relative z-10 p-8 sm:p-12 max-w-2xl space-y-4 flex flex-col justify-center h-full min-h-[320px] sm:min-h-[380px]">
             <div className="flex items-center gap-3 font-mono text-xs">

@@ -62,7 +62,7 @@ export function Top100Podium({
             <AnimePreviewCard key={item.id} media={item}>
               <Link
                 href={`/anime/${item.id}` as Route<string>}
-                className={`group relative block overflow-hidden border bg-surface-1 transition-all duration-300 hover:-translate-y-1 ${config.border} ${
+                className={`group relative block overflow-hidden border bg-surface-1 transition-all duration-300 hover:-translate-y-1 isolate transform-gpu ${config.border} ${
                   idx === 0 ? "min-h-[380px] sm:min-h-[420px]" : "min-h-[320px] sm:min-h-[360px]"
                 }`}
               >
@@ -72,23 +72,23 @@ export function Top100Podium({
                     alt={itemTitle}
                     fill
                     sizes="(min-width: 640px) 30vw, 90vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105 transform-gpu will-change-transform"
                   />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
 
-                <span className={`absolute top-3 left-3 px-2.5 py-0.5 font-mono text-xs font-bold ${config.badge}`}>
+                <span className={`pointer-events-none absolute top-3 left-3 px-2.5 py-0.5 font-mono text-xs font-bold ${config.badge}`}>
                   {config.label}
                 </span>
 
                 {item.averageScore && (
-                  <span className="absolute top-3 right-3 bg-black/70 px-2 py-0.5 font-mono text-xs font-semibold text-signal backdrop-blur-md border border-white/10">
+                  <span className="pointer-events-none absolute top-3 right-3 bg-black/70 px-2 py-0.5 font-mono text-xs font-semibold text-signal backdrop-blur-md border border-white/10">
                     <StarIcon className="inline size-3 mr-1 fill-signal" />
                     {(item.averageScore / 10).toFixed(1)}
                   </span>
                 )}
 
-                <div className="absolute inset-x-0 bottom-0 p-5 space-y-1">
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 p-5 space-y-1">
                   <h3 className="text-base sm:text-lg font-semibold tracking-tight text-foreground line-clamp-2 leading-tight">
                     {itemTitle}
                   </h3>
