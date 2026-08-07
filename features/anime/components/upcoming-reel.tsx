@@ -55,7 +55,7 @@ export function UpcomingReel({
             <AnimePreviewCard key={item.id} media={item}>
               <Link
                 href={`/anime/${item.id}` as Route<string>}
-                className="group relative block overflow-hidden border border-border-soft bg-surface-1 transition-all duration-300 hover:-translate-y-1 hover:border-signal/50 aspect-[16/10] isolate transform-gpu"
+                className="group relative block overflow-hidden border border-border-soft bg-surface-1 transition-colors duration-300 hover:border-signal/60 aspect-[16/10] isolate transform-gpu"
               >
                 {banner && (
                   <MediaImage

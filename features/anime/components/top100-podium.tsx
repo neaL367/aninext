@@ -62,7 +62,7 @@ export function Top100Podium({
             <AnimePreviewCard key={item.id} media={item}>
               <Link
                 href={`/anime/${item.id}` as Route<string>}
-                className={`group relative block overflow-hidden border bg-surface-1 transition-all duration-300 hover:-translate-y-1 isolate transform-gpu ${config.border} ${
+                className={`group relative block overflow-hidden border bg-surface-1 transition-colors duration-300 hover:border-signal/60 isolate transform-gpu ${config.border} ${
                   idx === 0 ? "min-h-[380px] sm:min-h-[420px]" : "min-h-[320px] sm:min-h-[360px]"
                 }`}
               >

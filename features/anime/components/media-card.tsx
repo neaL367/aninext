@@ -63,7 +63,7 @@ export function MediaCard({
     >
       <div
         className={cn(
-          "relative overflow-hidden border border-border-soft bg-surface-1 transition-[border-color,transform] duration-300 group-hover:-translate-y-1 group-hover:border-signal/55 motion-reduce:transform-none isolate transform-gpu",
+          "relative overflow-hidden border border-border-soft bg-surface-1 transition-colors duration-300 group-hover:border-signal/60 motion-reduce:transform-none isolate transform-gpu",
           size === "featured" ? "aspect-[16/9]" : "aspect-[2/3]",
         )}
         style={

@@ -54,7 +54,7 @@ export function FeatureMosaic({
           <AnimePreviewCard media={heroItem}>
             <Link
               href={`/anime/${heroItem.id}` as Route<string>}
-              className="group relative block h-full min-h-[380px] overflow-hidden border border-border-soft bg-surface-1 transition-all duration-300 hover:-translate-y-1 hover:border-signal/60 isolate transform-gpu"
+              className="group relative block h-full min-h-[380px] overflow-hidden border border-border-soft bg-surface-1 transition-colors duration-300 hover:border-signal/60 isolate transform-gpu"
             >
               {heroCover && (
                 <MediaImage
