@@ -2,7 +2,7 @@ import { io } from "next/cache";
 
 import { getBrowseCollection, getAiringWeek } from "@/features/anime/anime-queries";
 
-import { AiringHomeSection } from "../airing/airing-home-section";
+import { AiringHomeSection } from "./airing-home-section";
 import { FeatureMosaic } from "./feature-mosaic";
 import { HeroCarousel } from "./hero-carousel";
 import { SectionRow } from "./section-row";

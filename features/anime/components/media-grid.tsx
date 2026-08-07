@@ -1,5 +1,5 @@
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
-import { MediaCard, MediaCardSkeleton } from "@/features/anime/components/home/media-card";
+import { MediaCard, MediaCardSkeleton } from "@/features/anime/components/media-card";
 
 import type { Media } from "@/features/anime/types/anime";
 

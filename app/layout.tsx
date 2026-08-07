@@ -9,7 +9,7 @@ import { SiteHeader, SiteHeaderFallback } from "@/components/site-header";
 import { SiteMobileNav } from "@/components/site-mobile-nav";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { SearchCommand } from "@/features/anime/components/browse/search-command";
+import { SearchCommand } from "@/features/anime/components/search-command";
 
 import type { Metadata, Viewport } from "next";
 import "./globals.css";

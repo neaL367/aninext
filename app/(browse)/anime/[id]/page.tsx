@@ -3,10 +3,7 @@ import { Suspense } from "react";
 import { Crossfade } from "@/components/ui/crossfade";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { getAnimeMeta } from "@/features/anime/anime-queries";
-import {
-  DetailSection,
-  DetailSectionSkeleton,
-} from "@/features/anime/components/detail/detail-section";
+import { DetailSection, DetailSectionSkeleton } from "@/features/anime/components/detail-section";
 
 import type { Metadata } from "next";
 

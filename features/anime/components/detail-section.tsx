@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { getAnimeDetail } from "@/features/anime/anime-queries";
 
-import { GenreList } from "../home/genre-pills";
 import { AnimeAiringSchedule, AnimeAiringScheduleSkeleton } from "./anime-airing-schedule";
 import { AnimeCharacters, AnimeCharactersSkeleton } from "./anime-characters";
 import { AnimeHero, AnimeHeroSkeleton } from "./anime-hero";
@@ -12,6 +11,7 @@ import { AnimeRelations, AnimeRelationsSkeleton } from "./anime-relations";
 import { AnimeStaff, AnimeStaffSkeleton } from "./anime-staff";
 import { AnimeStreamingEpisodes, AnimeStreamingEpisodesSkeleton } from "./anime-streaming-episodes";
 import { AnimeTrailer, AnimeTrailerSkeleton } from "./anime-trailer";
+import { GenreList } from "./genre-pills";
 
 export async function DetailSection({ id }: { id: number }) {
   const detail = await getAnimeDetail(id);

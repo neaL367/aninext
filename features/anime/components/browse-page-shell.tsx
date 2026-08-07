@@ -3,22 +3,16 @@ import { Suspense } from "react";
 import { Crossfade } from "@/components/ui/crossfade";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { getGenres } from "@/features/anime/anime-queries";
-import {
-  ActiveFilters,
-  ActiveFiltersSkeleton,
-} from "@/features/anime/components/browse/active-filters";
-import { AnimeResults } from "@/features/anime/components/browse/anime-results";
-import { CollectionNav } from "@/features/anime/components/browse/collection-nav";
-import {
-  FilterSidebar,
-  FilterSidebarSkeleton,
-} from "@/features/anime/components/browse/filter-sidebar";
-import { MediaGridSkeleton } from "@/features/anime/components/browse/media-grid";
+import { ActiveFilters, ActiveFiltersSkeleton } from "@/features/anime/components/active-filters";
+import { AnimeResults } from "@/features/anime/components/anime-results";
+import { CollectionNav } from "@/features/anime/components/collection-nav";
+import { FilterSidebar, FilterSidebarSkeleton } from "@/features/anime/components/filter-sidebar";
+import { MediaGridSkeleton } from "@/features/anime/components/media-grid";
 import {
   MobileFilterDrawer,
   MobileFilterDrawerFallback,
-} from "@/features/anime/components/browse/mobile-filter-drawer";
-import { SearchBar, SearchBarFallback } from "@/features/anime/components/browse/search-bar";
+} from "@/features/anime/components/mobile-filter-drawer";
+import { SearchBar, SearchBarFallback } from "@/features/anime/components/search-bar";
 import { COLLECTIONS } from "@/features/anime/lib/collection-config";
 
 import type { AnimeCollection } from "@/features/anime/types/anime";

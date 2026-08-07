@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 
 import { ImageWithLoading } from "@/components/ui/image-with-loading";
 
-import { HeroInfo } from "./hero-content";
+import { HeroInfo } from "./hero-info";
 
 import type { Media } from "@/features/anime/types/anime";
 

@@ -2,10 +2,7 @@ import { RadioIcon } from "lucide-react";
 import { Suspense } from "react";
 
 import { Crossfade } from "@/components/ui/crossfade";
-import {
-  AiringContent,
-  AiringContentSkeleton,
-} from "@/features/anime/components/airing/airing-content";
+import { AiringContent, AiringContentSkeleton } from "@/features/anime/components/airing-content";
 
 import type { Metadata } from "next";
 

@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 
-import { BrowsePageShell } from "@/features/anime/components/browse/browse-page-shell";
-import { CollectionResults } from "@/features/anime/components/browse/collection-results";
-import { MediaGridSkeleton } from "@/features/anime/components/browse/media-grid";
+import { BrowsePageShell } from "@/features/anime/components/browse-page-shell";
+import { CollectionResults } from "@/features/anime/components/collection-results";
+import { MediaGridSkeleton } from "@/features/anime/components/media-grid";
 import { getCollectionMetadata } from "@/features/anime/lib/collection-config";
 import { parseFilters } from "@/features/anime/lib/parse-filters";
 

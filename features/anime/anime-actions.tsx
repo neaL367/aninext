@@ -1,7 +1,7 @@
 "use server";
 
 import { getAiringDay, getBrowseCollection } from "@/features/anime/anime-queries";
-import { MediaGrid } from "@/features/anime/components/browse/media-grid";
+import { MediaGrid } from "@/features/anime/components/media-grid";
 
 import type { AnimeCollection, AnimeFilters } from "@/features/anime/types/anime";
 import type { ReactNode } from "react";
