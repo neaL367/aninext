@@ -20,7 +20,6 @@ export function MediaCard({
   size = "default",
   rank,
   viewTransition = false,
-  vtIndex,
   priority = false,
   coverTier,
 }: {
@@ -28,7 +27,6 @@ export function MediaCard({
   size?: "default" | "featured";
   rank?: number;
   viewTransition?: boolean;
-  vtIndex?: number;
   priority?: boolean;
   coverTier?: CoverTier;
 }) {
@@ -77,11 +75,7 @@ export function MediaCard({
       >
         {coverImage ? (
           viewTransition ? (
-            <ViewTransition
-              name={`anime-cover-grid-${media.id}-${vtIndex ?? 0}`}
-              share="morph"
-              default="none"
-            >
+            <ViewTransition name={`anime-cover-${media.id}`} share="morph" default="none">
               {coverImage}
             </ViewTransition>
           ) : (

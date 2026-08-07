@@ -57,7 +57,7 @@ export function AnimeHero({ media }: { media: Media }) {
               style={color ? { backgroundColor: color } : undefined}
             >
               {cover ? (
-                <ViewTransition name={`anime-cover-hero-${media.id}`} share="morph" default="none">
+                <ViewTransition name={`anime-cover-${media.id}`} share="morph" default="none">
                   <ImageWithLoading
                     src={cover}
                     alt={`${title} cover`}
