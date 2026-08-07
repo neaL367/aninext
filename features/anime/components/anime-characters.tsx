@@ -26,16 +26,16 @@ export function AnimeCharacters({ edges }: { edges: CharacterEdge[] }) {
         return (
           <article
             key={`${edge.node.id}-${index}`}
-            className="group flex items-center gap-4 border border-border p-3 transition-colors hover:border-accent/40 hover:bg-surface-1/40"
+            className="group flex items-center gap-4 rounded-md border border-border-soft bg-surface-1/60 p-3 transition-colors hover:border-signal/60 hover:bg-surface-1 isolate transform-gpu"
           >
-            <div className="relative h-[72px] w-[54px] shrink-0 overflow-hidden bg-surface-2">
+            <div className="relative h-[72px] w-[54px] shrink-0 overflow-hidden rounded bg-surface-2">
               {edge.node.image.medium ? (
                 <MediaImage
                   src={edge.node.image.medium}
                   alt={edge.node.name.full}
                   fill
                   sizes="54px"
-                  className="object-cover"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105 transform-gpu will-change-transform"
                 />
               ) : (
                 <div className="flex h-full items-center justify-center p-1 text-center font-mono text-[0.5rem] uppercase text-muted-foreground">
@@ -44,14 +44,14 @@ export function AnimeCharacters({ edges }: { edges: CharacterEdge[] }) {
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold">{edge.node.name.full}</p>
-              <p className="mt-0.5 font-mono text-xs uppercase tracking-[0.06em] text-muted-foreground">
+              <p className="truncate text-sm font-semibold text-foreground group-hover:text-signal transition-colors">{edge.node.name.full}</p>
+              <p className="mt-0.5 font-mono text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">
                 {edge.role}
               </p>
             </div>
             {voiceActor && (
-              <div className="flex shrink-0 items-center gap-2 border-l border-border pl-3">
-                <div className="relative size-9 shrink-0 overflow-hidden rounded-full bg-surface-2">
+              <div className="flex shrink-0 items-center gap-2 border-l border-border-soft pl-3">
+                <div className="relative size-9 shrink-0 overflow-hidden rounded-full border border-border-soft bg-surface-2">
                   {voiceActor.image.medium ? (
                     <MediaImage
                       src={voiceActor.image.medium}

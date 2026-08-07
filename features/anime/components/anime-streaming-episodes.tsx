@@ -23,35 +23,35 @@ export function AnimeStreamingEpisodes({ media }: { media: Media }) {
 
   return (
     <div className="max-h-[420px] overflow-y-auto scrollbar-thin">
-      <div className="divide-y divide-border">
+      <div className="divide-y divide-border-soft">
         {episodes.map((ep, i) => (
           <a
             key={`${ep.url}-${i}`}
             href={ep.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex items-center gap-4 py-3 first:pt-0 last:pb-0"
+            className="group flex items-center gap-4 py-3 px-2 rounded-md transition-colors hover:bg-surface-1/60"
           >
             {ep.thumbnail ? (
-              <div className="relative h-[54px] w-[96px] shrink-0 overflow-hidden bg-surface-2">
-                <Image src={ep.thumbnail} alt="" fill sizes="96px" className="object-cover" />
+              <div className="relative h-[54px] w-[96px] shrink-0 overflow-hidden rounded border border-border-soft bg-surface-2">
+                <Image src={ep.thumbnail} alt="" fill sizes="96px" unoptimized className="object-cover transition-transform duration-300 group-hover:scale-105 transform-gpu" />
               </div>
             ) : (
-              <span className="flex size-[54px] shrink-0 items-center justify-center border border-border font-mono text-sm text-muted-foreground">
+              <span className="flex size-[54px] shrink-0 items-center justify-center rounded border border-border-soft font-mono text-sm text-muted-foreground bg-surface-1">
                 {String(i + 1).padStart(2, "0")}
               </span>
             )}
             <div className="min-w-0 flex-1">
-              <p className="line-clamp-2 text-sm font-medium group-hover:text-accent">
+              <p className="line-clamp-2 text-xs sm:text-sm font-semibold text-foreground group-hover:text-signal transition-colors">
                 {ep.title || `Episode ${i + 1}`}
               </p>
               {ep.site && (
-                <p className="mt-1 font-mono text-xs uppercase tracking-[0.06em] text-muted-foreground">
+                <p className="mt-0.5 font-mono text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">
                   {ep.site}
                 </p>
               )}
             </div>
-            <ExternalLinkIcon className="size-4 shrink-0 text-muted-foreground group-hover:text-accent" />
+            <ExternalLinkIcon className="size-3.5 shrink-0 text-muted-foreground group-hover:text-signal transition-colors" />
           </a>
         ))}
       </div>

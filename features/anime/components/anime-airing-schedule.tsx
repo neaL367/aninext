@@ -9,7 +9,7 @@ export function AnimeAiringSchedule({ nodes }: { nodes: AiringScheduleNode[] }) 
 
   return (
     <>
-      <p className="eyebrow text-accent">Schedule</p>
+      <p className="eyebrow text-signal">Schedule</p>
       <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">Next episodes</h2>
       <div className="mt-5">
         <AnimeAiringScheduleList nodes={nodes} />

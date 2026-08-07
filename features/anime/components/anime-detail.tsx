@@ -23,7 +23,7 @@ export async function AnimeDetail({ id }: { id: number }) {
       <section className="border-b border-border-soft py-12">
         <SectionHeader
           eyebrow="Watch"
-          eyebrowClassName="text-accent"
+          eyebrowClassName="text-signal"
           title="Choose your next scene"
         />
         <div className="mt-7 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
@@ -37,7 +37,7 @@ export async function AnimeDetail({ id }: { id: number }) {
           <section aria-label="Characters">
             <SectionHeader
               eyebrow="Cast"
-              eyebrowClassName="text-accent"
+              eyebrowClassName="text-signal"
               title="Characters and voices"
             />
             <div className="mt-7">
@@ -48,7 +48,7 @@ export async function AnimeDetail({ id }: { id: number }) {
           <section aria-label="More like this" className="border-t border-border-soft pt-12 mt-12">
             <SectionHeader
               eyebrow="Continue"
-              eyebrowClassName="text-accent"
+              eyebrowClassName="text-signal"
               title="More like this"
             />
             <div className="mt-7">
@@ -63,19 +63,19 @@ export async function AnimeDetail({ id }: { id: number }) {
               <AnimeAiringSchedule nodes={airingSchedule} />
             </section>
             <section aria-label="Related anime">
-              <SectionHeader eyebrow="Universe" eyebrowClassName="text-accent" title="Related" />
+              <SectionHeader eyebrow="Universe" eyebrowClassName="text-signal" title="Related" />
               <div className="mt-5">
                 <AnimeRelations edges={relations} />
               </div>
             </section>
             <section aria-label="Staff">
-              <SectionHeader eyebrow="Credits" eyebrowClassName="text-accent" title="Staff" />
+              <SectionHeader eyebrow="Credits" eyebrowClassName="text-signal" title="Staff" />
               <div className="mt-5">
                 <AnimeStaff edges={staff} />
               </div>
             </section>
             <section aria-label="Genres">
-              <SectionHeader eyebrow="Topics" eyebrowClassName="text-accent" title="Genres" />
+              <SectionHeader eyebrow="Topics" eyebrowClassName="text-signal" title="Genres" />
               <div className="mt-5">
                 <GenreList genres={media.genres} />
               </div>

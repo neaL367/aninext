@@ -33,7 +33,7 @@ export function AnimeRelations({ edges }: { edges: RelationEdge[] }) {
         tabIndex={0}
         role="list"
         aria-label="Related anime"
-        className="max-h-[360px] overflow-y-auto scrollbar-thin divide-y divide-border border-y border-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+        className="max-h-[360px] overflow-y-auto scrollbar-thin divide-y divide-border-soft border-y border-border-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
       >
         {edges.map((edge, i) => {
           const title = getTitle(edge.node.title);
@@ -44,10 +44,10 @@ export function AnimeRelations({ edges }: { edges: RelationEdge[] }) {
               <Link
                 href={`/anime/${edge.node.id}` as Route<string>}
                 role="listitem"
-                className="group flex items-center gap-3 py-3 first:pt-0 last:pb-0"
+                className="group flex items-center gap-3 py-3 transition-colors hover:bg-surface-1/50 px-2 rounded-md"
               >
                 <div
-                  className="relative h-14 w-10 shrink-0 overflow-hidden border border-border bg-surface-2"
+                  className="relative h-14 w-10 shrink-0 overflow-hidden rounded border border-border-soft bg-surface-2"
                   style={color ? { backgroundColor: color } : undefined}
                 >
                   {cover ? (
@@ -56,7 +56,7 @@ export function AnimeRelations({ edges }: { edges: RelationEdge[] }) {
                       alt={title}
                       fill
                       sizes="48px"
-                      className="object-cover"
+                      className="object-cover transition-transform duration-300 group-hover:scale-105 transform-gpu"
                     />
                   ) : (
                     <div
@@ -70,7 +70,7 @@ export function AnimeRelations({ edges }: { edges: RelationEdge[] }) {
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="line-clamp-2 text-sm font-medium leading-snug group-hover:text-accent">
+                  <p className="line-clamp-2 text-xs font-semibold leading-snug text-foreground group-hover:text-signal transition-colors">
                     {title}
                   </p>
                   <p className="mt-1 font-mono text-[0.6rem] uppercase tracking-[0.06em] text-muted-foreground">
