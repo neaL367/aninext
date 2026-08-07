@@ -15,7 +15,6 @@ export function HeroCarousel({ items }: { items: Media[] }) {
   const [current, setCurrent] = useState(0);
   const [prev, setPrev] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [isHovered, setIsHovered] = useState(false);
   const [progress, setProgress] = useState(0);
 
   const dragStartX = useRef<number | null>(null);
@@ -41,7 +40,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
 
   // Autoplay and Progress Bar Loop
   useEffect(() => {
-    if (len < 2 || !isPlaying || isHovered) {
+    if (len < 2 || !isPlaying) {
       if (progressTimerRef.current) cancelAnimationFrame(progressTimerRef.current);
       return;
     }
@@ -66,7 +65,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
     return () => {
       cancelAnimationFrame(animationFrameId);
     };
-  }, [current, isPlaying, isHovered, len, next]);
+  }, [current, isPlaying, len, next]);
 
   // Keyboard navigation (Left/Right arrows, Space bar)
   useEffect(() => {
@@ -123,9 +122,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
     <section
       aria-label="Featured anime hero carousel"
       className="relative w-full h-[500px] sm:h-[580px] lg:h-[640px] overflow-hidden bg-background select-none cursor-grab active:cursor-grabbing"
-      onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => {
-        setIsHovered(false);
         isDragging.current = false;
         dragStartX.current = null;
       }}
