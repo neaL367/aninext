@@ -262,3 +262,47 @@
     animation: none;
   }
 }
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes page-exit {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+::view-transition-new(.page-enter) {
+  animation-name: page-enter;
+  animation-duration: 300ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+}
+
+::view-transition-old(.page-exit) {
+  animation-name: page-exit;
+  animation-duration: 180ms;
+  animation-timing-function: ease;
+  animation-fill-mode: both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(.page-enter),
+  ::view-transition-group(.page-exit),
+  ::view-transition-group(.morph) {
+    animation: none;
+  }
+}

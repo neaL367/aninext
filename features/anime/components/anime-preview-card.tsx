@@ -35,7 +35,6 @@ export function AnimePreviewCard({ media, children }: { media: Media; children: 
               sizes="352px"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-card via-card/60 to-transparent" />
             {media.averageScore && (
               <div className="absolute right-3 top-3 flex items-center gap-1 rounded-sm bg-black/70 px-2 py-1 backdrop-blur-sm">
                 <span

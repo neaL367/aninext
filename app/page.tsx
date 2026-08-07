@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 
+import { Crossfade } from "@/components/ui/crossfade";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { HomeFeatured, HomeFeaturedSkeleton } from "@/features/anime/components/home-featured";
 
@@ -13,10 +14,12 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <ErrorBoundary title="Home failed to load">
-      <Suspense fallback={<HomeFeaturedSkeleton />}>
-        <HomeFeatured />
-      </Suspense>
-    </ErrorBoundary>
+    <Crossfade>
+      <ErrorBoundary title="Home failed to load">
+        <Suspense fallback={<HomeFeaturedSkeleton />}>
+          <HomeFeatured />
+        </Suspense>
+      </ErrorBoundary>
+    </Crossfade>
   );
 }
