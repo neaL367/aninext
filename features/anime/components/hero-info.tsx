@@ -14,9 +14,7 @@ export function HeroInfo({ media, rank }: { media: Media; rank?: number }) {
     <div className="space-y-4 max-w-3xl">
       {/* Eyebrow */}
       <div className="animate-stagger-up flex items-center gap-3 font-mono text-xs uppercase tracking-[0.14em]">
-        <p className="eyebrow">
-          {rank ? `Ranked #${rank}` : "Featured selection"}
-        </p>
+        <p className="eyebrow">{rank ? `Ranked #${rank}` : "Featured selection"}</p>
       </div>
 
       {/* Main Title */}
@@ -42,7 +40,9 @@ export function HeroInfo({ media, rank }: { media: Media; rank?: number }) {
         {media.format && <span>{formatFormat(media.format)}</span>}
         {media.episodes && <span>{media.episodes} episodes</span>}
         {media.season && media.seasonYear && (
-          <span>{media.season} {media.seasonYear}</span>
+          <span>
+            {media.season} {media.seasonYear}
+          </span>
         )}
         {media.status === "RELEASING" ? (
           <span className="inline-flex items-center gap-1.5 rounded-md border border-destructive/30 bg-destructive/15 px-2 py-0.5 font-mono text-[0.65rem] font-bold uppercase text-destructive">

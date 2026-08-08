@@ -46,10 +46,10 @@
 .dark {
   --background: oklch(0 0 0);
   --foreground: oklch(0.98 0 0);
-  --surface-1: oklch(0.06 0 0);
-  --surface-2: oklch(0.1 0 0);
-  --surface-3: oklch(0.15 0 0);
-  --card: oklch(0.06 0 0);
+  --surface-1: oklch(0.07 0 0);
+  --surface-2: oklch(0.13 0 0);
+  --surface-3: oklch(0.24 0 0);
+  --card: oklch(0.07 0 0);
   --card-foreground: oklch(0.98 0 0);
   --card-hover: oklch(0.11 0 0);
   --popover: oklch(0.06 0 0);
@@ -177,9 +177,14 @@
 
 @layer utilities {
   .shimmer {
-    background: linear-gradient(105deg, var(--muted) 0%, var(--surface-3) 45%, var(--muted) 100%);
-    background-size: 220% 100%;
-    animation: shimmer 2.4s ease-in-out infinite;
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--surface-2) 90%, transparent) 0%,
+      color-mix(in srgb, var(--surface-3) 95%, transparent) 50%,
+      color-mix(in srgb, var(--surface-2) 90%, transparent) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
   .eyebrow {
@@ -234,10 +239,10 @@
 
   @keyframes shimmer {
     0% {
-      background-position: 180% 0;
+      background-position: 200% 0;
     }
     100% {
-      background-position: -80% 0;
+      background-position: -200% 0;
     }
   }
 }
@@ -391,5 +396,3 @@
 .animate-stagger-up {
   animation: stagger-up 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
-
-

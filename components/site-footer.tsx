@@ -20,7 +20,9 @@ export function SiteFooter() {
             <span className="flex size-8 items-center justify-center rounded-md bg-signal text-white text-sm font-bold shadow-sm transition-all group-hover:bg-signal-strong">
               A
             </span>
-            <span className="font-mono text-sm font-semibold tracking-[0.22em] text-foreground">ANINEXT</span>
+            <span className="font-mono text-sm font-semibold tracking-[0.22em] text-foreground">
+              ANINEXT
+            </span>
           </Link>
           <p className="mt-6 max-w-sm text-sm leading-7 text-muted-foreground">
             A calmer way to find what is airing, rising, and worth your next evening.

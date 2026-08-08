@@ -44,7 +44,9 @@ export function AnimeCharacters({ edges }: { edges: CharacterEdge[] }) {
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-foreground group-hover:text-signal transition-colors">{edge.node.name.full}</p>
+              <p className="truncate text-sm font-semibold text-foreground group-hover:text-signal transition-colors">
+                {edge.node.name.full}
+              </p>
               <p className="mt-0.5 font-mono text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">
                 {edge.role}
               </p>

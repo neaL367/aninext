@@ -23,7 +23,7 @@ export function BrowsePaginator({
   emptyComponent: ReactNode;
 }) {
   return (
-    <Suspense fallback={<ResultsGrid>{skeleton}</ResultsGrid>}>
+    <Suspense fallback={skeleton}>
       <BrowsePaginatorContent
         initialPage={initialPage}
         collection={collection}
@@ -40,7 +40,7 @@ function BrowsePaginatorContent({
   initialPage,
   collection,
   filters,
-  skeleton,
+  skeleton: _skeleton,
   pageSize,
   emptyComponent,
 }: {
@@ -58,11 +58,27 @@ function BrowsePaginatorContent({
   const [hasItems] = useState(initialResult.hasItems);
   const loadingRef = useRef(false);
   const lastLoadRef = useRef(0);
+  const cooldownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (cooldownTimerRef.current) clearTimeout(cooldownTimerRef.current);
+    };
+  }, []);
 
   function loadMore() {
     if (!hasMore || loadingRef.current) return;
     const now = Date.now();
-    if (now - lastLoadRef.current < 500) return;
+    const elapsed = now - lastLoadRef.current;
+    if (elapsed < 500) {
+      if (!cooldownTimerRef.current) {
+        cooldownTimerRef.current = setTimeout(() => {
+          cooldownTimerRef.current = null;
+          loadMore();
+        }, 500 - elapsed);
+      }
+      return;
+    }
     lastLoadRef.current = now;
 
     const nextPage = pages.length + 1;
@@ -83,11 +99,15 @@ function BrowsePaginatorContent({
     });
   }
 
+  const pageSkeleton = (
+    <MediaGridSkeletonItems count={pageSize} rankStart={collection === "top100" ? 1 : undefined} />
+  );
+
   return (
     <>
       <ResultsGrid>
         {pages.map((page, i) => (
-          <Suspense key={i} fallback={skeleton}>
+          <Suspense key={i} fallback={pageSkeleton}>
             <PageContent page={page} />
           </Suspense>
         ))}
@@ -105,13 +125,11 @@ function BrowsePaginatorContent({
   );
 }
 
+import { MEDIA_GRID_CLASS, MediaGridSkeletonItems } from "./media-grid";
+
 function ResultsGrid({ children }: { children: ReactNode }) {
   return (
-    <div
-      className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-5 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6"
-      role="list"
-      aria-label="Anime results"
-    >
+    <div className={MEDIA_GRID_CLASS} role="list" aria-label="Anime results">
       {children}
     </div>
   );

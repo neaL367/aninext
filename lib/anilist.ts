@@ -30,7 +30,8 @@ async function respectLocalBudget(): Promise<void> {
   }
   if (requestLog.length >= REAL_LIMIT) {
     const oldest = requestLog[0] ?? now;
-    const waitMs = WINDOW_MS - (now - oldest) + Math.floor(Math.random() * 50) + 10;
+    const rawWait = WINDOW_MS - (now - oldest) + Math.floor(Math.random() * 50) + 10;
+    const waitMs = Math.min(rawWait, 1500);
     await wait(waitMs);
     return respectLocalBudget();
   }
@@ -149,4 +150,3 @@ export async function anilistFetch<T>(
   inFlightMap.set(key, promise);
   return promise;
 }
-

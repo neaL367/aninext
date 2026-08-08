@@ -10,6 +10,7 @@ import {
   getMediaTitle,
   stripHtml,
 } from "@/features/anime/lib/media-helpers";
+
 import { MediaCard, MediaCardSkeleton } from "./media-card";
 import { SectionHeader } from "./section-header";
 
@@ -119,9 +120,18 @@ export function FeatureMosaicSkeleton() {
         <div className="shimmer h-2.5 w-24 rounded" />
         <div className="shimmer h-8 w-56 rounded" />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
-        <div className="md:col-span-6 lg:col-span-5 shimmer h-[380px] border border-border-soft" />
-        <div className="md:col-span-6 lg:col-span-7 grid grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
+        <div className="md:col-span-6 lg:col-span-5">
+          <div className="relative block h-full min-h-[380px] overflow-hidden rounded-md border border-border-soft bg-surface-1 isolate">
+            <div className="absolute inset-0 shimmer" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 p-6 space-y-2">
+              <div className="shimmer h-6 w-3/4 rounded" />
+              <div className="shimmer h-3.5 w-1/2 rounded" />
+              <div className="shimmer h-4 w-5/6 rounded" />
+            </div>
+          </div>
+        </div>
+        <div className="md:col-span-6 lg:col-span-7 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {Array.from({ length: 4 }).map((_, i) => (
             <MediaCardSkeleton key={i} />
           ))}

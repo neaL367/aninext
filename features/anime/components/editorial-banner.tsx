@@ -71,7 +71,8 @@ export function EditorialBanner({ item }: { item: Media }) {
 
             <div className="pt-2">
               <span className="inline-flex items-center gap-2 border-b border-signal pb-1 font-mono text-xs uppercase tracking-[0.12em] font-medium text-signal group-hover:text-foreground transition-colors">
-                Explore feature detail <ArrowRightIcon className="size-3.5 transition-transform group-hover:translate-x-1" />
+                Explore feature detail{" "}
+                <ArrowRightIcon className="size-3.5 transition-transform group-hover:translate-x-1" />
               </span>
             </div>
           </div>

@@ -90,7 +90,7 @@ export async function getBrowseCollection(
     isAdult: filters.isAdult ?? false,
   };
 
-  if (config.status) variables.status = config.status;
+  if (config.status && !filters.status?.length) variables.status = config.status;
   if (config.season) variables.season = config.season;
   if (config.seasonYear) variables.seasonYear = config.seasonYear;
 
@@ -221,38 +221,22 @@ const GENRE_QUERY = `
   }
 `;
 
+let genresCache: { data: string[]; timestamp: number } | null = null;
+
 export async function getGenres() {
   "use cache: remote";
   cacheTag(ANIME_CACHE.genres);
   cacheLife({ stale: 86400, revalidate: 604800, expire: 1209600 });
 
+  if (genresCache && Date.now() - genresCache.timestamp < 3600_000) {
+    return genresCache.data;
+  }
+
   const data = await anilistFetch<{ GenreCollection: string[] }>(GENRE_QUERY, {});
+  if (data?.GenreCollection?.length) {
+    genresCache = { data: data.GenreCollection, timestamp: Date.now() };
+  }
   return data.GenreCollection;
-}
-
-const META_FIELDS = `
-  id
-  title { romaji english native userPreferred }
-  coverImage { extraLarge large color }
-  bannerImage
-  description(asHtml: false)
-`;
-
-export async function getAnimeMeta(id: number) {
-  "use cache: remote";
-  cacheTag("anime", `anime:meta:${id}`);
-  cacheLife({ stale: 3600, revalidate: 21600, expire: 604800 });
-
-  const data = await anilistFetch<{ Media: Media | null }>(
-    `query AnimeMeta($id: Int) {
-      Media(id: $id, type: ANIME) {
-        ${META_FIELDS}
-      }
-    }`,
-    { id },
-  );
-
-  return data.Media;
 }
 
 const HERO_FIELDS = `
@@ -351,13 +335,15 @@ export async function getAnimeFullDetail(id: number): Promise<AnimeFullDetailDat
   cacheLife({ stale: 300, revalidate: 900, expire: 86400 });
 
   const data = await anilistFetch<{
-    Media: (Media & {
-      characters?: { edges?: CharacterEdge[] | null } | null;
-      staff?: { edges?: StaffEdge[] | null } | null;
-      relations?: { edges?: RelationEdge[] | null } | null;
-      recommendations?: { nodes?: RecommendationNode[] | null } | null;
-      airingSchedule?: { nodes?: AiringScheduleNode[] | null } | null;
-    }) | null;
+    Media:
+      | (Media & {
+          characters?: { edges?: CharacterEdge[] | null } | null;
+          staff?: { edges?: StaffEdge[] | null } | null;
+          relations?: { edges?: RelationEdge[] | null } | null;
+          recommendations?: { nodes?: RecommendationNode[] | null } | null;
+          airingSchedule?: { nodes?: AiringScheduleNode[] | null } | null;
+        })
+      | null;
   }>(ANIME_FULL_DETAIL_QUERY, { id });
 
   const m = data.Media;
@@ -430,4 +416,3 @@ export async function getAiringDay(day: string, start: number, end: number) {
 
   return data.Page.airingSchedules;
 }
-

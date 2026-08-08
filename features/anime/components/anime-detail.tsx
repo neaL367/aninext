@@ -90,27 +90,64 @@ export async function AnimeDetail({ id }: { id: number }) {
 export function AnimeDetailSkeleton() {
   return (
     <div className="mx-auto w-full max-w-[1680px] px-4 sm:px-7 lg:px-10">
-      <div className="border-b border-border-soft py-12">
+      <section className="border-b border-border-soft py-12">
         <div className="space-y-3">
-          <div className="shimmer h-2.5 w-16 rounded" />
+          <div className="shimmer h-3.5 w-16 rounded" />
           <div className="shimmer h-8 w-64 rounded" />
         </div>
-        <div className="mt-7 grid gap-8 lg:grid-cols-2">
+        <div className="mt-7 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           <AnimeTrailerSkeleton />
           <AnimeStreamingEpisodesSkeleton />
         </div>
-      </div>
-      <div className="grid gap-16 py-12 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div>
-          <AnimeCharactersSkeleton />
-          <div className="mt-12 border-t border-border-soft pt-12">
-            <AnimeRecommendationsSkeleton />
+      </section>
+
+      <div className="grid gap-16 py-12 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-16">
+        <main className="min-w-0">
+          <section aria-label="Characters">
+            <div className="space-y-3">
+              <div className="shimmer h-3.5 w-16 rounded" />
+              <div className="shimmer h-8 w-56 rounded" />
+            </div>
+            <div className="mt-7">
+              <AnimeCharactersSkeleton />
+            </div>
+          </section>
+
+          <section aria-label="More like this" className="border-t border-border-soft pt-12 mt-12">
+            <div className="space-y-3">
+              <div className="shimmer h-3.5 w-20 rounded" />
+              <div className="shimmer h-8 w-48 rounded" />
+            </div>
+            <div className="mt-7">
+              <AnimeRecommendationsSkeleton />
+            </div>
+          </section>
+        </main>
+
+        <aside className="min-w-0 lg:border-l lg:border-border-soft lg:pl-8">
+          <div className="space-y-12">
+            <section aria-label="Airing schedule">
+              <AnimeAiringScheduleSkeleton />
+            </section>
+            <section aria-label="Related anime">
+              <div className="space-y-3">
+                <div className="shimmer h-3.5 w-16 rounded" />
+                <div className="shimmer h-6 w-32 rounded" />
+              </div>
+              <div className="mt-5">
+                <AnimeRelationsSkeleton />
+              </div>
+            </section>
+            <section aria-label="Staff">
+              <div className="space-y-3">
+                <div className="shimmer h-3.5 w-16 rounded" />
+                <div className="shimmer h-6 w-28 rounded" />
+              </div>
+              <div className="mt-5">
+                <AnimeStaffSkeleton />
+              </div>
+            </section>
           </div>
-        </div>
-        <aside className="space-y-12 lg:border-l lg:border-border-soft lg:pl-8">
-          <AnimeAiringScheduleSkeleton />
-          <AnimeRelationsSkeleton />
-          <AnimeStaffSkeleton />
         </aside>
       </div>
     </div>

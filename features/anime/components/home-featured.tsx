@@ -66,7 +66,10 @@ export async function HomeCollectionSection({
 
   if (collection === "trending" || collection === "popular") {
     const batch = await getHomePrimaryBatch();
-    items = collection === "trending" ? batch.trending.slice(0, perPage) : batch.popular.slice(0, perPage);
+    items =
+      collection === "trending"
+        ? batch.trending.slice(0, perPage)
+        : batch.popular.slice(0, perPage);
   } else if (collection === "top100") {
     const top100 = await getTop100Full();
     items = top100.slice(0, perPage);
@@ -81,9 +84,11 @@ export async function HomeCollectionSection({
   }
 
   if (collection === "trending") return <TrendingShowcase items={items} />;
-  if (collection === "popular" || mosaic) return <FeatureMosaic title={title} href={href} items={items} />;
+  if (collection === "popular" || mosaic)
+    return <FeatureMosaic title={title} href={href} items={items} />;
   if (collection === "top100") return <Top100Podium title={title} href={href} items={items} />;
-  if (collection === "upcoming") return <UpcomingReel title={title} href={href} items={items} description={description} />;
+  if (collection === "upcoming")
+    return <UpcomingReel title={title} href={href} items={items} description={description} />;
   if (collection === "alltimepopular" && items.length > 0) {
     return (
       <div className="space-y-16">
@@ -122,4 +127,3 @@ export async function HomeGenreSection() {
   const genres = await getGenres();
   return <GenreExplorer genres={genres} />;
 }
-

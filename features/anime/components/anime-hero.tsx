@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { ViewTransition } from "react";
 
 import { MediaImage } from "@/components/ui/media-image";
-import { Skeleton } from "@/components/ui/skeleton";
 import { getAnimeHero } from "@/features/anime/anime-queries";
 import {
   formatFormat,
@@ -35,7 +34,15 @@ export function AnimeHero({ media }: { media: Media }) {
     <section className="relative">
       <div className="relative h-[380px] overflow-hidden border-b border-border-soft sm:h-[460px]">
         {banner ? (
-          <MediaImage src={banner} alt="" fill priority unoptimized sizes="100vw" className="object-cover transform-gpu" />
+          <MediaImage
+            src={banner}
+            alt=""
+            fill
+            priority
+            unoptimized
+            sizes="100vw"
+            className="object-cover transform-gpu"
+          />
         ) : (
           <div
             className="absolute inset-0"
@@ -102,11 +109,30 @@ export function AnimeHero({ media }: { media: Media }) {
                   <span className="text-[0.65rem] font-normal text-muted-foreground">score</span>
                 </span>
               )}
-              {media.format && <span className="rounded-md border border-border-soft bg-surface-1/60 px-2 py-1">{formatFormat(media.format)}</span>}
-              {media.episodes && <span className="rounded-md border border-border-soft bg-surface-1/60 px-2 py-1">{media.episodes} episodes</span>}
-              {media.duration && <span className="rounded-md border border-border-soft bg-surface-1/60 px-2 py-1">{media.duration} min</span>}
+              {media.format && (
+                <span className="rounded-md border border-border-soft bg-surface-1/60 px-2 py-1">
+                  {formatFormat(media.format)}
+                </span>
+              )}
+              {media.episodes && (
+                <span className="rounded-md border border-border-soft bg-surface-1/60 px-2 py-1">
+                  {media.episodes} episodes
+                </span>
+              )}
+              {media.duration && (
+                <span className="rounded-md border border-border-soft bg-surface-1/60 px-2 py-1">
+                  {media.duration} min
+                </span>
+              )}
               {media.status && (
-                <span className={cn("rounded-md border px-2 py-1 font-semibold", media.status === "RELEASING" ? "border-destructive/30 bg-destructive/15 text-destructive" : "border-border-soft bg-surface-1/60 text-muted-foreground")}>
+                <span
+                  className={cn(
+                    "rounded-md border px-2 py-1 font-semibold",
+                    media.status === "RELEASING"
+                      ? "border-destructive/30 bg-destructive/15 text-destructive"
+                      : "border-border-soft bg-surface-1/60 text-muted-foreground",
+                  )}
+                >
                   {formatStatus(media.status)}
                 </span>
               )}
@@ -135,7 +161,9 @@ export function AnimeHero({ media }: { media: Media }) {
               {studio && (
                 <span>
                   <span className="font-semibold text-foreground">{studio}</span>{" "}
-                  <span className="text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">Studio</span>
+                  <span className="text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">
+                    Studio
+                  </span>
                 </span>
               )}
               {media.source && (
@@ -143,7 +171,9 @@ export function AnimeHero({ media }: { media: Media }) {
                   <span className="font-semibold text-foreground">
                     {media.source.replaceAll("_", " ")}
                   </span>{" "}
-                  <span className="text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">Source</span>
+                  <span className="text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">
+                    Source
+                  </span>
                 </span>
               )}
               {media.season && media.seasonYear && (
@@ -151,7 +181,9 @@ export function AnimeHero({ media }: { media: Media }) {
                   <span className="font-semibold text-foreground">
                     {media.season} {media.seasonYear}
                   </span>{" "}
-                  <span className="text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">Season</span>
+                  <span className="text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">
+                    Season
+                  </span>
                 </span>
               )}
             </div>
@@ -174,9 +206,18 @@ export function AnimeHero({ media }: { media: Media }) {
                     (link) =>
                       link.url &&
                       (link.type === "STREAMING" ||
-                        ["crunchyroll", "netflix", "hulu", "bilibili", "disney", "hidive", "prime", "amazon", "youtube", "funimation"].some(
-                          (s) => link.site?.toLowerCase().includes(s),
-                        )),
+                        [
+                          "crunchyroll",
+                          "netflix",
+                          "hulu",
+                          "bilibili",
+                          "disney",
+                          "hidive",
+                          "prime",
+                          "amazon",
+                          "youtube",
+                          "funimation",
+                        ].some((s) => link.site?.toLowerCase().includes(s))),
                   ) ?? [];
 
                 if (streamingLinks.length === 0) return null;
@@ -188,7 +229,9 @@ export function AnimeHero({ media }: { media: Media }) {
                     </span>
                     {streamingLinks.slice(0, 5).map((link) => {
                       const domain = getDomain(link.url);
-                      const favicon = domain ? `https://www.google.com/s2/favicons?domain=${domain}&sz=32` : "";
+                      const favicon = domain
+                        ? `https://www.google.com/s2/favicons?domain=${domain}&sz=32`
+                        : "";
                       return (
                         <a
                           key={link.url}
@@ -234,20 +277,39 @@ function getDomain(url: string): string {
 
 export function AnimeHeroSkeleton() {
   return (
-    <section>
-      <div className="h-[360px] bg-surface-2 sm:h-[440px]" />
-      <div className="mx-auto -mt-32 grid max-w-[1680px] gap-7 px-4 pb-12 sm:-mt-44 sm:grid-cols-[220px_minmax(0,1fr)] sm:px-7 lg:grid-cols-[220px_minmax(0,1fr)_240px] lg:px-10">
-        <div className="shimmer aspect-[2/3] w-44 sm:w-52 lg:w-[220px]" />
-        <div className="self-end space-y-5">
-          <div className="shimmer h-2.5 w-24 rounded" />
-          <div className="shimmer h-16 w-4/5 rounded" />
-          <div className="shimmer h-4 w-2/3 rounded" />
-          <div className="shimmer h-20 w-full rounded" />
-        </div>
-        <div className="hidden space-y-7 border-l border-border-soft pl-7 lg:block">
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-12 w-full" />
+    <section className="relative">
+      <div className="relative h-[380px] overflow-hidden border-b border-border-soft sm:h-[460px] bg-surface-2 isolate">
+        <div className="absolute inset-0 shimmer" />
+      </div>
+      <div className="relative mx-auto -mt-36 w-full max-w-[1680px] px-4 pb-8 sm:-mt-48 sm:px-7 sm:pb-12 lg:px-10">
+        <div className="grid gap-7 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10">
+          <div className="relative mx-auto w-44 shrink-0 self-end sm:mx-0 sm:w-52 lg:w-[220px]">
+            <div className="relative aspect-[2/3] overflow-hidden rounded-md border border-border-soft bg-surface-2 shadow-2xl isolate">
+              <div className="absolute inset-0 shimmer" />
+            </div>
+          </div>
+
+          <div className="min-w-0 self-end space-y-4">
+            <div className="shimmer h-3.5 w-24 rounded" />
+            <div className="shimmer h-10 w-3/4 rounded sm:h-14" />
+            <div className="shimmer h-4 w-1/3 rounded" />
+
+            <div className="flex flex-wrap gap-2 pt-1">
+              <div className="shimmer h-7 w-20 rounded-md" />
+              <div className="shimmer h-7 w-16 rounded-md" />
+              <div className="shimmer h-7 w-24 rounded-md" />
+              <div className="shimmer h-7 w-16 rounded-md" />
+            </div>
+
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              <div className="shimmer h-5 w-16 rounded-md" />
+              <div className="shimmer h-5 w-20 rounded-md" />
+              <div className="shimmer h-5 w-14 rounded-md" />
+              <div className="shimmer h-5 w-18 rounded-md" />
+            </div>
+
+            <div className="shimmer h-12 w-full max-w-3xl rounded" />
+          </div>
         </div>
       </div>
     </section>

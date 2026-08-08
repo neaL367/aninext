@@ -137,8 +137,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
           const image = item.bannerImage ?? item.coverImage.extraLarge;
           const isCurrent = i === current;
           const isPrev = i === prev;
-          const isAdjacent =
-            i === (current + 1) % len || i === (current - 1 + len) % len;
+          const isAdjacent = i === (current + 1) % len || i === (current - 1 + len) % len;
           const isMounted = isCurrent || isPrev || isAdjacent;
 
           if (!isMounted) return null;
@@ -151,7 +150,9 @@ export function HeroCarousel({ items }: { items: Media[] }) {
               }`}
             >
               {image && (
-                <div className={`relative w-full h-full ${isCurrent ? "animate-cinematic-scale" : ""}`}>
+                <div
+                  className={`relative w-full h-full ${isCurrent ? "animate-cinematic-scale" : ""}`}
+                >
                   <Image
                     src={image}
                     alt=""
@@ -191,7 +192,11 @@ export function HeroCarousel({ items }: { items: Media[] }) {
               className="flex size-8 shrink-0 items-center justify-center rounded-full bg-signal text-white hover:bg-signal-strong transition-all hover:scale-105 active:scale-95 shadow-md"
               aria-label={isPlaying ? "Pause slideshow" : "Play slideshow"}
             >
-              {isPlaying ? <PauseIcon className="size-3.5 fill-current" /> : <PlayIcon className="size-3.5 fill-current ml-0.5" />}
+              {isPlaying ? (
+                <PauseIcon className="size-3.5 fill-current" />
+              ) : (
+                <PlayIcon className="size-3.5 fill-current ml-0.5" />
+              )}
             </button>
 
             {/* Slide Indicators: Full Rounded Circles for Inactive, Progress Pill for Active */}
@@ -238,7 +243,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
 
 export function HeroCarouselSkeleton() {
   return (
-    <div className="relative w-full h-[500px] sm:h-[580px] lg:h-[640px] overflow-hidden bg-background">
+    <div className="relative w-full h-[520px] sm:h-[600px] lg:h-[660px] overflow-hidden bg-background">
       <div className="absolute inset-0 w-full h-full shimmer" />
       <div className="absolute inset-x-0 bottom-0 z-20 pb-14 sm:pb-16 lg:pb-18">
         <div className="mx-auto w-full max-w-[1680px] px-4 sm:px-7 lg:px-10">
@@ -253,4 +258,3 @@ export function HeroCarouselSkeleton() {
     </div>
   );
 }
-

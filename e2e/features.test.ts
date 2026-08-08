@@ -17,6 +17,13 @@ test.describe("canonical URLs", () => {
 test.describe("browse interactions", () => {
   test("genre filter updates URL and keeps results", async ({ page }) => {
     await page.goto("/anime/trending");
+    const genreButton = page.getByRole("button", { name: "Genre", exact: true });
+    if (await genreButton.isVisible()) {
+      const expanded = await genreButton.getAttribute("aria-expanded");
+      if (expanded !== "true") {
+        await genreButton.click();
+      }
+    }
     await page.getByRole("button", { name: "Action", exact: true }).first().click();
     await expect(page).toHaveURL(/genre=Action/);
     await expect(page.getByRole("heading", { name: "Trending Anime" })).toBeVisible();

@@ -19,7 +19,10 @@ export function AiringCalendar({ currentDay }: { currentDay: string }) {
   }, []);
 
   return (
-    <nav className="grid grid-cols-7 rounded-lg border border-border-soft bg-surface-1/40 backdrop-blur-md overflow-hidden" aria-label="Airing days">
+    <nav
+      className="grid grid-cols-7 rounded-lg border border-border-soft bg-surface-1/40 backdrop-blur-md overflow-hidden"
+      aria-label="Airing days"
+    >
       {weekDays.map((day) => {
         const date = new Date(day + "T00:00:00");
         const isToday = day === localToday;
@@ -48,7 +51,9 @@ export function AiringCalendar({ currentDay }: { currentDay: string }) {
             <span
               className={cn(
                 "font-mono text-2xl font-semibold tabular-nums sm:text-3xl tracking-tight",
-                isSelected ? "text-signal" : "text-foreground group-hover:text-signal transition-colors",
+                isSelected
+                  ? "text-signal"
+                  : "text-foreground group-hover:text-signal transition-colors",
               )}
             >
               {date.getDate()}

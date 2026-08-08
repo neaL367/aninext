@@ -21,12 +21,12 @@ export async function renderBrowsePage(
   const isTop100 = collection === "top100";
   const hasActiveFilters = Boolean(
     filters.search ||
-      filters.genre?.length ||
-      filters.format?.length ||
-      filters.status?.length ||
-      filters.country ||
-      filters.season ||
-      filters.year,
+    filters.genre?.length ||
+    filters.format?.length ||
+    filters.status?.length ||
+    filters.country ||
+    filters.season ||
+    filters.year,
   );
 
   if (isTop100 && !hasActiveFilters) {
@@ -64,4 +64,3 @@ export async function renderBrowsePage(
     node: <MediaGrid items={visibleItems} rankStart={rankStart} priorityFirst={page === 1} />,
   };
 }
-

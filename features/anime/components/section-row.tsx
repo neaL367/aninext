@@ -59,9 +59,9 @@ export function SectionRowSkeleton({ count = 6 }: { count?: number }) {
         <div className="shimmer h-2.5 w-24 rounded" />
         <div className="shimmer h-8 w-48 rounded" />
       </div>
-      <div className="flex gap-5 overflow-hidden md:grid md:grid-cols-6">
+      <div className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 scrollbar-none md:grid md:grid-cols-3 sm:grid-cols-2 md:gap-x-5 md:gap-y-8 md:overflow-visible lg:grid-cols-6 xl:grid-cols-6">
         {Array.from({ length: count }).map((_, i) => (
-          <div key={i} className="w-[148px] shrink-0 md:w-auto">
+          <div key={i} className="w-[148px] shrink-0 snap-start sm:w-[164px] md:w-auto">
             <MediaCardSkeleton />
           </div>
         ))}

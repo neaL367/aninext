@@ -4,11 +4,8 @@ import Link from "next/link";
 import { HoverPrefetchLink } from "@/components/ui/hover-prefetch-link";
 import { MediaImage } from "@/components/ui/media-image";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
-import {
-  formatFormat,
-  getMediaCover,
-  getMediaTitle,
-} from "@/features/anime/lib/media-helpers";
+import { formatFormat, getMediaCover, getMediaTitle } from "@/features/anime/lib/media-helpers";
+
 import { SectionHeader } from "./section-header";
 
 import type { Media } from "@/features/anime/types/anime";
@@ -30,8 +27,16 @@ export function Top100Podium({
 
   const podiumColors = [
     { border: "border-foreground/40", badge: "bg-foreground text-background", label: "#01" },
-    { border: "border-border-soft", badge: "bg-surface-2 text-foreground border border-border-soft", label: "#02" },
-    { border: "border-border-soft", badge: "bg-surface-2 text-foreground border border-border-soft", label: "#03" },
+    {
+      border: "border-border-soft",
+      badge: "bg-surface-2 text-foreground border border-border-soft",
+      label: "#02",
+    },
+    {
+      border: "border-border-soft",
+      badge: "bg-surface-2 text-foreground border border-border-soft",
+      label: "#03",
+    },
   ];
 
   return (
@@ -77,7 +82,9 @@ export function Top100Podium({
                 )}
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
 
-                <span className={`pointer-events-none absolute top-3 left-3 px-2.5 py-0.5 font-mono text-xs font-bold ${config.badge}`}>
+                <span
+                  className={`pointer-events-none absolute top-3 left-3 px-2.5 py-0.5 font-mono text-xs font-bold ${config.badge}`}
+                >
                   {config.label}
                 </span>
 

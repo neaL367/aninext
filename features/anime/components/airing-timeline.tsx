@@ -89,8 +89,14 @@ function AiringTimelineList({ day, schedules }: { day: string; schedules: Airing
               >
                 {block}
               </h2>
-              {isActive && <span className="font-mono text-[0.65rem] font-bold uppercase text-destructive bg-destructive/10 px-1.5 py-0.5 rounded border border-destructive/20">Now Airing</span>}
-              <span className="ml-auto font-mono text-xs text-muted-foreground">{items.length} {items.length === 1 ? "release" : "releases"}</span>
+              {isActive && (
+                <span className="font-mono text-[0.65rem] font-bold uppercase text-destructive bg-destructive/10 px-1.5 py-0.5 rounded border border-destructive/20">
+                  Now Airing
+                </span>
+              )}
+              <span className="ml-auto font-mono text-xs text-muted-foreground">
+                {items.length} {items.length === 1 ? "release" : "releases"}
+              </span>
             </div>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {items.map((item, index) => {
@@ -146,7 +152,9 @@ function AiringTimelineList({ day, schedules }: { day: string; schedules: Airing
                                 Soon
                               </span>
                             ) : phase === "aired" ? (
-                              <span className="font-mono text-[0.68rem] text-muted-foreground">Aired</span>
+                              <span className="font-mono text-[0.68rem] text-muted-foreground">
+                                Aired
+                              </span>
                             ) : (
                               <LocalTime
                                 timestamp={item.airingAt}
@@ -161,9 +169,18 @@ function AiringTimelineList({ day, schedules }: { day: string; schedules: Airing
                                   link.url &&
                                   isSafeExternalUrl(link.url) &&
                                   (link.type === "STREAMING" ||
-                                    ["crunchyroll", "netflix", "hulu", "bilibili", "disney", "hidive", "prime", "amazon", "youtube", "funimation"].some(
-                                      (s) => link.site?.toLowerCase().includes(s),
-                                    )),
+                                    [
+                                      "crunchyroll",
+                                      "netflix",
+                                      "hulu",
+                                      "bilibili",
+                                      "disney",
+                                      "hidive",
+                                      "prime",
+                                      "amazon",
+                                      "youtube",
+                                      "funimation",
+                                    ].some((s) => link.site?.toLowerCase().includes(s))),
                               ) ?? [];
                             if (streamingLinks.length > 0) {
                               return (

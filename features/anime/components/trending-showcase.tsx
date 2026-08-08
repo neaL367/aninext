@@ -10,6 +10,7 @@ import {
   getMediaTitle,
   stripHtml,
 } from "@/features/anime/lib/media-helpers";
+
 import { SectionHeader } from "./section-header";
 
 import type { Media } from "@/features/anime/types/anime";

@@ -4,11 +4,8 @@ import Link from "next/link";
 import { HoverPrefetchLink } from "@/components/ui/hover-prefetch-link";
 import { MediaImage } from "@/components/ui/media-image";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
-import {
-  formatFormat,
-  getMediaCover,
-  getMediaTitle,
-} from "@/features/anime/lib/media-helpers";
+import { formatFormat, getMediaCover, getMediaTitle } from "@/features/anime/lib/media-helpers";
+
 import { SectionHeader } from "./section-header";
 
 import type { Media } from "@/features/anime/types/anime";
@@ -48,7 +45,9 @@ export function UpcomingReel({
         {items.slice(0, 4).map((item) => {
           const itemTitle = getMediaTitle(item);
           const banner = item.bannerImage ?? getMediaCover(item, "extraLarge");
-          const seasonYear = item.seasonYear ? `${item.season ?? ""} ${item.seasonYear}`.trim() : "TBA";
+          const seasonYear = item.seasonYear
+            ? `${item.season ?? ""} ${item.seasonYear}`.trim()
+            : "TBA";
           const studio = item.studios?.nodes[0]?.name;
 
           return (

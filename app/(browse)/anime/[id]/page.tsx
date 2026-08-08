@@ -3,7 +3,7 @@ import { Suspense } from "react";
 
 import { Crossfade } from "@/components/ui/crossfade";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
-import { getAnimeMeta } from "@/features/anime/anime-queries";
+import { getAnimeHero } from "@/features/anime/anime-queries";
 import { AnimeDetail, AnimeDetailSkeleton } from "@/features/anime/components/anime-detail";
 import { AnimeHeroSection, AnimeHeroSkeleton } from "@/features/anime/components/anime-hero";
 import { stripHtml } from "@/features/anime/lib/media-helpers";
@@ -42,7 +42,7 @@ export async function generateMetadata({
   if (animeId === null) return {};
 
   try {
-    const media = await getAnimeMeta(animeId);
+    const media = await getAnimeHero(animeId);
     if (!media) return {};
     const title = media.title.english ?? media.title.romaji ?? "Unknown";
     const description = stripHtml(media.description)?.slice(0, 160) ?? "";

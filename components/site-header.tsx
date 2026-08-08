@@ -69,7 +69,10 @@ export function SiteHeader() {
             aria-keyshortcuts="Control+K Meta+K"
             className="group flex h-9 items-center gap-2.5 rounded-md border border-border-soft bg-surface-1/80 px-3 font-mono text-xs text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground"
           >
-            <SearchIcon aria-hidden="true" className="size-3.5 text-muted-foreground group-hover:text-signal" />
+            <SearchIcon
+              aria-hidden="true"
+              className="size-3.5 text-muted-foreground group-hover:text-signal"
+            />
             <span className="hidden sm:inline">Find a title</span>
             <kbd className="hidden border-l border-border-soft pl-2 font-mono text-[0.62rem] text-muted-foreground sm:inline">
               Ctrl/Cmd K

@@ -68,7 +68,7 @@ export function MediaCard({
         )}
       >
         {coverImage ? (
-          viewTransition && (priority || rank !== undefined && rank <= 6) ? (
+          viewTransition && (priority || (rank !== undefined && rank <= 6)) ? (
             <ViewTransition name={`anime-cover-${media.id}`} share="morph" default="none">
               {coverImage}
             </ViewTransition>
@@ -136,13 +136,19 @@ export function MediaCardSkeleton({ size = "default" }: { size?: "default" | "fe
     <div className={cn("min-w-0", size === "featured" && "md:col-span-2")}>
       <div
         className={cn(
-          "shimmer rounded-md border border-border-soft",
+          "relative overflow-hidden rounded-md border border-border-soft bg-surface-2 isolate",
           size === "featured" ? "aspect-[16/9]" : "aspect-[2/3]",
         )}
-      />
+      >
+        <div className="absolute inset-0 shimmer" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 p-3.5 space-y-1.5">
+          <div className="shimmer h-3.5 w-3/4 rounded" />
+          <div className="shimmer h-3 w-1/2 rounded opacity-75" />
+        </div>
+      </div>
       <div className="flex items-center justify-between border-b border-border-soft py-2.5">
-        <div className="shimmer h-2.5 w-24 rounded" />
-        <div className="shimmer h-2.5 w-8 rounded" />
+        <div className="shimmer h-3 w-20 rounded" />
+        <div className="shimmer h-3 w-10 rounded" />
       </div>
     </div>
   );

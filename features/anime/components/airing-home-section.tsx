@@ -134,9 +134,11 @@ export function AiringHomeSectionSkeleton() {
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
-            className="flex items-center gap-3 p-3 sm:gap-4 sm:p-4 border border-border overflow-hidden"
+            className="flex items-center gap-3 p-3 sm:gap-4 sm:p-4 border border-border overflow-hidden bg-surface-1/30"
           >
-            <div className="shimmer h-[72px] w-[54px]" />
+            <div className="relative h-[72px] w-[54px] shrink-0 overflow-hidden bg-surface-2 isolate">
+              <div className="absolute inset-0 shimmer" />
+            </div>
             <div className="w-0 flex-1 space-y-2">
               <div className="shimmer h-4 w-3/4 rounded" />
               <div className="shimmer h-3 w-2/3 rounded" />

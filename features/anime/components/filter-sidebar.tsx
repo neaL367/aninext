@@ -83,7 +83,7 @@ export function FilterSidebar({
 export function FilterSidebarContent({
   genresPromise,
   mobile = false,
-  collection: _collection,
+  collection,
   filters,
 }: {
   genresPromise: Promise<string[]>;
@@ -130,7 +130,7 @@ export function FilterSidebarContent({
       label: "Genre",
       options: genres,
       selected: state.genre,
-      defaultOpen: false,
+      defaultOpen: true,
       scroll: true,
     },
     {
@@ -139,12 +139,16 @@ export function FilterSidebarContent({
       options: FORMAT_OPTIONS,
       selected: state.format,
     },
-    {
-      key: "status",
-      label: "Status",
-      options: STATUS_OPTIONS,
-      selected: state.status,
-    },
+    ...(collection !== "upcoming"
+      ? [
+          {
+            key: "status" as const,
+            label: "Status",
+            options: STATUS_OPTIONS,
+            selected: state.status,
+          },
+        ]
+      : []),
     {
       key: "season",
       label: "Season",

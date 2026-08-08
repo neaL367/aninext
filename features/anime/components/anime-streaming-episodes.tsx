@@ -34,7 +34,14 @@ export function AnimeStreamingEpisodes({ media }: { media: Media }) {
           >
             {ep.thumbnail ? (
               <div className="relative h-[54px] w-[96px] shrink-0 overflow-hidden rounded border border-border-soft bg-surface-2">
-                <Image src={ep.thumbnail} alt="" fill sizes="96px" unoptimized className="object-cover transition-transform duration-300 group-hover:scale-105 transform-gpu" />
+                <Image
+                  src={ep.thumbnail}
+                  alt=""
+                  fill
+                  sizes="96px"
+                  unoptimized
+                  className="object-cover transition-transform duration-300 group-hover:scale-105 transform-gpu"
+                />
               </div>
             ) : (
               <span className="flex size-[54px] shrink-0 items-center justify-center rounded border border-border-soft font-mono text-sm text-muted-foreground bg-surface-1">
