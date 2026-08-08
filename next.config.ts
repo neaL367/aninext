@@ -14,6 +14,8 @@ const nextConfig: NextConfig = {
     trending: { stale: 300, revalidate: 900, expire: 3600 },
     home: { stale: 300, revalidate: 900, expire: 86400 },
     static: { stale: 3600, revalidate: 21600, expire: 604800 },
+    airing: { stale: 180, revalidate: 900, expire: 3600 },
+    max: { stale: 86400, revalidate: 604800, expire: 1209600 },
   },
   experimental: {
     useTypeScriptCli: true,

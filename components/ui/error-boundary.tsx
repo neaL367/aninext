@@ -16,6 +16,10 @@ const KIND_COPY: Record<AniListError["kind"], { title: string; body: string }> =
     title: "AniList is temporarily unavailable",
     body: "The data source is down right now. Try again in a moment.",
   },
+  circuit_open: {
+    title: "Service temporarily unavailable",
+    body: "AniList is taking a brief pause due to high error rates. Retrying automatically shortly.",
+  },
   graphql: {
     title: "Something went wrong",
     body: "The data source returned an unexpected response.",
@@ -62,7 +66,7 @@ function ErrorFallback(props: { title: string }, { error, retry }: ErrorInfo) {
       </div>
       <h2 className="text-lg font-semibold">{copy?.title ?? props.title}</h2>
       <p className="max-w-sm text-sm text-muted-foreground">{copy?.body ?? err.message}</p>
-      {anilistErr?.kind === "rate_limited" ? (
+      {anilistErr?.kind === "rate_limited" || anilistErr?.kind === "circuit_open" ? (
         <RateLimitCountdown
           seconds={Math.min(anilistErr.retryAfterSeconds ?? 30, 60)}
           onTick={() => retry()}

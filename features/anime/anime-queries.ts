@@ -130,7 +130,7 @@ const TOP100_FULL_QUERY = `
 export async function getTop100Full(): Promise<Media[]> {
   "use cache: remote";
   cacheTag("anime", "anime:top100:full");
-  cacheLife({ stale: 3600, revalidate: 21600, expire: 604800 });
+  cacheLife("static");
 
   const data = await anilistFetch<{
     page1: { media: Media[] };
@@ -226,7 +226,7 @@ let genresCache: { data: string[]; timestamp: number } | null = null;
 export async function getGenres() {
   "use cache: remote";
   cacheTag(ANIME_CACHE.genres);
-  cacheLife({ stale: 86400, revalidate: 604800, expire: 1209600 });
+  cacheLife("max");
 
   if (genresCache && Date.now() - genresCache.timestamp < 3600_000) {
     return genresCache.data;
@@ -332,7 +332,7 @@ export interface AnimeFullDetailData {
 export async function getAnimeFullDetail(id: number): Promise<AnimeFullDetailData | null> {
   "use cache: remote";
   cacheTag("anime", ANIME_CACHE.detail(id));
-  cacheLife({ stale: 300, revalidate: 900, expire: 86400 });
+  cacheLife("home");
 
   const data = await anilistFetch<{
     Media:
@@ -396,7 +396,7 @@ export async function getAiringWeek(start: number, end: number) {
   "use cache: remote";
   const date = localDateStr(fromAiringTimestamp(start));
   cacheTag("anime", ANIME_CACHE.airingWeek(date));
-  cacheLife({ stale: 180, revalidate: 900, expire: 3600 });
+  cacheLife("airing");
 
   const data = await anilistFetch<{
     Page: { airingSchedules: AiringScheduleNode[] };
@@ -408,7 +408,7 @@ export async function getAiringWeek(start: number, end: number) {
 export async function getAiringDay(day: string, start: number, end: number) {
   "use cache: remote";
   cacheTag("anime", ANIME_CACHE.airingDay(day, start));
-  cacheLife({ stale: 180, revalidate: 900, expire: 3600 });
+  cacheLife("airing");
 
   const data = await anilistFetch<{
     Page: { airingSchedules: AiringScheduleNode[] };
