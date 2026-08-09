@@ -13,6 +13,7 @@ export function LocalTime({
   format?: "time" | "date-time";
   className?: string;
 }) {
+  "use memo";
   const [label, setLabel] = useState("--:--");
 
   useEffect(() => {

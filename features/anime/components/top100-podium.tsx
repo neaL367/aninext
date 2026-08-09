@@ -1,8 +1,8 @@
-import { ArrowRightIcon, StarIcon } from "lucide-react";
+import { StarIcon } from "lucide-react";
 import Link from "next/link";
 
-import { HoverPrefetchLink } from "@/components/ui/hover-prefetch-link";
 import { MediaImage } from "@/components/ui/media-image";
+import { ViewAllLink } from "@/components/ui/view-all-link";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 import { formatFormat, getMediaCover, getMediaTitle } from "@/features/anime/lib/media-helpers";
 
@@ -20,6 +20,7 @@ export function Top100Podium({
   href: Route<string>;
   items: Media[];
 }) {
+  "use memo";
   if (items.length === 0) return null;
 
   const topThree = items.slice(0, 3);
@@ -45,15 +46,7 @@ export function Top100Podium({
         eyebrow="Game Awards Hall of Fame"
         title={title}
         description="The top-ranked masterpieces evaluated by enduring staying power."
-        action={
-          <HoverPrefetchLink
-            href={href}
-            className="group flex items-center gap-2 border-b border-border-soft pb-1 font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted-foreground hover:border-signal hover:text-signal"
-          >
-            View all Top 100{" "}
-            <ArrowRightIcon className="size-3 transition-transform group-hover:translate-x-1" />
-          </HoverPrefetchLink>
-        }
+        action={<ViewAllLink href={href}>View all Top 100</ViewAllLink>}
       />
 
       {/* Top 3 Podium Showcase */}

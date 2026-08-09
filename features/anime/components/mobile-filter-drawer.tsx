@@ -15,7 +15,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-import { useFilters } from "../hooks/use-filters";
+import { useFilterActions } from "../hooks/use-filter-actions";
+import { useFilterState } from "../hooks/use-filter-state";
 import { FilterSidebarContent } from "./filter-sidebar";
 
 import type { AnimeCollection } from "@/features/anime/types/anime";
@@ -27,9 +28,9 @@ export function MobileFilterDrawer({
   genresPromise: Promise<string[]>;
   collection: AnimeCollection;
 }) {
+  "use memo";
   const [open, setOpen] = useState(false);
-  const filters = useFilters();
-  const { facetCount } = filters;
+  const { facetCount } = useFilterState();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -63,7 +64,8 @@ export function MobileFilterDrawer({
             genresPromise={genresPromise}
             mobile
             collection={collection}
-            filters={filters}
+            state={useFilterState()}
+            actions={useFilterActions()}
           />
         </div>
         <SheetFooter className="sticky bottom-0 border-t border-border-soft bg-background/95 p-4 backdrop-blur-xl">

@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { FILTER_ADULT_GENRES } from "@/features/anime/lib/filter-constants";
 
 export function GenreExplorer({ genres }: { genres: string[] }) {
+  "use memo";
   const visibleGenres = genres.filter(
     (g) => !FILTER_ADULT_GENRES.some((adultGenre) => adultGenre === g),
   );
@@ -38,6 +39,7 @@ export function GenreExplorer({ genres }: { genres: string[] }) {
 }
 
 export function GenreList({ genres }: { genres: string[] }) {
+  "use memo";
   if (genres.length === 0) return null;
   return (
     <div className="grid grid-cols-2 gap-x-4">

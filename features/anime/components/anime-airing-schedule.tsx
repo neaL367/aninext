@@ -5,6 +5,7 @@ import { AnimeAiringScheduleList } from "./anime-airing-schedule-list";
 import type { AiringScheduleNode } from "@/features/anime/types/anime";
 
 export function AnimeAiringSchedule({ nodes }: { nodes: AiringScheduleNode[] }) {
+  "use memo";
   if (nodes.length === 0) return null;
 
   return (

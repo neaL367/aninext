@@ -5,7 +5,9 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   typedRoutes: true,
   reactStrictMode: true,
-  reactCompiler: true,
+  reactCompiler: {
+    compilationMode: "annotation",
+  },
   images: {
     unoptimized: true,
     remotePatterns: [{ hostname: "s4.anilist.co", protocol: "https" }],

@@ -24,6 +24,7 @@ export function AnimePreviewCard({
   media: Media;
   children: React.ReactElement;
 }) {
+  "use memo";
   const [open, setOpen] = useState(false);
   const title = getMediaTitle(media);
   const color = media.coverImage.color;

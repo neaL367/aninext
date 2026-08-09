@@ -1,24 +1,23 @@
 import { ExternalLinkIcon, PlayIcon } from "lucide-react";
 import Image from "next/image";
 
-import { Empty, EmptyHeader, EmptyTitle, EmptyMedia } from "@/components/ui/empty";
 import { isSafeExternalUrl } from "@/features/anime/lib/media-helpers";
+
+import { EmptyState } from "./empty-state";
 
 import type { Media, StreamingEpisode } from "@/features/anime/types/anime";
 
 export function AnimeStreamingEpisodes({ media }: { media: Media }) {
+  "use memo";
   const episodes = media.streamingEpisodes?.filter(hasSafeStreamingUrl);
 
   if (!episodes || episodes.length === 0)
     return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <PlayIcon />
-          </EmptyMedia>
-          <EmptyTitle>No streaming links indexed</EmptyTitle>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        icon={PlayIcon}
+        title="No streaming links indexed"
+        description="No streaming links are available for this anime."
+      />
     );
 
   return (

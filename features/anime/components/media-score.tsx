@@ -10,6 +10,7 @@ export function MediaScore({
   star?: boolean;
   className?: string;
 }) {
+  "use memo";
   if (score === undefined) return null;
 
   return (

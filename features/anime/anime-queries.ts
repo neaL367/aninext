@@ -5,7 +5,6 @@ import { anilistFetch } from "@/lib/anilist";
 
 import { ANIME_CACHE } from "./anime-cache";
 import { getCollectionConfig } from "./lib/collection-config";
-import { localDateStr, fromAiringTimestamp } from "./lib/media-helpers";
 import { buildFilterHash } from "./lib/parse-filters";
 import { getCurrentSeason } from "./lib/season";
 
@@ -221,21 +220,12 @@ const GENRE_QUERY = `
   }
 `;
 
-let genresCache: { data: string[]; timestamp: number } | null = null;
-
 export async function getGenres() {
   "use cache: remote";
   cacheTag(ANIME_CACHE.genres);
   cacheLife("max");
 
-  if (genresCache && Date.now() - genresCache.timestamp < 3600_000) {
-    return genresCache.data;
-  }
-
   const data = await anilistFetch<{ GenreCollection: string[] }>(GENRE_QUERY, {});
-  if (data?.GenreCollection?.length) {
-    genresCache = { data: data.GenreCollection, timestamp: Date.now() };
-  }
   return data.GenreCollection;
 }
 
@@ -359,26 +349,8 @@ export async function getAnimeFullDetail(id: number): Promise<AnimeFullDetailDat
   };
 }
 
-// Backward-compatible wrappers for existing component imports
-export async function getAnimeHero(id: number) {
-  const detail = await getAnimeFullDetail(id);
-  return detail?.media ?? null;
-}
-
-export async function getAnimeDetailSections(id: number) {
-  const detail = await getAnimeFullDetail(id);
-  if (!detail) return null;
-  return {
-    characters: { edges: detail.characters },
-    staff: detail.staff,
-    relations: detail.relations,
-    recommendations: detail.recommendations,
-    airingSchedule: detail.airingSchedule,
-  };
-}
-
-const AIRING_WEEK_QUERY = `
-  query AiringWeek($start: Int, $end: Int) {
+const AIRING_DAY_QUERY = `
+  query AiringDay($start: Int, $end: Int) {
     Page(perPage: 50) {
       airingSchedules(airingAt_greater: $start, airingAt_lesser: $end, sort: [TIME]) {
         episode
@@ -392,19 +364,6 @@ const AIRING_WEEK_QUERY = `
   }
 `;
 
-export async function getAiringWeek(start: number, end: number) {
-  "use cache: remote";
-  const date = localDateStr(fromAiringTimestamp(start));
-  cacheTag("anime", ANIME_CACHE.airingWeek(date));
-  cacheLife("airing");
-
-  const data = await anilistFetch<{
-    Page: { airingSchedules: AiringScheduleNode[] };
-  }>(AIRING_WEEK_QUERY, { start, end });
-
-  return data.Page.airingSchedules;
-}
-
 export async function getAiringDay(day: string, start: number, end: number) {
   "use cache: remote";
   cacheTag("anime", ANIME_CACHE.airingDay(day, start));
@@ -412,7 +371,7 @@ export async function getAiringDay(day: string, start: number, end: number) {
 
   const data = await anilistFetch<{
     Page: { airingSchedules: AiringScheduleNode[] };
-  }>(AIRING_WEEK_QUERY, { start, end });
+  }>(AIRING_DAY_QUERY, { start, end });
 
   return data.Page.airingSchedules;
 }

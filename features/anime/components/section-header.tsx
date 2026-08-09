@@ -17,6 +17,7 @@ export function SectionHeader({
   eyebrowClassName?: string;
   className?: string;
 }) {
+  "use memo";
   return (
     <div className={cn("mb-5 flex items-end justify-between gap-5", className)}>
       <div className="min-w-0">

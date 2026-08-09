@@ -5,6 +5,7 @@ import { MediaImage } from "@/components/ui/media-image";
 import type { Media } from "@/features/anime/types/anime";
 
 export function AnimeTrailer({ media }: { media: Media }) {
+  "use memo";
   const trailer = media.trailer;
   if (!trailer?.id || trailer.site !== "youtube")
     return (

@@ -1,6 +1,4 @@
-import { ArrowRightIcon } from "lucide-react";
-
-import { HoverPrefetchLink } from "@/components/ui/hover-prefetch-link";
+import { ViewAllLink } from "@/components/ui/view-all-link";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 
 import { MediaCard, MediaCardSkeleton } from "./media-card";
@@ -22,6 +20,7 @@ export function SectionRow({
   description?: string;
   showRank?: boolean;
 }) {
+  "use memo";
   return (
     <section>
       <SectionHeader
@@ -29,15 +28,7 @@ export function SectionRow({
         title={title}
         count={`/${String(items.length).padStart(2, "0")}`}
         description={description}
-        action={
-          <HoverPrefetchLink
-            href={href}
-            className="group flex shrink-0 items-center gap-2 border-b border-border-soft pb-1 font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:border-signal hover:text-signal"
-          >
-            View all{" "}
-            <ArrowRightIcon className="size-3 transition-transform group-hover:translate-x-1" />
-          </HoverPrefetchLink>
-        }
+        action={<ViewAllLink href={href}>View all</ViewAllLink>}
       />
       <div className="flex snap-x snap-mandatory gap-5 overflow-x-auto pb-3 scrollbar-none md:grid md:grid-cols-3 sm:grid-cols-2 md:gap-x-5 md:gap-y-8 md:overflow-visible lg:grid-cols-6 xl:grid-cols-6">
         {items.map((item, i) => (

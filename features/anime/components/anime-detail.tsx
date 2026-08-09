@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { getAnimeDetailSections, getAnimeHero } from "@/features/anime/anime-queries";
+import { getAnimeFullDetail } from "@/features/anime/anime-queries";
 
 import { AnimeAiringSchedule, AnimeAiringScheduleSkeleton } from "./anime-airing-schedule";
 import { AnimeCharacters, AnimeCharactersSkeleton } from "./anime-characters";
@@ -12,11 +12,15 @@ import { AnimeTrailer, AnimeTrailerSkeleton } from "./anime-trailer";
 import { GenreList } from "./genre-pills";
 import { SectionHeader } from "./section-header";
 
-export async function AnimeDetail({ id }: { id: number }) {
-  const [media, detail] = await Promise.all([getAnimeHero(id), getAnimeDetailSections(id)]);
-  if (!media || !detail) notFound();
+export async function AnimeDetail({
+  detailPromise,
+}: {
+  detailPromise: Promise<Awaited<ReturnType<typeof getAnimeFullDetail>>>;
+}) {
+  const detail = await detailPromise;
+  if (!detail) notFound();
 
-  const { characters, staff, relations, recommendations, airingSchedule } = detail;
+  const { media, characters, staff, relations, recommendations, airingSchedule } = detail;
 
   return (
     <div className="mx-auto w-full max-w-[1680px] px-4 sm:px-7 lg:px-10">
@@ -41,7 +45,7 @@ export async function AnimeDetail({ id }: { id: number }) {
               title="Characters and voices"
             />
             <div className="mt-7">
-              <AnimeCharacters edges={characters.edges} />
+              <AnimeCharacters edges={characters} />
             </div>
           </section>
 

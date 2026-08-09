@@ -12,6 +12,7 @@ const AUTOPLAY_INTERVAL = 7000;
 const SWIPE_THRESHOLD = 50;
 
 export function HeroCarousel({ items }: { items: Media[] }) {
+  "use memo";
   const [current, setCurrent] = useState(0);
   const [prev, setPrev] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -19,7 +20,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
 
   const dragStartX = useRef<number | null>(null);
   const isDragging = useRef(false);
-  const progressTimerRef = useRef<ReturnType<typeof requestAnimationFrame> | null>(null);
+  const progressTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startTimeRef = useRef<number>(Date.now());
 
   const len = items.length;
@@ -41,29 +42,24 @@ export function HeroCarousel({ items }: { items: Media[] }) {
   // Autoplay and Progress Bar Loop
   useEffect(() => {
     if (len < 2 || !isPlaying) {
-      if (progressTimerRef.current) cancelAnimationFrame(progressTimerRef.current);
+      if (progressTimerRef.current) clearInterval(progressTimerRef.current);
       return;
     }
 
     const startTime = Date.now();
-    let animationFrameId: number;
-
-    const loop = () => {
+    const intervalId = setInterval(() => {
       const elapsed = Date.now() - startTime;
       const pct = Math.min((elapsed / AUTOPLAY_INTERVAL) * 100, 100);
       setProgress(pct);
 
       if (elapsed >= AUTOPLAY_INTERVAL) {
         next();
-      } else {
-        animationFrameId = requestAnimationFrame(loop);
       }
-    };
-
-    animationFrameId = requestAnimationFrame(loop);
+    }, 100);
+    progressTimerRef.current = intervalId;
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      clearInterval(intervalId);
     };
   }, [current, isPlaying, len, next]);
 

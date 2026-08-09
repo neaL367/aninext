@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/input-group";
 
 export function SearchBar() {
+  "use memo";
   const router = useRouter();
   const searchParams = useSearchParams();
   const [value, setValue] = useState(searchParams.get("search") ?? "");

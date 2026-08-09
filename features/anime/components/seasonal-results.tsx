@@ -18,7 +18,6 @@ export async function SeasonalResults({
   filters: AnimeFilters;
 }) {
   await io();
-
   const current = getCurrentSeason();
 
   if (!season || !year) {

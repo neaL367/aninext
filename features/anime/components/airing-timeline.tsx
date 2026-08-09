@@ -1,27 +1,26 @@
 import { CalendarIcon, ExternalLinkIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useMemo } from "react";
 
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/ui/empty";
 import { LocalTime } from "@/components/ui/local-time";
 import { MediaImage } from "@/components/ui/media-image";
 import { getAiringDay } from "@/features/anime/anime-queries";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 import {
+  formatCountdown,
   formatFormat,
   fromAiringTimestamp,
   getAiringPhase,
+  getFaviconUrl,
+  getStreamingLinks,
   getTitle,
-  isSafeExternalUrl,
   localDateStr,
 } from "@/features/anime/lib/media-helpers";
+import { cn } from "@/lib/utils";
+
+import { FILTER_ADULT_GENRES } from "../lib/filter-constants";
+import { EmptyState } from "./empty-state";
 
 import type { AiringScheduleNode } from "@/features/anime/types/anime";
 import type { Route } from "next";
@@ -32,6 +31,15 @@ export async function AiringTimeline({ day }: { day: string }) {
 
   const schedules = await getAiringDay(day, bounds.start, bounds.end);
   return <AiringTimelineList day={day} schedules={schedules} />;
+}
+
+function isAdultContent(media: AiringScheduleNode["media"]): boolean {
+  if (!media) return false;
+  return (
+    media.genres?.some((genre) =>
+      FILTER_ADULT_GENRES.includes(genre as (typeof FILTER_ADULT_GENRES)[number]),
+    ) ?? false
+  );
 }
 
 function getAiringDayBounds(day: string): { start: number; end: number } | null {
@@ -46,24 +54,25 @@ function getAiringDayBounds(day: string): { start: number; end: number } | null 
 }
 
 function AiringTimelineList({ day, schedules }: { day: string; schedules: AiringScheduleNode[] }) {
-  if (schedules.length === 0)
-    return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <CalendarIcon />
-          </EmptyMedia>
-          <EmptyTitle>Nothing airing today</EmptyTitle>
-        </EmptyHeader>
-        <EmptyContent>
-          <EmptyDescription>Choose another day to scan the week.</EmptyDescription>
-        </EmptyContent>
-      </Empty>
-    );
-
-  const grouped = groupByTimeBlock(schedules);
+  "use memo";
   const now = Date.now() / 1000;
   const isToday = day === localDateStr();
+
+  const visibleSchedules = useMemo(
+    () => schedules.filter((s) => !isAdultContent(s.media)),
+    [schedules],
+  );
+
+  if (visibleSchedules.length === 0)
+    return (
+      <EmptyState
+        icon={CalendarIcon}
+        title="Nothing airing today"
+        description="Choose another day to scan the week."
+      />
+    );
+
+  const grouped = groupByTimeBlock(visibleSchedules);
   const activeBlock = isToday ? currentBlockName() : null;
 
   return (
@@ -104,6 +113,7 @@ function AiringTimelineList({ day, schedules }: { day: string; schedules: Airing
                 const title = getTitle(item.media.title);
                 const phase = getAiringPhase(item.airingAt, now);
                 const isClose = phase === "upcoming" && item.airingAt - now < 3600;
+                const countdown = phase === "upcoming" ? formatCountdown(item.airingAt, now) : "";
                 const color = item.media.coverImage.color;
                 return (
                   <AnimePreviewCard key={`${item.media.id}-${index}`} media={item.media}>
@@ -142,46 +152,34 @@ function AiringTimelineList({ day, schedules }: { day: string; schedules: Airing
                         </div>
                         <div className="flex items-center justify-between gap-2 pt-2 border-t border-border-soft/60">
                           <div className="flex items-center gap-2">
-                            {phase === "live" ? (
+                            {phase === "live" && (
                               <span className="flex items-center gap-1.5 font-mono text-[0.68rem] font-bold text-destructive">
                                 <span className="size-1.5 animate-pulse rounded-full bg-destructive" />
                                 Live
                               </span>
-                            ) : isClose ? (
-                              <span className="flex items-center gap-1 font-mono text-[0.68rem] font-bold text-destructive">
-                                Soon
-                              </span>
-                            ) : phase === "aired" ? (
+                            )}
+                            {phase === "aired" && (
                               <span className="font-mono text-[0.68rem] text-muted-foreground">
                                 Aired
                               </span>
-                            ) : (
-                              <LocalTime
-                                timestamp={item.airingAt}
-                                className="font-mono text-[0.68rem] tabular-nums text-muted-foreground"
-                              />
                             )}
+                            {phase === "upcoming" && isClose && (
+                              <span className="font-mono text-[0.68rem] font-bold text-destructive">
+                                {countdown}
+                              </span>
+                            )}
+                            <LocalTime
+                              timestamp={item.airingAt}
+                              className={cn(
+                                "font-mono text-[0.68rem] tabular-nums",
+                                phase === "aired"
+                                  ? "text-muted-foreground/60"
+                                  : "text-muted-foreground",
+                              )}
+                            />
                           </div>
                           {(() => {
-                            const streamingLinks =
-                              item.media?.externalLinks?.filter(
-                                (link) =>
-                                  link.url &&
-                                  isSafeExternalUrl(link.url) &&
-                                  (link.type === "STREAMING" ||
-                                    [
-                                      "crunchyroll",
-                                      "netflix",
-                                      "hulu",
-                                      "bilibili",
-                                      "disney",
-                                      "hidive",
-                                      "prime",
-                                      "amazon",
-                                      "youtube",
-                                      "funimation",
-                                    ].some((s) => link.site?.toLowerCase().includes(s))),
-                              ) ?? [];
+                            const streamingLinks = getStreamingLinks(item.media?.externalLinks);
                             if (streamingLinks.length > 0) {
                               return (
                                 <div className="flex shrink-0 items-center gap-1">
@@ -247,28 +245,19 @@ function currentBlockName(): string {
   return "Night";
 }
 
-function getFaviconUrl(url: string): string {
-  try {
-    const domain = new URL(url).hostname;
-    return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
-  } catch {
-    return "";
-  }
-}
-
 function groupByTimeBlock(schedules: AiringScheduleNode[]): Record<string, AiringScheduleNode[]> {
   const blocks: Record<string, AiringScheduleNode[]> = {
+    Night: [],
     Morning: [],
     Afternoon: [],
     Evening: [],
-    Night: [],
   };
   for (const item of schedules) {
     const hour = fromAiringTimestamp(item.airingAt).getHours();
-    if (hour >= 6 && hour < 12) blocks["Morning"].push(item);
+    if (hour >= 0 && hour < 6) blocks["Night"].push(item);
+    else if (hour >= 6 && hour < 12) blocks["Morning"].push(item);
     else if (hour >= 12 && hour < 18) blocks["Afternoon"].push(item);
-    else if (hour >= 18 && hour < 24) blocks["Evening"].push(item);
-    else blocks["Night"].push(item);
+    else blocks["Evening"].push(item);
   }
   return Object.fromEntries(Object.entries(blocks).filter(([, items]) => items.length > 0));
 }

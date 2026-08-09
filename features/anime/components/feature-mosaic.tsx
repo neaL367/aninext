@@ -1,8 +1,8 @@
-import { ArrowUpRightIcon, StarIcon } from "lucide-react";
+import { StarIcon } from "lucide-react";
 import Link from "next/link";
 
-import { HoverPrefetchLink } from "@/components/ui/hover-prefetch-link";
 import { MediaImage } from "@/components/ui/media-image";
+import { ViewAllLink } from "@/components/ui/view-all-link";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 import {
   formatFormat,
@@ -26,6 +26,7 @@ export function FeatureMosaic({
   href: Route<string>;
   items: Media[];
 }) {
+  "use memo";
   if (items.length === 0) return null;
 
   const heroItem = items[0];
@@ -39,15 +40,7 @@ export function FeatureMosaic({
       <SectionHeader
         eyebrow="PlayStation Showcase"
         title={title}
-        action={
-          <HoverPrefetchLink
-            href={href}
-            className="group flex items-center gap-2 border-b border-border-soft pb-1 font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted-foreground hover:border-signal hover:text-signal"
-          >
-            View all{" "}
-            <ArrowUpRightIcon className="size-3 transition-transform group-hover:translate-x-0.5" />
-          </HoverPrefetchLink>
-        }
+        action={<ViewAllLink href={href}>View all</ViewAllLink>}
       />
       <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-stretch">
         {/* Asymmetric Large Highlight Poster Card */}

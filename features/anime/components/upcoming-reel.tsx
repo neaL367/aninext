@@ -1,8 +1,7 @@
-import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 
-import { HoverPrefetchLink } from "@/components/ui/hover-prefetch-link";
 import { MediaImage } from "@/components/ui/media-image";
+import { ViewAllLink } from "@/components/ui/view-all-link";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 import { formatFormat, getMediaCover, getMediaTitle } from "@/features/anime/lib/media-helpers";
 
@@ -22,6 +21,7 @@ export function UpcomingReel({
   items: Media[];
   description?: string;
 }) {
+  "use memo";
   if (items.length === 0) return null;
 
   return (
@@ -30,15 +30,7 @@ export function UpcomingReel({
         eyebrow="Netflix Radar"
         title={title}
         description={description ?? "Not yet released, already on the radar."}
-        action={
-          <HoverPrefetchLink
-            href={href}
-            className="group flex items-center gap-2 border-b border-border-soft pb-1 font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted-foreground hover:border-signal hover:text-signal"
-          >
-            View upcoming reel{" "}
-            <ArrowRightIcon className="size-3 transition-transform group-hover:translate-x-1" />
-          </HoverPrefetchLink>
-        }
+        action={<ViewAllLink href={href}>View upcoming reel</ViewAllLink>}
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">

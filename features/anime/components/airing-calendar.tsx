@@ -8,6 +8,7 @@ import { localDateStr } from "@/features/anime/lib/media-helpers";
 import { cn } from "@/lib/utils";
 
 export function AiringCalendar({ currentDay }: { currentDay: string }) {
+  "use memo";
   const localToday = useMemo(() => localDateStr(), []);
   const weekDays = useMemo(() => {
     const today = new Date();

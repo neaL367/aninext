@@ -369,13 +369,14 @@ Covered by §1.1 — no page-specific additions.
 
 ### 3.1 Route Map
 
-| Route                   | Collection          | AniList `sort`      | Fixed args                                                              | Redirect source |
-| ----------------------- | ------------------- | ------------------- | ----------------------------------------------------------------------- | --------------- |
-| `/anime/trending`       | Trending Now        | `[TRENDING_DESC]`   | `type: ANIME, isAdult: false`                                           | `/anime` → 308  |
-| `/anime/popular`        | Popular This Season | `[POPULARITY_DESC]` | `type: ANIME, season: <current>, seasonYear: <current>, isAdult: false` | —               |
-| `/anime/top100`         | Top 100             | `[SCORE_DESC]`      | `type: ANIME, isAdult: false`                                           | —               |
-| `/anime/upcoming`       | Upcoming            | `[POPULARITY_DESC]` | `type: ANIME, status: NOT_YET_RELEASED, isAdult: false`                 | —               |
-| `/anime/alltimepopular` | All-Time Popular    | `[POPULARITY_DESC]` | `type: ANIME, isAdult: false`                                           | —               |
+| Route                   | Collection          | AniList `sort`      | Fixed args                                                                      | Redirect source |
+| ----------------------- | ------------------- | ------------------- | ------------------------------------------------------------------------------- | --------------- |
+| `/anime/trending`       | Trending Now        | `[TRENDING_DESC]`   | `type: ANIME, isAdult: false`                                                   | `/anime` → 308  |
+| `/anime/popular`        | Popular This Season | `[POPULARITY_DESC]` | `type: ANIME, season: <current>, seasonYear: <current>, isAdult: false`         | —               |
+| `/anime/top100`         | Top 100             | `[SCORE_DESC]`      | `type: ANIME, isAdult: false`                                                   | —               |
+| `/anime/upcoming`       | Upcoming            | `[POPULARITY_DESC]` | `type: ANIME, status: NOT_YET_RELEASED, isAdult: false`                         | —               |
+| `/anime/alltimepopular` | All-Time Popular    | `[POPULARITY_DESC]` | `type: ANIME, isAdult: false`                                                   | —               |
+| `/anime/seasonal`       | Seasonal            | `[POPULARITY_DESC]` | `type: ANIME, isAdult: false` (redirects to `?season=<current>&year=<current>`) | —               |
 
 ```tsx
 // app/(browse)/anime/page.tsx

@@ -11,7 +11,6 @@ import { AiringTimeline, AiringTimelineSkeleton } from "./airing-timeline";
 
 export async function AiringDayView({ day }: { day?: string }) {
   await io();
-
   if (!day) {
     redirect(`/airing?day=${localDateStr()}`);
   }

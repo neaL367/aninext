@@ -1,26 +1,21 @@
 import { LinkIcon } from "lucide-react";
 import Link from "next/link";
 
-import { Empty, EmptyHeader, EmptyTitle, EmptyMedia } from "@/components/ui/empty";
 import { MediaImage } from "@/components/ui/media-image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 import { getTitle, getCover } from "@/features/anime/lib/media-helpers";
 
+import { EmptyState } from "./empty-state";
+
 import type { RelationEdge } from "@/features/anime/types/anime";
 import type { Route } from "next";
 
 export function AnimeRelations({ edges }: { edges: RelationEdge[] }) {
+  "use memo";
   if (edges.length === 0) {
     return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <LinkIcon />
-          </EmptyMedia>
-          <EmptyTitle>No related anime</EmptyTitle>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState icon={LinkIcon} title="No related anime" description="No related anime found." />
     );
   }
 

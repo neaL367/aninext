@@ -15,6 +15,7 @@ export function MediaGrid({
   rankStart?: number;
   priorityFirst?: boolean;
 }) {
+  "use memo";
   return (
     <>
       {items.map((item, i) => {

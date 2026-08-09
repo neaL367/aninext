@@ -1,22 +1,21 @@
 import { UserIcon } from "lucide-react";
 
-import { Empty, EmptyHeader, EmptyTitle, EmptyMedia } from "@/components/ui/empty";
 import { MediaImage } from "@/components/ui/media-image";
 import { Skeleton } from "@/components/ui/skeleton";
+
+import { EmptyState } from "./empty-state";
 
 import type { StaffEdge } from "@/features/anime/types/anime";
 
 export function AnimeStaff({ edges }: { edges: StaffEdge[] }) {
+  "use memo";
   if (edges.length === 0)
     return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <UserIcon />
-          </EmptyMedia>
-          <EmptyTitle>No staff available</EmptyTitle>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        icon={UserIcon}
+        title="No staff available"
+        description="No staff information available."
+      />
     );
 
   return (

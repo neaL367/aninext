@@ -1,8 +1,9 @@
-import { ArrowRightIcon, StarIcon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
 
 import { MediaImage } from "@/components/ui/media-image";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
+import { ScoreBadge } from "@/features/anime/components/score-badge";
 import {
   formatFormat,
   getMediaCover,
@@ -14,6 +15,7 @@ import type { Media } from "@/features/anime/types/anime";
 import type { Route } from "next";
 
 export function EditorialBanner({ item }: { item: Media }) {
+  "use memo";
   if (!item) return null;
 
   const title = getMediaTitle(item);
@@ -45,12 +47,7 @@ export function EditorialBanner({ item }: { item: Media }) {
               <span className="bg-foreground text-background px-2.5 py-0.5 font-bold uppercase tracking-widest">
                 Masterpiece Feature
               </span>
-              {item.averageScore && (
-                <span className="flex items-center gap-1 font-bold text-foreground">
-                  <StarIcon className="size-3.5 fill-signal text-signal" />
-                  {(item.averageScore / 10).toFixed(1)} / 10
-                </span>
-              )}
+              {item.averageScore && <ScoreBadge score={item.averageScore} suffix="/ 10" />}
             </div>
 
             <h3 className="text-3xl sm:text-5xl font-semibold tracking-[-0.04em] text-foreground leading-none">

@@ -76,6 +76,7 @@ export function FilterChip({
   onRemove: () => void;
   className?: string;
 }) {
+  "use memo";
   return (
     <span
       className={cn(

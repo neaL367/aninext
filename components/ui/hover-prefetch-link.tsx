@@ -11,6 +11,7 @@ export function HoverPrefetchLink({
   onTouchStart,
   ...props
 }: ComponentProps<typeof Link>) {
+  "use memo";
   const [intent, setIntent] = useState(false);
   return (
     <Link

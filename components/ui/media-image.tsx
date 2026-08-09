@@ -24,6 +24,7 @@ export function MediaImage({
   loading?: "lazy" | "eager";
   unoptimized?: boolean;
 }) {
+  "use memo";
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (

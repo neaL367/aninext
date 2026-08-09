@@ -1,21 +1,20 @@
 import { UsersIcon } from "lucide-react";
 
-import { Empty, EmptyHeader, EmptyTitle, EmptyMedia } from "@/components/ui/empty";
 import { MediaImage } from "@/components/ui/media-image";
+
+import { EmptyState } from "./empty-state";
 
 import type { CharacterEdge } from "@/features/anime/types/anime";
 
 export function AnimeCharacters({ edges }: { edges: CharacterEdge[] }) {
+  "use memo";
   if (edges.length === 0) {
     return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <UsersIcon />
-          </EmptyMedia>
-          <EmptyTitle>No characters available</EmptyTitle>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        icon={UsersIcon}
+        title="No characters available"
+        description="No characters have been added yet."
+      />
     );
   }
 

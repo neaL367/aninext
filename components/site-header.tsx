@@ -15,6 +15,7 @@ const navItems: Array<{ href: Route; label: string; prefetch?: boolean }> = [
 ];
 
 export function SiteHeader() {
+  "use memo";
   const pathname = usePathname();
 
   const isActive = (href: Route) => {

@@ -3,6 +3,7 @@ import { LocalTime } from "@/components/ui/local-time";
 import type { AiringScheduleNode } from "@/features/anime/types/anime";
 
 export function AnimeAiringScheduleList({ nodes }: { nodes: AiringScheduleNode[] }) {
+  "use memo";
   if (nodes.length === 0) {
     return null;
   }

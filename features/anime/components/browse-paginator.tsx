@@ -1,9 +1,12 @@
 "use client";
 
-import { Suspense, use, useEffect, useRef, useState, useTransition, type ReactNode } from "react";
+import { Suspense, use, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 
 import { Spinner } from "@/components/ui/spinner";
 import { renderBrowsePage, type BrowsePage } from "@/features/anime/components/browse-page-action";
+
+import { useInfiniteScroll } from "../hooks/use-infinite-scroll";
+import { MEDIA_GRID_CLASS, MediaGridSkeletonItems } from "./media-grid";
 
 import type { AnimeCollection, AnimeFilters } from "@/features/anime/types/anime";
 
@@ -51,53 +54,23 @@ function BrowsePaginatorContent({
   pageSize: number;
   emptyComponent: ReactNode;
 }) {
+  "use memo";
   const initialResult = use(initialPage);
   const [pages, setPages] = useState<Promise<BrowsePage>[]>(() => [initialPage]);
-  const [isPending, startTransition] = useTransition();
-  const [hasMore, setHasMore] = useState(initialResult.hasMore);
   const [hasItems] = useState(initialResult.hasItems);
-  const loadingRef = useRef(false);
-  const lastLoadRef = useRef(0);
-  const cooldownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    return () => {
-      if (cooldownTimerRef.current) clearTimeout(cooldownTimerRef.current);
-    };
-  }, []);
+  const loadPage = useCallback(
+    async (page: number) => {
+      const result = await renderBrowsePage(collection, filters, page, pageSize);
+      setPages((prev) => [...prev, Promise.resolve(result)]);
+      return result;
+    },
+    [collection, filters, pageSize],
+  );
 
-  function loadMore() {
-    if (!hasMore || loadingRef.current) return;
-    const now = Date.now();
-    const elapsed = now - lastLoadRef.current;
-    if (elapsed < 500) {
-      if (!cooldownTimerRef.current) {
-        cooldownTimerRef.current = setTimeout(() => {
-          cooldownTimerRef.current = null;
-          loadMore();
-        }, 500 - elapsed);
-      }
-      return;
-    }
-    lastLoadRef.current = now;
-
-    const nextPage = pages.length + 1;
-    if (collection === "top100" && nextPage * pageSize > 100) {
-      setHasMore(false);
-      return;
-    }
-
-    loadingRef.current = true;
-    startTransition(async () => {
-      try {
-        const result = await renderBrowsePage(collection, filters, nextPage, pageSize);
-        setHasMore(result.hasMore);
-        setPages((prev) => [...prev, Promise.resolve(result)]);
-      } finally {
-        loadingRef.current = false;
-      }
-    });
-  }
+  const { isPending, hasMore, loadMore } = useInfiniteScroll(loadPage, {
+    ...(collection === "top100" ? { maxItems: 100, itemsPerPage: pageSize } : {}),
+  });
 
   const pageSkeleton = (
     <MediaGridSkeletonItems count={pageSize} rankStart={collection === "top100" ? 1 : undefined} />
@@ -124,8 +97,6 @@ function BrowsePaginatorContent({
     </>
   );
 }
-
-import { MEDIA_GRID_CLASS, MediaGridSkeletonItems } from "./media-grid";
 
 function ResultsGrid({ children }: { children: ReactNode }) {
   return (

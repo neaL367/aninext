@@ -5,6 +5,4 @@ export const ANIME_CACHE = {
   detail: (id: number) => `anime:detail:${id}` as const,
   airingDay: (date: string, windowStart: number) =>
     `anime:airing:day:${date}:${windowStart}` as const,
-  airingWeek: (monday: string) => `anime:airing:week:${monday}` as const,
-  detailSections: (id: number) => `anime:detail:${id}:sections` as const,
 } as const;

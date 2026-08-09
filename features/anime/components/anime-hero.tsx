@@ -4,22 +4,28 @@ import { notFound } from "next/navigation";
 import { ViewTransition } from "react";
 
 import { MediaImage } from "@/components/ui/media-image";
-import { getAnimeHero } from "@/features/anime/anime-queries";
+import { getAnimeFullDetail } from "@/features/anime/anime-queries";
 import {
   formatFormat,
   formatStatus,
+  getFaviconUrl,
   getMediaCover,
   getMediaTitle,
+  getStreamingLinks,
   stripHtml,
 } from "@/features/anime/lib/media-helpers";
 import { cn } from "@/lib/utils";
 
 import type { Media } from "@/features/anime/types/anime";
 
-export async function AnimeHeroSection({ id }: { id: number }) {
-  const media = await getAnimeHero(id);
-  if (!media) notFound();
-  return <AnimeHero media={media} />;
+export async function AnimeHeroSection({
+  detailPromise,
+}: {
+  detailPromise: Promise<Awaited<ReturnType<typeof getAnimeFullDetail>>>;
+}) {
+  const detail = await detailPromise;
+  if (!detail) notFound();
+  return <AnimeHero media={detail.media} />;
 }
 
 export function AnimeHero({ media }: { media: Media }) {
@@ -201,25 +207,7 @@ export function AnimeHero({ media }: { media: Media }) {
               )}
 
               {(() => {
-                const streamingLinks =
-                  media.externalLinks?.filter(
-                    (link) =>
-                      link.url &&
-                      (link.type === "STREAMING" ||
-                        [
-                          "crunchyroll",
-                          "netflix",
-                          "hulu",
-                          "bilibili",
-                          "disney",
-                          "hidive",
-                          "prime",
-                          "amazon",
-                          "youtube",
-                          "funimation",
-                        ].some((s) => link.site?.toLowerCase().includes(s))),
-                  ) ?? [];
-
+                const streamingLinks = getStreamingLinks(media.externalLinks);
                 if (streamingLinks.length === 0) return null;
 
                 return (
@@ -228,10 +216,7 @@ export function AnimeHero({ media }: { media: Media }) {
                       Stream on:
                     </span>
                     {streamingLinks.slice(0, 5).map((link) => {
-                      const domain = getDomain(link.url);
-                      const favicon = domain
-                        ? `https://www.google.com/s2/favicons?domain=${domain}&sz=32`
-                        : "";
+                      const favicon = getFaviconUrl(link.url);
                       return (
                         <a
                           key={link.url}
@@ -265,14 +250,6 @@ export function AnimeHero({ media }: { media: Media }) {
       </div>
     </section>
   );
-}
-
-function getDomain(url: string): string {
-  try {
-    return new URL(url).hostname;
-  } catch {
-    return "";
-  }
 }
 
 export function AnimeHeroSkeleton() {

@@ -2,12 +2,15 @@
 
 import { Button } from "@/components/ui/button";
 
-import { useFilters } from "../hooks/use-filters";
+import { useFilterActions } from "../hooks/use-filter-actions";
+import { useFilterState } from "../hooks/use-filter-state";
 import { FILTER_TYPE_LABELS, FILTER_ORDER } from "../lib/filter-constants";
 import { FilterChip } from "./filter-button";
 
 export function ActiveFilters() {
-  const { isPending, removeFilter, clearAll, activeFilters, groupedFilters } = useFilters();
+  "use memo";
+  const { isPending, activeFilters, groupedFilters } = useFilterState();
+  const { removeFilter, clearAll } = useFilterActions();
 
   if (activeFilters.length === 0) return null;
 

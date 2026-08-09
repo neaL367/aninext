@@ -4,6 +4,7 @@ import { WifiOffIcon } from "lucide-react";
 import { useOffline } from "next/offline";
 
 export function OfflineBanner() {
+  "use memo";
   const isOffline = useOffline();
 
   if (!isOffline) return null;

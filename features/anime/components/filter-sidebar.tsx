@@ -3,22 +3,11 @@
 import { ChevronDownIcon } from "lucide-react";
 import { memo, use, useCallback, useMemo, useState } from "react";
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
-import { useFilters, type FilterController } from "../hooks/use-filters";
+import { useFilterActions } from "../hooks/use-filter-actions";
+import { useFilterState } from "../hooks/use-filter-state";
 import {
   FILTER_ADULT_GENRES,
   FILTER_COUNTRIES,
@@ -28,7 +17,9 @@ import {
   formatFilterValue,
   getYears,
 } from "../lib/filter-constants";
+import { AdultContentFilter } from "./adult-content-filter";
 import { FilterOptionGrid } from "./filter-button";
+import { FiltersHeader } from "./filters-header";
 
 import type { AnimeCollection } from "@/features/anime/types/anime";
 
@@ -68,14 +59,17 @@ export function FilterSidebar({
   mobile?: boolean;
   collection: AnimeCollection;
 }) {
-  const filters = useFilters();
+  "use memo";
+  const state = useFilterState();
+  const actions = useFilterActions();
 
   return (
     <FilterSidebarContent
       genresPromise={genresPromise}
       mobile={mobile}
       collection={collection}
-      filters={filters}
+      state={state}
+      actions={actions}
     />
   );
 }
@@ -84,15 +78,19 @@ export function FilterSidebarContent({
   genresPromise,
   mobile = false,
   collection,
-  filters,
+  state,
+  actions,
 }: {
   genresPromise: Promise<string[]>;
   mobile?: boolean;
   collection: AnimeCollection;
-  filters: FilterController;
+  state: ReturnType<typeof useFilterState>;
+  actions: ReturnType<typeof useFilterActions>;
 }) {
+  "use memo";
   const allGenres = use(genresPromise);
-  const { state, isPending, updateFilter, clearAll, facetCount } = filters;
+  const { state: filterState, isPending, facetCount } = state;
+  const { updateFilter, clearAll } = actions;
   const [adultOpen, setAdultOpen] = useState(false);
   const setAdultContent = useCallback(
     (enabled: boolean) => updateFilter("isAdult", enabled ? "true" : undefined),
@@ -101,13 +99,13 @@ export function FilterSidebarContent({
 
   const genres = useMemo(
     () =>
-      (state.isAdult
+      (filterState.isAdult
         ? allGenres
         : allGenres.filter(
             (genre) => !FILTER_ADULT_GENRES.some((adultGenre) => adultGenre === genre),
           )
       ).map((value) => ({ value, label: value })),
-    [allGenres, state.isAdult],
+    [allGenres, filterState.isAdult],
   );
   const years = useMemo(
     () => [
@@ -129,7 +127,7 @@ export function FilterSidebarContent({
       key: "genre",
       label: "Genre",
       options: genres,
-      selected: state.genre,
+      selected: filterState.genre,
       defaultOpen: true,
       scroll: true,
     },
@@ -137,7 +135,7 @@ export function FilterSidebarContent({
       key: "format",
       label: "Format",
       options: FORMAT_OPTIONS,
-      selected: state.format,
+      selected: filterState.format,
     },
     ...(collection !== "upcoming"
       ? [
@@ -145,7 +143,7 @@ export function FilterSidebarContent({
             key: "status" as const,
             label: "Status",
             options: STATUS_OPTIONS,
-            selected: state.status,
+            selected: filterState.status,
           },
         ]
       : []),
@@ -153,22 +151,22 @@ export function FilterSidebarContent({
       key: "season",
       label: "Season",
       options: SEASON_OPTIONS,
-      selected: [state.season],
-      defaultOpen: Boolean(state.season),
+      selected: [filterState.season],
+      defaultOpen: Boolean(filterState.season),
     },
     {
       key: "year",
       label: "Year",
       options: years,
-      selected: [state.year],
-      defaultOpen: Boolean(state.year),
+      selected: [filterState.year],
+      defaultOpen: Boolean(filterState.year),
       scroll: true,
     },
     {
       key: "country",
       label: "Origin",
       options: COUNTRY_OPTIONS,
-      selected: [state.country],
+      selected: [filterState.country],
     },
   ];
 
@@ -180,43 +178,7 @@ export function FilterSidebarContent({
       )}
       data-pending={isPending ? "" : undefined}
     >
-      {mobile ? (
-        facetCount > 0 && (
-          <div className="mb-3 flex justify-end">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearAll}
-              className="h-8 rounded-none px-2 font-mono text-[0.62rem] uppercase tracking-[0.1em] text-muted-foreground"
-            >
-              Reset filters
-            </Button>
-          </div>
-        )
-      ) : (
-        <div className="mb-3 flex items-center justify-between border-b border-border-soft pb-3">
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-foreground">
-              Filters
-            </span>
-            {facetCount > 0 && (
-              <span className="flex size-5 items-center justify-center rounded-full bg-accent font-mono text-[0.6rem] font-semibold text-accent-foreground">
-                {facetCount}
-              </span>
-            )}
-          </div>
-          {facetCount > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearAll}
-              className="h-8 rounded-none px-2 font-mono text-[0.62rem] uppercase tracking-[0.1em] text-muted-foreground hover:text-foreground"
-            >
-              Reset
-            </Button>
-          )}
-        </div>
-      )}
+      <FiltersHeader facetCount={facetCount} onClear={clearAll} mobile={mobile} />
 
       <div className="flex flex-col">
         {sections.map((section) => (
@@ -235,7 +197,7 @@ export function FilterSidebarContent({
           />
         ))}
         <AdultContentFilter
-          enabled={state.isAdult}
+          enabled={filterState.isAdult}
           open={adultOpen}
           onOpenChange={setAdultOpen}
           onChange={setAdultContent}
@@ -325,6 +287,7 @@ function FilterSection({
   defaultOpen?: boolean;
   count?: number;
 }) {
+  "use memo";
   const [toggled, setToggled] = useState<boolean | null>(null);
   const open = toggled ?? ((count ?? 0) > 0 ? true : defaultOpen);
   const contentId = `filter-${id}-content`;
@@ -351,80 +314,6 @@ function FilterSection({
           {children}
         </div>
       )}
-    </section>
-  );
-}
-
-function AdultContentFilter({
-  enabled,
-  open,
-  onOpenChange,
-  onChange,
-}: {
-  enabled: boolean;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onChange: (enabled: boolean) => void;
-}) {
-  const [confirmOpen, setConfirmOpen] = useState(false);
-
-  return (
-    <section className="border-b border-border-soft py-3">
-      <button
-        type="button"
-        aria-expanded={open}
-        onClick={() => onOpenChange(!open)}
-        className="flex min-h-9 w-full items-center gap-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
-      >
-        <ChevronDownIcon className={cn("size-3.5 transition-transform", open && "rotate-180")} />
-        <span className="font-mono text-[0.68rem] font-medium uppercase tracking-[0.08em] text-foreground">
-          Adult content
-        </span>
-        {enabled && (
-          <span className="ml-auto rounded-sm bg-live-badge/10 px-1.5 py-0.5 font-mono text-[0.6rem] font-medium text-live-badge">
-            Enabled
-          </span>
-        )}
-      </button>
-      {open && (
-        <div className="flex flex-col gap-3 pt-3">
-          <p className="text-xs leading-5 text-muted-foreground">
-            Includes mature themes and graphic material. Age confirmation required.
-          </p>
-          <div className="flex min-h-9 items-center justify-between gap-4">
-            <span className="text-xs text-muted-foreground">Show adult content</span>
-            <Switch
-              checked={enabled}
-              onCheckedChange={(checked: boolean) => {
-                if (checked) setConfirmOpen(true);
-                else onChange(false);
-              }}
-            />
-          </div>
-        </div>
-      )}
-      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Age confirmation</AlertDialogTitle>
-            <AlertDialogDescription>
-              This content is intended for mature audiences and may include graphic material. You
-              must be 18 years or older to view adult content.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                setConfirmOpen(false);
-                onChange(true);
-              }}
-            >
-              I am 18 or older
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </section>
   );
 }

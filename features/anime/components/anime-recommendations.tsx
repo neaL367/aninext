@@ -1,22 +1,21 @@
 import { ThumbsUpIcon } from "lucide-react";
 
-import { Empty, EmptyHeader, EmptyTitle, EmptyMedia } from "@/components/ui/empty";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 import { MediaCard, MediaCardSkeleton } from "@/features/anime/components/media-card";
+
+import { EmptyState } from "./empty-state";
 
 import type { RecommendationNode } from "@/features/anime/types/anime";
 
 export function AnimeRecommendations({ nodes }: { nodes: RecommendationNode[] }) {
+  "use memo";
   if (nodes.length === 0) {
     return (
-      <Empty>
-        <EmptyHeader>
-          <EmptyMedia variant="icon">
-            <ThumbsUpIcon />
-          </EmptyMedia>
-          <EmptyTitle>No recommendations</EmptyTitle>
-        </EmptyHeader>
-      </Empty>
+      <EmptyState
+        icon={ThumbsUpIcon}
+        title="No recommendations"
+        description="No recommendations available yet."
+      />
     );
   }
 

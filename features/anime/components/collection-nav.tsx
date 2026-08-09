@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import type { AnimeCollection } from "@/features/anime/types/anime";
 
 export function CollectionNav() {
+  "use memo";
   const pathname = usePathname();
   const active = pathname.split("/")[2] as AnimeCollection;
 

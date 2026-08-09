@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 export function ScrollToTop() {
+  "use memo";
   const pathname = usePathname();
 
   useEffect(() => {

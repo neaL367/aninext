@@ -74,7 +74,7 @@
   --signal: #0070f3;
   --signal-strong: #0056cc;
   --signal-soft: color-mix(in srgb, #0070f3 10%, transparent);
-  --score-high: #0070f3;
+  --score-high: #34d399;
   --score-mid: #f59e0b;
   --score-low: oklch(0.64 0 0);
   --live-badge: #ee0000;

@@ -15,6 +15,7 @@ const items: Array<{ href: Route; label: string; icon: typeof CompassIcon; prefe
 ];
 
 export function SiteMobileNav() {
+  "use memo";
   const pathname = usePathname();
 
   const isActive = (href: Route) => {

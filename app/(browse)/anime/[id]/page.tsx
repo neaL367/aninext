@@ -3,7 +3,7 @@ import { Suspense } from "react";
 
 import { Crossfade } from "@/components/ui/crossfade";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
-import { getAnimeHero } from "@/features/anime/anime-queries";
+import { getAnimeFullDetail } from "@/features/anime/anime-queries";
 import { AnimeDetail, AnimeDetailSkeleton } from "@/features/anime/components/anime-detail";
 import { AnimeHeroSection, AnimeHeroSkeleton } from "@/features/anime/components/anime-hero";
 import { stripHtml } from "@/features/anime/lib/media-helpers";
@@ -24,12 +24,20 @@ function requireAnimeId(value: string): number {
   return id;
 }
 
-async function AnimeHeroContent({ id }: { id: Promise<number> }) {
-  return <AnimeHeroSection id={await id} />;
+async function AnimeHeroContent({
+  detailPromise,
+}: {
+  detailPromise: Promise<Awaited<ReturnType<typeof getAnimeFullDetail>>>;
+}) {
+  return <AnimeHeroSection detailPromise={detailPromise} />;
 }
 
-async function AnimeDetailContent({ id }: { id: Promise<number> }) {
-  return <AnimeDetail id={await id} />;
+async function AnimeDetailContent({
+  detailPromise,
+}: {
+  detailPromise: Promise<Awaited<ReturnType<typeof getAnimeFullDetail>>>;
+}) {
+  return <AnimeDetail detailPromise={detailPromise} />;
 }
 
 export async function generateMetadata({
@@ -42,8 +50,9 @@ export async function generateMetadata({
   if (animeId === null) return {};
 
   try {
-    const media = await getAnimeHero(animeId);
-    if (!media) return {};
+    const detail = await getAnimeFullDetail(animeId);
+    if (!detail) return {};
+    const media = detail.media;
     const title = media.title.english ?? media.title.romaji ?? "Unknown";
     const description = stripHtml(media.description)?.slice(0, 160) ?? "";
     return {
@@ -62,21 +71,21 @@ export async function generateMetadata({
 }
 
 export default function AnimeDetailPage({ params }: PageProps<"/anime/[id]">) {
-  const animeId = params.then(({ id }) => requireAnimeId(id));
+  const detailPromise = params.then(({ id }) => getAnimeFullDetail(requireAnimeId(id)));
 
   return (
     <>
       <ErrorBoundary title="Anime details failed to load">
         <Suspense fallback={<AnimeHeroSkeleton />}>
           <Crossfade>
-            <AnimeHeroContent id={animeId} />
+            <AnimeHeroContent detailPromise={detailPromise} />
           </Crossfade>
         </Suspense>
       </ErrorBoundary>
       <ErrorBoundary title="Anime sections failed to load">
         <Suspense fallback={<AnimeDetailSkeleton />}>
           <Crossfade>
-            <AnimeDetailContent id={animeId} />
+            <AnimeDetailContent detailPromise={detailPromise} />
           </Crossfade>
         </Suspense>
       </ErrorBoundary>

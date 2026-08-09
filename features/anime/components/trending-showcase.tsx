@@ -1,9 +1,9 @@
-import { ArrowRightIcon, StarIcon } from "lucide-react";
 import Link from "next/link";
 
-import { HoverPrefetchLink } from "@/components/ui/hover-prefetch-link";
 import { MediaImage } from "@/components/ui/media-image";
+import { ViewAllLink } from "@/components/ui/view-all-link";
 import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
+import { ScoreBadge } from "@/features/anime/components/score-badge";
 import {
   formatFormat,
   getMediaCover,
@@ -17,6 +17,7 @@ import type { Media } from "@/features/anime/types/anime";
 import type { Route } from "next";
 
 export function TrendingShowcase({ items }: { items: Media[] }) {
+  "use memo";
   if (items.length === 0) return null;
 
   const heroItem = items[0];
@@ -33,15 +34,7 @@ export function TrendingShowcase({ items }: { items: Media[] }) {
         eyebrow="Apple TV Spotlight"
         title="Trending Now"
         description="The most watched and talked-about titles this week."
-        action={
-          <HoverPrefetchLink
-            href="/anime/trending"
-            className="group flex items-center gap-2 border-b border-border-soft pb-1 font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:border-signal hover:text-signal"
-          >
-            View all trending{" "}
-            <ArrowRightIcon className="size-3 transition-transform group-hover:translate-x-1" />
-          </HoverPrefetchLink>
-        }
+        action={<ViewAllLink href="/anime/trending">View all trending</ViewAllLink>}
       />
 
       {/* Featured #1 Spotlight Hero Card */}
@@ -81,12 +74,7 @@ export function TrendingShowcase({ items }: { items: Media[] }) {
                 </h3>
 
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-xs text-muted-foreground pointer-events-auto">
-                  {heroItem.averageScore && (
-                    <span className="flex items-center gap-1 font-semibold text-foreground">
-                      <StarIcon className="size-3.5 fill-signal text-signal" />
-                      {(heroItem.averageScore / 10).toFixed(1)}
-                    </span>
-                  )}
+                  {heroItem.averageScore && <ScoreBadge score={heroItem.averageScore} />}
                   {heroItem.format && <span>{formatFormat(heroItem.format)}</span>}
                   {heroItem.episodes && <span>{heroItem.episodes} episodes</span>}
                   {heroStudio && <span className="text-foreground">{heroStudio}</span>}

@@ -31,6 +31,7 @@ export function MediaCard({
   priority?: boolean;
   coverTier?: CoverTier;
 }) {
+  "use memo";
   const title = getMediaTitle(media);
   const cover = getMediaCover(media, coverTier);
   const color = media.coverImage.color;

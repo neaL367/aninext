@@ -1,35 +1,36 @@
 "use client";
 
-import { ArrowRightIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";
 
-import { HoverPrefetchLink } from "@/components/ui/hover-prefetch-link";
-import { fromAiringTimestamp, getAiringPhase, getTitle } from "@/features/anime/lib/media-helpers";
+import { ViewAllLink } from "@/components/ui/view-all-link";
+import {
+  formatCountdown,
+  fromAiringTimestamp,
+  getAiringPhase,
+  getTitle,
+} from "@/features/anime/lib/media-helpers";
 
 import { SectionHeader } from "./section-header";
 
 import type { AiringScheduleNode } from "@/features/anime/types/anime";
 import type { Route } from "next";
 
-function localDayBounds(): { start: number; end: number } {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const end = new Date(start.getTime() + 86400000);
-  return { start: Math.floor(start.getTime() / 1000), end: Math.floor(end.getTime() / 1000) };
-}
-
 export function AiringHomeSection({ schedules }: { schedules: AiringScheduleNode[] }) {
-  const today = useMemo(() => localDayBounds(), []);
+  "use memo";
+  const now = Date.now() / 1000;
 
-  const todaySchedules = useMemo(
-    () => schedules.filter((s) => s.airingAt >= today.start && s.airingAt < today.end).slice(0, 6),
-    [schedules, today],
+  const upcomingSchedules = useMemo(
+    () =>
+      schedules
+        .filter((s) => s.airingAt > now)
+        .sort((a, b) => a.airingAt - b.airingAt)
+        .slice(0, 6),
+    [schedules, now],
   );
 
-  if (todaySchedules.length === 0) return null;
-  const now = Date.now() / 1000;
+  if (upcomingSchedules.length === 0) return null;
 
   return (
     <section>
@@ -37,33 +38,17 @@ export function AiringHomeSection({ schedules }: { schedules: AiringScheduleNode
         eyebrow="Today"
         title="Airing now"
         description="Catch the latest episodes as they land."
-        action={
-          <HoverPrefetchLink
-            href="/airing"
-            className="group flex items-center gap-2 border-b border-border-soft pb-1 font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted-foreground hover:border-accent hover:text-accent"
-          >
-            Full schedule{" "}
-            <ArrowRightIcon className="size-3 transition-transform group-hover:translate-x-1" />
-          </HoverPrefetchLink>
-        }
+        action={<ViewAllLink href="/airing">Full schedule</ViewAllLink>}
       />
       <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {todaySchedules.map((item, index) => {
+        {upcomingSchedules.map((item, index) => {
           if (!item.media) return null;
           const title = getTitle(item.media.title);
           const time = fromAiringTimestamp(item.airingAt);
           // eslint-disable-next-line react-hooks/purity -- live countdown, recomputed per render
           const phase = getAiringPhase(item.airingAt, now);
-          const minutes = Math.floor((item.airingAt - now) / 60);
-          const countdown =
-            phase === "live"
-              ? "Airing"
-              : phase === "aired"
-                ? "Aired"
-                : minutes > 60
-                  ? `${Math.floor(minutes / 60)}h ${minutes % 60}m`
-                  : `${Math.max(minutes, 0)}m`;
-          const isClose = phase === "upcoming" && minutes < 60;
+          const countdown = phase === "upcoming" ? formatCountdown(item.airingAt, now) : "";
+          const isClose = phase === "upcoming" && item.airingAt - now < 3600;
           const color = item.media.coverImage.color;
 
           return (

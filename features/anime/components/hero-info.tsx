@@ -1,12 +1,14 @@
-import { ArrowRightIcon, PlayIcon, StarIcon } from "lucide-react";
+import { PlayIcon } from "lucide-react";
 
-import { HoverPrefetchLink } from "@/components/ui/hover-prefetch-link";
+import { ViewAllLink } from "@/components/ui/view-all-link";
 import { formatFormat, getMediaTitle, stripHtml } from "@/features/anime/lib/media-helpers";
 
+import { ScoreBadge } from "./score-badge";
+
 import type { Media } from "@/features/anime/types/anime";
-import type { Route } from "next";
 
 export function HeroInfo({ media, rank }: { media: Media; rank?: number }) {
+  "use memo";
   const title = getMediaTitle(media);
   const description = stripHtml(media.description);
 
@@ -30,13 +32,7 @@ export function HeroInfo({ media, rank }: { media: Media; rank?: number }) {
         className="animate-stagger-up flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-muted-foreground"
         style={{ animationDelay: "140ms" }}
       >
-        {media.averageScore && (
-          <span className="inline-flex items-center gap-1.5 font-semibold text-foreground">
-            <StarIcon className="size-3.5 fill-signal text-signal" />
-            {(media.averageScore / 10).toFixed(1)}
-            <span className="font-normal text-muted-foreground">/ 10</span>
-          </span>
-        )}
+        {media.averageScore && <ScoreBadge score={media.averageScore} suffix="/ 10" />}
         {media.format && <span>{formatFormat(media.format)}</span>}
         {media.episodes && <span>{media.episodes} episodes</span>}
         {media.season && media.seasonYear && (
@@ -82,13 +78,9 @@ export function HeroInfo({ media, rank }: { media: Media; rank?: number }) {
           ))}
         </div>
         <div className="flex items-center gap-4">
-          <HoverPrefetchLink
-            href={`/anime/${media.id}` as Route<string>}
-            className="group flex items-center gap-2 border-b border-border-soft pb-1 font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:border-signal hover:text-signal"
-          >
-            Explore anime{" "}
-            <ArrowRightIcon className="size-3 transition-transform group-hover:translate-x-1" />
-          </HoverPrefetchLink>
+          <ViewAllLink href={`/anime/${media.id}` as import("next").Route}>
+            Explore anime
+          </ViewAllLink>
           {media.trailer?.id && media.trailer.site === "youtube" && (
             <a
               href={`https://www.youtube.com/watch?v=${media.trailer.id}`}
