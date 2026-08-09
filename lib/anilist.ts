@@ -2,8 +2,8 @@ import "server-only";
 import { AniListError } from "./anilist-errors";
 
 const ENDPOINT = "https://graphql.anilist.co";
-const REQUEST_TIMEOUT_MS = 6_000;
-const TOTAL_BUDGET_MS = 9_000;
+const REQUEST_TIMEOUT_MS = 15_000;
+const TOTAL_BUDGET_MS = 20_000;
 
 const MAX_CONCURRENT = 4;
 let activeRequestCount = 0;

@@ -324,34 +324,42 @@ export async function getAnimeFullDetail(id: number): Promise<AnimeFullDetailDat
   cacheTag("anime", ANIME_CACHE.detail(id));
   cacheLife("home");
 
-  const data = await anilistFetch<{
-    Media:
-      | (Media & {
-          characters?: { edges?: CharacterEdge[] | null } | null;
-          staff?: { edges?: StaffEdge[] | null } | null;
-          relations?: { edges?: RelationEdge[] | null } | null;
-          recommendations?: { nodes?: RecommendationNode[] | null } | null;
-          airingSchedule?: { nodes?: AiringScheduleNode[] | null } | null;
-        })
-      | null;
-  }>(ANIME_FULL_DETAIL_QUERY, { id });
+  try {
+    const data = await anilistFetch<{
+      Media:
+        | (Media & {
+            characters?: { edges?: CharacterEdge[] | null } | null;
+            staff?: { edges?: StaffEdge[] | null } | null;
+            relations?: { edges?: RelationEdge[] | null } | null;
+            recommendations?: { nodes?: RecommendationNode[] | null } | null;
+            airingSchedule?: { nodes?: AiringScheduleNode[] | null } | null;
+          })
+        | null;
+    }>(ANIME_FULL_DETAIL_QUERY, { id });
 
-  const m = data.Media;
-  if (!m) return null;
+    const m = data.Media;
+    if (!m) return null;
 
-  return {
-    media: m,
-    characters: m.characters?.edges ?? [],
-    staff: m.staff?.edges ?? [],
-    relations: m.relations?.edges ?? [],
-    recommendations: m.recommendations?.nodes ?? [],
-    airingSchedule: m.airingSchedule?.nodes ?? [],
-  };
+    return {
+      media: m,
+      characters: m.characters?.edges ?? [],
+      staff: m.staff?.edges ?? [],
+      relations: m.relations?.edges ?? [],
+      recommendations: m.recommendations?.nodes ?? [],
+      airingSchedule: m.airingSchedule?.nodes ?? [],
+    };
+  } catch {
+    return null;
+  }
 }
 
 const AIRING_DAY_QUERY = `
-  query AiringDay($start: Int, $end: Int) {
-    Page(perPage: 50) {
+  query AiringDay($start: Int, $end: Int, $page: Int) {
+    Page(page: $page, perPage: 50) {
+      pageInfo {
+        hasNextPage
+        total
+      }
       airingSchedules(airingAt_greater: $start, airingAt_lesser: $end, sort: [TIME]) {
         episode
         airingAt
@@ -369,9 +377,29 @@ export async function getAiringDay(day: string, start: number, end: number) {
   cacheTag("anime", ANIME_CACHE.airingDay(day, start));
   cacheLife("airing");
 
-  const data = await anilistFetch<{
-    Page: { airingSchedules: AiringScheduleNode[] };
-  }>(AIRING_DAY_QUERY, { start, end });
+  try {
+    const allSchedules: AiringScheduleNode[] = [];
+    let page = 1;
+    let hasNextPage = true;
 
-  return data.Page.airingSchedules;
+    while (hasNextPage) {
+      const data = await anilistFetch<{
+        Page: {
+          pageInfo: { hasNextPage: boolean; total: number };
+          airingSchedules: AiringScheduleNode[];
+        };
+      }>(AIRING_DAY_QUERY, { start, end, page });
+
+      allSchedules.push(...data.Page.airingSchedules);
+      hasNextPage = data.Page.pageInfo.hasNextPage;
+      page++;
+
+      // Safety limit: max 5 pages (250 items)
+      if (page > 5) break;
+    }
+
+    return allSchedules;
+  } catch {
+    return [];
+  }
 }
