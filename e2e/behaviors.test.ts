@@ -19,16 +19,12 @@ test.describe("infinite scroll pagination", () => {
     const results = page.locator('[role="listitem"]');
     const sentinel = page.locator('[aria-label="Load more anime"]');
     await expect(results.first()).toBeVisible({ timeout: 15_000 });
+    await expect(sentinel).toBeVisible({ timeout: 15_000 });
 
     let previousCount = await results.count();
     for (let i = 0; i < 10; i += 1) {
-      const didScroll = await page.evaluate(() => {
-        const element = document.querySelector('[aria-label="Load more anime"]');
-        if (!element) return false;
-        element.scrollIntoView({ block: "end" });
-        return true;
-      });
-      if (!didScroll) break;
+      if ((await sentinel.count()) === 0) break;
+      await sentinel.scrollIntoViewIfNeeded();
 
       await expect
         .poll(
@@ -90,7 +86,8 @@ test.describe("API failure error states", () => {
     // Far beyond AniList's highest anime id, so guaranteed to be missing — the old
     // random 100k–900k range could collide with real titles. A missing id flows
     // through getAnimeFullDetail → null → notFound(), which renders not-found.tsx
-    // (the error boundary never fires for this path).
+    // (the error boundary never fires for this path). API failures remain errors
+    // instead of being mistaken for a missing anime.
     const missingId = 2_000_000_000;
     await page.goto(`/anime/${missingId}`);
     await expect(page.getByRole("heading", { name: "Anime Not Found" })).toBeVisible({

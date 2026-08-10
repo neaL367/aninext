@@ -27,7 +27,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-border-soft bg-background/90 backdrop-blur-xl">
       <div className="mx-auto flex min-h-16 w-full max-w-[1680px] items-center gap-6 px-4 sm:px-7 lg:px-10">
         <Link href="/" className="group flex shrink-0 items-center gap-3" aria-label="AniNext home">
-          <span className="flex size-8 items-center justify-center rounded-md bg-signal text-white text-sm font-bold shadow-sm transition-all group-hover:bg-signal-strong">
+          <span className="flex size-8 items-center justify-center rounded-md bg-signal text-white text-sm font-bold shadow-sm transition-colors group-hover:bg-signal-strong">
             A
           </span>
           <span className="hidden leading-none sm:block">

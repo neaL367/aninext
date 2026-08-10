@@ -3,13 +3,14 @@ import {
   FILTER_FORMATS,
   FILTER_SEASONS,
   FILTER_STATUSES,
+  isValidFilterYear,
 } from "./filter-constants";
 
 import type { AnimeFilters } from "@/features/anime/types/anime";
 
 function values(value: string | string[] | undefined): string[] {
-  if (Array.isArray(value)) return value.filter(Boolean);
-  return value ? [value] : [];
+  const items = Array.isArray(value) ? value : value ? [value] : [];
+  return [...new Set(items.filter(Boolean))];
 }
 
 function isAllowed<T extends string>(value: string, options: readonly T[]): value is T {
@@ -44,7 +45,7 @@ export function parseFilters(
   const year = searchParams.year;
   if (typeof year === "string") {
     const y = Number(year);
-    if (Number.isInteger(y)) filters.year = y;
+    if (isValidFilterYear(year)) filters.year = y;
   }
 
   const country = searchParams.country;

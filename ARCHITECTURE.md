@@ -4,7 +4,7 @@
 
 **Architecture target**: `next-beats` feature-sliced RSC pattern — pages compose, features own data, route props become plain values at the boundary.
 
-**Scope**: The full consumer-facing site — homepage, five browse collections, anime detail, airing schedule. **Read-only.** No auth, no user accounts, no favorites, no watchlist, no mutations of any kind. Every Server Function in this document exists to _render a page of results_, never to write data. If personalization is added later, it's a new phase with its own design, not a deferred stub living in this one.
+**Scope**: The full consumer-facing site — homepage, six browse collections, anime detail, airing schedule. **Read-only.** No auth, no user accounts, no favorites, no watchlist, no mutations of any kind. Every Server Function in this document exists to _render a page of results_, never to write data. If personalization is added later, it's a new phase with its own design, not a deferred stub living in this one.
 
 **Conscious MVP deferrals** (see §3.22): multi-genre filtering (`genre_in`), tag-based filtering (`tag`/`tag_in`), and studio filtering (requires the `Studio.media` connection, not a direct `Media` filter arg). Each has a stated migration path.
 
@@ -49,6 +49,8 @@ app/
       alltimepopular/
         page.tsx
         opengraph-image.tsx
+      seasonal/
+        page.tsx
       [id]/
         page.tsx                    # /anime/[id] — detail page
         not-found.tsx
@@ -61,6 +63,7 @@ features/
   anime/
     anime-cache.ts                  # Pure cache tag builders (no favorites/watchlist tags)
     anime-queries.ts                # All server-side AniList GraphQL reads — import 'server-only'
+    anime-metadata.ts               # Anime detail metadata derived from cached reads
     types/
       anime.ts                      # Domain types (Media, PageResult, etc.)
     lib/
@@ -419,7 +422,7 @@ export default function AnimeIndexPage() {
 
 - Each collection is a real destination: distinct `<h1>`, metadata, canonical URL.
 - Switching collections is a full navigation, never client-side state.
-- Filters share one UI across all five collections.
+- Filters share one UI across all six collections.
 - Infinite scroll within a collection, no page-number UI.
 - Mobile: filter drawer. Desktop: sticky sidebar.
 - Search is debounced, updates the URL, never a full navigation.
@@ -487,7 +490,7 @@ export default function TrendingPage({ searchParams }: PageProps<"/anime/trendin
 }
 ```
 
-All five route files are this same ~25 lines with only the `collection` string and `generateMetadata` call changing. `CollectionNav`, `SearchBar`, and `FilterSidebar` take **no `searchParams` prop at all** — see §3.6 for why, and how they read the URL themselves. `AnimeResults` is the only component that needs parsed filters, and it gets them already-parsed at the page boundary — never the raw `searchParams` promise.
+All six route files are this same ~25 lines with only the `collection` string and `generateMetadata` call changing. `CollectionNav`, `SearchBar`, and `FilterSidebar` take **no `searchParams` prop at all** — see §3.6 for why, and how they read the URL themselves. `AnimeResults` is the only component that needs parsed filters, and it gets them already-parsed at the page boundary — never the raw `searchParams` promise.
 
 ### 3.6 Server / Client Boundary
 
@@ -701,9 +704,9 @@ function PageContent({ page }: { page: Promise<BrowsePage> }) {
 
 ### 3.10 Prefetch Architecture
 
-- `CollectionNav`'s five tab links: `HoverPrefetchLink` — these are exactly the "sidebar with twenty chat links" case from Next.js's own Partial Prefetching writeup, except with five links instead of twenty. Default `prefetch="auto"` already gives each of the five route templates a shared shell; `HoverPrefetchLink` upgrades to `prefetch={true}` on hover/focus/touch-intent, which pulls in the `'use cache'`-marked collection data itself (not just the shell) for whichever tab the user is actually about to click.
+- `CollectionNav`'s six tab links: `HoverPrefetchLink` — these are exactly the "sidebar with twenty chat links" case from Next.js's own Partial Prefetching writeup, except with six links instead of twenty. Default `prefetch="auto"` already gives each of the five route templates a shared shell; `HoverPrefetchLink` upgrades to `prefetch={true}` on hover/focus/touch-intent, which pulls in the `'use cache'`-marked collection data itself (not just the shell) for whichever tab the user is actually about to click.
 - `MediaCard` links to `/anime/[id]`: plain `<Link>`, default `prefetch="auto"`. Because Partial Prefetching shares one shell per route template, a 40-card grid doesn't multiply into 40 prefetch requests — it's already just the one `/anime/[id]` shell, prefetched once. There's no need to gate this behind hover the way the previous draft did; that concern was solving a problem 16.3 already solves for you.
-- Collection routes export `prefetch = 'allow-runtime'` (§3.5) so a hovered `CollectionNav` link can prefetch the _specific filtered/unfiltered result set_ the user is about to land on, not just the shell. Per Next.js's own docs, this trades some extra server load for that deeper prefetch — acceptable here since it's scoped to five nav links, not the whole grid.
+- Collection routes export `prefetch = 'allow-runtime'` (§3.5) so a hovered `CollectionNav` link can prefetch the _specific filtered/unfiltered result set_ the user is about to land on, not just the shell. Per Next.js's own docs, this trades some extra server load for that deeper prefetch — acceptable here since it's scoped to six nav links, not the whole grid.
 - Filter/search changes trigger `router.replace`, not a prefetch — they're not "about to navigate," they're already navigating.
 
 ### 3.11–3.12 Streaming & Suspense
@@ -812,7 +815,7 @@ Covered by §1.1.
 
 ### 3.24 Architectural Rationale for Next.js 16.3
 
-Path-based routing is what makes the rest of this section's cache and prefetch story work cleanly: each route gets its own `cacheLife` (§3.9), its own shell (§3.10), and its own Instant Insight compliance (§1.3) independently. Collapsing all five into `/anime?sort=` would force one shared cache profile and one shared shell across data with very different freshness needs — the opposite of what Cache Components is for.
+Path-based routing is what makes the rest of this section's cache and prefetch story work cleanly: each route gets its own `cacheLife` (§3.9), its own shell (§3.10), and its own Instant Insight compliance (§1.3) independently. Collapsing all six into `/anime?sort=` would force one shared cache profile and one shared shell across data with very different freshness needs — the opposite of what Cache Components is for.
 
 ---
 
@@ -1256,7 +1259,7 @@ AniList's public GraphQL endpoint has no API key; the rate limit is 90 requests/
 
 ### 6.2 Fragment Definitions
 
-A shared `MediaCardFields` fragment (id, title, coverImage, bannerImage, averageScore, popularity, format, episodes, status, season, seasonYear, genres) is reused across the homepage, all five browse queries, and the detail page's relations/recommendations queries — one definition, imported everywhere `MediaCard` needs data, so the card's prop shape and the fragment's field list can never drift apart.
+A shared `MediaCardFields` fragment (id, title, coverImage, bannerImage, averageScore, popularity, format, episodes, status, season, seasonYear, genres) is reused across the homepage, all six browse queries, and the detail page's relations/recommendations queries — one definition, imported everywhere `MediaCard` needs data, so the card's prop shape and the fragment's field list can never drift apart.
 
 ### 6.3 Cache Tag Contract (`features/anime/anime-cache.ts`)
 

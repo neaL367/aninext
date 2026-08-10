@@ -2,9 +2,10 @@ import "server-only";
 import { cacheTag, cacheLife } from "next/cache";
 
 import { anilistFetch } from "@/lib/anilist";
+import { AniListError } from "@/lib/anilist-errors";
 
 import { ANIME_CACHE } from "./anime-cache";
-import { addDays, dateStrFromEpoch, getAiringDayBounds, visitorToday } from "./lib/airing";
+import { addDays, createAiringContext, dateStrFromEpoch, getAiringDayBounds } from "./lib/airing";
 import { getCollectionConfig } from "./lib/collection-config";
 import { buildFilterHash } from "./lib/parse-filters";
 import { getCurrentSeason } from "./lib/season";
@@ -349,8 +350,13 @@ export async function getAnimeFullDetail(id: number): Promise<AnimeFullDetailDat
       recommendations: m.recommendations?.nodes ?? [],
       airingSchedule: m.airingSchedule?.nodes ?? [],
     };
-  } catch {
-    return null;
+  } catch (error) {
+    // AniList returns HTTP 404 for some impossible IDs instead of a successful
+    // GraphQL response with Media: null. Preserve the not-found contract for
+    // that case, while allowing real outages and network errors to reach the
+    // route's retryable error boundary.
+    if (error instanceof AniListError && error.status === 404) return null;
+    throw error;
   }
 }
 
@@ -373,38 +379,6 @@ const AIRING_DAY_QUERY = `
   }
 `;
 
-export async function getAiringDay(day: string, start: number, end: number) {
-  "use cache: remote";
-  cacheTag("anime", ANIME_CACHE.airingDay(day, start));
-  cacheLife("airing");
-
-  try {
-    const allSchedules: AiringScheduleNode[] = [];
-    let page = 1;
-    let hasNextPage = true;
-
-    while (hasNextPage) {
-      const data = await anilistFetch<{
-        Page: {
-          pageInfo: { hasNextPage: boolean; total: number };
-          airingSchedules: AiringScheduleNode[];
-        };
-      }>(AIRING_DAY_QUERY, { start, end, page });
-
-      allSchedules.push(...data.Page.airingSchedules);
-      hasNextPage = data.Page.pageInfo.hasNextPage;
-      page++;
-
-      // Safety limit: max 5 pages (250 items)
-      if (page > 5) break;
-    }
-
-    return allSchedules;
-  } catch {
-    return [];
-  }
-}
-
 // NOTE: AniList's `pageInfo.total` for airingSchedules is unreliable (returns a
 // capped 5000 for single-day windows), so day counts are derived by fetching a
 // week's schedules once and bucketing by day in getAiringWeek.
@@ -418,28 +392,24 @@ export async function getAiringWeekItems(
   cacheTag("anime", ANIME_CACHE.airingDay(`week:${start}`, start));
   cacheLife("airing");
 
-  try {
-    const allSchedules: AiringScheduleNode[] = [];
-    let page = 1;
-    let hasNextPage = true;
+  const allSchedules: AiringScheduleNode[] = [];
+  let page = 1;
+  let hasNextPage = true;
 
-    while (hasNextPage && page <= 12) {
-      const data = await anilistFetch<{
-        Page: {
-          pageInfo: { hasNextPage: boolean };
-          airingSchedules: AiringScheduleNode[];
-        };
-      }>(AIRING_DAY_QUERY, { start, end, page });
+  while (hasNextPage && page <= 12) {
+    const data = await anilistFetch<{
+      Page: {
+        pageInfo: { hasNextPage: boolean };
+        airingSchedules: AiringScheduleNode[];
+      };
+    }>(AIRING_DAY_QUERY, { start, end, page });
 
-      allSchedules.push(...data.Page.airingSchedules);
-      hasNextPage = data.Page.pageInfo.hasNextPage;
-      page++;
-    }
-
-    return allSchedules;
-  } catch {
-    return [];
+    allSchedules.push(...data.Page.airingSchedules);
+    hasNextPage = data.Page.pageInfo.hasNextPage;
+    page++;
   }
+
+  return allSchedules;
 }
 
 /**
@@ -457,17 +427,21 @@ export async function getAiringWeek(
   days: { day: string; count: number }[];
   today: string;
   schedules: Record<string, AiringScheduleNode[]>;
+  context: ReturnType<typeof createAiringContext>;
 }> {
-  const today = visitorToday(offsetMinutes);
+  const context = createAiringContext(day, offsetMinutes);
+  const { today } = context;
+  const safeOffset = context.offsetMinutes;
   // ISO dates compare lexicographically = chronologically.
   const anchor = day >= today && day <= addDays(today, 6) ? today : day;
   const days = Array.from({ length: 7 }, (_, i) => addDays(anchor, i));
 
-  const bounds = getAiringDayBounds(anchor, offsetMinutes);
-  if (!bounds) return { days: days.map((d) => ({ day: d, count: 0 })), today, schedules: {} };
+  const bounds = getAiringDayBounds(anchor, safeOffset);
+  if (!bounds) {
+    return { days: days.map((d) => ({ day: d, count: 0 })), today, schedules: {}, context };
+  }
 
-  const offset =
-    typeof offsetMinutes === "number" && Number.isFinite(offsetMinutes) ? offsetMinutes : 0;
+  const offset = safeOffset ?? 0;
   const weekItems = await getAiringWeekItems(bounds.start, bounds.start + 86400 * 7);
 
   const counts = new Array<number>(7).fill(0);
@@ -484,5 +458,6 @@ export async function getAiringWeek(
     days: days.map((d, i) => ({ day: d, count: counts[i] })),
     today,
     schedules,
+    context,
   };
 }

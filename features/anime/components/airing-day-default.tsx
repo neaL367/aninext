@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 
+import { isValidAiringOffset } from "@/features/anime/lib/airing";
 import { getLocalOffsetMinutes, localDateStr } from "@/features/anime/lib/media-helpers";
 
 /**
@@ -33,11 +34,14 @@ export function AiringDayDefault({ serverToday }: { serverToday: string }) {
     const urlOffset = rawOffset === null ? null : Number(rawOffset);
 
     // Only rewrite the day when the URL still holds the server's "today" (i.e. no
-    // user choice was made yet). A deliberately chosen day (e.g. a future date,
-    // or today in the visitor's timezone) is preserved — we only attach the
-    // missing/correct offset to it.
+    // user choice was made yet). A deliberately chosen day is preserved. An
+    // explicit valid offset is also preserved so shared links keep the timezone
+    // they were created for when opened in another browser.
     const dayNeedsFix = urlDay === serverToday && localToday !== serverToday;
-    const offsetNeedsFix = urlOffset !== offset;
+    const offsetNeedsFix =
+      rawOffset === null ||
+      rawOffset.trim() === "" ||
+      (urlOffset !== null && !isValidAiringOffset(urlOffset));
 
     if (!dayNeedsFix && !offsetNeedsFix) return;
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { isValidAiringOffset } from "@/features/anime/lib/airing";
 import { cn } from "@/lib/utils";
 
 /**
@@ -41,7 +42,7 @@ export function LocalTime({
         ? { hour: "2-digit", minute: "2-digit" }
         : { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" };
 
-    const hasOffset = typeof offsetMinutes === "number" && Number.isFinite(offsetMinutes);
+    const hasOffset = typeof offsetMinutes === "number" && isValidAiringOffset(offsetMinutes);
     if (hasOffset) {
       // Wall-clock in the offset's timezone: shift the instant so the offset
       // becomes UTC, then format as UTC.

@@ -57,8 +57,10 @@ export function SearchBar() {
         </InputGroupAddon>
         <InputGroupInput
           type="search"
+          name="search"
+          autoComplete="off"
           value={value}
-          placeholder="Search anime..."
+          placeholder="Search anime…"
           className="font-mono text-xs text-foreground placeholder:text-muted-foreground"
           onChange={(event) => {
             const nextValue = event.target.value;

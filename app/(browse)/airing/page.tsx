@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { AiringDayView, AiringDayViewSkeleton } from "@/features/anime/components/airing-day-view";
 import { parseAiringParams } from "@/features/anime/lib/airing";
 
@@ -13,11 +14,13 @@ export const metadata: Metadata = {
 
 export default function AiringPage({ searchParams }: PageProps<"/airing">) {
   return (
-    <Suspense fallback={<AiringDayViewSkeleton />}>
-      {searchParams.then((sp) => {
-        const { day, offsetMinutes } = parseAiringParams(sp);
-        return <AiringDayView day={day} offsetMinutes={offsetMinutes} />;
-      })}
-    </Suspense>
+    <ErrorBoundary title="Airing schedule failed to load">
+      <Suspense fallback={<AiringDayViewSkeleton />}>
+        {searchParams.then((sp) => {
+          const { day, offsetMinutes } = parseAiringParams(sp);
+          return <AiringDayView day={day} offsetMinutes={offsetMinutes} />;
+        })}
+      </Suspense>
+    </ErrorBoundary>
   );
 }

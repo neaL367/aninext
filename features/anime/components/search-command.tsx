@@ -19,12 +19,12 @@ import type { AnimeCollection } from "@/features/anime/types/anime";
 import type { Route } from "next";
 
 const COLLECTION_ICONS: Record<AnimeCollection, React.ReactNode> = {
-  trending: <TrendingUpIcon />,
-  popular: <StarIcon />,
-  top100: <StarIcon />,
-  upcoming: <CalendarIcon />,
-  seasonal: <ClockIcon />,
-  alltimepopular: <StarIcon />,
+  trending: <TrendingUpIcon aria-hidden="true" />,
+  popular: <StarIcon aria-hidden="true" />,
+  top100: <StarIcon aria-hidden="true" />,
+  upcoming: <CalendarIcon aria-hidden="true" />,
+  seasonal: <ClockIcon aria-hidden="true" />,
+  alltimepopular: <StarIcon aria-hidden="true" />,
 };
 
 export function SearchCommand() {
@@ -79,7 +79,8 @@ export function SearchCommand() {
       <Command>
         <CommandInput
           aria-label="Search anime or choose a collection"
-          placeholder="Search anime or choose a collection..."
+          autoComplete="off"
+          placeholder="Search anime or choose a collection…"
           value={query}
           onValueChange={setQuery}
           onKeyDown={(event) => {
@@ -101,7 +102,7 @@ export function SearchCommand() {
           <CommandSeparator />
           <CommandGroup heading="Pages">
             <CommandItem onSelect={() => navigateTo("/airing")}>
-              <ClockIcon />
+              <ClockIcon aria-hidden="true" />
               Airing schedule
             </CommandItem>
           </CommandGroup>

@@ -16,6 +16,8 @@ import {
   FILTER_STATUSES,
   formatFilterValue,
   getYears,
+  isMultiFilter,
+  type FacetFilterKey,
 } from "../lib/filter-constants";
 import { AdultContentFilter } from "./adult-content-filter";
 import { FilterOptionGrid } from "./filter-button";
@@ -23,7 +25,7 @@ import { FiltersHeader } from "./filters-header";
 
 import type { AnimeCollection } from "@/features/anime/types/anime";
 
-type OptionFilterKey = "genre" | "format" | "status" | "season" | "year" | "country";
+type OptionFilterKey = FacetFilterKey;
 
 type FilterOptionSectionProps = {
   filterKey: OptionFilterKey;
@@ -190,9 +192,7 @@ export function FilterSidebarContent({
             selected={section.selected}
             defaultOpen={section.defaultOpen}
             scroll={section.scroll}
-            multiple={
-              section.key === "genre" || section.key === "format" || section.key === "status"
-            }
+            multiple={isMultiFilter(section.key)}
             updateFilter={updateFilter}
           />
         ))}

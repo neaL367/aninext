@@ -8,6 +8,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { LocalTime } from "@/components/ui/local-time";
 import { MediaImage } from "@/components/ui/media-image";
 import { Skeleton } from "@/components/ui/skeleton";
+import { isValidAiringOffset, type AiringContext } from "@/features/anime/lib/airing";
 import {
   formatCountdown,
   formatFormat,
@@ -71,22 +72,27 @@ interface Band {
 export function AiringTimeline({
   day,
   schedules,
-  offsetMinutes,
+  context,
 }: {
   day: string;
   schedules: AiringScheduleNode[];
-  offsetMinutes?: number;
+  context: AiringContext;
 }) {
   "use memo";
   const now = useNow();
   // The offset that defines the fetched day — display follows it, not the
   // browser's ambient timezone, so shared links stay consistent.
+  const [browserOffset, setBrowserOffset] = useState(0);
+  useEffect(() => {
+    if (context.offsetMinutes === undefined) setBrowserOffset(getLocalOffsetMinutes());
+  }, [context.offsetMinutes]);
+
   const offset = useMemo(
     () =>
-      typeof offsetMinutes === "number" && Number.isFinite(offsetMinutes)
-        ? offsetMinutes
-        : getLocalOffsetMinutes(),
-    [offsetMinutes],
+      typeof context.offsetMinutes === "number" && isValidAiringOffset(context.offsetMinutes)
+        ? context.offsetMinutes
+        : browserOffset,
+    [browserOffset, context.offsetMinutes],
   );
   // "Is today" is judged in the offset's timezone (the day the data was fetched
   // for) — not the browser's ambient tz — so the NOW marker and day label stay
@@ -307,7 +313,7 @@ function ScheduleRow({
       <Link
         href={`/anime/${media.id}` as Route<string>}
         aria-label={`Open ${title}`}
-        className="group flex items-center gap-3 rounded-md px-3 py-1.5 opacity-60 transition-all hover:bg-surface-1/60 hover:opacity-100"
+        className="group flex items-center gap-3 rounded-md px-3 py-1.5 opacity-60 transition-[background-color,opacity] hover:bg-surface-1/60 hover:opacity-100"
       >
         <span className="w-12 shrink-0 font-mono text-[0.65rem] tabular-nums text-muted-foreground">
           <LocalTime timestamp={item.airingAt} offsetMinutes={offsetMinutes} />

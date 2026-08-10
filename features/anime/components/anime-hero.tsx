@@ -18,12 +18,10 @@ import { cn } from "@/lib/utils";
 
 import type { Media } from "@/features/anime/types/anime";
 
-export async function AnimeHeroSection({
-  detailPromise,
-}: {
-  detailPromise: Promise<Awaited<ReturnType<typeof getAnimeFullDetail>>>;
-}) {
-  const detail = await detailPromise;
+export async function AnimeHeroSection({ id }: { id: number | null }) {
+  if (id === null) notFound();
+
+  const detail = await getAnimeFullDetail(id);
   if (!detail) notFound();
   return <AnimeHero media={detail.media} />;
 }
@@ -200,7 +198,7 @@ export function AnimeHero({ media }: { media: Media }) {
                   href={`https://www.youtube.com/watch?v=${media.trailer.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-md bg-signal hover:bg-signal-strong px-4 py-2 text-xs font-semibold text-white shadow-md transition-all hover:scale-105 active:scale-95"
+                  className="inline-flex items-center gap-2 rounded-md bg-signal hover:bg-signal-strong px-4 py-2 text-xs font-semibold text-white shadow-md transition-[transform,background-color] hover:scale-105 active:scale-95"
                 >
                   <PlayIcon className="size-3.5 fill-current" /> Watch trailer
                 </a>
@@ -223,7 +221,7 @@ export function AnimeHero({ media }: { media: Media }) {
                           href={link.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 rounded-md border border-border-soft bg-surface-1/80 px-3 py-1.5 font-mono text-xs font-medium text-foreground transition-all hover:border-signal hover:text-signal hover:bg-surface-1 shadow-sm"
+                          className="inline-flex items-center gap-1.5 rounded-md border border-border-soft bg-surface-1/80 px-3 py-1.5 font-mono text-xs font-medium text-foreground transition-[background-color,border-color,color] hover:border-signal hover:text-signal hover:bg-surface-1 shadow-sm"
                         >
                           {favicon ? (
                             <Image

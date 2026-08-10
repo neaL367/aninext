@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { isValidAiringOffset, type AiringContext } from "@/features/anime/lib/airing";
 import {
   getLocalOffsetMinutes,
   getOffsetHour,
@@ -17,21 +18,26 @@ export function AiringDayStrip({
   week,
   today,
   schedules,
-  offsetMinutes,
+  context,
 }: {
   currentDay: string;
   week: { day: string; count: number }[];
   today: string;
   schedules: AiringScheduleNode[];
-  offsetMinutes?: number;
+  context: AiringContext;
 }) {
   "use memo";
+  const [browserOffset, setBrowserOffset] = useState(0);
+  useEffect(() => {
+    if (context.offsetMinutes === undefined) setBrowserOffset(getLocalOffsetMinutes());
+  }, [context.offsetMinutes]);
+
   const offset = useMemo(
     () =>
-      typeof offsetMinutes === "number" && Number.isFinite(offsetMinutes)
-        ? offsetMinutes
-        : getLocalOffsetMinutes(),
-    [offsetMinutes],
+      typeof context.offsetMinutes === "number" && isValidAiringOffset(context.offsetMinutes)
+        ? context.offsetMinutes
+        : browserOffset,
+    [browserOffset, context.offsetMinutes],
   );
   const nowHour = useMemo(() => getOffsetHour(Date.now() / 1000, offset), [offset]);
   // The "now" marker only applies when the selected day is actually today in

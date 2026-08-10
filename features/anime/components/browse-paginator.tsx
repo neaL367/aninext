@@ -32,7 +32,6 @@ export function BrowsePaginator({
         collection={collection}
         filters={filters}
         pageSize={pageSize}
-        skeleton={skeleton}
         emptyComponent={emptyComponent}
       />
     </Suspense>
@@ -43,14 +42,12 @@ function BrowsePaginatorContent({
   initialPage,
   collection,
   filters,
-  skeleton: _skeleton,
   pageSize,
   emptyComponent,
 }: {
   initialPage: Promise<BrowsePage>;
   collection: AnimeCollection;
   filters: AnimeFilters;
-  skeleton: ReactNode;
   pageSize: number;
   emptyComponent: ReactNode;
 }) {
@@ -58,17 +55,30 @@ function BrowsePaginatorContent({
   const initialResult = use(initialPage);
   const [pages, setPages] = useState<Promise<BrowsePage>[]>(() => [initialPage]);
   const [hasItems] = useState(initialResult.hasItems);
+  const mountedRef = useRef(true);
+  const loadedPagesRef = useRef(new Set([1]));
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   const loadPage = useCallback(
     async (page: number) => {
       const result = await renderBrowsePage(collection, filters, page, pageSize);
-      setPages((prev) => [...prev, Promise.resolve(result)]);
+      if (mountedRef.current && !loadedPagesRef.current.has(page)) {
+        loadedPagesRef.current.add(page);
+        setPages((prev) => [...prev, Promise.resolve(result)]);
+      }
       return result;
     },
     [collection, filters, pageSize],
   );
 
-  const { isPending, hasMore, loadMore } = useInfiniteScroll(loadPage, {
+  const { isPending, hasMore, error, loadMore, retry } = useInfiniteScroll(loadPage, {
+    initialHasMore: initialResult.hasMore,
     ...(collection === "top100" ? { maxItems: 100, itemsPerPage: pageSize } : {}),
   });
 
@@ -92,7 +102,12 @@ function BrowsePaginatorContent({
       {!hasItems ? (
         emptyComponent
       ) : hasMore ? (
-        <InfiniteScrollSentinel onLoadMore={loadMore} isLoading={isPending} />
+        <InfiniteScrollSentinel
+          onLoadMore={loadMore}
+          onRetry={retry}
+          isLoading={isPending}
+          error={error}
+        />
       ) : (
         <p className="border-t border-border-soft py-8 text-center font-mono text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground">
           End of results
@@ -118,10 +133,14 @@ function PageContent({ page }: { page: Promise<BrowsePage> }) {
 
 function InfiniteScrollSentinel({
   onLoadMore,
+  onRetry,
   isLoading,
+  error,
 }: {
   onLoadMore: () => void;
+  onRetry: () => void;
   isLoading: boolean;
+  error: unknown;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const callbackRef = useRef(onLoadMore);
@@ -132,7 +151,7 @@ function InfiniteScrollSentinel({
 
   useEffect(() => {
     const el = ref.current;
-    if (!el || isLoading) return;
+    if (!el || isLoading || error) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -145,7 +164,7 @@ function InfiniteScrollSentinel({
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [isLoading]);
+  }, [error, isLoading]);
 
   return (
     <div
@@ -153,7 +172,20 @@ function InfiniteScrollSentinel({
       className="flex items-center justify-center border-t border-border-soft py-8"
       aria-label="Load more anime"
     >
-      {isLoading && <Spinner className="size-5" />}
+      {error ? (
+        <div className="flex items-center gap-3" role="alert">
+          <span className="text-sm text-muted-foreground">Couldn&apos;t load more anime.</span>
+          <button
+            type="button"
+            onClick={onRetry}
+            className="font-mono text-[0.62rem] font-semibold uppercase tracking-[0.1em] text-signal hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+          >
+            Try again
+          </button>
+        </div>
+      ) : (
+        isLoading && <Spinner className="size-5" />
+      )}
     </div>
   );
 }

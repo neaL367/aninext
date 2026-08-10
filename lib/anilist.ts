@@ -1,7 +1,8 @@
 import "server-only";
 import { AniListError } from "./anilist-errors";
 
-const ENDPOINT = "https://graphql.anilist.co";
+const ENDPOINT = process.env.ANILIST_ENDPOINT ?? "https://graphql.anilist.co";
+const USER_AGENT = "AniNext/0.1 (+https://ani-next.vercel.app)";
 const REQUEST_TIMEOUT_MS = 15_000;
 const TOTAL_BUDGET_MS = 20_000;
 
@@ -159,6 +160,7 @@ export async function anilistFetch<T>(
             headers: {
               "Content-Type": "application/json",
               Accept: "application/json",
+              "User-Agent": USER_AGENT,
             },
             body: JSON.stringify({ query, variables }),
             signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),

@@ -42,14 +42,14 @@ export async function AiringDayView(props: { day?: string; offsetMinutes?: numbe
         week={week.days}
         today={week.today}
         schedules={schedules}
-        offsetMinutes={props.offsetMinutes}
+        context={week.context}
       />
 
       {/* Keyed by day: only the day-dependent content remounts and crossfades. */}
       <Crossfade key={day}>
         <div className="space-y-10">
-          <AiringNow schedules={schedules} offsetMinutes={props.offsetMinutes} />
-          <AiringTimeline day={day} schedules={schedules} offsetMinutes={props.offsetMinutes} />
+          <AiringNow schedules={schedules} offsetMinutes={week.context.offsetMinutes} />
+          <AiringTimeline day={day} schedules={schedules} context={week.context} />
         </div>
       </Crossfade>
     </div>

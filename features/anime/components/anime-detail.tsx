@@ -12,12 +12,10 @@ import { AnimeTrailer, AnimeTrailerSkeleton } from "./anime-trailer";
 import { GenreList } from "./genre-pills";
 import { SectionHeader } from "./section-header";
 
-export async function AnimeDetail({
-  detailPromise,
-}: {
-  detailPromise: Promise<Awaited<ReturnType<typeof getAnimeFullDetail>>>;
-}) {
-  const detail = await detailPromise;
+export async function AnimeDetail({ id }: { id: number | null }) {
+  if (id === null) notFound();
+
+  const detail = await getAnimeFullDetail(id);
   if (!detail) notFound();
 
   const { media, characters, staff, relations, recommendations, airingSchedule } = detail;

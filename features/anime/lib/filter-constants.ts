@@ -53,6 +53,19 @@ export type FilterState = {
   isAdult: boolean;
 };
 
+export type FacetFilterKey = Exclude<FilterKey, "search" | "isAdult">;
+
+export const MULTI_FILTER_KEYS = ["genre", "format", "status"] as const;
+
+export function isMultiFilter(key: FacetFilterKey): boolean {
+  return MULTI_FILTER_KEYS.includes(key as (typeof MULTI_FILTER_KEYS)[number]);
+}
+
+export function isValidFilterYear(value: string): boolean {
+  const year = Number(value);
+  return /^\d{4}$/.test(value) && Number.isInteger(year) && year >= 1900 && year <= 2100;
+}
+
 export type SearchParamReader = {
   get(name: string): string | null;
   getAll(name: string): string[];
@@ -80,15 +93,31 @@ export const FILTER_ORDER: FilterKey[] = [
   "isAdult",
 ];
 
+function isAllowed<T extends string>(value: string, options: readonly T[]): value is T {
+  return options.includes(value as T);
+}
+
 export function getFilterState(searchParams: SearchParamReader): FilterState {
+  const unique = (values: string[]) => [...new Set(values.filter(Boolean))];
+  const format = unique(
+    searchParams.getAll("format").filter((value) => isAllowed(value, FILTER_FORMATS)),
+  );
+  const status = unique(
+    searchParams.getAll("status").filter((value) => isAllowed(value, FILTER_STATUSES)),
+  );
+  const rawSeason = searchParams.get("season") ?? "";
+  const rawYear = searchParams.get("year") ?? "";
+  const rawCountry = searchParams.get("country") ?? "";
+  const rawSearch = searchParams.get("search") ?? "";
+
   return {
-    genre: searchParams.getAll("genre"),
-    format: searchParams.getAll("format"),
-    status: searchParams.getAll("status"),
-    season: searchParams.get("season") ?? "",
-    year: searchParams.get("year") ?? "",
-    country: searchParams.get("country") ?? "",
-    search: searchParams.get("search") ?? "",
+    genre: unique(searchParams.getAll("genre")),
+    format,
+    status,
+    season: FILTER_SEASONS.some(({ value }) => value === rawSeason) ? rawSeason : "",
+    year: isValidFilterYear(rawYear) ? rawYear : "",
+    country: FILTER_COUNTRIES.some(({ value }) => value === rawCountry) ? rawCountry : "",
+    search: rawSearch.trim(),
     isAdult: searchParams.get("isAdult") === "true",
   };
 }

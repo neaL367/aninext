@@ -185,7 +185,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
                 e.stopPropagation();
                 setIsPlaying((p) => !p);
               }}
-              className="flex size-8 shrink-0 items-center justify-center rounded-full bg-signal text-white hover:bg-signal-strong transition-all hover:scale-105 active:scale-95 shadow-md"
+              className="flex size-8 shrink-0 items-center justify-center rounded-full bg-signal text-white transition-[transform,background-color] hover:bg-signal-strong hover:scale-105 active:scale-95 shadow-md"
               aria-label={isPlaying ? "Pause slideshow" : "Play slideshow"}
             >
               {isPlaying ? (
@@ -206,7 +206,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
                       e.stopPropagation();
                       goTo(index);
                     }}
-                    className={`group relative transition-all duration-300 ${
+                    className={`group relative transition-[width,height,background-color] duration-300 ${
                       isActive
                         ? "w-12 sm:w-14 h-2.5 rounded-full bg-foreground/20 overflow-hidden"
                         : "size-2.5 rounded-full bg-foreground/30 hover:bg-foreground/70"
