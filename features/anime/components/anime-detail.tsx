@@ -37,7 +37,7 @@ export async function AnimeDetail({
       </section>
 
       <div className="grid gap-16 py-12 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-16">
-        <main className="min-w-0">
+        <div className="min-w-0">
           <section aria-label="Characters">
             <SectionHeader
               eyebrow="Cast"
@@ -59,7 +59,7 @@ export async function AnimeDetail({
               <AnimeRecommendations nodes={recommendations} />
             </div>
           </section>
-        </main>
+        </div>
 
         <aside className="min-w-0 lg:border-l lg:border-border-soft lg:pl-8">
           <div className="space-y-12">
@@ -106,7 +106,7 @@ export function AnimeDetailSkeleton() {
       </section>
 
       <div className="grid gap-16 py-12 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-16">
-        <main className="min-w-0">
+        <div className="min-w-0">
           <section aria-label="Characters">
             <div className="space-y-3">
               <div className="shimmer h-3.5 w-16 rounded" />
@@ -126,7 +126,7 @@ export function AnimeDetailSkeleton() {
               <AnimeRecommendationsSkeleton />
             </div>
           </section>
-        </main>
+        </div>
 
         <aside className="min-w-0 lg:border-l lg:border-border-soft lg:pl-8">
           <div className="space-y-12">
