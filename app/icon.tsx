@@ -3,6 +3,10 @@ import { ImageResponse } from "next/og";
 export const size = { width: 32, height: 32 };
 export const contentType = "image/png";
 
+// Mirrors the site header logo: a signal-blue rounded square with a bold white
+// "A" (components/site-header.tsx). Keep the two in sync when the brand changes.
+const SIGNAL = "#0070f3";
+
 export default function Icon() {
   return new ImageResponse(
     <div
@@ -12,24 +16,32 @@ export default function Icon() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#000000",
+        background: "transparent",
       }}
     >
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="#FFFFFF"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: SIGNAL,
+          borderRadius: "6px",
+        }}
       >
-        <path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973" />
-        <path d="m2 12 10 8" />
-        <path d="M12 20V4" />
-        <path d="m2 12 10-8" />
-      </svg>
+        <span
+          style={{
+            color: "#ffffff",
+            fontSize: 21,
+            fontWeight: 800,
+            lineHeight: 1,
+            fontFamily: "Inter, Arial, sans-serif",
+          }}
+        >
+          A
+        </span>
+      </div>
     </div>,
     { ...size },
   );
