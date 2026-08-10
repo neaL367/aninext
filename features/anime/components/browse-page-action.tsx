@@ -38,7 +38,14 @@ export async function renderBrowsePage(
     return {
       hasMore,
       hasItems: visibleItems.length > 0,
-      node: <MediaGrid items={visibleItems} rankStart={rankStart} priorityFirst={page === 1} />,
+      node: (
+        <MediaGrid
+          items={visibleItems}
+          rankStart={rankStart}
+          priorityFirst={page === 1}
+          firstPage={page === 1}
+        />
+      ),
     };
   }
 
@@ -61,6 +68,13 @@ export async function renderBrowsePage(
   return {
     hasMore: pageInfo.hasNextPage && canLoadNextPage,
     hasItems: visibleItems.length > 0,
-    node: <MediaGrid items={visibleItems} rankStart={rankStart} priorityFirst={page === 1} />,
+    node: (
+      <MediaGrid
+        items={visibleItems}
+        rankStart={rankStart}
+        priorityFirst={page === 1}
+        firstPage={page === 1}
+      />
+    ),
   };
 }

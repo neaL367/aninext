@@ -73,7 +73,11 @@ function BrowsePaginatorContent({
   });
 
   const pageSkeleton = (
-    <MediaGridSkeletonItems count={pageSize} rankStart={collection === "top100" ? 1 : undefined} />
+    <MediaGridSkeletonItems
+      count={pageSize}
+      rankStart={collection === "top100" ? 1 : undefined}
+      firstPage={false}
+    />
   );
 
   return (

@@ -10,16 +10,21 @@ export function MediaGrid({
   items,
   rankStart,
   priorityFirst = false,
+  firstPage = true,
 }: {
   items: Media[];
   rankStart?: number;
   priorityFirst?: boolean;
+  // Featured (2-column) cards only belong on the first page — on later pages
+  // they can't fit the partial last row of the previous page and leave a hole
+  // in the grid (the "missing card" at the infinite-scroll join).
+  firstPage?: boolean;
 }) {
   "use memo";
   return (
     <>
       {items.map((item, i) => {
-        const isFeatured = (i === 0 || i === 12) && !rankStart;
+        const isFeatured = firstPage && (i === 0 || i === 12) && !rankStart;
         const isAboveFold = i < 4;
         return (
           <div
@@ -60,14 +65,16 @@ export function MediaGridSkeleton({
 export function MediaGridSkeletonItems({
   count = 20,
   rankStart,
+  firstPage = true,
 }: {
   count?: number;
   rankStart?: number;
+  firstPage?: boolean;
 }) {
   return (
     <>
       {Array.from({ length: count }).map((_, i) => {
-        const isFeatured = (i === 0 || i === 12) && !rankStart;
+        const isFeatured = firstPage && (i === 0 || i === 12) && !rankStart;
         return (
           <div
             key={i}
