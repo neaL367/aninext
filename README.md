@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
 
-## Getting Started
+# AniNext
 
-First, run the development server:
+An anime discovery and airing platform on [Next.js 16.3](https://nextjs.org/blog/next-16-3-instant-navigations) — a fast, cinematic live TV guide over the [AniList GraphQL API](https://docs.anilist.co/).
+
+[**Live demo →**](https://ani-next.vercel.app)
+
+</div>
+
+---
+
+## Features
+
+- **[Cache Components](https://preview.nextjs.org/docs/app/api-reference/config/next-config-js/cacheComponents)** — every server read is marked `'use cache'` with a named `cacheTag` and a `cacheLife` profile (`trending` / `home` / `static` / `airing` / `max`), so repeated visits come from cache until a profile expires. The site is read-only, so expiry is the only invalidation path.
+- **[Partial Prefetching](https://nextjs.org/docs/app/guides/adopting-partial-prefetching)** — Next.js prefetches one shared shell per route template, so a grid of 40 anime cards costs a single shell prefetch and every navigation commits instantly.
+- **[Hover-triggered prefetch](https://nextjs.org/docs/app/guides/prefetching#hover-triggered-prefetch)** — `HoverPrefetchLink` defers a link's deep prefetch until pointer, focus, or touch intent, so the five collection tabs and "See all" links stay cheap instead of prefetching every destination on render.
+- **[Server Functions that return rendered RSC](https://nextjs.org/docs/app/getting-started/mutating-data)** — infinite scroll never ships raw JSON: a `'use server'` action renders the next page of cards on the server and hands the client ready-to-append React nodes, keeping `MediaCard`/`MediaGrid` 100% server components.
+- **[React Compiler](https://react.dev/learn/react-compiler)** in annotation mode memoizes components and hooks automatically, so hot paths need no manual `useMemo`/`useCallback`.
+- **[View Transitions](https://nextjs.org/docs/app/guides/view-transitions)** — a `Crossfade` wrapper animates Suspense reveals, appended browse pages, and day switches on the airing schedule.
+- **[Timezone-aware airing schedule](ARCHITECTURE.md#5-route-airing--airing-schedule) — the `/airing` page is a time-axis TV guide**: hour bands, a sticky day rail with real per-day release counts, episode progress bars, first-class streaming links, and a pulsing `NOW` marker. Every time renders in the visitor's UTC offset (carried in the URL), so shared links show the same schedule in any browser.
+
+## Getting started
+
+No database and no API key — AniList's public GraphQL endpoint needs neither. Just:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun install
+bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). The homepage, five browse collections (`/anime/trending`, `/popular`, `/top100`, `/upcoming`, `/alltimepopular`), anime detail pages, and the airing schedule all read live AniList data.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Testing
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+End-to-end tests use [`@next/playwright`](https://nextjs.org/docs/app/guides/testing/playwright) with the [`instant()`](https://preview.nextjs.org/docs/app/api-reference/file-conventions/route-segment-config/instant) API to assert that static shells commit immediately and content streams behind them — covering hard navigations, client-side navigations, and the detail page's streamed sections.
 
-## Learn More
+```bash
+bun run test:e2e
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **[Next.js 16.3](https://nextjs.org/)**: App Router, Cache Components, Server Functions, Instant Navigations
+- **[React 19](https://react.dev/)** with React Compiler: Suspense, `use()`, View Transitions
+- **[TypeScript](https://www.typescriptlang.org/)** and **[Tailwind CSS v4](https://tailwindcss.com/)**
+- **[shadcn/ui](https://ui.shadcn.com/)** on **[Base UI](https://base-ui.com/)**
+- **[AniList GraphQL](https://docs.anilist.co/)** — read-only data source; no auth, no mutations
+- **[Bun](https://bun.sh/)** runtime, **[oxlint](https://oxc.rs/)** + **[oxfmt](https://oxc.rs/)** for lint and formatting
+- **[Playwright](https://playwright.dev/)** + `@next/playwright` for instant-navigation e2e
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Architecture
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The full build plan and its invariants live in [ARCHITECTURE.md](ARCHITECTURE.md): a feature-sliced RSC layout (`features/anime/` owns every query, cache tag, and component), synchronous pages that compose `<Suspense>` boundaries, a shared cache-tag contract, and a verification checklist for new work.
