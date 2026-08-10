@@ -68,7 +68,11 @@ test.describe("offline banner", () => {
   test("shows banner when browser goes offline", async ({ page, context }) => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     await expect(page.locator("main")).toBeVisible();
-    await expect.poll(() => page.evaluate(() => navigator.onLine), { timeout: 10_000 }).toBe(true);
+    // next/offline registers its window listener when its client chunk executes.
+    // Going offline before that both loses the browser's offline event and can
+    // block the chunk download itself — wait for the page to finish loading
+    // (network idle) before dropping the connection.
+    await page.waitForLoadState("networkidle", { timeout: 15_000 });
 
     await context.setOffline(true);
     await page.evaluate(() => window.dispatchEvent(new Event("offline")));
@@ -82,10 +86,16 @@ test.describe("offline banner", () => {
 });
 
 test.describe("API failure error states", () => {
-  test("detail page shows error boundary when anime is not found", async ({ page }) => {
-    const missingId = Math.floor(100_000 + Math.random() * 800_000);
+  test("detail page shows not-found for an unknown anime id", async ({ page }) => {
+    // Far beyond AniList's highest anime id, so guaranteed to be missing — the old
+    // random 100k–900k range could collide with real titles. A missing id flows
+    // through getAnimeFullDetail → null → notFound(), which renders not-found.tsx
+    // (the error boundary never fires for this path).
+    const missingId = 2_000_000_000;
     await page.goto(`/anime/${missingId}`);
-    await expect(page.getByRole("heading", { name: "Anime details failed to load" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Anime Not Found" })).toBeVisible({
+      timeout: 10_000,
+    });
   });
 
   test("collection shows empty state for unmatched filters", async ({ page }) => {

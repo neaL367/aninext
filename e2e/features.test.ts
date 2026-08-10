@@ -1,9 +1,11 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("canonical URLs", () => {
-  test("airing redirects to day param", async ({ page }) => {
+  test("airing redirects to day param with visitor offset", async ({ page }) => {
     await page.goto("/airing");
-    await expect(page).toHaveURL(/\/airing\?day=\d{4}-\d{2}-\d{2}$/);
+    // Day is the visitor's local date; offset (minutes east of UTC) is attached by
+    // the client after hydration so the server fetches the visitor's day window.
+    await expect(page).toHaveURL(/\/airing\?day=\d{4}-\d{2}-\d{2}&offset=-?\d+$/);
     await expect(page.getByRole("heading", { name: "Schedule" })).toBeVisible();
   });
 
