@@ -192,7 +192,7 @@
   }
 
   .signal-rule {
-    background: linear-gradient(90deg, var(--signal), transparent);
+    background: var(--signal);
   }
 
   .paper-grid {
@@ -213,6 +213,15 @@
   .content-visibility-auto {
     content-visibility: auto;
     contain-intrinsic-size: 0 420px;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 
   .scrollbar-thin {

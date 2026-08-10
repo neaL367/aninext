@@ -4,6 +4,7 @@ import { cacheTag, cacheLife } from "next/cache";
 import { anilistFetch } from "@/lib/anilist";
 
 import { ANIME_CACHE } from "./anime-cache";
+import { addDays, dateStrFromEpoch, getAiringDayBounds, visitorToday } from "./lib/airing";
 import { getCollectionConfig } from "./lib/collection-config";
 import { buildFilterHash } from "./lib/parse-filters";
 import { getCurrentSeason } from "./lib/season";
@@ -402,4 +403,86 @@ export async function getAiringDay(day: string, start: number, end: number) {
   } catch {
     return [];
   }
+}
+
+// NOTE: AniList's `pageInfo.total` for airingSchedules is unreliable (returns a
+// capped 5000 for single-day windows), so day counts are derived by fetching a
+// week's schedules once and bucketing by day in getAiringWeek.
+
+/** All schedules across [start, end) — used to derive accurate per-day counts. */
+export async function getAiringWeekItems(
+  start: number,
+  end: number,
+): Promise<AiringScheduleNode[]> {
+  "use cache: remote";
+  cacheTag("anime", ANIME_CACHE.airingDay(`week:${start}`, start));
+  cacheLife("airing");
+
+  try {
+    const allSchedules: AiringScheduleNode[] = [];
+    let page = 1;
+    let hasNextPage = true;
+
+    while (hasNextPage && page <= 12) {
+      const data = await anilistFetch<{
+        Page: {
+          pageInfo: { hasNextPage: boolean };
+          airingSchedules: AiringScheduleNode[];
+        };
+      }>(AIRING_DAY_QUERY, { start, end, page });
+
+      allSchedules.push(...data.Page.airingSchedules);
+      hasNextPage = data.Page.pageInfo.hasNextPage;
+      page++;
+    }
+
+    return allSchedules;
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * The seven-day rail shown above the schedule, plus every schedule in that
+ * window bucketed per local day. The window is anchored at the visitor's today
+ * (so TODAY stays in reach) unless the selected day is more than a week out —
+ * or in the past — in which case the selection anchors it. Because the window
+ * always contains the selected day, day switches can slice this data
+ * client-side instead of re-fetching.
+ */
+export async function getAiringWeek(
+  day: string,
+  offsetMinutes?: number,
+): Promise<{
+  days: { day: string; count: number }[];
+  today: string;
+  schedules: Record<string, AiringScheduleNode[]>;
+}> {
+  const today = visitorToday(offsetMinutes);
+  // ISO dates compare lexicographically = chronologically.
+  const anchor = day >= today && day <= addDays(today, 6) ? today : day;
+  const days = Array.from({ length: 7 }, (_, i) => addDays(anchor, i));
+
+  const bounds = getAiringDayBounds(anchor, offsetMinutes);
+  if (!bounds) return { days: days.map((d) => ({ day: d, count: 0 })), today, schedules: {} };
+
+  const offset =
+    typeof offsetMinutes === "number" && Number.isFinite(offsetMinutes) ? offsetMinutes : 0;
+  const weekItems = await getAiringWeekItems(bounds.start, bounds.start + 86400 * 7);
+
+  const counts = new Array<number>(7).fill(0);
+  const schedules: Record<string, AiringScheduleNode[]> = {};
+  for (const s of weekItems) {
+    const dayStr = dateStrFromEpoch(s.airingAt, offset);
+    const idx = days.indexOf(dayStr);
+    if (idx >= 0) counts[idx] += 1;
+    (schedules[dayStr] ??= []).push(s);
+  }
+  for (const d of days) schedules[d] ??= [];
+
+  return {
+    days: days.map((d, i) => ({ day: d, count: counts[i] })),
+    today,
+    schedules,
+  };
 }

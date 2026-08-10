@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import { AiringDayView, AiringDayViewSkeleton } from "@/features/anime/components/airing-day-view";
+import { parseAiringParams } from "@/features/anime/lib/airing";
 
 import type { Metadata } from "next";
 
@@ -13,9 +14,10 @@ export const metadata: Metadata = {
 export default function AiringPage({ searchParams }: PageProps<"/airing">) {
   return (
     <Suspense fallback={<AiringDayViewSkeleton />}>
-      {searchParams.then((sp) => (
-        <AiringDayView day={typeof sp.day === "string" ? sp.day : undefined} />
-      ))}
+      {searchParams.then((sp) => {
+        const { day, offsetMinutes } = parseAiringParams(sp);
+        return <AiringDayView day={day} offsetMinutes={offsetMinutes} />;
+      })}
     </Suspense>
   );
 }

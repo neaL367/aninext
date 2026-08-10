@@ -86,6 +86,42 @@ export function localDateStr(date: Date = new Date()): string {
   return `${year}-${month}-${day}`;
 }
 
+/**
+ * Minutes east of UTC for the given instant (Bangkok +7 → 420, New York -5 → -300).
+ * getTimezoneOffset() returns minutes BEHIND UTC, so the sign is inverted.
+ * Must be read client-side: the server cannot know the visitor's timezone.
+ */
+export function getLocalOffsetMinutes(date: Date = new Date()): number {
+  return -date.getTimezoneOffset();
+}
+
+/** Compact timezone label, e.g. "GMT+7", "GMT-5", "GMT+5:30". Defaults to the
+ * browser/visitor offset when no offset is given. */
+export function getTimezoneLabel(offsetMinutes?: number): string {
+  const o =
+    typeof offsetMinutes === "number" && Number.isFinite(offsetMinutes)
+      ? offsetMinutes
+      : getLocalOffsetMinutes();
+  const sign = o >= 0 ? "+" : "-";
+  const abs = Math.abs(o);
+  const hours = Math.floor(abs / 60);
+  const minutes = abs % 60;
+  return `GMT${sign}${hours}${minutes ? `:${String(minutes).padStart(2, "0")}` : ""}`;
+}
+
+/** Hour (0-23) of an epoch second within the offset-defined local day. */
+export function getOffsetHour(epochSeconds: number, offsetMinutes: number): number {
+  return Math.floor(((epochSeconds + offsetMinutes * 60) % 86400) / 3600);
+}
+
+/** Current calendar date (YYYY-MM-DD) in the offset's timezone. */
+export function getOffsetTodayStr(offsetMinutes: number): string {
+  const d = new Date(Date.now() + offsetMinutes * 60_000);
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(
+    d.getUTCDate(),
+  ).padStart(2, "0")}`;
+}
+
 export function isSafeExternalUrl(value: string | undefined): value is string {
   if (!value) return false;
 

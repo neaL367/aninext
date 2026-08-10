@@ -116,6 +116,8 @@ export interface MediaExternalLink {
   url: string;
   site: string;
   type?: string;
+  icon?: string;
+  color?: string;
 }
 
 export type AnimeCollection =
