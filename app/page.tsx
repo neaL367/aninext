@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 
-import { Crossfade } from "@/components/ui/crossfade";
+import { PageTransition } from "@/components/ui/crossfade";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { AiringHomeSectionSkeleton } from "@/features/anime/components/airing-home-section";
 import { FeatureMosaicSkeleton } from "@/features/anime/components/feature-mosaic";
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <ErrorBoundary title="Home failed to load">
-      <Crossfade>
+      <PageTransition>
         <HomeFeaturedShell
           hero={
             <ErrorBoundary title="Featured anime failed to load">
@@ -103,7 +103,7 @@ export default function HomePage() {
             </Suspense>
           </ErrorBoundary>
         </HomeFeaturedShell>
-      </Crossfade>
+      </PageTransition>
     </ErrorBoundary>
   );
 }

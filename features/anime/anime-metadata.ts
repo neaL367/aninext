@@ -1,14 +1,13 @@
-import { getAnimeFullDetail } from "./anime-queries";
+import { getAnimeDetail } from "./anime-queries";
 import { stripHtml } from "./lib/media-helpers";
 
 import type { Metadata } from "next";
 
 export async function getAnimeMetadata(id: number): Promise<Metadata> {
   try {
-    const detail = await getAnimeFullDetail(id);
-    if (!detail) return {};
+    const media = await getAnimeDetail(id);
+    if (!media) return {};
 
-    const media = detail.media;
     const title = media.title.english ?? media.title.romaji ?? "Unknown";
     const description = stripHtml(media.description)?.slice(0, 160) ?? "";
 

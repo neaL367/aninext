@@ -64,6 +64,22 @@ function formatDayLabel(day: string): string {
   });
 }
 
+function formatFilterLabel(f: (typeof FORMAT_FILTERS)[number]): string {
+  if (f === "ALL") return "All";
+  if (f === "TV_SHORT") return "TV Short";
+  return formatFormat(f);
+}
+
+function formatEpisodeSummary(total: number, live: number, upcoming: number): string {
+  if (total === 0) return "0 episodes";
+  if (live === total) return `${total} episodes live now`;
+  if (upcoming === total) return `${total} episodes coming up`;
+  const parts = [`${total} episodes`];
+  if (live > 0) parts.push(`${live} live now`);
+  if (upcoming > 0) parts.push(`${upcoming} coming up`);
+  return parts.join(" · ");
+}
+
 interface Band {
   hour: number;
   items: AiringScheduleNode[];
@@ -151,7 +167,7 @@ export function AiringTimeline({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- once per day mount
   }, [isToday, bands]);
 
-  if (sorted.length === 0) {
+  if (visible.length === 0) {
     return (
       <EmptyState
         icon={CalendarIcon}
@@ -173,9 +189,7 @@ export function AiringTimeline({
             </h2>
           </div>
           <p className="mt-1.5 max-w-xl text-sm leading-6 text-muted-foreground">
-            {filtered.length} episodes
-            {liveCount > 0 ? ` · ${liveCount} live now` : ""}
-            {upcomingCount > 0 ? ` · ${upcomingCount} coming up` : ""}
+            {formatEpisodeSummary(filtered.length, liveCount, upcomingCount)}
             <span className="text-muted-foreground/70"> · times in {timezone}</span>
           </p>
         </div>
@@ -198,90 +212,100 @@ export function AiringTimeline({
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
-              {f === "TV_SHORT" ? "TV Short" : f === "ALL" ? "All" : formatFormat(f)}
+              {formatFilterLabel(f)}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Time bands */}
-      {bands.map((band, i) => {
-        const phases = band.items.map((s) => getPhase(s.airingAt, now));
-        const hasUpcoming = phases.includes("upcoming");
-        const hasLive = phases.includes("live");
-        const isNext =
-          hasUpcoming &&
-          !bands
-            .slice(0, i)
-            .some((b) => b.items.some((s) => getPhase(s.airingAt, now) === "upcoming"));
+      {/* Time bands (or a filter-specific empty state) */}
+      {sorted.length === 0 ? (
+        <EmptyState
+          icon={CalendarIcon}
+          title={`No ${formatFilterLabel(formatFilter)} airing this day`}
+          description="Try another format above or switch back to All."
+        />
+      ) : (
+        bands.map((band, i) => {
+          const phases = band.items.map((s) => getPhase(s.airingAt, now));
+          const hasUpcoming = phases.includes("upcoming");
+          const hasLive = phases.includes("live");
+          const isNext =
+            hasUpcoming &&
+            !bands
+              .slice(0, i)
+              .some((b) => b.items.some((s) => getPhase(s.airingAt, now) === "upcoming"));
 
-        return (
-          <div key={band.hour} className="space-y-2">
-            {/* NOW indicator before the first upcoming band */}
-            {isToday && isNext && (
-              <div
-                id="now-indicator"
-                className="flex items-center gap-3 py-1"
-                role="separator"
-                aria-label="Current time"
-              >
-                <span className="relative flex size-2.5 items-center justify-center">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-60" />
-                  <span className="relative inline-flex size-1.5 rounded-full bg-destructive" />
+          return (
+            <div key={band.hour} className="space-y-2">
+              {/* NOW indicator before the first upcoming band */}
+              {isToday && isNext && (
+                <div
+                  id="now-indicator"
+                  className="flex items-center gap-3 py-1"
+                  role="separator"
+                  aria-label="Current time"
+                >
+                  <span className="relative flex size-2.5 items-center justify-center">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-60" />
+                    <span className="relative inline-flex size-1.5 rounded-full bg-destructive" />
+                  </span>
+                  <LocalTime
+                    timestamp={now}
+                    offsetMinutes={offset}
+                    className="font-mono text-xs font-bold tabular-nums text-destructive"
+                  />
+                  <span className="h-px flex-1 bg-destructive/20" />
+                  <span className="font-mono text-[0.62rem] uppercase tracking-[0.16em] text-muted-foreground">
+                    Now
+                  </span>
+                </div>
+              )}
+
+              {/* Band header — time as the axis */}
+              <div id={`band-${band.hour}`} className="scroll-mt-[11rem] flex items-center gap-3">
+                <span className="flex items-center gap-2">
+                  {hasLive && (
+                    <span className="size-1.5 animate-pulse rounded-full bg-destructive" />
+                  )}
+                  <span
+                    className={cn(
+                      "font-mono text-sm font-bold tabular-nums tracking-tight",
+                      hasLive ? "text-destructive" : "text-foreground",
+                    )}
+                  >
+                    {String(band.hour).padStart(2, "0")}:00
+                  </span>
                 </span>
-                <LocalTime
-                  timestamp={now}
-                  offsetMinutes={offset}
-                  className="font-mono text-xs font-bold tabular-nums text-destructive"
-                />
-                <span className="h-px flex-1 bg-destructive/20" />
-                <span className="font-mono text-[0.62rem] uppercase tracking-[0.16em] text-muted-foreground">
-                  Now
+                <span className="h-px flex-1 bg-border-soft" />
+                <span className="shrink-0 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground">
+                  {band.items.length} {band.items.length === 1 ? "show" : "shows"}
                 </span>
               </div>
-            )}
 
-            {/* Band header — time as the axis */}
-            <div id={`band-${band.hour}`} className="scroll-mt-[11rem] flex items-center gap-3">
-              <span className="flex items-center gap-2">
-                {hasLive && <span className="size-1.5 animate-pulse rounded-full bg-destructive" />}
-                <span
-                  className={cn(
-                    "font-mono text-sm font-bold tabular-nums tracking-tight",
-                    hasLive ? "text-destructive" : "text-foreground",
-                  )}
-                >
-                  {String(band.hour).padStart(2, "0")}:00
-                </span>
-              </span>
-              <span className="h-px flex-1 bg-border-soft" />
-              <span className="shrink-0 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground">
-                {band.items.length} {band.items.length === 1 ? "show" : "shows"}
-              </span>
+              {/* Rows — progressive density: live large, upcoming standard, aired compact */}
+              <div className="space-y-2">
+                {band.items.map((item) => {
+                  const density: "featured" | "standard" | "compact" = hasLive
+                    ? "featured"
+                    : getPhase(item.airingAt, now) === "upcoming"
+                      ? "standard"
+                      : "compact";
+                  return (
+                    <ScheduleRow
+                      key={`${item.media!.id}-${item.episode}`}
+                      item={item}
+                      now={now}
+                      density={density}
+                      offsetMinutes={offset}
+                    />
+                  );
+                })}
+              </div>
             </div>
-
-            {/* Rows — progressive density: live large, upcoming standard, aired compact */}
-            <div className="space-y-2">
-              {band.items.map((item) => {
-                const density: "featured" | "standard" | "compact" = hasLive
-                  ? "featured"
-                  : getPhase(item.airingAt, now) === "upcoming"
-                    ? "standard"
-                    : "compact";
-                return (
-                  <ScheduleRow
-                    key={`${item.media!.id}-${item.episode}`}
-                    item={item}
-                    now={now}
-                    density={density}
-                    offsetMinutes={offset}
-                  />
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
+          );
+        })
+      )}
     </section>
   );
 }
@@ -461,7 +485,7 @@ function ScheduleRow({
 
       {/* Streaming — real links, open in a new tab */}
       {streamingLinks.length > 0 && (
-        <div className="flex items-center gap-1.5 border-t border-border-soft/60 px-3 pb-2.5 pt-2 sm:px-4">
+        <div className="flex items-center gap-2 border-t border-border-soft/60 px-3 pb-2.5 pt-2 sm:px-4">
           {streamingLinks.slice(0, 3).map((link) => (
             <a
               key={link.url}
@@ -469,28 +493,28 @@ function ScheduleRow({
               target="_blank"
               rel="noopener noreferrer"
               title={`Watch on ${link.site ?? "streaming"}`}
-              className="flex items-center gap-1 rounded-md border border-border-soft bg-surface-1 px-1.5 py-1 font-mono text-[0.58rem] text-muted-foreground transition-colors hover:border-signal/60 hover:text-foreground"
+              className="flex items-center gap-1.5 rounded-md border border-border-soft bg-surface-1 px-2.5 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:border-signal/60 hover:text-foreground"
             >
-              {link.icon ? (
-                <Image
-                  src={link.icon}
-                  alt=""
-                  width={10}
-                  height={10}
-                  className="size-2.5"
-                  unoptimized
-                />
-              ) : (
+              {getFaviconUrl(link.url) ? (
                 <Image
                   src={getFaviconUrl(link.url)}
                   alt=""
-                  width={10}
-                  height={10}
-                  className="size-2.5"
+                  width={14}
+                  height={14}
+                  className="size-3.5"
                   unoptimized
                 />
-              )}
-              <span className="max-w-20 truncate">{link.site ?? "Watch"}</span>
+              ) : link.icon ? (
+                <Image
+                  src={link.icon}
+                  alt=""
+                  width={14}
+                  height={14}
+                  className="size-3.5"
+                  unoptimized
+                />
+              ) : null}
+              <span className="max-w-28 truncate">{link.site ?? "Watch"}</span>
             </a>
           ))}
         </div>

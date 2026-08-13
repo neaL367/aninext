@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ViewTransition } from "react";
 
 import { MediaImage } from "@/components/ui/media-image";
-import { getAnimeFullDetail } from "@/features/anime/anime-queries";
+import { getAnimeDetail } from "@/features/anime/anime-queries";
 import {
   formatFormat,
   formatStatus,
@@ -21,9 +21,9 @@ import type { Media } from "@/features/anime/types/anime";
 export async function AnimeHeroSection({ id }: { id: number | null }) {
   if (id === null) notFound();
 
-  const detail = await getAnimeFullDetail(id);
-  if (!detail) notFound();
-  return <AnimeHero media={detail.media} />;
+  const media = await getAnimeDetail(id);
+  if (!media) notFound();
+  return <AnimeHero media={media} />;
 }
 
 export function AnimeHero({ media }: { media: Media }) {

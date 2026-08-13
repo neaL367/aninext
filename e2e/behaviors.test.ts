@@ -85,7 +85,7 @@ test.describe("API failure error states", () => {
   test("detail page shows not-found for an unknown anime id", async ({ page }) => {
     // Far beyond AniList's highest anime id, so guaranteed to be missing — the old
     // random 100k–900k range could collide with real titles. A missing id flows
-    // through getAnimeFullDetail → null → notFound(), which renders not-found.tsx
+    // through getAnimeDetail → null → notFound(), which renders not-found.tsx
     // (the error boundary never fires for this path). API failures remain errors
     // instead of being mistaken for a missing anime.
     const missingId = 2_000_000_000;

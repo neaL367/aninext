@@ -54,30 +54,42 @@ function top100Media(start: number, count: number) {
 }
 
 function detailMedia(id: number) {
-  const item = media(id, id === 21 ? "ONE PIECE" : `Mock Anime ${id}`);
+  return media(id, id === 21 ? "ONE PIECE" : `Mock Anime ${id}`);
+}
+
+function detailCharacters() {
   return {
-    ...item,
-    characters: {
-      edges: [
-        {
-          role: "MAIN",
-          voiceActors: [{ id: 1, name: { full: "Mock Voice Actor" }, image: { medium: "" } }],
-          node: { id: 1, name: { full: "Mock Character" }, image: { medium: "" } },
-        },
-      ],
-    },
-    staff: {
-      edges: [
-        {
-          role: "Director",
-          node: { id: 2, name: { full: "Mock Director" }, image: { medium: "" } },
-        },
-      ],
-    },
-    relations: { edges: [{ relationType: "SEQUEL", node: media(id + 1, "Mock Related Anime") }] },
-    recommendations: { nodes: [{ mediaRecommendation: media(id + 2, "Mock Recommendation") }] },
-    airingSchedule: { nodes: [{ episode: 2, airingAt: Math.floor(Date.now() / 1000) + 3600 }] },
+    edges: [
+      {
+        role: "MAIN",
+        voiceActors: [{ id: 1, name: { full: "Mock Voice Actor" }, image: { medium: "" } }],
+        node: { id: 1, name: { full: "Mock Character" }, image: { medium: "" } },
+      },
+    ],
   };
+}
+
+function detailStaff() {
+  return {
+    edges: [
+      {
+        role: "Director",
+        node: { id: 2, name: { full: "Mock Director" }, image: { medium: "" } },
+      },
+    ],
+  };
+}
+
+function detailRelations(id: number) {
+  return { edges: [{ relationType: "SEQUEL", node: media(id + 1, "Mock Related Anime") }] };
+}
+
+function detailRecommendations(id: number) {
+  return { nodes: [{ mediaRecommendation: media(id + 2, "Mock Recommendation") }] };
+}
+
+function detailAiringSchedule() {
+  return { nodes: [{ episode: 2, airingAt: Math.floor(Date.now() / 1000) + 3600 }] };
 }
 
 function airingSchedules() {
@@ -94,9 +106,29 @@ function responseFor(query: string, variables: Record<string, unknown>) {
     return { GenreCollection: ["Action", "Adventure", "Comedy", "Drama", "Fantasy"] };
   }
 
-  if (query.includes("AnimeFullDetail")) {
+  if (query.includes("AnimeDetailMedia")) {
     const id = Number(variables.id);
     return { Media: id === 2_000_000_000 ? null : detailMedia(id) };
+  }
+
+  if (query.includes("AnimeCharacters")) {
+    return { Media: { characters: detailCharacters() } };
+  }
+
+  if (query.includes("AnimeStaff")) {
+    return { Media: { staff: detailStaff() } };
+  }
+
+  if (query.includes("AnimeRelations")) {
+    return { Media: { relations: detailRelations(Number(variables.id)) } };
+  }
+
+  if (query.includes("AnimeRecommendations")) {
+    return { Media: { recommendations: detailRecommendations(Number(variables.id)) } };
+  }
+
+  if (query.includes("AnimeAiringSchedule")) {
+    return { Media: { airingSchedule: detailAiringSchedule() } };
   }
 
   if (query.includes("Top100Full")) {

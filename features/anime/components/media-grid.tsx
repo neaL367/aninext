@@ -26,6 +26,11 @@ export function MediaGrid({
       {items.map((item, i) => {
         const isFeatured = firstPage && (i === 0 || i === 12) && !rankStart;
         const isAboveFold = i < 4;
+        // Only the first page's top cards morph into the detail hero. Limiting
+        // to a single page avoids duplicate <ViewTransition> names when AniList's
+        // live sorts shift an item across a page boundary during infinite scroll.
+        const canMorph =
+          firstPage && (isAboveFold || (rankStart !== undefined && rankStart + i <= 6));
         return (
           <div
             key={item.id}
@@ -37,7 +42,7 @@ export function MediaGrid({
                 media={item}
                 size={isFeatured ? "featured" : "default"}
                 rank={rankStart !== undefined ? rankStart + i : undefined}
-                viewTransition
+                viewTransition={canMorph}
                 priority={priorityFirst || isAboveFold}
               />
             </AnimePreviewCard>

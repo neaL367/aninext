@@ -69,7 +69,7 @@ export function MediaCard({
         )}
       >
         {coverImage ? (
-          viewTransition && (priority || (rank !== undefined && rank <= 6)) ? (
+          viewTransition ? (
             <ViewTransition name={`anime-cover-${media.id}`} share="morph" default="none">
               {coverImage}
             </ViewTransition>

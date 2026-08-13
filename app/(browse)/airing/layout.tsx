@@ -1,6 +1,6 @@
 import { RadioIcon } from "lucide-react";
 
-import { Crossfade } from "@/components/ui/crossfade";
+import { PageTransition } from "@/components/ui/crossfade";
 
 export default function AiringLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -16,7 +16,7 @@ export default function AiringLayout({ children }: { children: React.ReactNode }
           What is airing, what comes next, and where to watch it — a live TV guide for anime.
         </p>
       </header>
-      <Crossfade>{children}</Crossfade>
+      <PageTransition>{children}</PageTransition>
     </div>
   );
 }

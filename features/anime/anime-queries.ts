@@ -289,67 +289,22 @@ const AIRING_SCHEDULE_SUBFIELDS = `
   nodes { episode airingAt }
 `;
 
-const ANIME_FULL_DETAIL_QUERY = `
-  query AnimeFullDetail($id: Int) {
+const ANIME_DETAIL_QUERY = `
+  query AnimeDetailMedia($id: Int) {
     Media(id: $id, type: ANIME) {
       ${HERO_FIELDS}
-      characters(page: 1, perPage: 12, sort: [ROLE, RELEVANCE]) {
-        ${CHARACTERS_SUBFIELDS}
-      }
-      staff(page: 1, perPage: 10) {
-        ${STAFF_SUBFIELDS}
-      }
-      relations {
-        ${RELATIONS_SUBFIELDS}
-      }
-      recommendations(page: 1, perPage: 8, sort: [RATING_DESC]) {
-        ${RECOMMENDATIONS_SUBFIELDS}
-      }
-      airingSchedule(notYetAired: true, perPage: 25) {
-        ${AIRING_SCHEDULE_SUBFIELDS}
-      }
     }
   }
 `;
 
-export interface AnimeFullDetailData {
-  media: Media;
-  characters: CharacterEdge[];
-  staff: StaffEdge[];
-  relations: RelationEdge[];
-  recommendations: RecommendationNode[];
-  airingSchedule: AiringScheduleNode[];
-}
-
-export async function getAnimeFullDetail(id: number): Promise<AnimeFullDetailData | null> {
+export async function getAnimeDetail(id: number): Promise<Media | null> {
   "use cache: remote";
   cacheTag("anime", ANIME_CACHE.detail(id));
   cacheLife("home");
 
   try {
-    const data = await anilistFetch<{
-      Media:
-        | (Media & {
-            characters?: { edges?: CharacterEdge[] | null } | null;
-            staff?: { edges?: StaffEdge[] | null } | null;
-            relations?: { edges?: RelationEdge[] | null } | null;
-            recommendations?: { nodes?: RecommendationNode[] | null } | null;
-            airingSchedule?: { nodes?: AiringScheduleNode[] | null } | null;
-          })
-        | null;
-    }>(ANIME_FULL_DETAIL_QUERY, { id });
-
-    const m = data.Media;
-    if (!m) return null;
-
-    return {
-      media: m,
-      characters: m.characters?.edges ?? [],
-      staff: m.staff?.edges ?? [],
-      relations: m.relations?.edges ?? [],
-      recommendations: m.recommendations?.nodes ?? [],
-      airingSchedule: m.airingSchedule?.nodes ?? [],
-    };
+    const data = await anilistFetch<{ Media: Media | null }>(ANIME_DETAIL_QUERY, { id });
+    return data.Media;
   } catch (error) {
     // AniList returns HTTP 404 for some impossible IDs instead of a successful
     // GraphQL response with Media: null. Preserve the not-found contract for
@@ -358,6 +313,111 @@ export async function getAnimeFullDetail(id: number): Promise<AnimeFullDetailDat
     if (error instanceof AniListError && error.status === 404) return null;
     throw error;
   }
+}
+
+const ANIME_CHARACTERS_QUERY = `
+  query AnimeCharacters($id: Int) {
+    Media(id: $id, type: ANIME) {
+      characters(page: 1, perPage: 12, sort: [ROLE, RELEVANCE]) {
+        ${CHARACTERS_SUBFIELDS}
+      }
+    }
+  }
+`;
+
+export async function getAnimeCharacters(id: number): Promise<CharacterEdge[]> {
+  "use cache: remote";
+  cacheTag("anime", ANIME_CACHE.characters(id));
+  cacheLife("static");
+
+  const data = await anilistFetch<{
+    Media: { characters?: { edges?: CharacterEdge[] | null } | null } | null;
+  }>(ANIME_CHARACTERS_QUERY, { id });
+  return data.Media?.characters?.edges ?? [];
+}
+
+const ANIME_STAFF_QUERY = `
+  query AnimeStaff($id: Int) {
+    Media(id: $id, type: ANIME) {
+      staff(page: 1, perPage: 10) {
+        ${STAFF_SUBFIELDS}
+      }
+    }
+  }
+`;
+
+export async function getAnimeStaff(id: number): Promise<StaffEdge[]> {
+  "use cache: remote";
+  cacheTag("anime", ANIME_CACHE.staff(id));
+  cacheLife("static");
+
+  const data = await anilistFetch<{
+    Media: { staff?: { edges?: StaffEdge[] | null } | null } | null;
+  }>(ANIME_STAFF_QUERY, { id });
+  return data.Media?.staff?.edges ?? [];
+}
+
+const ANIME_RELATIONS_QUERY = `
+  query AnimeRelations($id: Int) {
+    Media(id: $id, type: ANIME) {
+      relations {
+        ${RELATIONS_SUBFIELDS}
+      }
+    }
+  }
+`;
+
+export async function getAnimeRelations(id: number): Promise<RelationEdge[]> {
+  "use cache: remote";
+  cacheTag("anime", ANIME_CACHE.subSection(id, "relations"));
+  cacheLife("static");
+
+  const data = await anilistFetch<{
+    Media: { relations?: { edges?: RelationEdge[] | null } | null } | null;
+  }>(ANIME_RELATIONS_QUERY, { id });
+  return data.Media?.relations?.edges ?? [];
+}
+
+const ANIME_RECOMMENDATIONS_QUERY = `
+  query AnimeRecommendations($id: Int) {
+    Media(id: $id, type: ANIME) {
+      recommendations(page: 1, perPage: 8, sort: [RATING_DESC]) {
+        ${RECOMMENDATIONS_SUBFIELDS}
+      }
+    }
+  }
+`;
+
+export async function getAnimeRecommendations(id: number): Promise<RecommendationNode[]> {
+  "use cache: remote";
+  cacheTag("anime", ANIME_CACHE.subSection(id, "recs"));
+  cacheLife("home");
+
+  const data = await anilistFetch<{
+    Media: { recommendations?: { nodes?: RecommendationNode[] | null } | null } | null;
+  }>(ANIME_RECOMMENDATIONS_QUERY, { id });
+  return data.Media?.recommendations?.nodes ?? [];
+}
+
+const ANIME_AIRING_SCHEDULE_QUERY = `
+  query AnimeAiringSchedule($id: Int) {
+    Media(id: $id, type: ANIME) {
+      airingSchedule(notYetAired: true, perPage: 25) {
+        ${AIRING_SCHEDULE_SUBFIELDS}
+      }
+    }
+  }
+`;
+
+export async function getAnimeAiringSchedule(id: number): Promise<AiringScheduleNode[]> {
+  "use cache: remote";
+  cacheTag("anime", ANIME_CACHE.subSection(id, "airing"));
+  cacheLife("trending");
+
+  const data = await anilistFetch<{
+    Media: { airingSchedule?: { nodes?: AiringScheduleNode[] | null } | null } | null;
+  }>(ANIME_AIRING_SCHEDULE_QUERY, { id });
+  return data.Media?.airingSchedule?.nodes ?? [];
 }
 
 const AIRING_DAY_QUERY = `
@@ -383,6 +443,9 @@ const AIRING_DAY_QUERY = `
 // capped 5000 for single-day windows), so day counts are derived by fetching a
 // week's schedules once and bucketing by day in getAiringWeek.
 
+const MAX_AIRING_PAGES = 12;
+const AIRING_PARALLEL_PAGES = 4;
+
 /** All schedules across [start, end) — used to derive accurate per-day counts. */
 export async function getAiringWeekItems(
   start: number,
@@ -393,20 +456,38 @@ export async function getAiringWeekItems(
   cacheLife("airing");
 
   const allSchedules: AiringScheduleNode[] = [];
-  let page = 1;
-  let hasNextPage = true;
 
-  while (hasNextPage && page <= 12) {
-    const data = await anilistFetch<{
-      Page: {
-        pageInfo: { hasNextPage: boolean };
-        airingSchedules: AiringScheduleNode[];
-      };
-    }>(AIRING_DAY_QUERY, { start, end, page });
+  // Fetch page 1 first so a quiet week costs a single request, then fetch any
+  // remaining pages in bounded parallel waves. The fetch client already caps
+  // concurrency, so Promise.all can't fan out past that limit.
+  const first = await anilistFetch<{
+    Page: {
+      pageInfo: { hasNextPage: boolean };
+      airingSchedules: AiringScheduleNode[];
+    };
+  }>(AIRING_DAY_QUERY, { start, end, page: 1 });
+  allSchedules.push(...first.Page.airingSchedules);
 
-    allSchedules.push(...data.Page.airingSchedules);
-    hasNextPage = data.Page.pageInfo.hasNextPage;
-    page++;
+  let page = 2;
+  let hasNextPage = first.Page.pageInfo.hasNextPage;
+
+  while (hasNextPage && page <= MAX_AIRING_PAGES) {
+    const waveSize = Math.min(AIRING_PARALLEL_PAGES, MAX_AIRING_PAGES - page + 1);
+    const pages = Array.from({ length: waveSize }, (_, i) => page + i);
+    const results = await Promise.all(
+      pages.map((p) =>
+        anilistFetch<{
+          Page: {
+            pageInfo: { hasNextPage: boolean };
+            airingSchedules: AiringScheduleNode[];
+          };
+        }>(AIRING_DAY_QUERY, { start, end, page: p }),
+      ),
+    );
+
+    for (const data of results) allSchedules.push(...data.Page.airingSchedules);
+    hasNextPage = results[results.length - 1].Page.pageInfo.hasNextPage;
+    page += waveSize;
   }
 
   return allSchedules;

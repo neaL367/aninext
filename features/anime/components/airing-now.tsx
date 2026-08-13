@@ -223,16 +223,7 @@ export function AiringNow({
                   title={`Watch on ${link.site ?? "streaming"}`}
                   className="flex size-8 items-center justify-center rounded-lg border border-border-soft bg-background/70 backdrop-blur transition-colors hover:border-signal/60"
                 >
-                  {link.icon ? (
-                    <Image
-                      src={link.icon}
-                      alt=""
-                      width={16}
-                      height={16}
-                      className="size-4"
-                      unoptimized
-                    />
-                  ) : (
+                  {getFaviconUrl(link.url) ? (
                     <Image
                       src={getFaviconUrl(link.url)}
                       alt=""
@@ -241,7 +232,16 @@ export function AiringNow({
                       className="size-4"
                       unoptimized
                     />
-                  )}
+                  ) : link.icon ? (
+                    <Image
+                      src={link.icon}
+                      alt=""
+                      width={16}
+                      height={16}
+                      className="size-4"
+                      unoptimized
+                    />
+                  ) : null}
                 </a>
               ))}
             </div>

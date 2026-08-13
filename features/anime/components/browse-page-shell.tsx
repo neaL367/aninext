@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 
-import { Crossfade } from "@/components/ui/crossfade";
+import { PageTransition } from "@/components/ui/crossfade";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { getGenres } from "@/features/anime/anime-queries";
 import { ActiveFilters, ActiveFiltersSkeleton } from "@/features/anime/components/active-filters";
@@ -80,7 +80,7 @@ export function BrowsePageShell({
         </aside>
 
         <div className="min-w-0">
-          <Crossfade>{children}</Crossfade>
+          <PageTransition>{children}</PageTransition>
         </div>
       </div>
     </div>

@@ -1,6 +1,15 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
-import { getAnimeFullDetail } from "@/features/anime/anime-queries";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
+import {
+  getAnimeAiringSchedule,
+  getAnimeCharacters,
+  getAnimeDetail,
+  getAnimeRecommendations,
+  getAnimeRelations,
+  getAnimeStaff,
+} from "@/features/anime/anime-queries";
 
 import { AnimeAiringSchedule, AnimeAiringScheduleSkeleton } from "./anime-airing-schedule";
 import { AnimeCharacters, AnimeCharactersSkeleton } from "./anime-characters";
@@ -15,10 +24,8 @@ import { SectionHeader } from "./section-header";
 export async function AnimeDetail({ id }: { id: number | null }) {
   if (id === null) notFound();
 
-  const detail = await getAnimeFullDetail(id);
-  if (!detail) notFound();
-
-  const { media, characters, staff, relations, recommendations, airingSchedule } = detail;
+  const media = await getAnimeDetail(id);
+  if (!media) notFound();
 
   return (
     <div className="mx-auto w-full max-w-[1680px] px-4 sm:px-7 lg:px-10">
@@ -43,7 +50,11 @@ export async function AnimeDetail({ id }: { id: number | null }) {
               title="Characters and voices"
             />
             <div className="mt-7">
-              <AnimeCharacters edges={characters} />
+              <ErrorBoundary title="Characters failed to load">
+                <Suspense fallback={<AnimeCharactersSkeleton />}>
+                  <CharactersSection id={id} />
+                </Suspense>
+              </ErrorBoundary>
             </div>
           </section>
 
@@ -54,7 +65,11 @@ export async function AnimeDetail({ id }: { id: number | null }) {
               title="More like this"
             />
             <div className="mt-7">
-              <AnimeRecommendations nodes={recommendations} />
+              <ErrorBoundary title="Recommendations failed to load">
+                <Suspense fallback={<AnimeRecommendationsSkeleton />}>
+                  <RecommendationsSection id={id} />
+                </Suspense>
+              </ErrorBoundary>
             </div>
           </section>
         </div>
@@ -62,18 +77,30 @@ export async function AnimeDetail({ id }: { id: number | null }) {
         <aside className="min-w-0 lg:border-l lg:border-border-soft lg:pl-8">
           <div className="space-y-12">
             <section aria-label="Airing schedule">
-              <AnimeAiringSchedule nodes={airingSchedule} />
+              <ErrorBoundary title="Schedule failed to load">
+                <Suspense fallback={<AnimeAiringScheduleSkeleton />}>
+                  <AiringSection id={id} />
+                </Suspense>
+              </ErrorBoundary>
             </section>
             <section aria-label="Related anime">
               <SectionHeader eyebrow="Universe" eyebrowClassName="text-signal" title="Related" />
               <div className="mt-5">
-                <AnimeRelations edges={relations} />
+                <ErrorBoundary title="Related anime failed to load">
+                  <Suspense fallback={<AnimeRelationsSkeleton />}>
+                    <RelationsSection id={id} />
+                  </Suspense>
+                </ErrorBoundary>
               </div>
             </section>
             <section aria-label="Staff">
               <SectionHeader eyebrow="Credits" eyebrowClassName="text-signal" title="Staff" />
               <div className="mt-5">
-                <AnimeStaff edges={staff} />
+                <ErrorBoundary title="Staff failed to load">
+                  <Suspense fallback={<AnimeStaffSkeleton />}>
+                    <StaffSection id={id} />
+                  </Suspense>
+                </ErrorBoundary>
               </div>
             </section>
             <section aria-label="Genres">
@@ -87,6 +114,31 @@ export async function AnimeDetail({ id }: { id: number | null }) {
       </div>
     </div>
   );
+}
+
+async function CharactersSection({ id }: { id: number }) {
+  const edges = await getAnimeCharacters(id);
+  return <AnimeCharacters edges={edges} />;
+}
+
+async function RecommendationsSection({ id }: { id: number }) {
+  const nodes = await getAnimeRecommendations(id);
+  return <AnimeRecommendations nodes={nodes} />;
+}
+
+async function AiringSection({ id }: { id: number }) {
+  const nodes = await getAnimeAiringSchedule(id);
+  return <AnimeAiringSchedule nodes={nodes} />;
+}
+
+async function RelationsSection({ id }: { id: number }) {
+  const edges = await getAnimeRelations(id);
+  return <AnimeRelations edges={edges} />;
+}
+
+async function StaffSection({ id }: { id: number }) {
+  const edges = await getAnimeStaff(id);
+  return <AnimeStaff edges={edges} />;
 }
 
 export function AnimeDetailSkeleton() {
