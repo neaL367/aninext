@@ -39,8 +39,15 @@ export function LocalTime({
   useEffect(() => {
     const options: Intl.DateTimeFormatOptions =
       format === "time"
-        ? { hour: "2-digit", minute: "2-digit" }
-        : { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" };
+        ? { hour: "2-digit", minute: "2-digit", hour12: false, hourCycle: "h23" }
+        : {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+            hourCycle: "h23",
+          };
 
     const hasOffset = typeof offsetMinutes === "number" && isValidAiringOffset(offsetMinutes);
     if (hasOffset) {

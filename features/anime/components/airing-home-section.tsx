@@ -4,13 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";
 
+import { LocalTime } from "@/components/ui/local-time";
 import { ViewAllLink } from "@/components/ui/view-all-link";
-import {
-  formatCountdown,
-  fromAiringTimestamp,
-  getAiringPhase,
-  getTitle,
-} from "@/features/anime/lib/media-helpers";
+import { formatCountdown, getAiringPhase, getTitle } from "@/features/anime/lib/media-helpers";
 
 import { SectionHeader } from "./section-header";
 
@@ -44,7 +40,6 @@ export function AiringHomeSection({ schedules }: { schedules: AiringScheduleNode
         {upcomingSchedules.map((item, index) => {
           if (!item.media) return null;
           const title = getTitle(item.media.title);
-          const time = fromAiringTimestamp(item.airingAt);
           // eslint-disable-next-line react-hooks/purity -- live countdown, recomputed per render
           const phase = getAiringPhase(item.airingAt, now);
           const countdown = phase === "upcoming" ? formatCountdown(item.airingAt, now) : "";
@@ -79,21 +74,17 @@ export function AiringHomeSection({ schedules }: { schedules: AiringScheduleNode
                 <p className="line-clamp-1 text-sm font-medium group-hover:text-accent">{title}</p>
                 <p className="mt-1 font-mono text-xs text-muted-foreground">
                   Ep {item.episode} <span className="hidden sm:inline">· </span>
-                  <span className="text-foreground">
-                    {time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
-                  </span>
+                  <LocalTime timestamp={item.airingAt} className="text-foreground" />
                   <span className={`ml-1 ${isClose ? "text-live-badge" : "text-muted-foreground"}`}>
                     ({countdown})
                   </span>
                 </p>
               </div>
               <div className="hidden shrink-0 text-right sm:block">
-                <time
-                  dateTime={time.toISOString()}
+                <LocalTime
+                  timestamp={item.airingAt}
                   className="block font-mono text-sm tabular-nums text-foreground"
-                >
-                  {time.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
-                </time>
+                />
                 <span
                   className={`block mt-0.5 font-mono text-xs tabular-nums ${isClose ? "text-live-badge" : "text-muted-foreground"}`}
                 >

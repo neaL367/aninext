@@ -111,7 +111,7 @@ export function getTimezoneLabel(offsetMinutes?: number): string {
 
 /** Hour (0-23) of an epoch second within the offset-defined local day. */
 export function getOffsetHour(epochSeconds: number, offsetMinutes: number): number {
-  return Math.floor(((epochSeconds + offsetMinutes * 60) % 86400) / 3600);
+  return new Date((epochSeconds + offsetMinutes * 60) * 1000).getUTCHours();
 }
 
 /** Current calendar date (YYYY-MM-DD) in the offset's timezone. */
