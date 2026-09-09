@@ -20,11 +20,13 @@ let lastLimitAdjustMs = 0;
 const RECOVERY_INTERVAL_MS = 120_000;
 
 // Circuit Breaker state
-let consecutiveFailures = 0;
-let circuitOpenUntil = 0; // epoch ms; 0 = closed
-const FAILURE_THRESHOLD = 5;
+const failureTimestamps: number[] = [];
+const FAILURE_WINDOW_MS = 30_000;
+const FAILURE_THRESHOLD = 12;
 const OPEN_DURATION_MS = 12_000;
 const MAX_OPEN_DURATION_MS = 60_000;
+let circuitOpenUntil = 0; // epoch ms; 0 = closed
+let isHalfOpen = false;
 let currentOpenDurationMs = OPEN_DURATION_MS;
 
 const MAX_WORTH_RETRYING_MS = 8_000;
@@ -81,8 +83,9 @@ function toNetworkError(error: unknown, status?: number): AniListError {
 }
 
 function onSuccess() {
-  consecutiveFailures = 0;
+  failureTimestamps.length = 0;
   circuitOpenUntil = 0;
+  isHalfOpen = false;
   currentOpenDurationMs = OPEN_DURATION_MS;
 
   const now = Date.now();
@@ -98,10 +101,16 @@ function onRateLimitHit() {
 }
 
 function onUltimateFailure() {
-  consecutiveFailures += 1;
-  if (consecutiveFailures >= FAILURE_THRESHOLD) {
-    circuitOpenUntil = Date.now() + currentOpenDurationMs;
-    consecutiveFailures = 0;
+  const now = Date.now();
+  failureTimestamps.push(now);
+  while (failureTimestamps.length > 0 && now - failureTimestamps[0] > FAILURE_WINDOW_MS) {
+    failureTimestamps.shift();
+  }
+
+  if (failureTimestamps.length >= FAILURE_THRESHOLD || isHalfOpen) {
+    circuitOpenUntil = now + currentOpenDurationMs;
+    failureTimestamps.length = 0;
+    isHalfOpen = false;
     currentOpenDurationMs = Math.min(MAX_OPEN_DURATION_MS, currentOpenDurationMs * 2);
   }
 }
@@ -113,7 +122,8 @@ function checkCircuitBreaker() {
     throw new AniListError("AniList is temporarily unavailable", "circuit_open", remainingSec);
   }
   if (circuitOpenUntil > 0) {
-    circuitOpenUntil = now + currentOpenDurationMs;
+    circuitOpenUntil = 0;
+    isHalfOpen = true;
   }
 }
 

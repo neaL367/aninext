@@ -55,9 +55,21 @@ function RateLimitCountdown({ seconds, onTick }: { seconds: number; onTick: () =
 }
 
 function ErrorFallback(props: { title: string }, { error, retry }: ErrorInfo) {
-  const err = error as Error;
+  const err = error as Error & { digest?: string };
   const anilistErr = err instanceof AniListError ? err : null;
   const copy = anilistErr ? KIND_COPY[anilistErr.kind] : null;
+
+  const isMinifiedRscError =
+    typeof err.message === "string" &&
+    (err.message.includes("Minified React error #441") ||
+      err.message.includes("react.dev/errors/441") ||
+      err.message.includes("Server Components render"));
+
+  const displayBody =
+    copy?.body ??
+    (isMinifiedRscError
+      ? "The data source is temporarily unavailable. Please try again shortly."
+      : err.message || "An unexpected error occurred.");
 
   return (
     <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-border-soft bg-surface-2/30 p-8 text-center">
@@ -65,7 +77,12 @@ function ErrorFallback(props: { title: string }, { error, retry }: ErrorInfo) {
         <AlertTriangleIcon className="size-5 text-destructive" />
       </div>
       <h2 className="text-lg font-semibold">{copy?.title ?? props.title}</h2>
-      <p className="max-w-sm text-sm text-muted-foreground">{copy?.body ?? err.message}</p>
+      <p className="max-w-sm text-sm text-muted-foreground">{displayBody}</p>
+      {err.digest && (
+        <p className="font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted-foreground/60">
+          Ref: {err.digest}
+        </p>
+      )}
       {anilistErr?.kind === "rate_limited" || anilistErr?.kind === "circuit_open" ? (
         <RateLimitCountdown
           seconds={Math.min(anilistErr.retryAfterSeconds ?? 30, 60)}
