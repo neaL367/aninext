@@ -208,7 +208,16 @@ export async function anilistFetch<T>(
 
       if (res.status === 403) {
         onUltimateFailure();
-        throw new AniListError("AniList API temporarily unavailable", "outage", undefined, 403);
+        let msg = "AniList API temporarily unavailable";
+        try {
+          const json = (await res.json()) as { errors?: { message: string }[] };
+          if (json?.errors?.[0]?.message) {
+            msg = json.errors[0].message;
+          }
+        } catch {
+          // ignore parse error
+        }
+        throw new AniListError(msg, "outage", undefined, 403);
       }
 
       if (res.status >= 500 && res.status < 600) {
@@ -219,12 +228,16 @@ export async function anilistFetch<T>(
           return attempt(remaining - 1);
         }
         onUltimateFailure();
-        throw new AniListError(
-          `AniList server error (${res.status})`,
-          "outage",
-          undefined,
-          res.status,
-        );
+        let msg = `AniList server error (${res.status})`;
+        try {
+          const json = (await res.json()) as { errors?: { message: string }[] };
+          if (json?.errors?.[0]?.message) {
+            msg = json.errors[0].message;
+          }
+        } catch {
+          // ignore parse error
+        }
+        throw new AniListError(msg, "outage", undefined, res.status);
       }
 
       if (!res.ok) {
