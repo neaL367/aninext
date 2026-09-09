@@ -222,13 +222,40 @@ const GENRE_QUERY = `
   }
 `;
 
-export async function getGenres() {
+export const STATIC_GENRES = [
+  "Action",
+  "Adventure",
+  "Comedy",
+  "Drama",
+  "Ecchi",
+  "Fantasy",
+  "Hentai",
+  "Horror",
+  "Mahou Shoujo",
+  "Mecha",
+  "Music",
+  "Mystery",
+  "Psychological",
+  "Romance",
+  "Sci-Fi",
+  "Slice of Life",
+  "Sports",
+  "Supernatural",
+  "Thriller",
+] as const;
+
+export async function getGenres(): Promise<string[]> {
   "use cache: remote";
   cacheTag(ANIME_CACHE.genres);
   cacheLife("max");
 
-  const data = await anilistFetch<{ GenreCollection: string[] }>(GENRE_QUERY, {});
-  return data.GenreCollection;
+  try {
+    const data = await anilistFetch<{ GenreCollection: string[] }>(GENRE_QUERY, {});
+    return data.GenreCollection;
+  } catch (error) {
+    console.warn("Failed to fetch GenreCollection from AniList, using static fallback:", error);
+    return [...STATIC_GENRES];
+  }
 }
 
 const HERO_FIELDS = `

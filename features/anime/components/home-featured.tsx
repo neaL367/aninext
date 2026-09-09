@@ -38,6 +38,7 @@ export function HomeFeaturedShell({
 }
 
 export async function HomeHero() {
+  await io();
   const { trending } = await getHomePrimaryBatch();
   const heroItems = trending.slice(0, 5);
   return heroItems.length > 0 ? <HeroCarousel items={heroItems} /> : null;
@@ -153,6 +154,7 @@ export async function HomeAiringSection() {
 }
 
 export async function HomeGenreSection() {
+  await io();
   const genres = await getGenres();
   return <GenreExplorer genres={genres} />;
 }

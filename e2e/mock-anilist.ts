@@ -138,6 +138,32 @@ function responseFor(query: string, variables: Record<string, unknown>) {
     };
   }
 
+  if (query.includes("GenreCollection")) {
+    return {
+      GenreCollection: [
+        "Action",
+        "Adventure",
+        "Comedy",
+        "Drama",
+        "Ecchi",
+        "Fantasy",
+        "Hentai",
+        "Horror",
+        "Mahou Shoujo",
+        "Mecha",
+        "Music",
+        "Mystery",
+        "Psychological",
+        "Romance",
+        "Sci-Fi",
+        "Slice of Life",
+        "Sports",
+        "Supernatural",
+        "Thriller",
+      ],
+    };
+  }
+
   if (query.includes("HomePrimaryBatch")) {
     return {
       trending: { media: collectionMedia(1, 14) },
