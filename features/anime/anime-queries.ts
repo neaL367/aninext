@@ -253,7 +253,8 @@ export async function getGenres(): Promise<string[]> {
     const data = await anilistFetch<{ GenreCollection: string[] }>(GENRE_QUERY, {});
     return data.GenreCollection;
   } catch (error) {
-    console.warn("Failed to fetch GenreCollection from AniList, using static fallback:", error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn(`[AniList] GenreCollection fetch failed (${message}), using static fallback.`);
     return [...STATIC_GENRES];
   }
 }
