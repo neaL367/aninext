@@ -5,7 +5,6 @@ import { Crossfade } from "@/components/ui/crossfade";
 import { getAiringWeek } from "@/features/anime/anime-queries";
 import { localDateStr } from "@/features/anime/lib/media-helpers";
 
-import { AiringDayDefault } from "./airing-day-default";
 import { AiringDayStrip, AiringDayStripSkeleton } from "./airing-day-strip";
 import { AiringNow, AiringNowSkeleton } from "./airing-now";
 import { AiringTimeline, AiringTimelineSkeleton } from "./airing-timeline";
@@ -19,9 +18,6 @@ export async function AiringDayView(props: { day?: string; offsetMinutes?: numbe
   // skeleton ships as the shell and this streams in.)
   await io();
 
-  // The server's own "today" — the day a bare /airing request would redirect to.
-  // Passed separately so AiringDayDefault can tell "server picked the day" apart
-  // from "visitor chose this day" (which must never be rewritten).
   const serverToday = localDateStr();
   const day = props.day ?? serverToday;
   if (!props.day) {
@@ -39,8 +35,6 @@ export async function AiringDayView(props: { day?: string; offsetMinutes?: numbe
 
   return (
     <div className="space-y-10">
-      <AiringDayDefault serverToday={serverToday} />
-
       {/* Stable across day switches — only the highlight/`currentDay` changes,
           so the sticky rail never remounts or flickers. */}
       <AiringDayStrip

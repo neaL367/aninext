@@ -12,7 +12,7 @@ export function addDays(day: string, days: number): string {
 /**
  * The visitor's local "today" as YYYY-MM-DD, derived from their UTC offset
  * (which the client sends). Falls back to the server's own today when no
- * offset is available yet (first paint before AiringDayDefault hydrates).
+ * offset is available.
  */
 export function visitorToday(offsetMinutes?: number): string {
   if (typeof offsetMinutes !== "number" || !isValidAiringOffset(offsetMinutes)) {
@@ -102,8 +102,7 @@ export function getAiringDayBounds(
     const utcMidnight = Date.UTC(year, month - 1, dayOfMonth);
     start = Math.floor(utcMidnight / 1000) - offsetMinutes * 60;
   } else {
-    // No client offset yet (first paint before AiringDayDefault hydrates):
-    // fall back to server-local midnight, matching the pre-fix behavior.
+    // No offset provided: fall back to server-local midnight.
     if (localDateStr(parsed) !== day) return null;
     start = Math.floor(parsed.getTime() / 1000);
   }
