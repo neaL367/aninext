@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 
 import { parseAiringParams } from "@/features/anime/lib/airing";
 import { localDateStr } from "@/features/anime/lib/media-helpers";
@@ -20,10 +21,13 @@ export const metadata: Metadata = {
 export const instant = false;
 
 export default async function AiringPage({ searchParams }: PageProps<"/airing">) {
+  await connection();
   const sp = await searchParams;
   const { day, offsetMinutes } = parseAiringParams(sp);
   const target = day ?? localDateStr();
   redirect(
-    (offsetMinutes === undefined ? `/airing/${target}` : `/airing/${target}?offset=${offsetMinutes}`) as Route,
+    (offsetMinutes === undefined
+      ? `/airing/${target}`
+      : `/airing/${target}?offset=${offsetMinutes}`) as Route,
   );
 }

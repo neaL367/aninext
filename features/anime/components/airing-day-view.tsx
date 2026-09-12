@@ -5,12 +5,12 @@ import { Crossfade } from "@/components/ui/crossfade";
 import { getAiringWeek } from "@/features/anime/anime-queries";
 import { localDateStr } from "@/features/anime/lib/media-helpers";
 
-import type { Route } from "next";
-
 import { AiringDayDefault } from "./airing-day-default";
 import { AiringDayStrip, AiringDayStripSkeleton } from "./airing-day-strip";
 import { AiringNow, AiringNowSkeleton } from "./airing-now";
 import { AiringTimeline, AiringTimelineSkeleton } from "./airing-timeline";
+
+import type { Route } from "next";
 
 export async function AiringDayView(props: { day?: string; offsetMinutes?: number }) {
   // The "today" fallback below reads the current date, which must not be captured
@@ -26,7 +26,9 @@ export async function AiringDayView(props: { day?: string; offsetMinutes?: numbe
   const day = props.day ?? serverToday;
   if (!props.day) {
     redirect(
-      (props.offsetMinutes === undefined ? `/airing/${day}` : `/airing/${day}?offset=${props.offsetMinutes}`) as Route,
+      (props.offsetMinutes === undefined
+        ? `/airing/${day}`
+        : `/airing/${day}?offset=${props.offsetMinutes}`) as Route,
     );
   }
 

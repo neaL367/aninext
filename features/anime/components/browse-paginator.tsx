@@ -170,9 +170,7 @@ function BrowsePaginatorContent({
     };
   }, [restoreState, pages.length, hasMore, loadPage, restoreTick, syncPage]);
 
-  const pageSkeleton = (
-    <MediaGridSkeletonItems count={pageSize} firstPage={false} />
-  );
+  const pageSkeleton = <MediaGridSkeletonItems count={pageSize} firstPage={false} />;
 
   return (
     <>

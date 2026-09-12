@@ -1,5 +1,5 @@
-import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { AiringDayView, AiringDayViewSkeleton } from "@/features/anime/components/airing-day-view";

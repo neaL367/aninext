@@ -54,9 +54,7 @@ export function ScrollToTopButton() {
       }}
       className={cn(
         "fixed right-4 bottom-20 z-40 size-10 cursor-pointer rounded-full shadow-lg transition-all duration-200 md:right-6 md:bottom-6",
-        visible
-          ? "translate-y-0 opacity-100"
-          : "pointer-events-none translate-y-2 opacity-0",
+        visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-2 opacity-0",
       )}
     >
       <ArrowUpIcon className="size-4" />

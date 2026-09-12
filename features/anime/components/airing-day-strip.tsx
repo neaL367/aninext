@@ -74,7 +74,11 @@ export function AiringDayStrip({
             return (
               <Link
                 key={day}
-                href={(linkOffset === undefined ? `/airing/${day}` : `/airing/${day}?offset=${linkOffset}`) as Route}
+                href={
+                  (linkOffset === undefined
+                    ? `/airing/${day}`
+                    : `/airing/${day}?offset=${linkOffset}`) as Route
+                }
                 prefetch={isSelected ? false : undefined}
                 aria-current={isSelected ? "date" : undefined}
                 className={cn(
