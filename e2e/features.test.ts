@@ -1,11 +1,11 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("canonical URLs", () => {
-  test("airing redirects to day param with visitor offset", async ({ page }) => {
+  test("airing redirects to day path with visitor offset", async ({ page }) => {
     await page.goto("/airing");
-    // Day is the visitor's local date; offset (minutes east of UTC) is attached by
+    // Day lives in the path; offset (minutes east of UTC) is attached by
     // the client after hydration so the server fetches the visitor's day window.
-    await expect(page).toHaveURL(/\/airing\?day=\d{4}-\d{2}-\d{2}&offset=-?\d+$/, {
+    await expect(page).toHaveURL(/\/airing\/\d{4}-\d{2}-\d{2}\?offset=-?\d+$/, {
       timeout: 10_000,
     });
     await expect(page.getByRole("heading", { name: "Schedule" })).toBeVisible();
@@ -19,16 +19,21 @@ test.describe("canonical URLs", () => {
 
   test("airing normalizes invalid day and offset params", async ({ page }) => {
     await page.goto("/airing?day=2026-02-30&offset=9999");
-    await expect(page).toHaveURL(/\/airing\?day=\d{4}-\d{2}-\d{2}&offset=-?\d+$/);
+    await expect(page).toHaveURL(/\/airing\/\d{4}-\d{2}-\d{2}\?offset=-?\d+$/);
     await expect(page.getByRole("heading", { name: "Schedule" })).toBeVisible();
+  });
+
+  test("airing redirects legacy day query to day path", async ({ page }) => {
+    await page.goto("/airing?day=2030-01-15&offset=840");
+    await expect(page).toHaveURL(/\/airing\/2030-01-15\?offset=840$/);
   });
 
   test("airing preserves the timezone in shared links", async ({ browser }) => {
     const context = await browser.newContext({ timezoneId: "America/Los_Angeles" });
     const page = await context.newPage();
 
-    await page.goto("/airing?day=2030-01-15&offset=840", { waitUntil: "domcontentloaded" });
-    await expect(page).toHaveURL(/\/airing\?day=2030-01-15&offset=840$/);
+    await page.goto("/airing/2030-01-15?offset=840", { waitUntil: "domcontentloaded" });
+    await expect(page).toHaveURL(/\/airing\/2030-01-15\?offset=840$/);
 
     await context.close();
   });
@@ -42,17 +47,17 @@ test.describe("canonical URLs", () => {
       const page = await context.newPage();
       await page.goto("/airing", { waitUntil: "domcontentloaded" });
       await expect(page).toHaveURL(
-        new RegExp(`/airing\\?day=\\d{4}-\\d{2}-\\d{2}&offset=${offset}$`),
+        new RegExp(`/airing\\/\\d{4}-\\d{2}-\\d{2}\\?offset=${offset}$`),
       );
       await context.close();
     }
   });
 
   test("airing distinguishes an empty day from an API failure", async ({ page }) => {
-    await page.goto("/airing?day=2099-01-15&offset=0");
+    await page.goto("/airing/2099-01-15?offset=0");
     await expect(page.getByText("Nothing airing this day")).toBeVisible();
 
-    await page.goto("/airing?day=2098-01-15&offset=0");
+    await page.goto("/airing/2098-01-15?offset=0");
     await expect(page.getByRole("heading", { name: "Airing schedule failed to load" })).toBeVisible(
       { timeout: 15_000 },
     );

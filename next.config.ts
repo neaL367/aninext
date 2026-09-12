@@ -13,10 +13,14 @@ const nextConfig: NextConfig = {
     remotePatterns: [{ hostname: "s4.anilist.co", protocol: "https" }],
   },
   cacheLife: {
-    trending: { stale: 300, revalidate: 900, expire: 3600 },
-    home: { stale: 300, revalidate: 900, expire: 86400 },
+    // Degraded upstream (30 req/min): serve stale instantly, refresh in
+    // background. Wider revalidate/expire windows avoid blocking misses while
+    // background refresh keeps data fresh. Restore tighter windows when full
+    // rate limit returns.
+    trending: { stale: 300, revalidate: 1800, expire: 7200 },
+    home: { stale: 300, revalidate: 1800, expire: 86400 },
     static: { stale: 3600, revalidate: 21600, expire: 604800 },
-    airing: { stale: 180, revalidate: 900, expire: 3600 },
+    airing: { stale: 300, revalidate: 1800, expire: 7200 },
     max: { stale: 86400, revalidate: 604800, expire: 1209600 },
   },
   experimental: {

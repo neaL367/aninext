@@ -42,8 +42,8 @@ export async function renderBrowsePage(
         <MediaGrid
           items={visibleItems}
           rankStart={rankStart}
-          priorityFirst={page === 1}
           firstPage={page === 1}
+          page={page}
         />
       ),
     };
@@ -72,8 +72,8 @@ export async function renderBrowsePage(
       <MediaGrid
         items={visibleItems}
         rankStart={rankStart}
-        priorityFirst={page === 1}
-        firstPage={page === 1}
+          firstPage={page === 1}
+          page={page}
       />
     ),
   };

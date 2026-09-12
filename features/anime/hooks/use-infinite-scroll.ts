@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 
-const LOAD_COOLDOWN_MS = 500;
+const LOAD_COOLDOWN_MS = 800;
 
 type InfiniteScrollOptions = {
   maxItems?: number;
@@ -18,15 +18,14 @@ export function useInfiniteScroll<T>(
   const [hasMore, setHasMore] = useState(opts.initialHasMore ?? true);
   const [error, setError] = useState<unknown>(null);
   const loadingRef = useRef(false);
-  const mountedRef = useRef(true);
   const lastLoadRef = useRef(0);
   const cooldownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pageRef = useRef(1);
 
+  // Only the cooldown timer needs unmount cleanup. State updates after
+  // unmount are silent no-ops (React 18+), so no mounted guard is needed.
   useEffect(() => {
-    mountedRef.current = true;
     return () => {
-      mountedRef.current = false;
       if (cooldownTimerRef.current) clearTimeout(cooldownTimerRef.current);
     };
   }, []);
@@ -48,19 +47,18 @@ export function useInfiniteScroll<T>(
 
     const nextPage = pageRef.current + 1;
     if (opts.maxItems && opts.itemsPerPage && nextPage * opts.itemsPerPage > opts.maxItems) {
-      if (mountedRef.current) setHasMore(false);
+      setHasMore(false);
       return;
     }
 
     lastLoadRef.current = now;
     pageRef.current = nextPage;
     loadingRef.current = true;
-    if (mountedRef.current) setError(null);
+    setError(null);
 
     startTransition(async () => {
       try {
         const result = await loadPage(nextPage);
-        if (!mountedRef.current) return;
 
         if (result && typeof result === "object" && "hasMore" in result) {
           setHasMore((result as { hasMore: boolean }).hasMore);
@@ -69,7 +67,7 @@ export function useInfiniteScroll<T>(
         // Keep the failed page available for retry instead of skipping it on
         // the next intersection or retry attempt.
         pageRef.current = nextPage - 1;
-        if (mountedRef.current) setError(cause);
+        setError(cause);
       } finally {
         loadingRef.current = false;
       }
@@ -77,9 +75,16 @@ export function useInfiniteScroll<T>(
   }, [hasMore, loadPage, opts.itemsPerPage, opts.maxItems, startTransition]);
 
   const retry = useCallback(() => {
-    if (mountedRef.current) setError(null);
+    setError(null);
     loadMore();
   }, [loadMore]);
 
-  return { isPending, hasMore, error, setHasMore, loadMore, retry };
+  // Fast-forward the page cursor when pages were filled outside loadMore
+  // (restore path) so the sentinel continues after them instead of
+  // re-walking already-loaded pages.
+  const syncPage = useCallback((page: number) => {
+    pageRef.current = Math.max(pageRef.current, page);
+  }, []);
+
+  return { isPending, hasMore, error, setHasMore, loadMore, retry, syncPage };
 }

@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ViewTransition } from "react";
 
 import { MediaImage } from "@/components/ui/media-image";
-import { getAnimeDetail } from "@/features/anime/anime-queries";
+import { getAnimePageBatch } from "@/features/anime/anime-queries";
 import {
   formatFormat,
   formatStatus,
@@ -21,7 +21,7 @@ import type { Media } from "@/features/anime/types/anime";
 export async function AnimeHeroSection({ id }: { id: number | null }) {
   if (id === null) notFound();
 
-  const media = await getAnimeDetail(id);
+  const { media } = await getAnimePageBatch(id);
   if (!media) notFound();
   return <AnimeHero media={media} />;
 }
@@ -36,7 +36,7 @@ export function AnimeHero({ media }: { media: Media }) {
 
   return (
     <section className="relative">
-      <div className="relative h-[380px] overflow-hidden border-b border-border-soft sm:h-[460px]">
+      <div className="relative h-[280px] overflow-hidden sm:h-[350px] lg:h-[400px]">
         {banner ? (
           <MediaImage
             src={banner}
@@ -45,7 +45,7 @@ export function AnimeHero({ media }: { media: Media }) {
             priority
             unoptimized
             sizes="100vw"
-            className="object-cover transform-gpu"
+            className="object-cover object-center transform-gpu"
           />
         ) : (
           <div
@@ -57,17 +57,36 @@ export function AnimeHero({ media }: { media: Media }) {
             }}
           />
         )}
-        <div className="paper-grid absolute inset-0 opacity-20" aria-hidden="true" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-transparent to-transparent" />
+        {/* Fade blur black: progressive backdrop blur at the bottom of the banner */}
+        <div
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-44 sm:h-56 backdrop-blur-md"
+          style={{
+            maskImage:
+              "linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 35%, black 100%)",
+            WebkitMaskImage:
+              "linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 35%, black 100%)",
+          }}
+        />
+        {/* Smooth multi-stop cinematic black gradient fading seamlessly into black */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%, transparent 20%, transparent 40%, rgba(0, 0, 0, 0.3) 60%, rgba(0, 0, 0, 0.72) 80%, rgba(0, 0, 0, 0.95) 93%, #000000 100%), linear-gradient(to right, rgba(0, 0, 0, 0.35) 0%, transparent 12%, transparent 88%, rgba(0, 0, 0, 0.35) 100%)",
+          }}
+        />
       </div>
 
-      <div className="relative mx-auto -mt-36 w-full max-w-[1680px] px-4 pb-8 sm:-mt-48 sm:px-7 sm:pb-12 lg:px-10">
-        <div className="grid gap-7 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10">
-          <div className="relative mx-auto w-44 shrink-0 self-end sm:mx-0 sm:w-52 lg:w-[220px]">
+      <div className="relative mx-auto -mt-20 w-full max-w-[1680px] px-4 pb-8 sm:-mt-28 lg:-mt-32 sm:px-7 sm:pb-12 lg:px-10">
+        <div className="grid gap-7 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-10">
+          <div className="relative mx-auto w-52 shrink-0 self-end sm:mx-0 sm:w-60 lg:w-[280px]">
             <div
-              className="relative aspect-[2/3] overflow-hidden rounded-md border border-border-soft bg-surface-2 shadow-2xl isolate transform-gpu"
-              style={color ? { backgroundColor: color } : undefined}
+              className="relative aspect-[2/3] overflow-hidden rounded-md border border-white/10 bg-surface-2 shadow-2xl isolate transform-gpu"
+              style={{
+                ...(color ? { backgroundColor: color } : undefined),
+                boxShadow:
+                  "0 30px 60px -12px rgba(0, 0, 0, 0.85), 0 18px 36px -18px rgba(0, 0, 0, 0.7)",
+              }}
             >
               {cover ? (
                 <ViewTransition name={`anime-cover-${media.id}`} share="morph" default="none">
@@ -76,7 +95,7 @@ export function AnimeHero({ media }: { media: Media }) {
                     alt={`${title} cover`}
                     fill
                     priority
-                    sizes="220px"
+                    sizes="280px"
                     className="object-cover transform-gpu"
                   />
                 </ViewTransition>
@@ -98,43 +117,42 @@ export function AnimeHero({ media }: { media: Media }) {
           </div>
 
           <div className="min-w-0 self-end space-y-4">
-            <p className="eyebrow text-signal">Anime details</p>
-            <h1 className="text-4xl font-semibold leading-[0.98] tracking-[-0.055em] text-foreground sm:text-6xl">
+            <h1 className="text-4xl font-semibold leading-[0.98] tracking-[-0.055em] text-white sm:text-6xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
               {title}
             </h1>
             {media.title.native && (
-              <p className="text-sm font-mono text-muted-foreground">{media.title.native}</p>
+              <p className="text-sm font-mono text-zinc-200 drop-shadow-sm">{media.title.native}</p>
             )}
 
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-muted-foreground pt-1">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs pt-1">
               {media.averageScore && (
-                <span className="inline-flex items-center gap-1.5 rounded-md bg-surface-1/90 border border-border-soft px-2.5 py-1 text-xs font-bold text-signal backdrop-blur-md">
+                <span className="inline-flex items-center gap-1.5 rounded-md bg-black/50 border border-white/20 px-2.5 py-1 text-xs font-bold text-signal backdrop-blur-md shadow-sm">
                   {(media.averageScore / 10).toFixed(1)}
-                  <span className="text-[0.65rem] font-normal text-muted-foreground">score</span>
+                  <span className="text-[0.65rem] font-medium text-zinc-300">score</span>
                 </span>
               )}
               {media.format && (
-                <span className="rounded-md border border-border-soft bg-surface-1/60 px-2 py-1">
+                <span className="rounded-md border border-white/20 bg-black/50 px-2 py-1 text-zinc-100 font-medium backdrop-blur-md shadow-sm">
                   {formatFormat(media.format)}
                 </span>
               )}
               {media.episodes && (
-                <span className="rounded-md border border-border-soft bg-surface-1/60 px-2 py-1">
+                <span className="rounded-md border border-white/20 bg-black/50 px-2 py-1 text-zinc-100 font-medium backdrop-blur-md shadow-sm">
                   {media.episodes} episodes
                 </span>
               )}
               {media.duration && (
-                <span className="rounded-md border border-border-soft bg-surface-1/60 px-2 py-1">
+                <span className="rounded-md border border-white/20 bg-black/50 px-2 py-1 text-zinc-100 font-medium backdrop-blur-md shadow-sm">
                   {media.duration} min
                 </span>
               )}
               {media.status && (
                 <span
                   className={cn(
-                    "rounded-md border px-2 py-1 font-semibold",
+                    "rounded-md border px-2 py-1 font-semibold backdrop-blur-md shadow-sm",
                     media.status === "RELEASING"
-                      ? "border-destructive/30 bg-destructive/15 text-destructive"
-                      : "border-border-soft bg-surface-1/60 text-muted-foreground",
+                      ? "border-red-500/40 bg-red-950/60 text-red-300"
+                      : "border-white/20 bg-black/50 text-zinc-100",
                   )}
                 >
                   {formatStatus(media.status)}
@@ -147,7 +165,7 @@ export function AnimeHero({ media }: { media: Media }) {
                 {media.genres.slice(0, 5).map((genre) => (
                   <span
                     key={genre}
-                    className="rounded-md border border-border-soft bg-surface-1/80 px-2.5 py-0.5 font-mono text-[0.62rem] uppercase tracking-wider text-muted-foreground"
+                    className="rounded-md border border-white/20 bg-black/45 px-2.5 py-0.5 font-mono text-[0.62rem] uppercase tracking-wider text-zinc-200 font-medium backdrop-blur-md shadow-sm"
                   >
                     {genre}
                   </span>
@@ -156,36 +174,36 @@ export function AnimeHero({ media }: { media: Media }) {
             )}
 
             {description && (
-              <p className="line-clamp-3 max-w-3xl text-xs sm:text-sm leading-relaxed text-muted-foreground font-normal pt-1">
+              <p className="max-w-3xl text-sm sm:text-base leading-relaxed text-zinc-100 font-normal pt-1 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
                 {description}
               </p>
             )}
 
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-muted-foreground pt-2 font-mono">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs pt-2 font-mono drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]">
               {studio && (
                 <span>
-                  <span className="font-semibold text-foreground">{studio}</span>{" "}
-                  <span className="text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">
+                  <span className="font-semibold text-white">{studio}</span>{" "}
+                  <span className="text-[0.65rem] uppercase tracking-[0.06em] text-zinc-300">
                     Studio
                   </span>
                 </span>
               )}
               {media.source && (
                 <span>
-                  <span className="font-semibold text-foreground">
+                  <span className="font-semibold text-white">
                     {media.source.replaceAll("_", " ")}
                   </span>{" "}
-                  <span className="text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">
+                  <span className="text-[0.65rem] uppercase tracking-[0.06em] text-zinc-300">
                     Source
                   </span>
                 </span>
               )}
               {media.season && media.seasonYear && (
                 <span>
-                  <span className="font-semibold text-foreground">
+                  <span className="font-semibold text-white">
                     {media.season} {media.seasonYear}
                   </span>{" "}
-                  <span className="text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">
+                  <span className="text-[0.65rem] uppercase tracking-[0.06em] text-zinc-300">
                     Season
                   </span>
                 </span>
@@ -195,10 +213,8 @@ export function AnimeHero({ media }: { media: Media }) {
             <div className="pt-3 flex flex-wrap items-center gap-3">
               {media.trailer?.id && media.trailer.site === "youtube" && (
                 <a
-                  href={`https://www.youtube.com/watch?v=${media.trailer.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-md bg-signal hover:bg-signal-strong px-4 py-2 text-xs font-semibold text-white shadow-md transition-[transform,background-color] hover:scale-105 active:scale-95"
+                  href="#trailer"
+                  className="inline-flex cursor-pointer items-center gap-2 rounded-md bg-signal hover:bg-signal-strong px-4 py-2 text-xs font-semibold text-white shadow-md transition-[transform,background-color] hover:scale-105 active:scale-95"
                 >
                   <PlayIcon className="size-3.5 fill-current" /> Watch trailer
                 </a>
@@ -210,7 +226,7 @@ export function AnimeHero({ media }: { media: Media }) {
 
                 return (
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-[0.62rem] uppercase tracking-wider text-muted-foreground mr-1">
+                    <span className="font-mono text-[0.62rem] uppercase tracking-wider text-zinc-300 mr-1">
                       Stream on:
                     </span>
                     {streamingLinks.slice(0, 5).map((link) => {
@@ -221,7 +237,7 @@ export function AnimeHero({ media }: { media: Media }) {
                           href={link.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 rounded-md border border-border-soft bg-surface-1/80 px-3 py-1.5 font-mono text-xs font-medium text-foreground transition-[background-color,border-color,color] hover:border-signal hover:text-signal hover:bg-surface-1 shadow-sm"
+                          className="inline-flex items-center gap-1.5 rounded-md border border-white/20 bg-black/50 px-3 py-1.5 font-mono text-xs font-medium text-zinc-100 transition-[background-color,border-color,color] hover:border-signal hover:text-signal hover:bg-black/70 shadow-sm backdrop-blur-md"
                         >
                           {favicon ? (
                             <Image
@@ -233,7 +249,7 @@ export function AnimeHero({ media }: { media: Media }) {
                               unoptimized
                             />
                           ) : (
-                            <ExternalLinkIcon className="size-3.5 text-muted-foreground" />
+                            <ExternalLinkIcon className="size-3.5 text-zinc-300" />
                           )}
                           <span>{link.site}</span>
                         </a>
@@ -253,12 +269,19 @@ export function AnimeHero({ media }: { media: Media }) {
 export function AnimeHeroSkeleton() {
   return (
     <section className="relative">
-      <div className="relative h-[380px] overflow-hidden border-b border-border-soft sm:h-[460px] bg-surface-2 isolate">
+      <div className="relative h-[280px] overflow-hidden sm:h-[350px] lg:h-[400px] isolate">
         <div className="absolute inset-0 shimmer" />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to bottom, transparent 30%, rgba(0, 0, 0, 0.7) 75%, #000000 100%)",
+          }}
+        />
       </div>
-      <div className="relative mx-auto -mt-36 w-full max-w-[1680px] px-4 pb-8 sm:-mt-48 sm:px-7 sm:pb-12 lg:px-10">
-        <div className="grid gap-7 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10">
-          <div className="relative mx-auto w-44 shrink-0 self-end sm:mx-0 sm:w-52 lg:w-[220px]">
+      <div className="relative mx-auto -mt-20 w-full max-w-[1680px] px-4 pb-8 sm:-mt-28 lg:-mt-32 sm:px-7 sm:pb-12 lg:px-10">
+        <div className="grid gap-7 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-10">
+          <div className="relative mx-auto w-52 shrink-0 self-end sm:mx-0 sm:w-60 lg:w-[280px]">
             <div className="relative aspect-[2/3] overflow-hidden rounded-md border border-border-soft bg-surface-2 shadow-2xl isolate">
               <div className="absolute inset-0 shimmer" />
             </div>
@@ -283,7 +306,7 @@ export function AnimeHeroSkeleton() {
               <div className="shimmer h-5 w-18 rounded-md" />
             </div>
 
-            <div className="shimmer h-12 w-full max-w-3xl rounded" />
+            <div className="shimmer h-20 w-full max-w-3xl rounded" />
           </div>
         </div>
       </div>

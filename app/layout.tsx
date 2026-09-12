@@ -7,6 +7,7 @@ import { ScrollToTop } from "@/components/scroll-to-top";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader, SiteHeaderFallback } from "@/components/site-header";
 import { SiteMobileNav } from "@/components/site-mobile-nav";
+import { ScrollToTopButton } from "@/components/ui/scroll-to-top-button";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SearchCommand } from "@/features/anime/components/search-command";
@@ -69,6 +70,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <SiteFooter />
               <Suspense fallback={null}>
                 <SiteMobileNav />
+              </Suspense>
+              <Suspense fallback={null}>
+                <ScrollToTopButton />
               </Suspense>
             </div>
           </TooltipProvider>

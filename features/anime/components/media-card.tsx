@@ -49,7 +49,7 @@ export function MediaCard({
           ? "(min-width: 1024px) 42vw, 92vw"
           : "(min-width: 1280px) 16vw, (min-width: 768px) 24vw, 44vw"
       }
-      className="object-cover transition-transform duration-500 group-hover:scale-[1.035] motion-reduce:transform-none transform-gpu will-change-transform"
+        className="object-cover transition-transform duration-500 group-hover:scale-[1.035] motion-reduce:transform-none transform-gpu"
     />
   ) : null;
 

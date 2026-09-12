@@ -448,6 +448,96 @@ export async function getAnimeAiringSchedule(id: number): Promise<AiringSchedule
   return data.Media?.airingSchedule?.nodes ?? [];
 }
 
+const ANIME_PAGE_BATCH_QUERY = `
+  query AnimePageBatch($id: Int) {
+    Media(id: $id, type: ANIME) {
+      ${HERO_FIELDS}
+      characters(page: 1, perPage: 12, sort: [ROLE, RELEVANCE]) {
+        ${CHARACTERS_SUBFIELDS}
+      }
+      staff(page: 1, perPage: 10) {
+        ${STAFF_SUBFIELDS}
+      }
+      relations {
+        ${RELATIONS_SUBFIELDS}
+      }
+      recommendations(page: 1, perPage: 8, sort: [RATING_DESC]) {
+        ${RECOMMENDATIONS_SUBFIELDS}
+      }
+      airingSchedule(notYetAired: true, perPage: 25) {
+        ${AIRING_SCHEDULE_SUBFIELDS}
+      }
+    }
+  }
+`;
+
+export interface AnimePageBatch {
+  media: Media | null;
+  characters: CharacterEdge[];
+  staff: StaffEdge[];
+  relations: RelationEdge[];
+  recommendations: RecommendationNode[];
+  airingSchedule: AiringScheduleNode[];
+}
+
+/**
+ * Degraded-mode detail fetch: hero + all sub-sections in ONE AniList request
+ * instead of six. Every section on /anime/[id] reads this same cached entry,
+ * so concurrent Suspense boundaries collapse onto a single origin call via
+ * `use cache` + request dedup. Freshness uses `home` (most sections already
+ * did); static sections refresh slightly more often — right tradeoff while
+ * the API is capped at 30 req/min.
+ */
+export async function getAnimePageBatch(id: number): Promise<AnimePageBatch> {
+  "use cache: remote";
+  cacheTag(
+    "anime",
+    ANIME_CACHE.detail(id),
+    ANIME_CACHE.characters(id),
+    ANIME_CACHE.staff(id),
+    ANIME_CACHE.subSection(id, "relations"),
+    ANIME_CACHE.subSection(id, "recs"),
+    ANIME_CACHE.subSection(id, "airing"),
+  );
+  cacheLife("home");
+
+  const empty: AnimePageBatch = {
+    media: null,
+    characters: [],
+    staff: [],
+    relations: [],
+    recommendations: [],
+    airingSchedule: [],
+  };
+
+  try {
+    const data = await anilistFetch<{
+      Media:
+        | (Media & {
+            characters?: { edges?: CharacterEdge[] | null } | null;
+            staff?: { edges?: StaffEdge[] | null } | null;
+            relations?: { edges?: RelationEdge[] | null } | null;
+            recommendations?: { nodes?: RecommendationNode[] | null } | null;
+            airingSchedule?: { nodes?: AiringScheduleNode[] | null } | null;
+          })
+        | null;
+    }>(ANIME_PAGE_BATCH_QUERY, { id });
+    const m = data.Media;
+    if (!m) return empty;
+    return {
+      media: m,
+      characters: m.characters?.edges ?? [],
+      staff: m.staff?.edges ?? [],
+      relations: m.relations?.edges ?? [],
+      recommendations: m.recommendations?.nodes ?? [],
+      airingSchedule: m.airingSchedule?.nodes ?? [],
+    };
+  } catch (error) {
+    if (error instanceof AniListError && error.status === 404) return empty;
+    throw error;
+  }
+}
+
 const AIRING_DAY_QUERY = `
   query AiringDay($start: Int, $end: Int, $page: Int) {
     Page(page: $page, perPage: 50) {
@@ -471,8 +561,8 @@ const AIRING_DAY_QUERY = `
 // capped 5000 for single-day windows), so day counts are derived by fetching a
 // week's schedules once and bucketing by day in getAiringWeek.
 
-const MAX_AIRING_PAGES = 12;
-const AIRING_PARALLEL_PAGES = 4;
+const MAX_AIRING_PAGES = 6;
+const AIRING_PARALLEL_PAGES = 2;
 
 /** All schedules across [start, end) — used to derive accurate per-day counts. */
 export async function getAiringWeekItems(

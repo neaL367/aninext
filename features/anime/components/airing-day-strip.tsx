@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 
 import { isValidAiringOffset, type AiringContext } from "@/features/anime/lib/airing";
 import {
@@ -12,6 +12,7 @@ import {
 import { cn } from "@/lib/utils";
 
 import type { AiringScheduleNode } from "@/features/anime/types/anime";
+import type { Route } from "next";
 
 export function AiringDayStrip({
   currentDay,
@@ -27,18 +28,23 @@ export function AiringDayStrip({
   context: AiringContext;
 }) {
   "use memo";
-  const [browserOffset, setBrowserOffset] = useState(0);
-  useEffect(() => {
-    if (context.offsetMinutes === undefined) setBrowserOffset(getLocalOffsetMinutes());
-  }, [context.offsetMinutes]);
-
-  const offset = useMemo(
-    () =>
-      typeof context.offsetMinutes === "number" && isValidAiringOffset(context.offsetMinutes)
-        ? context.offsetMinutes
-        : browserOffset,
-    [browserOffset, context.offsetMinutes],
+  // Visitor timezone, hydration-safe without an effect: unknown (undefined)
+  // during SSR/prerender, local offset after hydration. Never changes within
+  // a session, so the subscription is a noop.
+  const browserOffset = useSyncExternalStore<number | undefined>(
+    () => () => {},
+    () => getLocalOffsetMinutes(),
+    () => undefined,
   );
+
+  // Link offset: known visitor timezone, if any. Omitted until hydration so
+  // server-rendered links stay clean (`/airing/2026-09-13`) instead of
+  // guessing `offset=0`.
+  const linkOffset =
+    typeof context.offsetMinutes === "number" && isValidAiringOffset(context.offsetMinutes)
+      ? context.offsetMinutes
+      : browserOffset;
+  const offset = linkOffset ?? 0;
   const nowHour = useMemo(() => getOffsetHour(Date.now() / 1000, offset), [offset]);
   // The "now" marker only applies when the selected day is actually today in
   // the offset's timezone — otherwise it would light up on a past/future day's
@@ -68,7 +74,7 @@ export function AiringDayStrip({
             return (
               <Link
                 key={day}
-                href={`/airing?day=${day}&offset=${offset}`}
+                href={(linkOffset === undefined ? `/airing/${day}` : `/airing/${day}?offset=${linkOffset}`) as Route}
                 prefetch={isSelected ? false : undefined}
                 aria-current={isSelected ? "date" : undefined}
                 className={cn(

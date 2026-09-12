@@ -2,14 +2,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { ErrorBoundary } from "@/components/ui/error-boundary";
-import {
-  getAnimeAiringSchedule,
-  getAnimeCharacters,
-  getAnimeDetail,
-  getAnimeRecommendations,
-  getAnimeRelations,
-  getAnimeStaff,
-} from "@/features/anime/anime-queries";
+import { getAnimePageBatch } from "@/features/anime/anime-queries";
 
 import { AnimeAiringSchedule, AnimeAiringScheduleSkeleton } from "./anime-airing-schedule";
 import { AnimeCharacters, AnimeCharactersSkeleton } from "./anime-characters";
@@ -24,7 +17,7 @@ import { SectionHeader } from "./section-header";
 export async function AnimeDetail({ id }: { id: number | null }) {
   if (id === null) notFound();
 
-  const media = await getAnimeDetail(id);
+  const { media } = await getAnimePageBatch(id);
   if (!media) notFound();
 
   return (
@@ -117,28 +110,28 @@ export async function AnimeDetail({ id }: { id: number | null }) {
 }
 
 async function CharactersSection({ id }: { id: number }) {
-  const edges = await getAnimeCharacters(id);
-  return <AnimeCharacters edges={edges} />;
+  const { characters } = await getAnimePageBatch(id);
+  return <AnimeCharacters edges={characters} />;
 }
 
 async function RecommendationsSection({ id }: { id: number }) {
-  const nodes = await getAnimeRecommendations(id);
-  return <AnimeRecommendations nodes={nodes} />;
+  const { recommendations } = await getAnimePageBatch(id);
+  return <AnimeRecommendations nodes={recommendations} />;
 }
 
 async function AiringSection({ id }: { id: number }) {
-  const nodes = await getAnimeAiringSchedule(id);
-  return <AnimeAiringSchedule nodes={nodes} />;
+  const { airingSchedule } = await getAnimePageBatch(id);
+  return <AnimeAiringSchedule nodes={airingSchedule} />;
 }
 
 async function RelationsSection({ id }: { id: number }) {
-  const edges = await getAnimeRelations(id);
-  return <AnimeRelations edges={edges} />;
+  const { relations } = await getAnimePageBatch(id);
+  return <AnimeRelations edges={relations} />;
 }
 
 async function StaffSection({ id }: { id: number }) {
-  const edges = await getAnimeStaff(id);
-  return <AnimeStaff edges={edges} />;
+  const { staff } = await getAnimePageBatch(id);
+  return <AnimeStaff edges={staff} />;
 }
 
 export function AnimeDetailSkeleton() {

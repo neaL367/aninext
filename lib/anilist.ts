@@ -6,9 +6,15 @@ const USER_AGENT = "AniNext/0.1 (+https://ani-next.vercel.app)";
 const REQUEST_TIMEOUT_MS = 15_000;
 const TOTAL_BUDGET_MS = 20_000;
 
-const MAX_CONCURRENT = 4;
+const MAX_CONCURRENT = 3;
 let activeRequestCount = 0;
 const requestQueue: (() => void)[] = [];
+
+// Degraded upstream: 30 req/min. Pace request starts so bursts can't burn the
+// whole window at once, and gate all starts behind a shared 429 backoff.
+const MIN_START_INTERVAL_MS = 300;
+let lastRequestStartMs = 0;
+let rateLimitedUntilMs = 0;
 
 // Sliding window rate limiter (adaptive limit starting at 30, floor 10, ceiling 30)
 const requestLog: number[] = [];
@@ -43,6 +49,15 @@ function jitter(ms: number) {
 
 async function respectLocalBudget(): Promise<void> {
   const now = Date.now();
+  if (now < rateLimitedUntilMs) {
+    await wait(Math.min(rateLimitedUntilMs - now, 2000));
+    return respectLocalBudget();
+  }
+  const sinceLastStart = now - lastRequestStartMs;
+  if (lastRequestStartMs > 0 && sinceLastStart < MIN_START_INTERVAL_MS) {
+    await wait(MIN_START_INTERVAL_MS - sinceLastStart);
+    return respectLocalBudget();
+  }
   while (requestLog.length > 0 && now - (requestLog[0] ?? 0) > WINDOW_MS) {
     requestLog.shift();
   }
@@ -53,7 +68,9 @@ async function respectLocalBudget(): Promise<void> {
     await wait(waitMs);
     return respectLocalBudget();
   }
-  requestLog.push(Date.now());
+  const stamped = Date.now();
+  requestLog.push(stamped);
+  lastRequestStartMs = stamped;
 }
 
 function retryAfterSeconds(headers: Headers, fallback: number) {
@@ -95,9 +112,16 @@ function onSuccess() {
   }
 }
 
-function onRateLimitHit() {
+function onRateLimitHit(retryAfterSeconds?: number) {
   effectiveLimit = Math.max(MIN_LIMIT, Math.floor(effectiveLimit * 0.7));
   lastLimitAdjustMs = Date.now();
+  // Shared gate: one 429 pauses every queued request, not just the unlucky one.
+  const retryAfterMs =
+    typeof retryAfterSeconds === "number" && Number.isFinite(retryAfterSeconds)
+      ? retryAfterSeconds * 1000
+      : 5000;
+  const gateMs = Math.min(Math.max(retryAfterMs, 1000), 30_000);
+  rateLimitedUntilMs = Math.max(rateLimitedUntilMs, Date.now() + gateMs);
 }
 
 function onUltimateFailure() {
@@ -193,8 +217,8 @@ export async function anilistFetch<T>(
       }
 
       if (res.status === 429) {
-        onRateLimitHit();
         const retryAfter = retryAfterSeconds(res.headers, 5);
+        onRateLimitHit(retryAfter);
         const retryAfterMs = retryAfter * 1000;
 
         if (retryAfterMs <= MAX_WORTH_RETRYING_MS && remaining > 0) {

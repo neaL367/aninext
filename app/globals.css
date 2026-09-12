@@ -215,6 +215,14 @@
     contain-intrinsic-size: 0 420px;
   }
 
+  /* Infinite-scroll browse cards. Off-screen cards skip style/layout/paint;
+     `auto` reuses the measured size after first render so the scrollbar
+     doesn't jump on revisit. 420px ≈ default card + meta row. */
+  .cv-card {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 420px;
+  }
+
   .no-scrollbar {
     scrollbar-width: none;
     -ms-overflow-style: none;

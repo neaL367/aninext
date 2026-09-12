@@ -116,6 +116,9 @@ export function getAiringDayBounds(
  * Resolve /airing searchParams to plain feature values at the page boundary.
  * `day` is the visitor's local calendar day; `offsetMinutes` (east of UTC)
  * defines the timezone the day was fetched in.
+ *
+ * Legacy `?day=` query URLs redirect to the `/airing/[day]` path form;
+ * this stays to honor old shared links.
  */
 export function parseAiringParams(sp: { [key: string]: string | string[] | undefined }): {
   day: string | undefined;
@@ -127,4 +130,9 @@ export function parseAiringParams(sp: { [key: string]: string | string[] | undef
   const offsetMinutes = typeof sp.offset === "string" ? parseAiringOffset(sp.offset) : undefined;
 
   return { day, offsetMinutes };
+}
+
+/** Validate the `[day]` path segment of `/airing/[day]`. */
+export function parseDayParam(value: string | undefined): string | undefined {
+  return typeof value === "string" && isValidCalendarDay(value) ? value : undefined;
 }

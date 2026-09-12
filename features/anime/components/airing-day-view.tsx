@@ -5,6 +5,8 @@ import { Crossfade } from "@/components/ui/crossfade";
 import { getAiringWeek } from "@/features/anime/anime-queries";
 import { localDateStr } from "@/features/anime/lib/media-helpers";
 
+import type { Route } from "next";
+
 import { AiringDayDefault } from "./airing-day-default";
 import { AiringDayStrip, AiringDayStripSkeleton } from "./airing-day-strip";
 import { AiringNow, AiringNowSkeleton } from "./airing-now";
@@ -23,7 +25,9 @@ export async function AiringDayView(props: { day?: string; offsetMinutes?: numbe
   const serverToday = localDateStr();
   const day = props.day ?? serverToday;
   if (!props.day) {
-    redirect(`/airing?day=${day}`);
+    redirect(
+      (props.offsetMinutes === undefined ? `/airing/${day}` : `/airing/${day}?offset=${props.offsetMinutes}`) as Route,
+    );
   }
 
   // One week-long fetch covers the rail AND the selected day — switching days
