@@ -4,7 +4,7 @@ import {
   getGenres,
   getHomePrimaryBatch,
   getHomeSecondaryBatch,
-  getTop100Full,
+  getTop100Preview,
 } from "@/features/anime/anime-queries";
 
 import { AiringHomeSection } from "./airing-home-section";
@@ -52,7 +52,7 @@ async function getCollectionItems(collection: AnimeCollection, perPage: number):
       : batch.popular.slice(0, perPage);
   }
   if (collection === "top100") {
-    return (await getTop100Full()).slice(0, perPage);
+    return getTop100Preview(perPage);
   }
   if (collection === "upcoming" || collection === "alltimepopular") {
     const now = Math.floor(Date.now() / 1000);

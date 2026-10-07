@@ -39,6 +39,26 @@ const MAX_WORTH_RETRYING_MS = 8_000;
 
 const inFlightMap = new Map<string, Promise<unknown>>();
 
+// Dev-only origin pressure stats: proves whether the per-instance limiter
+// (#3) actually holds under real browsing, before tuning it blindly.
+// Zero prod impact — gated on NODE_ENV and throttled to one line.
+const originStats = { requests: 0, retries429: 0, dedupHits: 0, circuitOpens: 0 };
+
+function noteOriginEvent(event: "request" | "retry429" | "dedupHit" | "circuitOpen") {
+  if (process.env.NODE_ENV === "production") return;
+  if (event === "request") originStats.requests += 1;
+  else if (event === "retry429") originStats.retries429 += 1;
+  else if (event === "dedupHit") originStats.dedupHits += 1;
+  else originStats.circuitOpens += 1;
+  if (originStats.requests % 20 === 0 || event === "circuitOpen") {
+    console.debug(
+      `[AniList] origin pressure: ${originStats.requests} req, ` +
+        `${originStats.retries429} 429-retries, ${originStats.dedupHits} dedup hits, ` +
+        `${originStats.circuitOpens} circuit opens (limit ${effectiveLimit}/min)`,
+    );
+  }
+}
+
 function wait(ms: number) {
   return new Promise<void>((r) => setTimeout(r, ms));
 }
@@ -133,6 +153,7 @@ function onUltimateFailure() {
 
   if (failureTimestamps.length >= FAILURE_THRESHOLD || isHalfOpen) {
     circuitOpenUntil = now + currentOpenDurationMs;
+    noteOriginEvent("circuitOpen");
     failureTimestamps.length = 0;
     isHalfOpen = false;
     currentOpenDurationMs = Math.min(MAX_OPEN_DURATION_MS, currentOpenDurationMs * 2);
@@ -177,6 +198,7 @@ export async function anilistFetch<T>(
   const key = `${query}:${JSON.stringify(variables)}`;
   const existing = inFlightMap.get(key);
   if (existing) {
+    noteOriginEvent("dedupHit");
     return existing as Promise<T>;
   }
 
@@ -188,6 +210,7 @@ export async function anilistFetch<T>(
       let fetchError: unknown = null;
 
       try {
+        noteOriginEvent("request");
         res = await track(() =>
           fetch(ENDPOINT, {
             method: "POST",
@@ -222,6 +245,7 @@ export async function anilistFetch<T>(
         const retryAfterMs = retryAfter * 1000;
 
         if (retryAfterMs <= MAX_WORTH_RETRYING_MS && remaining > 0) {
+          noteOriginEvent("retry429");
           const backoff = jitter(retryAfterMs);
           await wait(backoff);
           return attempt(remaining - 1);

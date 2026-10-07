@@ -43,6 +43,22 @@ const MEDIA_CARD_FIELDS = `
   studios(isMain: true) { nodes { id name } }
 `;
 
+// Slim fragment for airing schedules: timeline/now/home sections render only
+// identity, artwork, progress inputs, and streaming links — never description,
+// studios, or scores. Used × up to 300 schedules per week fetch, so every
+// dropped field multiplies. Includes duration (MEDIA_CARD_FIELDS lacks it,
+// which is why the timeline's "· Xm" span never rendered for airing rows).
+const AIRING_MEDIA_FIELDS = `
+  id
+  title { romaji english userPreferred }
+  coverImage { extraLarge large medium color }
+  bannerImage
+  format
+  episodes
+  duration
+  genres
+`;
+
 const BROWSE_QUERY = `
   query BrowseCollection(
     $page: Int, $perPage: Int, $sort: [MediaSort], $season: MediaSeason, $seasonYear: Int,
@@ -141,6 +157,33 @@ export async function getTop100Full(): Promise<Media[]> {
   return [...data.page1.media, ...data.page2.media];
 }
 
+const TOP100_PREVIEW_QUERY = `
+  query Top100Preview($perPage: Int) {
+    Page(page: 1, perPage: $perPage) {
+      media(type: ANIME, sort: [SCORE_DESC], isAdult: false) {
+        ${MEDIA_CARD_FIELDS}
+      }
+    }
+  }
+`;
+
+/**
+ * Homepage Top100 section only renders `perPage` cards — fetch exactly that
+ * instead of the full 100-record `getTop100Full` snapshot (browse keeps the
+ * full snapshot for rank slicing across infinite-scroll pages).
+ */
+export async function getTop100Preview(perPage: number): Promise<Media[]> {
+  "use cache: remote";
+  cacheTag("anime", `anime:top100:preview:${perPage}`);
+  cacheLife("static");
+
+  const data = await anilistFetch<{
+    Page: { media: Media[] };
+  }>(TOP100_PREVIEW_QUERY, { perPage });
+
+  return data.Page.media;
+}
+
 const HOME_PRIMARY_BATCH_QUERY = `
   query HomePrimaryBatch($season: MediaSeason, $seasonYear: Int) {
     trending: Page(page: 1, perPage: 14) {
@@ -190,7 +233,7 @@ const HOME_SECONDARY_BATCH_QUERY = `
         episode
         airingAt
         media {
-          ${MEDIA_CARD_FIELDS}
+          ${AIRING_MEDIA_FIELDS}
           externalLinks { url site type icon color }
         }
       }
@@ -549,7 +592,7 @@ const AIRING_DAY_QUERY = `
         episode
         airingAt
         media {
-          ${MEDIA_CARD_FIELDS}
+          ${AIRING_MEDIA_FIELDS}
           externalLinks { url site type icon color }
         }
       }

@@ -138,6 +138,11 @@ function responseFor(query: string, variables: Record<string, unknown>) {
     };
   }
 
+  if (query.includes("Top100Preview")) {
+    const perPage = Number(variables.perPage ?? 14);
+    return { Page: { media: top100Media(0, perPage) } };
+  }
+
   if (query.includes("GenreCollection")) {
     return {
       GenreCollection: [
