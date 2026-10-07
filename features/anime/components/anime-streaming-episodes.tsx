@@ -1,25 +1,40 @@
 import { ExternalLinkIcon, PlayIcon } from "lucide-react";
 import Image from "next/image";
 
-import { isSafeExternalUrl } from "@/features/anime/lib/media-helpers";
+import {
+  isSafeExternalUrl,
+  getStreamingLinks,
+  getFaviconUrl,
+} from "@/features/anime/lib/media-helpers";
 
 import { EmptyState } from "./empty-state";
 
-import type { Media, StreamingEpisode } from "@/features/anime/types/anime";
+import type { Media, MediaExternalLink, StreamingEpisode } from "@/features/anime/types/anime";
 
 export function AnimeStreamingEpisodes({ media }: { media: Media }) {
   "use memo";
   const episodes = media.streamingEpisodes?.filter(hasSafeStreamingUrl);
 
-  if (!episodes || episodes.length === 0)
-    return (
-      <EmptyState
-        icon={PlayIcon}
-        title="No streaming links indexed"
-        description="No streaming links are available for this anime."
-      />
-    );
+  if (episodes && episodes.length > 0) return <EpisodeList episodes={episodes} />;
 
+  // AniList rarely indexes per-episode entries for current-season titles
+  // (verified: trending rows return []) while externalLinks still carries
+  // STREAMING sites. Fall back to site links instead of an empty panel.
+  const sites = getStreamingLinks(media.externalLinks).filter((link) =>
+    isSafeExternalUrl(link.url),
+  );
+  if (sites.length > 0) return <SiteList sites={sites} />;
+
+  return (
+    <EmptyState
+      icon={PlayIcon}
+      title="No streaming links indexed"
+      description="No streaming links are available for this anime."
+    />
+  );
+}
+
+function EpisodeList({ episodes }: { episodes: (StreamingEpisode & { url: string })[] }) {
   return (
     <div className="max-h-[420px] overflow-y-auto scrollbar-thin">
       <div className="divide-y divide-border-soft">
@@ -60,6 +75,51 @@ export function AnimeStreamingEpisodes({ media }: { media: Media }) {
             <ExternalLinkIcon className="size-3.5 shrink-0 text-muted-foreground group-hover:text-signal transition-colors" />
           </a>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function SiteList({ sites }: { sites: MediaExternalLink[] }) {
+  return (
+    <div className="max-h-[420px] overflow-y-auto scrollbar-thin">
+      <div className="divide-y divide-border-soft">
+        {sites.map((link) => {
+          const favicon = getFaviconUrl(link.url);
+          return (
+            <a
+              key={link.url}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center gap-4 py-3 px-2 rounded-md transition-colors hover:bg-surface-1/60"
+            >
+              <span className="flex size-[54px] shrink-0 items-center justify-center overflow-hidden rounded border border-border-soft bg-surface-1">
+                {favicon ? (
+                  <Image
+                    src={favicon}
+                    alt=""
+                    width={24}
+                    height={24}
+                    unoptimized
+                    className="size-6 rounded-sm"
+                  />
+                ) : (
+                  <PlayIcon className="size-5 text-muted-foreground" />
+                )}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="line-clamp-2 text-xs sm:text-sm font-semibold text-foreground group-hover:text-signal transition-colors">
+                  Watch on {link.site}
+                </p>
+                <p className="mt-0.5 font-mono text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">
+                  Streaming
+                </p>
+              </div>
+              <ExternalLinkIcon className="size-3.5 shrink-0 text-muted-foreground group-hover:text-signal transition-colors" />
+            </a>
+          );
+        })}
       </div>
     </div>
   );
