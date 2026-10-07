@@ -37,14 +37,15 @@ export function AiringDayStrip({
     () => undefined,
   );
 
-  // Link offset: known visitor timezone, if any. Omitted until hydration so
-  // server-rendered links stay clean (`/airing/2026-09-13`) instead of
-  // guessing `offset=0`.
-  const linkOffset =
+  // Display timezone: known visitor offset, if any, else the browser's after
+  // hydration (SSR-safe: unknown during prerender). Day links are always
+  // clean (`/airing/2026-09-13`) — timezone resolves from the tz_offset
+  // cookie server-side, never from the URL.
+  const displayOffset =
     typeof context.offsetMinutes === "number" && isValidAiringOffset(context.offsetMinutes)
       ? context.offsetMinutes
       : browserOffset;
-  const offset = linkOffset ?? 0;
+  const offset = displayOffset ?? 0;
   const nowHour = useMemo(() => getOffsetHour(Date.now() / 1000, offset), [offset]);
   // The "now" marker only applies when the selected day is actually today in
   // the offset's timezone — otherwise it would light up on a past/future day's
@@ -74,11 +75,7 @@ export function AiringDayStrip({
             return (
               <Link
                 key={day}
-                href={
-                  (linkOffset === undefined
-                    ? `/airing/${day}`
-                    : `/airing/${day}?offset=${linkOffset}`) as Route
-                }
+                href={`/airing/${day}` as Route}
                 prefetch={isSelected ? false : undefined}
                 aria-current={isSelected ? "date" : undefined}
                 className={cn(

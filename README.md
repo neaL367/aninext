@@ -18,7 +18,7 @@ An anime discovery and airing platform on [Next.js 16.3](https://nextjs.org/blog
 - **[Server Functions that return rendered RSC](https://nextjs.org/docs/app/getting-started/mutating-data)** — infinite scroll never ships raw JSON: a `'use server'` action renders the next page of cards on the server and hands the client ready-to-append React nodes, keeping `MediaCard`/`MediaGrid` 100% server components.
 - **[React Compiler](https://react.dev/learn/react-compiler)** in annotation mode memoizes components and hooks automatically, so hot paths need no manual `useMemo`/`useCallback`.
 - **[View Transitions](https://nextjs.org/docs/app/guides/view-transitions)** — a `Crossfade` wrapper animates Suspense reveals, appended browse pages, and day switches on the airing schedule.
-- **[Timezone-aware airing schedule](ARCHITECTURE.md#5-route-airing--airing-schedule) — the `/airing` page is a time-axis TV guide**: hour bands, a sticky day rail with real per-day release counts, episode progress bars, first-class streaming links, and a pulsing `NOW` marker. Every time renders in the visitor's UTC offset (carried in the URL), so shared links show the same schedule in any browser.
+- **[Timezone-aware airing schedule](ARCHITECTURE.md#5-route-airing--airing-schedule) — the `/airing` page is a time-axis TV guide**: hour bands, a sticky day rail with real per-day release counts, episode progress bars, first-class streaming links, and a pulsing `NOW` marker. Every time renders in the visitor's UTC offset (resolved from a cookie, URLs stay clean dates), so the schedule always matches the viewer's timezone.
 
 ## Getting started
 

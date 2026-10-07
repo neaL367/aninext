@@ -11,9 +11,9 @@ import { cn } from "@/lib/utils";
  * By default it renders in the browser's own timezone. Pass `offsetMinutes`
  * (minutes east of UTC) when the surrounding data was fetched for a specific
  * timezone — e.g. the /airing schedule is fetched for the visitor's day as
- * defined by the `?offset=` URL param, so display must follow that offset
- * rather than the browser's ambient timezone (they can differ for shared
- * links), otherwise rows can appear on the wrong date.
+ * defined by their `tz_offset` cookie, so display must follow that offset
+ * rather than the browser's ambient timezone (they can differ when the cookie
+ * is stale), otherwise rows can appear on the wrong date.
  *
  * Both the label and the dateTime attribute are set after mount only: the
  * timestamp can come from a live clock (e.g. useNow), whose value differs

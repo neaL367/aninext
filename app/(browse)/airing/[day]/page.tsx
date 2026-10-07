@@ -4,7 +4,7 @@ import { Suspense } from "react";
 
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { AiringDayView, AiringDayViewSkeleton } from "@/features/anime/components/airing-day-view";
-import { parseAiringOffset, parseAiringParams, parseDayParam } from "@/features/anime/lib/airing";
+import { parseAiringOffset, parseDayParam } from "@/features/anime/lib/airing";
 import { localDateStr } from "@/features/anime/lib/media-helpers";
 
 import type { Metadata, Route } from "next";
@@ -31,15 +31,14 @@ export default function AiringDayPage({
       <Suspense fallback={<AiringDayViewSkeleton />}>
         {Promise.all([params, searchParams, cookies()]).then(
           ([{ day: rawDay }, sp, cookieStore]) => {
-            // Invalid days normalize to today. This redirect streams (the shell
-            // ships first, the router follows) — the HTTP-307 variant lives on
-            // bare /airing, which blocks instead (see its `instant = false`).
+            // Invalid days normalize to today. Legacy `?offset=` links
+            // normalize to the clean canonical day URL — timezone now
+            // resolves from the `tz_offset` cookie, never the URL.
             const day = parseDayParam(rawDay);
             if (!day) redirect(`/airing/${localDateStr()}` as Route);
-            const { offsetMinutes } = parseAiringParams(sp);
+            if (typeof sp.offset === "string") redirect(`/airing/${day}` as Route);
             const cookieOffset = cookieStore.get("tz_offset")?.value;
-            const resolvedOffset =
-              offsetMinutes ?? (cookieOffset ? parseAiringOffset(cookieOffset) : undefined);
+            const resolvedOffset = cookieOffset ? parseAiringOffset(cookieOffset) : undefined;
             return <AiringDayView day={day} offsetMinutes={resolvedOffset} />;
           },
         )}

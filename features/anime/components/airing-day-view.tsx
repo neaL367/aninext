@@ -21,11 +21,7 @@ export async function AiringDayView(props: { day?: string; offsetMinutes?: numbe
   const serverToday = localDateStr();
   const day = props.day ?? serverToday;
   if (!props.day) {
-    redirect(
-      (props.offsetMinutes === undefined
-        ? `/airing/${day}`
-        : `/airing/${day}?offset=${props.offsetMinutes}`) as Route,
-    );
+    redirect(`/airing/${day}` as Route);
   }
 
   // One week-long fetch covers the rail AND the selected day — switching days
