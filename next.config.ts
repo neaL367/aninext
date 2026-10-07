@@ -24,6 +24,7 @@ const nextConfig: NextConfig = {
     max: { stale: 86400, revalidate: 604800, expire: 1209600 },
   },
   experimental: {
+    agentUpgrade: "security",
     useTypeScriptCli: true,
     useOffline: true,
     exposeTestingApiInProductionBuild: true,
