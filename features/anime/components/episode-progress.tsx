@@ -14,7 +14,7 @@ export function EpisodeProgress({
   const pct = total ? Math.min(100, Math.round((episode / total) * 100)) : null;
   return (
     <div className={cn("flex items-center gap-3", className)}>
-      <span className="shrink-0 font-mono text-xs font-semibold tracking-tight text-foreground">
+      <span className="shrink-0 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-foreground/80">
         Ep {episode}
         {total ? <span className="text-muted-foreground"> / {total}</span> : null}
       </span>
@@ -25,13 +25,10 @@ export function EpisodeProgress({
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label={`Episode ${episode} of ${total}`}
-          className={cn(
-            "h-1 w-full max-w-56 overflow-hidden rounded-full bg-surface-3",
-            barClassName,
-          )}
+          className={cn("h-px w-full max-w-56 overflow-hidden bg-border-soft", barClassName)}
         >
           <span
-            className="block h-full rounded-full bg-signal transition-[width] duration-700 ease-out"
+            className="block h-full bg-signal transition-[width] duration-700 ease-out"
             style={{ width: `${pct}%` }}
           />
         </span>

@@ -7,23 +7,23 @@ test.describe("collection pages", () => {
       page,
       async () => {
         await page.goto("/anime/trending");
-        await expect(page.getByRole("heading", { name: "Trending Anime" })).toBeVisible();
+        await expect(page.getByRole("heading", { name: "Trending" })).toBeVisible();
       },
       { baseURL },
     );
-    await expect(page.getByRole("heading", { name: "Trending Anime" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Trending" })).toBeVisible();
   });
 
   test("home to popular client navigation is instant", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { name: "Trending now" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Trending" })).toBeVisible();
 
     await instant(page, async () => {
       await page.click('a[href="/anime/popular"]');
       await page.waitForURL((url) => url.pathname === "/anime/popular");
-      await expect(page.getByRole("heading", { name: "Popular This Season" })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "This season" })).toBeVisible();
     });
-    await expect(page.getByRole("heading", { name: "Popular This Season" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "This season" })).toBeVisible();
   });
 });
 

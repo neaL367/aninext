@@ -1,16 +1,13 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-
 import { useFilterActions } from "../hooks/use-filter-actions";
 import { useFilterState } from "../hooks/use-filter-state";
-import { FILTER_TYPE_LABELS, FILTER_ORDER } from "../lib/filter-constants";
 import { FilterChip } from "./filter-button";
 
 export function ActiveFilters() {
   "use memo";
-  const { isPending, activeFilters, groupedFilters } = useFilterState();
-  const { removeFilter, clearAll } = useFilterActions();
+  const { activeFilters } = useFilterState();
+  const { removeFilter, clearAll, isPending } = useFilterActions();
 
   if (activeFilters.length === 0) return null;
 
@@ -19,71 +16,37 @@ export function ActiveFilters() {
       role="region"
       aria-label="Active filters"
       aria-live="polite"
-      className="flex flex-col gap-3 border-b border-border-soft py-4"
       data-pending={isPending ? "" : undefined}
+      className="flex flex-wrap items-center gap-2 border-b border-border-soft pb-4 transition-opacity data-[pending]:opacity-50"
     >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-[0.65rem] font-semibold uppercase tracking-[0.12em] text-foreground">
-            Filters
-          </span>
-          <span className="flex size-5 items-center justify-center rounded-full bg-accent font-mono text-[0.6rem] font-semibold text-accent-foreground">
-            {activeFilters.length}
-          </span>
-        </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={clearAll}
-          className="h-6 rounded-none px-2 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted-foreground hover:text-foreground"
-        >
-          Clear all
-        </Button>
-      </div>
-
-      <div className="flex flex-wrap gap-3">
-        {FILTER_ORDER.map((key) => {
-          const items = groupedFilters[key];
-          if (!items) return null;
-          const typeLabel = FILTER_TYPE_LABELS[key];
-
-          return (
-            <div key={key} className="flex items-center gap-1.5">
-              <span className="font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted-foreground">
-                {typeLabel}:
-              </span>
-              <div className="flex flex-wrap gap-1.5">
-                {items.map((item, i) => (
-                  <FilterChip
-                    key={`${item.key}-${item.value ?? i}`}
-                    label={item.label}
-                    onRemove={() => removeFilter(item.key, item.value)}
-                  />
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <span className="font-mono text-[0.58rem] uppercase tracking-[0.14em] text-muted-foreground/70">
+        Active
+      </span>
+      {activeFilters.map((item, index) => (
+        <FilterChip
+          key={`${item.key}-${item.value ?? index}`}
+          label={item.label}
+          onRemove={() => removeFilter(item.key, item.value)}
+        />
+      ))}
+      <button
+        type="button"
+        onClick={clearAll}
+        className="ml-1 font-mono text-[0.58rem] uppercase tracking-[0.12em] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+      >
+        Clear
+      </button>
     </div>
   );
 }
 
 export function ActiveFiltersSkeleton() {
   return (
-    <div className="flex flex-col gap-3 border-b border-border-soft py-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="shimmer h-3 w-12 rounded" />
-          <div className="shimmer size-5 rounded-full" />
-        </div>
-        <div className="shimmer h-3 w-14 rounded" />
-      </div>
-      <div className="flex flex-wrap gap-3">
-        <div className="shimmer h-5 w-20 rounded-full" />
-        <div className="shimmer h-5 w-28 rounded-full" />
-        <div className="shimmer h-5 w-16 rounded-full" />
-      </div>
+    <div className="flex flex-wrap items-center gap-2 border-b border-border-soft pb-4">
+      <div className="shimmer h-3 w-10 rounded-[2px]" />
+      <div className="shimmer h-6 w-20 rounded-[2px]" />
+      <div className="shimmer h-6 w-24 rounded-[2px]" />
+      <div className="shimmer h-6 w-16 rounded-[2px]" />
     </div>
   );
 }

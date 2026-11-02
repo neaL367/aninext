@@ -31,38 +31,38 @@ export function AdultContentFilter({
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   return (
-    <section className="border-b border-border-soft py-3">
+    <section className="border-b border-border-soft py-2.5">
       <button
         type="button"
         aria-expanded={open}
         onClick={() => onOpenChange(!open)}
-        className="flex min-h-9 w-full items-center gap-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+        className="flex min-h-8 w-full items-center gap-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
       >
-        <ChevronDownIcon className={cn("size-3.5 transition-transform", open && "rotate-180")} />
-        <span className="font-mono text-[0.68rem] font-medium uppercase tracking-[0.08em] text-foreground">
+        <ChevronDownIcon
+          className={cn(
+            "size-3 text-muted-foreground transition-transform duration-200",
+            open && "rotate-180",
+          )}
+        />
+        <span className="font-mono text-[0.62rem] uppercase tracking-[0.14em] text-foreground/85">
           Adult content
         </span>
         {enabled && (
-          <span className="ml-auto rounded-sm bg-live-badge/10 px-1.5 py-0.5 font-mono text-[0.6rem] font-medium text-live-badge">
-            Enabled
+          <span className="ml-auto font-mono text-[0.56rem] uppercase tracking-[0.12em] text-signal">
+            On
           </span>
         )}
       </button>
       {open && (
-        <div className="flex flex-col gap-3 pt-3">
-          <p className="text-xs leading-5 text-muted-foreground">
-            Includes mature themes and graphic material. Age confirmation required.
-          </p>
-          <div className="flex min-h-9 items-center justify-between gap-4">
-            <span className="text-xs text-muted-foreground">Show adult content</span>
-            <Switch
-              checked={enabled}
-              onCheckedChange={(checked: boolean) => {
-                if (checked) setConfirmOpen(true);
-                else onChange(false);
-              }}
-            />
-          </div>
+        <div className="flex min-h-9 items-center justify-between gap-4 pt-3">
+          <span className="text-xs text-muted-foreground">Include mature titles</span>
+          <Switch
+            checked={enabled}
+            onCheckedChange={(checked: boolean) => {
+              if (checked) setConfirmOpen(true);
+              else onChange(false);
+            }}
+          />
         </div>
       )}
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
@@ -70,8 +70,7 @@ export function AdultContentFilter({
           <AlertDialogHeader>
             <AlertDialogTitle>Age confirmation</AlertDialogTitle>
             <AlertDialogDescription>
-              This content is intended for mature audiences and may include graphic material. You
-              must be 18 years or older to view adult content.
+              Adult titles may include graphic material. Confirm you are 18 or older.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

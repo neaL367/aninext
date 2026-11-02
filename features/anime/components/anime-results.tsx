@@ -41,7 +41,8 @@ function getEmptyComponent(collection: AnimeCollection, filters: AnimeFilters) {
     filters.genre?.length ||
     filters.format?.length ||
     filters.status?.length ||
-    filters.country
+    filters.country ||
+    filters.isAdult
   ) {
     return <EmptyFilters />;
   }

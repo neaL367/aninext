@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetTitle,
@@ -30,7 +29,9 @@ export function MobileFilterDrawer({
 }) {
   "use memo";
   const [open, setOpen] = useState(false);
-  const { facetCount } = useFilterState();
+  const state = useFilterState();
+  const actions = useFilterActions();
+  const { facetCount } = state;
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -39,39 +40,38 @@ export function MobileFilterDrawer({
           <Button
             variant="outline"
             size="sm"
-            className="h-10 rounded-none border-border-soft font-mono text-[0.62rem] uppercase tracking-[0.1em] lg:hidden"
+            className="h-10 rounded-[2px] border-border-soft font-mono text-[0.6rem] uppercase tracking-[0.14em] lg:hidden"
           />
         }
       >
-        <SlidersHorizontalIcon className="size-4" />
-        Filters
+        <SlidersHorizontalIcon className="size-3.5" />
+        Filter
         {facetCount > 0 && (
-          <span className="ml-1.5 flex size-5 items-center justify-center bg-signal text-[10px] font-semibold text-accent-foreground">
-            {facetCount}
-          </span>
+          <span className="ml-1 font-mono text-[0.58rem] text-signal">{facetCount}</span>
         )}
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="w-[min(25rem,calc(100vw-1rem))] overflow-y-auto bg-background"
+        className="w-[min(24rem,calc(100vw-1rem))] overflow-y-auto bg-background"
       >
         <SheetHeader className="border-b border-border-soft pb-4 text-left">
-          <SheetTitle className="font-mono text-sm uppercase tracking-[0.14em]">Filters</SheetTitle>
-          <SheetDescription>Refine results without leaving this view.</SheetDescription>
+          <SheetTitle className="font-mono text-[0.68rem] uppercase tracking-[0.18em]">
+            Filter
+          </SheetTitle>
         </SheetHeader>
         <div className="px-4 py-4">
           <FilterSidebarContent
             genresPromise={genresPromise}
             mobile
             collection={collection}
-            state={useFilterState()}
-            actions={useFilterActions()}
+            state={state}
+            actions={actions}
           />
         </div>
         <SheetFooter className="sticky bottom-0 border-t border-border-soft bg-background/95 p-4 backdrop-blur-xl">
           <SheetClose
             render={
-              <Button className="w-full rounded-none font-mono text-[0.65rem] uppercase tracking-[0.12em]" />
+              <Button className="w-full rounded-[2px] font-mono text-[0.6rem] uppercase tracking-[0.14em]" />
             }
           >
             Done

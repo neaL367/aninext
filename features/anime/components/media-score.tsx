@@ -11,7 +11,7 @@ export function MediaScore({
   className?: string;
 }) {
   "use memo";
-  if (score === undefined) return null;
+  if (score === undefined || score <= 0) return null;
 
   return (
     <span className={cn("font-mono font-semibold tabular-nums", scoreColor(score), className)}>

@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { GeistSerif } from "geist/font/serif/variable";
 import { Suspense } from "react";
 
 import { OfflineBanner } from "@/components/offline-banner";
@@ -15,27 +15,17 @@ import { SearchCommand } from "@/features/anime/components/search-command";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
 export const metadata: Metadata = {
   title: {
-    default: "AniNext — Discover Anime",
-    template: "%s | AniNext",
+    default: "AniNext",
+    template: "%s — AniNext",
   },
-  description: "Discover trending, popular, and upcoming anime from AniList.",
+  description: "What to watch next. A quiet index of anime worth your evening.",
   metadataBase: new URL("https://ani-next.vercel.app"),
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0a",
+  themeColor: "#060606",
   colorScheme: "dark",
 };
 
@@ -43,7 +33,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} dark`}
+      className={`${GeistSerif.variable} dark`}
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
@@ -54,7 +44,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <div className="flex min-h-screen flex-col">
               <a
                 href="#main-content"
-                className="sr-only z-[100] rounded-md bg-background px-3 py-2 text-sm font-medium focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+                className="sr-only z-[100] rounded-sm bg-background px-3 py-2 text-sm font-medium focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
               >
                 Skip to content
               </a>

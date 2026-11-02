@@ -16,20 +16,22 @@ export function EmptyState({
 }: {
   icon: ComponentType<{ className?: string }>;
   title: string;
-  description: string;
+  description?: string;
 }) {
   "use memo";
   return (
-    <Empty>
+    <Empty className="rounded-[2px] border border-border-soft py-10">
       <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <Icon />
+        <EmptyMedia variant="icon" className="rounded-[2px] bg-transparent text-muted-foreground">
+          <Icon className="size-4" />
         </EmptyMedia>
-        <EmptyTitle>{title}</EmptyTitle>
+        <EmptyTitle className="font-serif text-lg font-normal">{title}</EmptyTitle>
       </EmptyHeader>
-      <EmptyContent>
-        <EmptyDescription>{description}</EmptyDescription>
-      </EmptyContent>
+      {description && (
+        <EmptyContent>
+          <EmptyDescription>{description}</EmptyDescription>
+        </EmptyContent>
+      )}
     </Empty>
   );
 }

@@ -1,39 +1,44 @@
 # AniNext UI System
 
-AniNext uses familiar Vercel and Next.js visual language with an immersive anime layer: deep black surfaces, Geist typography, hairline borders, restrained blue-violet accents, and image-led composition.
+A quiet, editorial anime index. Near-black surfaces, warm ivory type, one vermilion signal, and large artwork. The interface should feel like a film programme, not a dashboard.
 
 ## Direction
 
-- **Base:** near-black `#050505`, graphite surfaces, soft white text.
-- **Accent:** electric blue-violet for links, focus, active states, and primary actions.
-- **Luxury detail:** subtle ambient gradients, precise spacing, quiet borders, large artwork, no decorative noise.
-- **Typography:** Geist Sans for all interface text. Geist Mono only for scores, dates, episode counts, shortcuts, and compact metadata.
-- **Shape:** small radius, square controls, no excessive pill UI, no heavy shadows.
+- **Base:** `#060606` with graphite surfaces and hairline borders.
+- **Type:** **Geist Serif is the only typeface** — body, headings, navigation, buttons, metadata, times, and scores. Numeric runs use tabular figures where alignment matters.
+- **Accent:** vermilion (`#ff5433`) for live state, active marks, scores, and small signals. Never as a large fill.
+- **Shape:** 2–3px radii. No pills, no heavy shadows, no rounded cards.
+- **Space:** generous vertical rhythm; section headers are rules, not boxes.
+- **Copy:** one label and one action where possible. Remove marketing lines and duplicated metadata.
 
 ## Layout
 
-- Use fluid rails up to `1600px`; do not force every route into one narrow container.
-- Homepage: immersive featured panel, content shelves, seasonal feature mosaic, genre explorer.
-- Browse: heading, collection navigation, search, filter rail, responsive result grid.
-- Detail: art-led hero, watch section, cast, recommendations, right-side schedule/relations/staff/genres.
-- Airing: day selector and full-width timeline with a compact explanatory rail.
-- Mobile: recomposed one-column layouts, horizontal shelves, fixed bottom navigation, no desktop shrinkage.
+- Fluid rail up to `1760px`; do not center every route into a narrow column.
+- Home: full-bleed featured hero, then numbered editorial sections (`01 Trending`, `02 This season`, `03 Tonight`, `04 Top 100`, `05 Coming soon`, `06 By mood`).
+- Browse: serif page title, quiet collection tabs, search, 210px filter rail, 5-column result grid.
+- Detail: art-led hero with a serif title, then sparse watch / cast / related sections.
+- Airing: serif page title, sticky day rail, hour-band timeline with a live marker.
+- Mobile: recomposed one-column layouts, horizontal rails, fixed bottom navigation.
 
 ## Components
 
-- `MediaCard`: image-first card with title and minimal metadata below artwork.
-- `AnimePreviewCard`: elevated hover surface matching global colors; banner when available, AniList color fallback.
-- `SectionRow`: open shelf with concise heading and a single useful action.
-- `BrowsePageShell`: fluid workspace with filters and results.
-- `AnimeHero`: immersive banner/cover identity block with stable height.
-- `ViewTransition`: shared cover morph from browse cards into detail hero.
+- `MediaCard`: borderless cover, serif title, mono metadata, CSS-only hover synopsis. No client JS.
+- `TrendingIndex`: one large still plus a numbered title ledger.
+- `SeasonMosaic`: one large poster and four quiet covers.
+- `RankingList`: a two-column ranked ledger with no card chrome.
+- `UpcomingStrip`: wide cinematic anticipation cards.
+- `SectionHeader`: index + serif title + one action.
+- `AnimeHero`: immersive banner/cover identity block with a shared cover morph.
+- `AiringTimeline`: hour bands, live marker, hairline rows, thin episode progress.
+- `ViewTransition`: shared cover morph from browse cards into the detail hero.
 
 ## Rules
 
-- Keep actions visible and labels literal: `Open profile`, `Full collection`, `Show all`.
-- Prefer one strong hierarchy over many badges. Score, live state, and Top 100 rank only when meaningful.
+- Keep actions literal: `Open title`, `All trending`, `Full season`, `Full ranking`.
+- One hierarchy: score, live state, and rank only when meaningful.
 - Preserve visible focus rings and `prefers-reduced-motion` behavior.
-- Keep descriptions readable with line limits or deliberate expansion.
-- Use `content-visibility: auto` only on long, below-the-fold lists where skipped paint will not create blank visual gaps.
-- Keep server reads in feature queries and keep client boundaries at interactive leaves.
+- Do not add marketing copy, eyebrows, or descriptive paragraphs to sections.
+- Keep hover previews CSS-only. Do not reintroduce per-card client components.
+- Keep server reads in feature queries and client boundaries at interactive leaves.
+- Use `<Suspense>` per section and keep the static shell free of data reads.
 - Verify layouts at 375px, 768px, 1024px, and 1440px.

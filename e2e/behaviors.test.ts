@@ -45,17 +45,14 @@ test.describe("infinite scroll pagination", () => {
   });
 });
 
-test.describe("hover preview card", () => {
-  test("opens preview on hover", async ({ page }) => {
+test.describe("hover preview", () => {
+  test("reveals the in-card preview on hover", async ({ page }) => {
     await page.goto("/anime/trending", { waitUntil: "domcontentloaded" });
-    const trigger = page.locator('[data-slot="hover-card-trigger"]').first();
-    await expect(trigger).toBeVisible();
-    await page.waitForTimeout(500);
-    await page.mouse.move(10, 10);
-    await page.waitForTimeout(300);
-    await trigger.hover({ force: true });
-    await expect(page.locator('[data-slot="hover-card-content"]')).toBeVisible({
-      timeout: 8000,
+    const card = page.locator('[role="listitem"]').first();
+    await expect(card).toBeVisible();
+    await card.hover();
+    await expect(card.locator('[data-slot="card-preview"]')).toHaveCSS("opacity", "1", {
+      timeout: 5000,
     });
   });
 });
@@ -90,7 +87,7 @@ test.describe("API failure error states", () => {
     // instead of being mistaken for a missing anime.
     const missingId = 2_000_000_000;
     await page.goto(`/anime/${missingId}`);
-    await expect(page.getByRole("heading", { name: "Anime Not Found" })).toBeVisible({
+    await expect(page.getByRole("heading", { name: "Not found" })).toBeVisible({
       timeout: 10_000,
     });
   });
@@ -98,7 +95,7 @@ test.describe("API failure error states", () => {
   test("collection shows empty state for unmatched filters", async ({ page }) => {
     const uncachedGenre = `XxX-${Math.floor(Math.random() * 1e6)}`;
     await page.goto(`/anime/trending?genre=${uncachedGenre}`);
-    await expect(page.getByRole("heading", { name: "Trending Anime" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Trending" })).toBeVisible();
     await expect(page.getByText("No results match these filters")).toBeVisible();
   });
 });

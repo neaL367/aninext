@@ -25,26 +25,20 @@ export function AnimeStreamingEpisodes({ media }: { media: Media }) {
   );
   if (sites.length > 0) return <SiteList sites={sites} />;
 
-  return (
-    <EmptyState
-      icon={PlayIcon}
-      title="No streaming links indexed"
-      description="No streaming links are available for this anime."
-    />
-  );
+  return <EmptyState icon={PlayIcon} title="No streams" />;
 }
 
 function EpisodeList({ episodes }: { episodes: (StreamingEpisode & { url: string })[] }) {
   return (
     <div className="max-h-[420px] overflow-y-auto scrollbar-thin">
-      <div className="divide-y divide-border-soft">
+      <div className="divide-y divide-border-soft border-t border-border-soft">
         {episodes.map((ep, i) => (
           <a
             key={`${ep.url}-${i}`}
             href={ep.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex items-center gap-4 py-3 px-2 rounded-md transition-colors hover:bg-surface-1/60"
+            className="group flex items-center gap-4 px-1 py-2.5 transition-colors hover:bg-surface-1/40"
           >
             {ep.thumbnail ? (
               <div className="relative h-[54px] w-[96px] shrink-0 overflow-hidden rounded border border-border-soft bg-surface-2">
@@ -83,7 +77,7 @@ function EpisodeList({ episodes }: { episodes: (StreamingEpisode & { url: string
 function SiteList({ sites }: { sites: MediaExternalLink[] }) {
   return (
     <div className="max-h-[420px] overflow-y-auto scrollbar-thin">
-      <div className="divide-y divide-border-soft">
+      <div className="divide-y divide-border-soft border-t border-border-soft">
         {sites.map((link) => {
           const favicon = getFaviconUrl(link.url);
           return (
@@ -92,31 +86,31 @@ function SiteList({ sites }: { sites: MediaExternalLink[] }) {
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center gap-4 py-3 px-2 rounded-md transition-colors hover:bg-surface-1/60"
+              className="group flex items-center gap-4 px-1 py-2.5 transition-colors hover:bg-surface-1/40"
             >
-              <span className="flex size-[54px] shrink-0 items-center justify-center overflow-hidden rounded border border-border-soft bg-surface-1">
+              <span className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-[2px] bg-surface-1">
                 {favicon ? (
                   <Image
                     src={favicon}
                     alt=""
-                    width={24}
-                    height={24}
+                    width={22}
+                    height={22}
                     unoptimized
-                    className="size-6 rounded-sm"
+                    className="size-5 rounded-[2px]"
                   />
                 ) : (
-                  <PlayIcon className="size-5 text-muted-foreground" />
+                  <PlayIcon className="size-4 text-muted-foreground" />
                 )}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="line-clamp-2 text-xs sm:text-sm font-semibold text-foreground group-hover:text-signal transition-colors">
+                <p className="line-clamp-2 font-serif text-sm text-foreground transition-colors group-hover:text-signal">
                   Watch on {link.site}
                 </p>
-                <p className="mt-0.5 font-mono text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">
+                <p className="mt-0.5 font-mono text-[0.58rem] uppercase tracking-[0.12em] text-muted-foreground/70">
                   Streaming
                 </p>
               </div>
-              <ExternalLinkIcon className="size-3.5 shrink-0 text-muted-foreground group-hover:text-signal transition-colors" />
+              <ExternalLinkIcon className="size-3.5 shrink-0 text-muted-foreground transition-colors group-hover:text-signal" />
             </a>
           );
         })}

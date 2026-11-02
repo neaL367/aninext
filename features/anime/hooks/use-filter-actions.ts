@@ -9,7 +9,7 @@ type FilterValue = string | string[] | undefined;
 
 export function useFilterActions() {
   const router = useRouter();
-  const [, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition();
 
   const navigate = useCallback(
     (params: URLSearchParams) => {
@@ -56,5 +56,5 @@ export function useFilterActions() {
     navigate(new URLSearchParams());
   }, [navigate]);
 
-  return { updateFilter, removeFilter, clearAll };
+  return { updateFilter, removeFilter, clearAll, isPending };
 }

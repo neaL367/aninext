@@ -106,6 +106,22 @@ function responseFor(query: string, variables: Record<string, unknown>) {
     return { GenreCollection: ["Action", "Adventure", "Comedy", "Drama", "Fantasy"] };
   }
 
+  if (query.includes("AnimePageBatch")) {
+    const id = Number(variables.id);
+    if (id === 2_000_000_000) return { Media: null };
+    const base = detailMedia(id);
+    return {
+      Media: {
+        ...base,
+        characters: detailCharacters(),
+        staff: detailStaff(),
+        relations: detailRelations(id),
+        recommendations: detailRecommendations(id),
+        airingSchedule: detailAiringSchedule(),
+      },
+    };
+  }
+
   if (query.includes("AnimeDetailMedia")) {
     const id = Number(variables.id);
     return { Media: id === 2_000_000_000 ? null : detailMedia(id) };

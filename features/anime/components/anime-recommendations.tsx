@@ -1,6 +1,5 @@
 import { ThumbsUpIcon } from "lucide-react";
 
-import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 import { MediaCard, MediaCardSkeleton } from "@/features/anime/components/media-card";
 
 import { EmptyState } from "./empty-state";
@@ -26,9 +25,7 @@ export function AnimeRecommendations({ nodes }: { nodes: RecommendationNode[] })
           const media = node.mediaRecommendation;
           return (
             <div key={media.id}>
-              <AnimePreviewCard media={media}>
-                <MediaCard media={media} />
-              </AnimePreviewCard>
+              <MediaCard media={media} />
             </div>
           );
         })}

@@ -1,6 +1,5 @@
 "use client";
 
-import { ArrowUpRightIcon } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import { HoverPrefetchLink } from "@/components/ui/hover-prefetch-link";
@@ -16,7 +15,7 @@ export function CollectionNav() {
 
   return (
     <nav
-      className="flex items-center gap-1 overflow-x-auto border-b border-border-soft scrollbar-none"
+      className="no-scrollbar flex items-center gap-6 overflow-x-auto border-b border-border-soft max-sm:[mask-image:linear-gradient(to_right,black_88%,transparent)]"
       aria-label="Anime collections"
     >
       {COLLECTION_NAV_ITEMS.map(({ id, label }) => {
@@ -28,13 +27,14 @@ export function CollectionNav() {
             prefetch={id === "seasonal" ? false : undefined}
             aria-current={isActive ? "page" : undefined}
             className={cn(
-              "group relative flex shrink-0 items-center gap-2 px-3 pb-3 pt-1 text-sm transition-colors",
+              "relative shrink-0 pb-3 pt-2 font-mono text-[0.62rem] uppercase tracking-[0.16em] transition-colors",
               isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
             )}
           >
             {label}
-            {isActive && <span className="absolute inset-x-3 -bottom-px h-px bg-signal" />}
-            <ArrowUpRightIcon className="size-3 opacity-0 transition-opacity group-hover:opacity-100" />
+            {isActive && (
+              <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-px bg-signal" />
+            )}
           </HoverPrefetchLink>
         );
       })}

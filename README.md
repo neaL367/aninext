@@ -16,6 +16,7 @@ An anime discovery and airing platform on [Next.js 16.3](https://nextjs.org/blog
 - **[Partial Prefetching](https://nextjs.org/docs/app/guides/adopting-partial-prefetching)** — Next.js prefetches one shared shell per route template, so a grid of 40 anime cards costs a single shell prefetch and every navigation commits instantly.
 - **[Hover-triggered prefetch](https://nextjs.org/docs/app/guides/prefetching#hover-triggered-prefetch)** — `HoverPrefetchLink` defers a link's deep prefetch until pointer, focus, or touch intent, so the six collection tabs and "See all" links stay cheap instead of prefetching every destination on render.
 - **[Server Functions that return rendered RSC](https://nextjs.org/docs/app/getting-started/mutating-data)** — infinite scroll never ships raw JSON: a `'use server'` action renders the next page of cards on the server and hands the client ready-to-append React nodes, keeping `MediaCard`/`MediaGrid` 100% server components.
+- **CSS-only card previews** — hover synopses are rendered on the server and revealed with CSS, so result grids ship no per-card client islands.
 - **[React Compiler](https://react.dev/learn/react-compiler)** in annotation mode memoizes components and hooks automatically, so hot paths need no manual `useMemo`/`useCallback`.
 - **[View Transitions](https://nextjs.org/docs/app/guides/view-transitions)** — a `Crossfade` wrapper animates Suspense reveals, appended browse pages, and day switches on the airing schedule.
 - **[Timezone-aware airing schedule](ARCHITECTURE.md#5-route-airing--airing-schedule) — the `/airing` page is a time-axis TV guide**: hour bands, a sticky day rail with real per-day release counts, episode progress bars, first-class streaming links, and a pulsing `NOW` marker. Every time renders in the visitor's UTC offset (resolved from a cookie, URLs stay clean dates), so the schedule always matches the viewer's timezone.
@@ -43,6 +44,7 @@ bun run test:e2e
 
 - **[Next.js 16.3](https://nextjs.org/)**: App Router, Cache Components, Server Functions, Instant Navigations
 - **[React 19](https://react.dev/)** with React Compiler: Suspense, `use()`, View Transitions
+- **[Geist Serif](https://vercel.com/font)** as the single typeface for editorial UI and tabular metadata
 - **[TypeScript](https://www.typescriptlang.org/)** and **[Tailwind CSS v4](https://tailwindcss.com/)**
 - **[shadcn/ui](https://ui.shadcn.com/)** on **[Base UI](https://base-ui.com/)**
 - **[AniList GraphQL](https://docs.anilist.co/)** — read-only data source; no auth, no mutations

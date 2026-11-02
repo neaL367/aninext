@@ -26,7 +26,8 @@ export async function renderBrowsePage(
     filters.status?.length ||
     filters.country ||
     filters.season ||
-    filters.year,
+    filters.year ||
+    filters.isAdult,
   );
 
   if (isTop100 && !hasActiveFilters) {

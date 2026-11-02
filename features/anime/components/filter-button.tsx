@@ -23,10 +23,10 @@ export function FilterButton({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "flex min-h-9 min-w-0 items-center justify-center rounded-sm border px-2.5 py-1.5 text-left font-mono text-[0.68rem] leading-tight transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal",
+        "flex min-h-8 min-w-0 items-center justify-start rounded-[2px] px-2 py-1 text-left font-mono text-[0.64rem] leading-tight transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal",
         active
-          ? "border-accent bg-accent/10 text-accent"
-          : "border-border-soft bg-surface-1/50 text-muted-foreground hover:border-accent/40 hover:text-foreground",
+          ? "bg-signal text-white"
+          : "text-muted-foreground hover:bg-surface-1 hover:text-foreground",
         className,
       )}
     >
@@ -49,7 +49,7 @@ export function FilterOptionGrid({
   return (
     <div
       className={cn(
-        "grid grid-cols-2 gap-1.5",
+        "grid grid-cols-2 gap-0.5",
         scroll && "max-h-56 overflow-y-auto pr-1 scrollbar-thin",
       )}
     >
@@ -58,7 +58,7 @@ export function FilterOptionGrid({
           key={option.value}
           active={selected.includes(option.value)}
           onClick={() => onToggle(option.value)}
-          className="w-full justify-start"
+          className="w-full"
         >
           <span className="truncate">{option.label}</span>
         </FilterButton>
@@ -80,7 +80,7 @@ export function FilterChip({
   return (
     <span
       className={cn(
-        "group inline-flex items-center gap-1.5 rounded-sm border border-border-soft bg-surface-1/50 px-2 py-0.5 font-mono text-[0.65rem] transition-colors hover:border-accent/60 hover:bg-accent/5 hover:text-accent",
+        "group inline-flex items-center gap-1 rounded-[2px] bg-surface-1 px-2 py-1 font-mono text-[0.6rem] text-foreground/80 transition-colors hover:text-foreground",
         className,
       )}
     >
@@ -88,10 +88,10 @@ export function FilterChip({
       <button
         type="button"
         onClick={onRemove}
-        className="flex size-6 shrink-0 items-center justify-center rounded-sm transition-colors hover:bg-accent/20 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-signal"
+        className="flex size-4 shrink-0 items-center justify-center rounded-[2px] text-muted-foreground transition-colors hover:bg-signal hover:text-white focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-signal"
         aria-label={`Remove ${label}`}
       >
-        <XIcon className="size-3" />
+        <XIcon className="size-2.5" />
       </button>
     </span>
   );

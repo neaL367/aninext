@@ -3,9 +3,8 @@ import { ImageResponse } from "next/og";
 export const size = { width: 32, height: 32 };
 export const contentType = "image/png";
 
-// Mirrors the site header logo: a signal-blue rounded square with a bold white
-// "A" (components/site-header.tsx). Keep the two in sync when the brand changes.
-const SIGNAL = "#0070f3";
+// Mirrors the site wordmark: a vermilion tile with a serif "A".
+const SIGNAL = "#ff5433";
 
 export default function Icon() {
   return new ImageResponse(
@@ -27,16 +26,15 @@ export default function Icon() {
           alignItems: "center",
           justifyContent: "center",
           background: SIGNAL,
-          borderRadius: "6px",
+          borderRadius: "3px",
         }}
       >
         <span
           style={{
-            color: "#ffffff",
-            fontSize: 21,
-            fontWeight: 800,
+            color: "#fff8f4",
+            fontSize: 22,
             lineHeight: 1,
-            fontFamily: "Inter, Arial, sans-serif",
+            fontFamily: "Georgia, 'Times New Roman', serif",
           }}
         >
           A

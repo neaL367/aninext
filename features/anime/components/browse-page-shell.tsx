@@ -28,28 +28,17 @@ export function BrowsePageShell({
   const genresPromise = getGenres();
 
   return (
-    <div className="mx-auto w-full max-w-[1680px] px-4 py-8 sm:px-7 sm:py-12 lg:px-10 space-y-8">
-      <header className="space-y-6">
-        <div>
-          <p className="eyebrow">
-            Collection / {collection === "alltimepopular" ? "all time" : collection}
-          </p>
-          <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-[-0.055em] text-foreground sm:text-6xl">
-            {config.pageHeading}
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            {config.pageDescription}
-          </p>
-        </div>
-
-        <div className="pt-2">
+    <div className="mx-auto w-full max-w-[1760px] px-4 pb-16 pt-10 sm:px-7 sm:pt-14 lg:px-10">
+      <header>
+        <h1 className="display text-[clamp(2.8rem,8vw,6rem)]">{config.pageHeading}</h1>
+        <div className="mt-6 sm:mt-8">
           <Suspense fallback={<nav className="h-9 border-b border-border-soft" aria-hidden />}>
             <CollectionNav />
           </Suspense>
         </div>
       </header>
 
-      <div className="flex items-center gap-3 lg:hidden">
+      <div className="mt-7 flex items-center gap-3 lg:hidden">
         <div className="min-w-0 flex-1">
           <Suspense fallback={<SearchBarFallback />}>
             <SearchBar />
@@ -62,15 +51,12 @@ export function BrowsePageShell({
         </Suspense>
       </div>
 
-      {/* Refined Desktop Grid: Sticky Left Filter Sidebar + Main Content */}
-      <div className="grid gap-10 lg:grid-cols-[250px_minmax(0,1fr)] lg:gap-12">
+      <div className="mt-8 grid gap-10 lg:grid-cols-[210px_minmax(0,1fr)] lg:gap-14">
         <aside className="hidden lg:block">
-          <div className="sticky top-24 space-y-6">
-            <div>
-              <Suspense fallback={<SearchBarFallback />}>
-                <SearchBar />
-              </Suspense>
-            </div>
+          <div className="sticky top-20 space-y-5">
+            <Suspense fallback={<SearchBarFallback />}>
+              <SearchBar />
+            </Suspense>
             <Suspense fallback={<FilterSidebarSkeleton />}>
               <ErrorBoundary title="Filters failed to load">
                 <FilterSidebarBoundary collection={collection} genresPromise={genresPromise} />

@@ -170,7 +170,7 @@ function BrowsePaginatorContent({
     };
   }, [restoreState, pages.length, hasMore, loadPage, restoreTick, syncPage]);
 
-  const pageSkeleton = <MediaGridSkeletonItems count={pageSize} firstPage={false} />;
+  const pageSkeleton = <MediaGridSkeletonItems count={pageSize} />;
 
   return (
     <>
@@ -402,10 +402,10 @@ function PaginationRail({
             aria-label={`Go to page ${marker}`}
             aria-current={marker === active ? "true" : undefined}
             className={cn(
-              "flex size-6 cursor-pointer items-center justify-center rounded-full font-mono text-[0.65rem] font-semibold tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal",
+              "flex size-6 cursor-pointer items-center justify-center rounded-[2px] font-mono text-[0.62rem] tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal",
               marker === active
-                ? "bg-signal text-white shadow-[0_0_0_3px_var(--signal-soft)]"
-                : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
+                ? "bg-signal text-white"
+                : "text-muted-foreground hover:bg-surface-1 hover:text-foreground",
             )}
           >
             {marker}

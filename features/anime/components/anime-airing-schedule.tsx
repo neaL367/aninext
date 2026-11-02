@@ -10,11 +10,10 @@ export function AnimeAiringSchedule({ nodes }: { nodes: AiringScheduleNode[] }) 
 
   return (
     <>
-      <p className="eyebrow text-signal">Schedule</p>
-      <h2 className="mt-2 text-2xl font-semibold tracking-[-0.04em] sm:text-3xl">Next episodes</h2>
-      <div className="mt-5">
-        <AnimeAiringScheduleList nodes={nodes} />
-      </div>
+      <h2 className="mb-4 border-b border-border-soft pb-3 font-serif text-2xl leading-none tracking-[-0.03em]">
+        Next episodes
+      </h2>
+      <AnimeAiringScheduleList nodes={nodes} />
     </>
   );
 }
@@ -25,10 +24,10 @@ export function AnimeAiringScheduleSkeleton() {
       {Array.from({ length: 4 }).map((_, i) => (
         <div
           key={i}
-          className="flex items-center justify-between rounded-lg border border-border-soft bg-surface-2/30 p-3"
+          className="flex items-center justify-between border-b border-border-soft py-2.5"
         >
-          <Skeleton className="h-4 w-24 rounded" />
-          <Skeleton className="h-3 w-28 rounded" />
+          <Skeleton className="h-3.5 w-20 rounded-[2px]" />
+          <Skeleton className="h-3 w-24 rounded-[2px]" />
         </div>
       ))}
     </div>

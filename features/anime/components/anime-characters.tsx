@@ -9,32 +9,26 @@ import type { CharacterEdge } from "@/features/anime/types/anime";
 export function AnimeCharacters({ edges }: { edges: CharacterEdge[] }) {
   "use memo";
   if (edges.length === 0) {
-    return (
-      <EmptyState
-        icon={UsersIcon}
-        title="No characters available"
-        description="No characters have been added yet."
-      />
-    );
+    return <EmptyState icon={UsersIcon} title="No characters" />;
   }
 
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+    <div className="grid grid-cols-1 gap-x-8 gap-y-0 sm:grid-cols-2">
       {edges.map((edge, index) => {
         const voiceActor = edge.voiceActors?.[0];
         return (
           <article
             key={`${edge.node.id}-${index}`}
-            className="group flex items-center gap-4 rounded-md border border-border-soft bg-surface-1/60 p-3 transition-colors hover:border-signal/60 hover:bg-surface-1 isolate transform-gpu"
+            className="group flex items-center gap-4 border-b border-border-soft py-2.5 first:pt-0"
           >
-            <div className="relative h-[72px] w-[54px] shrink-0 overflow-hidden rounded bg-surface-2">
+            <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-[2px] bg-surface-2">
               {edge.node.image.medium ? (
                 <MediaImage
                   src={edge.node.image.medium}
                   alt={edge.node.name.full}
                   fill
-                  sizes="54px"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105 transform-gpu will-change-transform"
+                  sizes="48px"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transform-none"
                 />
               ) : (
                 <div className="flex h-full items-center justify-center p-1 text-center font-mono text-[0.5rem] uppercase text-muted-foreground">
@@ -43,38 +37,33 @@ export function AnimeCharacters({ edges }: { edges: CharacterEdge[] }) {
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-foreground group-hover:text-signal transition-colors">
+              <p className="truncate font-serif text-sm leading-snug text-foreground">
                 {edge.node.name.full}
               </p>
-              <p className="mt-0.5 font-mono text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">
+              <p className="mt-0.5 truncate font-mono text-[0.55rem] uppercase tracking-[0.12em] text-muted-foreground/70">
                 {edge.role}
               </p>
             </div>
             {voiceActor && (
-              <div className="flex shrink-0 items-center gap-2 border-l border-border-soft pl-3">
-                <div className="relative size-9 shrink-0 overflow-hidden rounded-full border border-border-soft bg-surface-2">
+              <div className="flex shrink-0 items-center gap-2">
+                <div className="relative size-7 shrink-0 overflow-hidden rounded-full bg-surface-2">
                   {voiceActor.image.medium ? (
                     <MediaImage
                       src={voiceActor.image.medium}
                       alt={voiceActor.name.full}
                       fill
-                      sizes="36px"
+                      sizes="28px"
                       className="object-cover"
                     />
                   ) : (
-                    <span className="flex size-full items-center justify-center font-mono text-xs text-muted-foreground">
+                    <span className="flex size-full items-center justify-center font-mono text-[0.55rem] text-muted-foreground">
                       {voiceActor.name.full.charAt(0)}
                     </span>
                   )}
                 </div>
-                <div className="min-w-0 max-w-[96px]">
-                  <p className="truncate text-xs font-medium text-foreground">
-                    {voiceActor.name.full}
-                  </p>
-                  <p className="truncate font-mono text-[0.55rem] uppercase tracking-[0.04em] text-muted-foreground">
-                    VA
-                  </p>
-                </div>
+                <p className="hidden max-w-[88px] truncate font-mono text-[0.55rem] text-muted-foreground/80 sm:block">
+                  {voiceActor.name.full}
+                </p>
               </div>
             )}
           </article>
@@ -86,20 +75,13 @@ export function AnimeCharacters({ edges }: { edges: CharacterEdge[] }) {
 
 export function AnimeCharactersSkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+    <div className="grid grid-cols-1 gap-x-8 sm:grid-cols-2">
       {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="flex items-center gap-4 border border-border p-3">
-          <div className="shimmer h-[72px] w-[54px]" />
+        <div key={i} className="flex items-center gap-4 border-b border-border-soft py-2.5">
+          <div className="shimmer h-16 w-12 shrink-0 rounded-[2px]" />
           <div className="flex-1 space-y-2">
-            <div className="shimmer h-4 w-3/4 rounded" />
-            <div className="shimmer h-3 w-1/3 rounded" />
-          </div>
-          <div className="flex items-center gap-2 border-l border-border pl-3">
-            <div className="shimmer size-9 rounded-full" />
-            <div className="hidden sm:block sm:space-y-1">
-              <div className="shimmer h-3 w-20 rounded" />
-              <div className="shimmer h-2 w-8 rounded" />
-            </div>
+            <div className="shimmer h-3.5 w-3/4 rounded-[2px]" />
+            <div className="shimmer h-2.5 w-1/3 rounded-[2px]" />
           </div>
         </div>
       ))}

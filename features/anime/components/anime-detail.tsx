@@ -21,88 +21,75 @@ export async function AnimeDetail({ id }: { id: number | null }) {
   if (!media) notFound();
 
   return (
-    <div className="mx-auto w-full max-w-[1680px] px-4 sm:px-7 lg:px-10">
-      <section className="border-b border-border-soft py-12">
-        <SectionHeader
-          eyebrow="Watch"
-          eyebrowClassName="text-signal"
-          title="Choose your next scene"
-        />
-        <div className="mt-7 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          <AnimeTrailer media={media} />
+    <div className="mx-auto w-full max-w-[1760px] px-4 sm:px-7 lg:px-10">
+      <section className="rule py-10 sm:py-12">
+        <SectionHeader title="Watch" />
+        <div
+          className={
+            media.trailer?.id && media.trailer.site === "youtube"
+              ? "grid gap-8 lg:grid-cols-[1.15fr_0.85fr]"
+              : "max-w-4xl"
+          }
+        >
+          {media.trailer?.id && media.trailer.site === "youtube" && (
+            <AnimeTrailer media={media} />
+          )}
           <AnimeStreamingEpisodes media={media} />
         </div>
       </section>
 
-      <div className="grid gap-16 py-12 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-16">
-        <div className="min-w-0">
+      <div className="grid gap-14 pb-16 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-16">
+        <div className="min-w-0 space-y-14">
           <section aria-label="Characters">
-            <SectionHeader
-              eyebrow="Cast"
-              eyebrowClassName="text-signal"
-              title="Characters and voices"
-            />
-            <div className="mt-7">
-              <ErrorBoundary title="Characters failed to load">
-                <Suspense fallback={<AnimeCharactersSkeleton />}>
-                  <CharactersSection id={id} />
-                </Suspense>
-              </ErrorBoundary>
-            </div>
+            <SectionHeader title="Characters and voices" />
+            <ErrorBoundary title="Characters failed to load">
+              <Suspense fallback={<AnimeCharactersSkeleton />}>
+                <CharactersSection id={id} />
+              </Suspense>
+            </ErrorBoundary>
           </section>
 
-          <section aria-label="More like this" className="border-t border-border-soft pt-12 mt-12">
-            <SectionHeader
-              eyebrow="Continue"
-              eyebrowClassName="text-signal"
-              title="More like this"
-            />
-            <div className="mt-7">
-              <ErrorBoundary title="Recommendations failed to load">
-                <Suspense fallback={<AnimeRecommendationsSkeleton />}>
-                  <RecommendationsSection id={id} />
-                </Suspense>
-              </ErrorBoundary>
-            </div>
+          <section aria-label="More like this" className="rule pt-12">
+            <SectionHeader title="More like this" />
+            <ErrorBoundary title="Recommendations failed to load">
+              <Suspense fallback={<AnimeRecommendationsSkeleton />}>
+                <RecommendationsSection id={id} />
+              </Suspense>
+            </ErrorBoundary>
           </section>
         </div>
 
-        <aside className="min-w-0 lg:border-l lg:border-border-soft lg:pl-8">
-          <div className="space-y-12">
-            <section aria-label="Airing schedule">
-              <ErrorBoundary title="Schedule failed to load">
-                <Suspense fallback={<AnimeAiringScheduleSkeleton />}>
-                  <AiringSection id={id} />
-                </Suspense>
-              </ErrorBoundary>
-            </section>
-            <section aria-label="Related anime">
-              <SectionHeader eyebrow="Universe" eyebrowClassName="text-signal" title="Related" />
-              <div className="mt-5">
-                <ErrorBoundary title="Related anime failed to load">
-                  <Suspense fallback={<AnimeRelationsSkeleton />}>
-                    <RelationsSection id={id} />
-                  </Suspense>
-                </ErrorBoundary>
-              </div>
-            </section>
-            <section aria-label="Staff">
-              <SectionHeader eyebrow="Credits" eyebrowClassName="text-signal" title="Staff" />
-              <div className="mt-5">
-                <ErrorBoundary title="Staff failed to load">
-                  <Suspense fallback={<AnimeStaffSkeleton />}>
-                    <StaffSection id={id} />
-                  </Suspense>
-                </ErrorBoundary>
-              </div>
-            </section>
-            <section aria-label="Genres">
-              <SectionHeader eyebrow="Topics" eyebrowClassName="text-signal" title="Genres" />
-              <div className="mt-5">
-                <GenreList genres={media.genres} />
-              </div>
-            </section>
-          </div>
+        <aside className="min-w-0 space-y-12 lg:border-l lg:border-border-soft lg:pl-8">
+          <section aria-label="Airing schedule">
+            <ErrorBoundary title="Schedule failed to load">
+              <Suspense fallback={<AnimeAiringScheduleSkeleton />}>
+                <AiringSection id={id} />
+              </Suspense>
+            </ErrorBoundary>
+          </section>
+
+          <section aria-label="Related anime">
+            <SectionHeader title="Related" />
+            <ErrorBoundary title="Related anime failed to load">
+              <Suspense fallback={<AnimeRelationsSkeleton />}>
+                <RelationsSection id={id} />
+              </Suspense>
+            </ErrorBoundary>
+          </section>
+
+          <section aria-label="Staff">
+            <SectionHeader title="Staff" />
+            <ErrorBoundary title="Staff failed to load">
+              <Suspense fallback={<AnimeStaffSkeleton />}>
+                <StaffSection id={id} />
+              </Suspense>
+            </ErrorBoundary>
+          </section>
+
+          <section aria-label="Genres">
+            <SectionHeader title="Genres" />
+            <GenreList genres={media.genres} />
+          </section>
         </aside>
       </div>
     </div>
@@ -136,65 +123,50 @@ async function StaffSection({ id }: { id: number }) {
 
 export function AnimeDetailSkeleton() {
   return (
-    <div className="mx-auto w-full max-w-[1680px] px-4 sm:px-7 lg:px-10">
-      <section className="border-b border-border-soft py-12">
-        <div className="space-y-3">
-          <div className="shimmer h-3.5 w-16 rounded" />
-          <div className="shimmer h-8 w-64 rounded" />
+    <div className="mx-auto w-full max-w-[1760px] px-4 sm:px-7 lg:px-10">
+      <section className="rule py-10 sm:py-12">
+        <div className="mb-6 border-b border-border-soft pb-4">
+          <div className="shimmer h-8 w-28 rounded-[2px]" />
         </div>
-        <div className="mt-7 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
           <AnimeTrailerSkeleton />
           <AnimeStreamingEpisodesSkeleton />
         </div>
       </section>
 
-      <div className="grid gap-16 py-12 lg:grid-cols-[minmax(0,1fr)_320px] lg:gap-16">
-        <div className="min-w-0">
+      <div className="grid gap-14 pb-16 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-16">
+        <div className="min-w-0 space-y-14">
           <section aria-label="Characters">
-            <div className="space-y-3">
-              <div className="shimmer h-3.5 w-16 rounded" />
-              <div className="shimmer h-8 w-56 rounded" />
+            <div className="mb-6 border-b border-border-soft pb-4">
+              <div className="shimmer h-8 w-64 rounded-[2px]" />
             </div>
-            <div className="mt-7">
-              <AnimeCharactersSkeleton />
-            </div>
+            <AnimeCharactersSkeleton />
           </section>
 
-          <section aria-label="More like this" className="border-t border-border-soft pt-12 mt-12">
-            <div className="space-y-3">
-              <div className="shimmer h-3.5 w-20 rounded" />
-              <div className="shimmer h-8 w-48 rounded" />
+          <section aria-label="More like this" className="rule pt-12">
+            <div className="mb-6 border-b border-border-soft pb-4">
+              <div className="shimmer h-8 w-48 rounded-[2px]" />
             </div>
-            <div className="mt-7">
-              <AnimeRecommendationsSkeleton />
-            </div>
+            <AnimeRecommendationsSkeleton />
           </section>
         </div>
 
-        <aside className="min-w-0 lg:border-l lg:border-border-soft lg:pl-8">
-          <div className="space-y-12">
-            <section aria-label="Airing schedule">
-              <AnimeAiringScheduleSkeleton />
-            </section>
-            <section aria-label="Related anime">
-              <div className="space-y-3">
-                <div className="shimmer h-3.5 w-16 rounded" />
-                <div className="shimmer h-6 w-32 rounded" />
-              </div>
-              <div className="mt-5">
-                <AnimeRelationsSkeleton />
-              </div>
-            </section>
-            <section aria-label="Staff">
-              <div className="space-y-3">
-                <div className="shimmer h-3.5 w-16 rounded" />
-                <div className="shimmer h-6 w-28 rounded" />
-              </div>
-              <div className="mt-5">
-                <AnimeStaffSkeleton />
-              </div>
-            </section>
-          </div>
+        <aside className="min-w-0 space-y-12 lg:border-l lg:border-border-soft lg:pl-8">
+          <section aria-label="Airing schedule">
+            <AnimeAiringScheduleSkeleton />
+          </section>
+          <section aria-label="Related anime">
+            <div className="mb-5 border-b border-border-soft pb-4">
+              <div className="shimmer h-7 w-24 rounded-[2px]" />
+            </div>
+            <AnimeRelationsSkeleton />
+          </section>
+          <section aria-label="Staff">
+            <div className="mb-5 border-b border-border-soft pb-4">
+              <div className="shimmer h-7 w-20 rounded-[2px]" />
+            </div>
+            <AnimeStaffSkeleton />
+          </section>
         </aside>
       </div>
     </div>

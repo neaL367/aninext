@@ -91,8 +91,8 @@ export function FilterSidebarContent({
 }) {
   "use memo";
   const allGenres = use(genresPromise);
-  const { state: filterState, isPending, facetCount } = state;
-  const { updateFilter, clearAll } = actions;
+  const { state: filterState, facetCount } = state;
+  const { updateFilter, clearAll, isPending } = actions;
   const [adultOpen, setAdultOpen] = useState(false);
   const setAdultContent = useCallback(
     (enabled: boolean) => updateFilter("isAdult", enabled ? "true" : undefined),
@@ -176,7 +176,7 @@ export function FilterSidebarContent({
     <aside
       className={cn(
         mobile ? "flex w-full" : "hidden w-full lg:flex",
-        "flex-col transition-opacity data-[pending]:opacity-60",
+        "flex-col transition-opacity duration-200 data-[pending]:opacity-50",
       )}
       data-pending={isPending ? "" : undefined}
     >
@@ -293,24 +293,29 @@ function FilterSection({
   const contentId = `filter-${id}-content`;
 
   return (
-    <section className="border-b border-border-soft py-3">
+    <section className="border-b border-border-soft py-2.5">
       <button
         type="button"
         aria-expanded={open}
         aria-controls={contentId}
         onClick={() => setToggled(!open)}
-        className="flex min-h-9 w-full items-center gap-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+        className="flex min-h-8 w-full items-center gap-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
       >
-        <ChevronDownIcon className={cn("size-3.5 transition-transform", open && "rotate-180")} />
-        <span className="font-mono text-[0.68rem] font-medium uppercase tracking-[0.08em] text-foreground">
+        <ChevronDownIcon
+          className={cn(
+            "size-3 text-muted-foreground transition-transform duration-200",
+            open && "rotate-180",
+          )}
+        />
+        <span className="font-mono text-[0.62rem] uppercase tracking-[0.14em] text-foreground/85">
           {label}
         </span>
         {count !== undefined && count > 0 && (
-          <span className="ml-auto font-mono text-[0.62rem] text-accent">{count}</span>
+          <span className="ml-auto font-mono text-[0.58rem] text-signal">{count}</span>
         )}
       </button>
       {open && (
-        <div id={contentId} className="pt-3">
+        <div id={contentId} className="pt-2">
           {children}
         </div>
       )}
@@ -323,7 +328,7 @@ export function FilterSidebarSkeleton() {
     <aside className="hidden w-full flex-col gap-2 lg:flex">
       {Array.from({ length: 5 }).map((_, i) => (
         <div key={i} className="border-b border-border-soft py-3">
-          <Skeleton className="h-5 w-24 rounded" />
+          <Skeleton className="h-4 w-20 rounded-[2px]" />
         </div>
       ))}
     </aside>

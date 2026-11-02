@@ -14,7 +14,7 @@ test.describe("canonical URLs", () => {
   test("seasonal redirects to season and year params", async ({ page }) => {
     await page.goto("/anime/seasonal");
     await expect(page).toHaveURL(/\/anime\/seasonal\?season=[A-Z]+&year=\d{4}$/);
-    await expect(page.getByRole("heading", { name: "Seasonal Anime" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Seasonal" })).toBeVisible();
   });
 
   test("airing normalizes invalid day and offset params", async ({ page }) => {
@@ -72,7 +72,7 @@ test.describe("browse interactions", () => {
     }
     await page.getByRole("button", { name: "Action", exact: true }).first().click();
     await expect(page).toHaveURL(/genre=Action/);
-    await expect(page.getByRole("heading", { name: "Trending Anime" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Trending" })).toBeVisible();
     await expect(page.getByRole("list", { name: "Anime results" })).toBeVisible();
   });
 
@@ -80,7 +80,7 @@ test.describe("browse interactions", () => {
     await page.goto("/anime/trending");
     await page.getByRole("searchbox", { name: "Search anime" }).fill("one piece");
     await expect(page).toHaveURL(/search=one\+piece/, { timeout: 5000 });
-    await expect(page.getByRole("heading", { name: "Trending Anime" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Trending" })).toBeVisible();
   });
 });
 

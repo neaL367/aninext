@@ -7,7 +7,7 @@ import { parseAiringOffset, parseAiringParams, visitorToday } from "@/features/a
 import type { Metadata, Route } from "next";
 
 export const metadata: Metadata = {
-  title: "Airing schedule — AniNext",
+  title: "Airing schedule",
   description: "See what anime is airing this week and plan your next watch.",
   alternates: { canonical: "/airing" },
 };

@@ -30,7 +30,7 @@ export function ScrollToTopButton() {
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update);
     };
-    update();
+    raf = requestAnimationFrame(update);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       window.removeEventListener("scroll", onScroll);
@@ -53,11 +53,11 @@ export function ScrollToTopButton() {
         window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
       }}
       className={cn(
-        "fixed right-4 bottom-20 z-40 size-10 cursor-pointer rounded-full shadow-lg transition-all duration-200 md:right-6 md:bottom-6",
+        "fixed right-4 bottom-20 z-40 size-9 cursor-pointer rounded-[2px] border border-border-soft bg-background/80 text-muted-foreground shadow-sm backdrop-blur-xl transition-all duration-200 hover:text-foreground md:right-6 md:bottom-6",
         visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-2 opacity-0",
       )}
     >
-      <ArrowUpIcon className="size-4" />
+      <ArrowUpIcon className="size-3.5" />
     </Button>
   );
 }

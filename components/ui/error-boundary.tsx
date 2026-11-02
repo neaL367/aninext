@@ -1,32 +1,30 @@
 "use client";
 
-import { AlertTriangleIcon } from "lucide-react";
 import { catchError, type ErrorInfo } from "next/error";
 import { useEffect, useState } from "react";
 
-import { Button } from "@/components/ui/button";
 import { AniListError } from "@/lib/anilist-errors";
 
 const KIND_COPY: Record<AniListError["kind"], { title: string; body: string }> = {
   rate_limited: {
-    title: "AniList rate limit hit",
-    body: "Too many requests. Retrying automatically.",
+    title: "Rate limited",
+    body: "Too many requests. Retrying shortly.",
   },
   outage: {
-    title: "AniList is temporarily unavailable",
-    body: "The data source is down right now. Try again in a moment.",
+    title: "Source unavailable",
+    body: "AniList is down right now. Try again in a moment.",
   },
   circuit_open: {
-    title: "Service temporarily unavailable",
-    body: "AniList is taking a brief pause due to high error rates. Retrying automatically shortly.",
+    title: "Taking a pause",
+    body: "AniList is cooling down after errors. Retrying shortly.",
   },
   graphql: {
-    title: "Something went wrong",
-    body: "The data source returned an unexpected response.",
+    title: "Unexpected response",
+    body: "The source returned something we could not read.",
   },
   network: {
-    title: "Failed to load",
-    body: "Could not reach the data source. Check your connection.",
+    title: "Could not reach the source",
+    body: "Check your connection and try again.",
   },
 };
 
@@ -35,12 +33,12 @@ function RateLimitCountdown({ seconds, onTick }: { seconds: number; onTick: () =
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setRemaining((r) => {
-        if (r <= 1) {
+      setRemaining((value) => {
+        if (value <= 1) {
           clearInterval(timer);
           return 0;
         }
-        return r - 1;
+        return value - 1;
       });
     }, 1000);
     return () => clearInterval(timer);
@@ -51,7 +49,11 @@ function RateLimitCountdown({ seconds, onTick }: { seconds: number; onTick: () =
   }, [remaining, onTick]);
 
   if (remaining <= 0) return null;
-  return <p className="font-mono text-xs text-muted-foreground">Retrying in {remaining}s</p>;
+  return (
+    <p className="font-mono text-[0.58rem] uppercase tracking-[0.14em] text-muted-foreground">
+      Retrying in {remaining}s
+    </p>
+  );
 }
 
 function ErrorFallback(props: { title: string }, { error, retry }: ErrorInfo) {
@@ -65,22 +67,22 @@ function ErrorFallback(props: { title: string }, { error, retry }: ErrorInfo) {
       err.message.includes("react.dev/errors/441") ||
       err.message.includes("Server Components render"));
 
-  const displayBody =
+  const body =
     copy?.body ??
     (isMinifiedRscError
-      ? "The data source is temporarily unavailable. Please try again shortly."
+      ? "The source is temporarily unavailable. Try again shortly."
       : err.message || "An unexpected error occurred.");
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-border-soft bg-surface-2/30 p-8 text-center">
-      <div className="flex size-12 items-center justify-center rounded-full bg-destructive/10">
-        <AlertTriangleIcon className="size-5 text-destructive" />
-      </div>
-      <h2 className="text-lg font-semibold">{copy?.title ?? props.title}</h2>
-      <p className="max-w-sm text-sm text-muted-foreground">{displayBody}</p>
+    <div className="flex flex-col items-start gap-3 border border-border-soft p-6">
+      <p className="font-mono text-[0.58rem] uppercase tracking-[0.2em] text-signal">Error</p>
+      <h2 className="font-serif text-2xl leading-none tracking-[-0.03em]">
+        {copy?.title ?? props.title}
+      </h2>
+      <p className="max-w-md text-sm leading-6 text-muted-foreground">{body}</p>
       {err.digest && (
-        <p className="font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted-foreground/60">
-          Ref: {err.digest}
+        <p className="font-mono text-[0.55rem] uppercase tracking-[0.16em] text-muted-foreground/60">
+          Ref {err.digest}
         </p>
       )}
       {anilistErr?.kind === "rate_limited" || anilistErr?.kind === "circuit_open" ? (
@@ -89,9 +91,13 @@ function ErrorFallback(props: { title: string }, { error, retry }: ErrorInfo) {
           onTick={() => retry()}
         />
       ) : (
-        <Button onClick={() => retry()} variant="outline" size="sm">
+        <button
+          type="button"
+          onClick={() => retry()}
+          className="mt-1 border-b border-border-soft pb-1 font-mono text-[0.6rem] uppercase tracking-[0.16em] text-foreground transition-colors hover:border-signal hover:text-signal focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
+        >
           Try again
-        </Button>
+        </button>
       )}
     </div>
   );

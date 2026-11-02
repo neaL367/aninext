@@ -1,11 +1,9 @@
-import { AnimePreviewCard } from "@/features/anime/components/anime-preview-card";
 import { MediaCard, MediaCardSkeleton } from "@/features/anime/components/media-card";
-import { cn } from "@/lib/utils";
 
 import type { Media } from "@/features/anime/types/anime";
 
 export const MEDIA_GRID_CLASS =
-  "grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-5 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5";
+  "grid grid-cols-2 gap-x-4 gap-y-9 sm:grid-cols-3 sm:gap-x-5 lg:grid-cols-4 xl:grid-cols-5";
 
 export function MediaGrid({
   items,
@@ -27,8 +25,7 @@ export function MediaGrid({
   return (
     <>
       {items.map((item, i) => {
-        const isFeatured = firstPage && (i === 0 || i === 12) && !rankStart;
-        const isAboveFold = i < 4;
+        const isAboveFold = i < 6;
         // Eager-load only the first page's top cards. Pages 2+ stay lazy —
         // `priority` forces eager fetch + preload, which would stall the
         // current viewport with off-screen covers on long scrolls.
@@ -39,21 +36,13 @@ export function MediaGrid({
         const canMorph =
           firstPage && (isAboveFold || (rankStart !== undefined && rankStart + i <= 6));
         return (
-          <div
-            key={item.id}
-            role="listitem"
-            className={cn("cv-card", isFeatured ? "col-span-2 md:col-span-2" : undefined)}
-            data-page={page}
-          >
-            <AnimePreviewCard media={item}>
-              <MediaCard
-                media={item}
-                size={isFeatured ? "featured" : "default"}
-                rank={rankStart !== undefined ? rankStart + i : undefined}
-                viewTransition={canMorph}
-                priority={eager}
-              />
-            </AnimePreviewCard>
+          <div key={item.id} role="listitem" className="cv-card" data-page={page}>
+            <MediaCard
+              media={item}
+              rank={rankStart !== undefined ? rankStart + i : undefined}
+              viewTransition={canMorph}
+              priority={eager}
+            />
           </div>
         );
       })}
@@ -61,43 +50,22 @@ export function MediaGrid({
   );
 }
 
-export function MediaGridSkeleton({
-  count = 20,
-  rankStart,
-}: {
-  count?: number;
-  rankStart?: number;
-}) {
+export function MediaGridSkeleton({ count = 20 }: { count?: number }) {
   return (
     <div className={MEDIA_GRID_CLASS} role="list" aria-label="Loading anime results">
-      <MediaGridSkeletonItems count={count} rankStart={rankStart} />
+      <MediaGridSkeletonItems count={count} />
     </div>
   );
 }
 
-export function MediaGridSkeletonItems({
-  count = 20,
-  rankStart,
-  firstPage = true,
-}: {
-  count?: number;
-  rankStart?: number;
-  firstPage?: boolean;
-}) {
+export function MediaGridSkeletonItems({ count = 20 }: { count?: number }) {
   return (
     <>
-      {Array.from({ length: count }).map((_, i) => {
-        const isFeatured = firstPage && (i === 0 || i === 12) && !rankStart;
-        return (
-          <div
-            key={i}
-            role="listitem"
-            className={isFeatured ? "col-span-2 md:col-span-2" : undefined}
-          >
-            <MediaCardSkeleton size={isFeatured ? "featured" : "default"} />
-          </div>
-        );
-      })}
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} role="listitem">
+          <MediaCardSkeleton />
+        </div>
+      ))}
     </>
   );
 }

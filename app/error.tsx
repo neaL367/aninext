@@ -1,9 +1,6 @@
 "use client";
 
-import { AlertTriangleIcon } from "lucide-react";
 import { useEffect } from "react";
-
-import { Button } from "@/components/ui/button";
 
 export default function GlobalError({
   error,
@@ -17,23 +14,24 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-8 text-center">
-      <div className="flex size-12 items-center justify-center rounded-full bg-destructive/10">
-        <AlertTriangleIcon className="size-5 text-destructive" />
-      </div>
-      <h1 className="text-lg font-semibold">Something went wrong</h1>
-      <p className="max-w-sm text-sm text-muted-foreground">
-        This section failed to load. Try again — if it keeps failing, the data source may be
-        temporarily unavailable.
+    <div className="mx-auto flex min-h-[55vh] w-full max-w-xl flex-col items-center justify-center gap-5 px-6 text-center">
+      <p className="font-mono text-[0.62rem] uppercase tracking-[0.22em] text-signal">Error</p>
+      <h1 className="display text-5xl sm:text-6xl">Something broke</h1>
+      <p className="max-w-sm text-sm leading-6 text-muted-foreground">
+        The data source did not respond. Try again in a moment.
       </p>
       {error.digest && (
-        <p className="font-mono text-[0.6rem] uppercase tracking-[0.12em] text-muted-foreground/60">
-          Reference {error.digest}
+        <p className="font-mono text-[0.55rem] uppercase tracking-[0.16em] text-muted-foreground/60">
+          Ref {error.digest}
         </p>
       )}
-      <Button onClick={() => reset()} variant="outline" size="sm">
+      <button
+        type="button"
+        onClick={() => reset()}
+        className="mt-2 border-b border-border-soft pb-1 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-foreground transition-colors hover:border-signal hover:text-signal focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
+      >
         Try again
-      </Button>
+      </button>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useTransition, useMemo } from "react";
+import { useMemo } from "react";
 
 import {
   getFacetFilterCount,
@@ -19,7 +19,6 @@ export interface ActiveFilter {
 
 export function useFilterState() {
   const searchParams = useSearchParams();
-  const [isPending] = useTransition();
   const state = useMemo<FilterState>(() => getFilterState(searchParams), [searchParams]);
 
   const activeFilters = useMemo<ActiveFilter[]>(() => {
@@ -46,15 +45,13 @@ export function useFilterState() {
 
   const groupedFilters = useMemo(() => {
     const groups: Record<string, ActiveFilter[]> = {};
-    activeFilters.forEach((f) => {
-      if (!groups[f.key]) groups[f.key] = [];
-      groups[f.key].push(f);
+    activeFilters.forEach((filter) => {
+      (groups[filter.key] ??= []).push(filter);
     });
     return groups;
   }, [activeFilters]);
 
   return {
-    isPending,
     state,
     activeFilters,
     groupedFilters,

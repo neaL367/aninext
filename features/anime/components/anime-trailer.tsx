@@ -66,8 +66,8 @@ export function AnimeTrailer({ media }: { media: Media }) {
 
   if (!trailer?.id || trailer.site !== "youtube") {
     return (
-      <div className="flex min-h-32 items-center border border-dashed border-border-soft px-5 font-mono text-xs uppercase tracking-[0.1em] text-muted-foreground">
-        No trailer indexed
+      <div className="flex min-h-32 items-center rounded-[3px] border border-border-soft px-5 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground">
+        No trailer
       </div>
     );
   }
@@ -79,7 +79,7 @@ export function AnimeTrailer({ media }: { media: Media }) {
   return (
     <div
       id="trailer"
-      className="group relative block aspect-video overflow-hidden rounded-md border border-border-soft bg-surface-2 isolate transform-gpu shadow-lg scroll-mt-24"
+      className="group relative isolate block aspect-video transform-gpu overflow-hidden rounded-[3px] bg-surface-2 scroll-mt-24"
     >
       {isPlaying ? (
         <>
@@ -133,5 +133,5 @@ export function AnimeTrailer({ media }: { media: Media }) {
 }
 
 export function AnimeTrailerSkeleton() {
-  return <div className="shimmer aspect-video w-full rounded-md border border-border-soft" />;
+  return <div className="shimmer aspect-video w-full rounded-[3px]" />;
 }

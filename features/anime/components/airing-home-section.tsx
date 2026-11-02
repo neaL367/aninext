@@ -1,12 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";
 
 import { LocalTime } from "@/components/ui/local-time";
 import { ViewAllLink } from "@/components/ui/view-all-link";
+import { MediaImage } from "@/components/ui/media-image";
 import { formatCountdown, getAiringPhase, getTitle } from "@/features/anime/lib/media-helpers";
+import { cn } from "@/lib/utils";
 
 import { SectionHeader } from "./section-header";
 
@@ -17,84 +18,74 @@ export function AiringHomeSection({ schedules }: { schedules: AiringScheduleNode
   "use memo";
   const now = Date.now() / 1000;
 
-  const upcomingSchedules = useMemo(
+  const upcoming = useMemo(
     () =>
       schedules
-        .filter((s) => s.airingAt > now)
+        .filter((schedule) => schedule.airingAt > now)
         .sort((a, b) => a.airingAt - b.airingAt)
-        .slice(0, 6),
+        .slice(0, 5),
     [schedules, now],
   );
 
-  if (upcomingSchedules.length === 0) return null;
+  if (upcoming.length === 0) return null;
 
   return (
-    <section>
+    <section aria-labelledby="tonight">
       <SectionHeader
-        eyebrow="Today"
-        title="Airing now"
-        description="Catch the latest episodes as they land."
+        index="03"
+        title="Tonight"
         action={<ViewAllLink href="/airing">Full schedule</ViewAllLink>}
       />
-      <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {upcomingSchedules.map((item, index) => {
+      <ol className="divide-y divide-border-soft border-t border-border-soft">
+        {upcoming.map((item) => {
           if (!item.media) return null;
           const title = getTitle(item.media.title);
-          // eslint-disable-next-line react-hooks/purity -- live countdown, recomputed per render
           const phase = getAiringPhase(item.airingAt, now);
           const countdown = phase === "upcoming" ? formatCountdown(item.airingAt, now) : "";
-          const isClose = phase === "upcoming" && item.airingAt - now < 3600;
-          const color = item.media.coverImage.color;
+          const isSoon = phase === "upcoming" && item.airingAt - now < 3600;
 
           return (
-            <Link
-              key={`${item.media.id}-${index}`}
-              href={`/anime/${item.media.id}` as Route<string>}
-              className="group flex items-center gap-3 p-3 sm:gap-4 sm:p-4 border border-border transition-colors hover:border-accent/50 hover:bg-surface-1/50 overflow-hidden"
-            >
-              <div
-                className="relative h-[72px] w-[54px] shrink-0 overflow-hidden bg-surface-2"
-                style={color ? { backgroundColor: color } : undefined}
+            <li key={`${item.media.id}-${item.episode}`}>
+              <Link
+                href={`/anime/${item.media.id}` as Route<string>}
+                className="group flex items-center gap-4 py-3.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
               >
-                {item.media.coverImage.medium ? (
-                  <Image
-                    src={item.media.coverImage.medium}
-                    alt={title}
-                    fill
-                    sizes="54px"
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-center font-mono text-[0.5rem] text-muted-foreground">
-                    {title}
-                  </div>
-                )}
-              </div>
-              <div className="w-0 flex-1">
-                <p className="line-clamp-1 text-sm font-medium group-hover:text-accent">{title}</p>
-                <p className="mt-1 font-mono text-xs text-muted-foreground">
-                  Ep {item.episode} <span className="hidden sm:inline">· </span>
-                  <LocalTime timestamp={item.airingAt} className="text-foreground" />
-                  <span className={`ml-1 ${isClose ? "text-live-badge" : "text-muted-foreground"}`}>
-                    ({countdown})
-                  </span>
-                </p>
-              </div>
-              <div className="hidden shrink-0 text-right sm:block">
-                <LocalTime
-                  timestamp={item.airingAt}
-                  className="block font-mono text-sm tabular-nums text-foreground"
-                />
-                <span
-                  className={`block mt-0.5 font-mono text-xs tabular-nums ${isClose ? "text-live-badge" : "text-muted-foreground"}`}
-                >
-                  {countdown}
+                <span className="w-14 shrink-0 font-mono text-sm tabular-nums text-foreground/80">
+                  <LocalTime timestamp={item.airingAt} />
                 </span>
-              </div>
-            </Link>
+                <span className="relative aspect-[2/3] w-8 shrink-0 overflow-hidden rounded-[2px] bg-surface-2">
+                  {item.media.coverImage.medium && (
+                    <MediaImage
+                      src={item.media.coverImage.medium}
+                      alt=""
+                      fill
+                      sizes="32px"
+                      loading="lazy"
+                      className="object-cover"
+                    />
+                  )}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-serif text-base leading-snug text-foreground transition-colors group-hover:text-signal sm:text-lg">
+                    {title}
+                  </span>
+                  <span className="mt-0.5 block font-mono text-[0.56rem] uppercase tracking-[0.12em] text-muted-foreground/75">
+                    Episode {item.episode}
+                  </span>
+                </span>
+                <span
+                  className={cn(
+                    "shrink-0 font-mono text-[0.62rem] tabular-nums",
+                    isSoon ? "text-signal" : "text-muted-foreground",
+                  )}
+                >
+                  {isSoon ? `in ${countdown}` : countdown}
+                </span>
+              </Link>
+            </li>
           );
         })}
-      </div>
+      </ol>
     </section>
   );
 }
@@ -102,27 +93,19 @@ export function AiringHomeSection({ schedules }: { schedules: AiringScheduleNode
 export function AiringHomeSectionSkeleton() {
   return (
     <section>
-      <div className="mb-5 space-y-3">
-        <div className="shimmer h-2.5 w-16 rounded" />
-        <div className="shimmer h-8 w-56 rounded" />
+      <div className="mb-8 border-b border-border-soft pb-4">
+        <div className="shimmer h-9 w-40 rounded-[2px]" />
       </div>
-      <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div
-            key={i}
-            className="flex items-center gap-3 p-3 sm:gap-4 sm:p-4 border border-border overflow-hidden bg-surface-1/30"
-          >
-            <div className="relative h-[72px] w-[54px] shrink-0 overflow-hidden bg-surface-2 isolate">
-              <div className="absolute inset-0 shimmer" />
+      <div className="divide-y divide-border-soft border-t border-border-soft">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="flex items-center gap-4 py-3.5">
+            <div className="shimmer h-4 w-12 rounded-[2px]" />
+            <div className="shimmer h-10 w-8 rounded-[2px]" />
+            <div className="flex-1 space-y-2">
+              <div className="shimmer h-4 w-3/5 rounded-[2px]" />
+              <div className="shimmer h-2.5 w-20 rounded-[2px]" />
             </div>
-            <div className="w-0 flex-1 space-y-2">
-              <div className="shimmer h-4 w-3/4 rounded" />
-              <div className="shimmer h-3 w-2/3 rounded" />
-            </div>
-            <div className="hidden shrink-0 space-y-1 sm:block">
-              <div className="shimmer h-3 w-10 rounded" />
-              <div className="shimmer h-2 w-8 rounded" />
-            </div>
+            <div className="shimmer h-3 w-10 rounded-[2px]" />
           </div>
         ))}
       </div>

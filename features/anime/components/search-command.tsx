@@ -73,14 +73,14 @@ export function SearchCommand() {
     <CommandDialog
       open={open}
       onOpenChange={setOpen}
-      title="Search AniNext"
-      description="Search anime or jump to a collection."
+      title="Search"
+      description="Find an anime or jump to a collection."
     >
       <Command>
         <CommandInput
           aria-label="Search anime or choose a collection"
           autoComplete="off"
-          placeholder="Search anime or choose a collection…"
+          placeholder="Search anime"
           value={query}
           onValueChange={setQuery}
           onKeyDown={(event) => {
@@ -89,7 +89,7 @@ export function SearchCommand() {
         />
         <CommandList>
           <CommandEmpty>
-            {query ? "Press Enter to search this title." : "No commands found."}
+            {query ? "Press Enter to search." : "No commands."}
           </CommandEmpty>
           <CommandGroup heading="Collections">
             {COLLECTION_NAV_ITEMS.map(({ id, label }) => (

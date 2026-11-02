@@ -5,11 +5,12 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { HeroInfo } from "./hero-info";
+import { usePrefersReducedMotion } from "../hooks/use-reduced-motion";
 
 import type { Media } from "@/features/anime/types/anime";
 
-const AUTOPLAY_INTERVAL = 7000;
-const SWIPE_THRESHOLD = 50;
+const AUTOPLAY_INTERVAL = 9000;
+const SWIPE_THRESHOLD = 56;
 
 export function HeroCarousel({ items }: { items: Media[] }) {
   "use memo";
@@ -17,12 +18,10 @@ export function HeroCarousel({ items }: { items: Media[] }) {
   const [prev, setPrev] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(true);
   const [progress, setProgress] = useState(0);
+  const reducedMotion = usePrefersReducedMotion();
 
   const dragStartX = useRef<number | null>(null);
   const isDragging = useRef(false);
-  const progressTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const startTimeRef = useRef<number>(Date.now());
-
   const len = items.length;
   const media = items[current] ?? items[0];
 
@@ -31,7 +30,6 @@ export function HeroCarousel({ items }: { items: Media[] }) {
       setPrev(current);
       setCurrent((index + len) % len);
       setProgress(0);
-      startTimeRef.current = Date.now();
     },
     [current, len],
   );
@@ -39,58 +37,38 @@ export function HeroCarousel({ items }: { items: Media[] }) {
   const next = useCallback(() => goTo(current + 1), [current, goTo]);
   const prevSlide = useCallback(() => goTo(current - 1), [current, goTo]);
 
-  // Autoplay and Progress Bar Loop
+  // Autoplay is a progressive enhancement: off for reduced-motion visitors.
   useEffect(() => {
-    if (len < 2 || !isPlaying) {
-      if (progressTimerRef.current) clearInterval(progressTimerRef.current);
-      return;
-    }
+    if (len < 2 || !isPlaying || reducedMotion) return;
 
     const startTime = Date.now();
     const intervalId = setInterval(() => {
       const elapsed = Date.now() - startTime;
       const pct = Math.min((elapsed / AUTOPLAY_INTERVAL) * 100, 100);
       setProgress(pct);
-
-      if (elapsed >= AUTOPLAY_INTERVAL) {
-        next();
-      }
+      if (elapsed >= AUTOPLAY_INTERVAL) next();
     }, 100);
-    progressTimerRef.current = intervalId;
 
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [current, isPlaying, len, next]);
+    return () => clearInterval(intervalId);
+  }, [current, isPlaying, len, next, reducedMotion]);
 
-  // Keyboard navigation (Left/Right arrows, Space bar)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        prevSlide();
-      } else if (e.key === "ArrowRight") {
-        e.preventDefault();
-        next();
-      } else if (e.key === " ") {
-        e.preventDefault();
-        setIsPlaying((p) => !p);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [next, prevSlide]);
-
-  // Touch and Drag Handlers
-  const handleTouchStart = (e: React.TouchEvent) => {
-    dragStartX.current = e.touches[0].clientX;
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      prevSlide();
+    } else if (event.key === "ArrowRight") {
+      event.preventDefault();
+      next();
+    }
   };
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
+  const handleTouchStart = (event: React.TouchEvent) => {
+    dragStartX.current = event.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (event: React.TouchEvent) => {
     if (dragStartX.current === null) return;
-    const diff = e.changedTouches[0].clientX - dragStartX.current;
+    const diff = event.changedTouches[0].clientX - dragStartX.current;
     if (Math.abs(diff) > SWIPE_THRESHOLD) {
       if (diff > 0) prevSlide();
       else next();
@@ -98,14 +76,14 @@ export function HeroCarousel({ items }: { items: Media[] }) {
     dragStartX.current = null;
   };
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    dragStartX.current = e.clientX;
+  const handleMouseDown = (event: React.MouseEvent) => {
+    dragStartX.current = event.clientX;
     isDragging.current = true;
   };
 
-  const handleMouseUp = (e: React.MouseEvent) => {
+  const handleMouseUp = (event: React.MouseEvent) => {
     if (!isDragging.current || dragStartX.current === null) return;
-    const diff = e.clientX - dragStartX.current;
+    const diff = event.clientX - dragStartX.current;
     if (Math.abs(diff) > SWIPE_THRESHOLD) {
       if (diff > 0) prevSlide();
       else next();
@@ -116,8 +94,10 @@ export function HeroCarousel({ items }: { items: Media[] }) {
 
   return (
     <section
-      aria-label="Featured anime hero carousel"
-      className="relative w-full h-[500px] sm:h-[580px] lg:h-[640px] overflow-hidden bg-background select-none cursor-grab active:cursor-grabbing"
+      aria-roledescription="carousel"
+      aria-label="Featured anime"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
       onMouseLeave={() => {
         isDragging.current = false;
         dragStartX.current = null;
@@ -126,28 +106,27 @@ export function HeroCarousel({ items }: { items: Media[] }) {
       onTouchEnd={handleTouchEnd}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
+      className="relative h-[76vh] min-h-[520px] max-h-[780px] w-full cursor-grab select-none overflow-hidden bg-background focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-signal active:cursor-grabbing"
     >
-      {/* Full-Bleed Media Layer with GPU Scale Interpolation */}
-      <div className="absolute inset-0 w-full h-full pointer-events-none bg-background">
+      <div className="pointer-events-none absolute inset-0">
         {items.map((item, i) => {
           const image = item.bannerImage ?? item.coverImage.extraLarge;
           const isCurrent = i === current;
           const isPrev = i === prev;
           const isAdjacent = i === (current + 1) % len || i === (current - 1 + len) % len;
-          const isMounted = isCurrent || isPrev || isAdjacent;
-
-          if (!isMounted) return null;
+          if (!(isCurrent || isPrev || isAdjacent)) return null;
 
           return (
             <div
               key={item.id}
-              className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out bg-background ${
-                isCurrent ? "opacity-100 z-10" : "opacity-0 z-0"
-              }`}
+              className="absolute inset-0 transition-opacity duration-[1400ms] ease-out"
+              style={{ opacity: isCurrent ? 1 : 0 }}
             >
               {image && (
                 <div
-                  className={`relative w-full h-full ${isCurrent ? "animate-cinematic-scale" : ""}`}
+                  className={`relative h-full w-full ${
+                    isCurrent && !reducedMotion ? "animate-cinematic-scale" : ""
+                  }`}
                 >
                   <Image
                     src={image}
@@ -156,7 +135,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
                     priority={i === 0 || isCurrent}
                     sizes="100vw"
                     unoptimized
-                    className="object-cover object-center transform-gpu"
+                    className="object-cover object-[50%_28%]"
                   />
                 </div>
               )}
@@ -165,71 +144,58 @@ export function HeroCarousel({ items }: { items: Media[] }) {
         })}
       </div>
 
-      {/* Seamless Bottom Gradient Overlay matching Page Background */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-4/5 z-15 bg-gradient-to-t from-background via-background/70 via-50% to-transparent" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/55 to-background/5" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/75 via-transparent to-transparent" />
 
-      {/* Foreground Content Positioned Bottom-Left Aligned with Main Width Layout */}
-      <div className="absolute inset-x-0 bottom-0 z-20 pb-14 sm:pb-16 lg:pb-18">
-        <div className="mx-auto w-full max-w-[1680px] px-4 sm:px-7 lg:px-10">
-          <HeroInfo key={media.id} media={media} rank={current + 1} />
+      <div className="absolute inset-x-0 bottom-0 z-20 pb-16 sm:pb-20 lg:pb-24">
+        <div className="mx-auto w-full max-w-[1760px] px-4 sm:px-7 lg:px-10">
+          <HeroInfo key={media.id} media={media} />
         </div>
       </div>
 
-      {/* Carousel Controls Aligned with Page Layout */}
-      <div className="absolute bottom-5 sm:bottom-7 inset-x-0 z-30 pointer-events-none">
-        <div className="mx-auto flex w-full max-w-[1680px] items-center justify-end px-4 sm:px-7 lg:px-10">
-          <div className="pointer-events-auto flex items-center gap-3.5">
-            {/* Play / Pause Toggle Button */}
+      <div className="absolute inset-x-0 bottom-5 z-30 sm:bottom-7">
+        <div className="mx-auto flex w-full max-w-[1760px] items-center gap-5 px-4 sm:px-7 lg:px-10">
+          <div className="flex items-center gap-2">
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsPlaying((p) => !p);
-              }}
-              className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full bg-signal text-white transition-[transform,background-color] hover:bg-signal-strong hover:scale-105 active:scale-95 shadow-md"
+              type="button"
+              onClick={() => setIsPlaying((value) => !value)}
+              className="flex size-8 items-center justify-center rounded-full border border-white/20 text-white/80 transition-colors hover:border-white/50 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
               aria-label={isPlaying ? "Pause slideshow" : "Play slideshow"}
+              aria-pressed={isPlaying}
             >
               {isPlaying ? (
-                <PauseIcon className="size-3.5 fill-current" />
+                <PauseIcon className="size-3 fill-current" />
               ) : (
-                <PlayIcon className="size-3.5 fill-current ml-0.5" />
+                <PlayIcon className="ml-0.5 size-3 fill-current" />
               )}
             </button>
+            <span className="font-mono text-[0.62rem] tabular-nums tracking-[0.12em] text-white/60">
+              {String(current + 1).padStart(2, "0")} / {String(len).padStart(2, "0")}
+            </span>
+          </div>
 
-            {/* Slide Indicators: Full Rounded Circles for Inactive, Progress Pill for Active */}
-            <div className="flex items-center gap-2">
-              {items.map((item, index) => {
-                const isActive = index === current;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      goTo(index);
-                    }}
-                    className={`group relative cursor-pointer transition-[width,height,background-color] duration-300 ${
-                      isActive
-                        ? "w-12 sm:w-14 h-2.5 rounded-full bg-foreground/20 overflow-hidden"
-                        : "size-2.5 rounded-full bg-foreground/30 hover:bg-foreground/70"
-                    }`}
-                    aria-label={`Go to slide ${index + 1}`}
-                  >
-                    {isActive && (
-                      <div
-                        className="absolute inset-y-0 left-0 bg-signal rounded-full"
-                        style={{ width: `${progress}%` }}
-                      />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Slide Counter */}
-            <div className="font-mono text-xs font-bold text-foreground tracking-wider tabular-nums pl-1">
-              <span className="text-signal">{String(current + 1).padStart(2, "0")}</span>
-              <span className="text-muted-foreground/60 mx-1">/</span>
-              <span className="text-muted-foreground">{String(len).padStart(2, "0")}</span>
-            </div>
+          <div className="flex flex-1 items-center gap-1.5">
+            {items.map((item, index) => {
+              const isActive = index === current;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => goTo(index)}
+                  aria-label={`Go to slide ${index + 1}`}
+                  aria-current={isActive ? "true" : undefined}
+                  className="group relative h-4 flex-1 max-w-24 cursor-pointer"
+                >
+                  <span className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-white/25 transition-colors group-hover:bg-white/60" />
+                  {isActive && (
+                    <span
+                      className="absolute left-0 top-1/2 h-px -translate-y-1/2 bg-signal"
+                      style={{ width: reducedMotion ? "100%" : `${progress}%` }}
+                    />
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -239,15 +205,16 @@ export function HeroCarousel({ items }: { items: Media[] }) {
 
 export function HeroCarouselSkeleton() {
   return (
-    <div className="relative w-full h-[520px] sm:h-[600px] lg:h-[660px] overflow-hidden bg-background">
-      <div className="absolute inset-0 w-full h-full shimmer" />
-      <div className="absolute inset-x-0 bottom-0 z-20 pb-14 sm:pb-16 lg:pb-18">
-        <div className="mx-auto w-full max-w-[1680px] px-4 sm:px-7 lg:px-10">
-          <div className="space-y-4 max-w-2xl">
-            <div className="shimmer h-4 w-24 rounded-full" />
-            <div className="shimmer h-12 w-3/4 rounded-lg" />
-            <div className="shimmer h-4 w-1/2 rounded" />
-            <div className="shimmer h-12 w-full rounded-lg" />
+    <div className="relative h-[76vh] min-h-[520px] max-h-[780px] w-full overflow-hidden bg-background">
+      <div className="absolute inset-0 shimmer" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 z-20 pb-16 sm:pb-20 lg:pb-24">
+        <div className="mx-auto w-full max-w-[1760px] px-4 sm:px-7 lg:px-10">
+          <div className="max-w-2xl space-y-4">
+            <div className="shimmer h-3 w-20 rounded-[2px]" />
+            <div className="shimmer h-14 w-4/5 rounded-[2px] sm:h-20" />
+            <div className="shimmer h-4 w-1/2 rounded-[2px]" />
+            <div className="shimmer h-12 w-full max-w-xl rounded-[2px]" />
           </div>
         </div>
       </div>

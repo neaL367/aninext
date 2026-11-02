@@ -24,9 +24,9 @@ export function getStreamingLinks(links: MediaExternalLink[] | undefined): Media
   if (!links) return [];
   return links.filter(
     (link) =>
-      link.url &&
+      isSafeExternalUrl(link.url) &&
       (link.type === "STREAMING" ||
-        STREAMING_SITES.some((s) => link.site?.toLowerCase().includes(s))),
+        STREAMING_SITES.some((site) => link.site?.toLowerCase().includes(site))),
   );
 }
 

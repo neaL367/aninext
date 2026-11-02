@@ -5,13 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "@/components/ui/input-group";
-
 export function SearchBar() {
   "use memo";
   const router = useRouter();
@@ -51,17 +44,18 @@ export function SearchBar() {
 
   return (
     <form role="search" aria-label="Search anime" onSubmit={handleSubmit} className="w-full">
-      <InputGroup className="h-10 rounded-md border-border-soft bg-surface-1/80 transition-colors focus-within:border-signal">
-        <InputGroupAddon align="inline-start" className="pl-3">
-          <SearchIcon className="size-3.5 text-muted-foreground" aria-hidden="true" />
-        </InputGroupAddon>
-        <InputGroupInput
+      <div className="group relative flex h-10 items-center border-b border-border-soft transition-colors focus-within:border-signal">
+        <SearchIcon
+          className="size-3.5 shrink-0 text-muted-foreground transition-colors group-focus-within:text-signal"
+          aria-hidden="true"
+        />
+        <input
           type="search"
           name="search"
           autoComplete="off"
           value={value}
-          placeholder="Search anime…"
-          className="font-mono text-xs text-foreground placeholder:text-muted-foreground"
+          placeholder="Search anime"
+          className="h-full w-full min-w-0 bg-transparent px-2.5 font-mono text-xs text-foreground outline-none placeholder:text-muted-foreground/60 [&::-webkit-search-cancel-button]:hidden"
           onChange={(event) => {
             const nextValue = event.target.value;
             setValue(nextValue);
@@ -70,23 +64,21 @@ export function SearchBar() {
           aria-label="Search anime"
         />
         {value && (
-          <InputGroupButton
+          <button
             type="button"
-            size="icon-sm"
-            variant="ghost"
             onClick={handleClear}
             aria-label="Clear search"
             title="Clear search"
-            className="pr-2"
+            className="flex size-7 shrink-0 items-center justify-center rounded-[2px] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
           >
             <XIcon className="size-3.5" />
-          </InputGroupButton>
+          </button>
         )}
-      </InputGroup>
+      </div>
     </form>
   );
 }
 
 export function SearchBarFallback() {
-  return <div className="h-10 rounded-md border border-border-soft bg-surface-1/60 shimmer" />;
+  return <div className="h-10 border-b border-border-soft shimmer" />;
 }

@@ -1,7 +1,4 @@
-"use client";
-
 import Image from "next/image";
-import { useState } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -24,9 +21,6 @@ export function MediaImage({
   loading?: "lazy" | "eager";
   unoptimized?: boolean;
 }) {
-  "use memo";
-  const [isLoaded, setIsLoaded] = useState(false);
-
   return (
     <Image
       src={src}
@@ -36,12 +30,7 @@ export function MediaImage({
       priority={priority}
       loading={loading ?? (priority ? "eager" : undefined)}
       unoptimized={unoptimized}
-      onLoad={() => setIsLoaded(true)}
-      className={cn(
-        "transition-opacity duration-500 ease-out",
-        isLoaded ? "opacity-100" : "opacity-0",
-        className,
-      )}
+      className={cn(className)}
     />
   );
 }

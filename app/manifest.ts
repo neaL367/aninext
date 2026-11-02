@@ -2,13 +2,13 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "AniNext — Discover Anime",
+    name: "AniNext",
     short_name: "AniNext",
-    description: "Discover what is airing, rising, and worth your next evening.",
+    description: "A quiet index of anime worth your evening.",
     start_url: "/",
     display: "standalone",
-    background_color: "#0a0a0a",
-    theme_color: "#0a0a0a",
+    background_color: "#060606",
+    theme_color: "#060606",
     icons: [
       {
         src: "/icon",

@@ -16,8 +16,8 @@ export async function generateMetadata({
   const validDay = parseDayParam(day);
   if (!validDay) return {};
   return {
-    title: `Airing schedule for ${validDay} — AniNext`,
-    description: `Anime airing on ${validDay}. See times, episodes, and where to watch.`,
+    title: `Airing schedule for ${validDay}`,
+    description: `Anime airing on ${validDay}.`,
     alternates: { canonical: `/airing/${validDay}` },
   };
 }

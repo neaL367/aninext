@@ -6,19 +6,11 @@ import {
   getHomeSecondaryBatch,
   getTop100Preview,
 } from "@/features/anime/anime-queries";
+import { FILTER_ADULT_GENRES } from "@/features/anime/lib/filter-constants";
 
 import { AiringHomeSection } from "./airing-home-section";
-import { EditorialBanner } from "./editorial-banner";
-import { FeatureMosaic } from "./feature-mosaic";
-import { GenreExplorer } from "./genre-pills";
 import { HeroCarousel } from "./hero-carousel";
-import { SectionRow } from "./section-row";
-import { Top100Podium } from "./top100-podium";
-import { TrendingShowcase } from "./trending-showcase";
-import { UpcomingReel } from "./upcoming-reel";
-
-import type { AnimeCollection, Media } from "@/features/anime/types/anime";
-import type { Route } from "next";
+import { GenreIndex, RankingList, SeasonMosaic, TrendingIndex, UpcomingStrip } from "./home-sections";
 
 export function HomeFeaturedShell({
   hero,
@@ -28,9 +20,9 @@ export function HomeFeaturedShell({
   children: React.ReactNode;
 }) {
   return (
-    <div className="home-page">
+    <div>
       {hero}
-      <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-16 px-4 py-14 sm:px-7 sm:py-20 lg:gap-24 lg:px-10">
+      <div className="mx-auto flex w-full max-w-[1760px] flex-col gap-16 px-4 py-14 sm:gap-20 sm:px-7 sm:py-16 lg:gap-24 lg:px-10 lg:py-20">
         {children}
       </div>
     </div>
@@ -40,112 +32,25 @@ export function HomeFeaturedShell({
 export async function HomeHero() {
   await io();
   const { trending } = await getHomePrimaryBatch();
-  const heroItems = trending.slice(0, 5);
-  return heroItems.length > 0 ? <HeroCarousel items={heroItems} /> : null;
+  const items = trending.slice(0, 5);
+  return items.length > 0 ? <HeroCarousel items={items} /> : null;
 }
 
-async function getCollectionItems(collection: AnimeCollection, perPage: number): Promise<Media[]> {
-  if (collection === "trending" || collection === "popular") {
-    const batch = await getHomePrimaryBatch();
-    return collection === "trending"
-      ? batch.trending.slice(0, perPage)
-      : batch.popular.slice(0, perPage);
-  }
-  if (collection === "top100") {
-    return getTop100Preview(perPage);
-  }
-  if (collection === "upcoming" || collection === "alltimepopular") {
-    const now = Math.floor(Date.now() / 1000);
-    const bucket = Math.floor(now / 300) * 300;
-    const batch = await getHomeSecondaryBatch(bucket - 43_200, bucket + 129_600);
-    return collection === "upcoming"
-      ? batch.upcoming.slice(0, perPage)
-      : batch.alltimepopular.slice(0, perPage);
-  }
-  return [];
-}
-
-function CollectionRenderer({
-  collection,
-  items,
-  title,
-  href,
-  description,
-  showRank,
-  mosaic,
-}: {
-  collection: AnimeCollection;
-  items: Media[];
-  title: string;
-  href: Route<string>;
-  description?: string;
-  showRank?: boolean;
-  mosaic?: boolean;
-}) {
-  if (collection === "trending") return <TrendingShowcase items={items} />;
-  if (collection === "popular" || mosaic)
-    return <FeatureMosaic title={title} href={href} items={items} />;
-  if (collection === "top100") return <Top100Podium title={title} href={href} items={items} />;
-  if (collection === "upcoming")
-    return <UpcomingReel title={title} href={href} items={items} description={description} />;
-  if (collection === "alltimepopular" && items.length > 0) {
-    return (
-      <div className="space-y-16">
-        <EditorialBanner item={items[0]} />
-        <SectionRow
-          title={title}
-          href={href}
-          items={items.slice(1)}
-          description={description}
-          showRank={showRank}
-        />
-      </div>
-    );
-  }
-  return (
-    <SectionRow
-      title={title}
-      href={href}
-      items={items}
-      description={description}
-      showRank={showRank}
-    />
-  );
-}
-
-export async function HomeCollectionSection({
-  collection,
-  title,
-  href,
-  perPage,
-  description,
-  showRank = false,
-  mosaic = false,
-}: {
-  collection: AnimeCollection;
-  title: string;
-  href: Route<string>;
-  perPage: number;
-  description?: string;
-  showRank?: boolean;
-  mosaic?: boolean;
-}) {
+export async function HomeTrending() {
   await io();
-  const items = await getCollectionItems(collection, perPage);
+  const { trending } = await getHomePrimaryBatch();
+  return <TrendingIndex items={trending.slice(0, 7)} />;
+}
+
+export async function HomeSeason() {
+  await io();
+  const { popular } = await getHomePrimaryBatch();
   return (
-    <CollectionRenderer
-      collection={collection}
-      items={items}
-      title={title}
-      href={href}
-      description={description}
-      showRank={showRank}
-      mosaic={mosaic}
-    />
+    <SeasonMosaic title="This season" href="/anime/popular" items={popular.slice(0, 5)} />
   );
 }
 
-export async function HomeAiringSection() {
+export async function HomeTonight() {
   await io();
   const now = Math.floor(Date.now() / 1000);
   const bucket = Math.floor(now / 300) * 300;
@@ -153,8 +58,24 @@ export async function HomeAiringSection() {
   return <AiringHomeSection schedules={airingSchedules} />;
 }
 
-export async function HomeGenreSection() {
+export async function HomeRanking() {
   await io();
-  const genres = await getGenres();
-  return <GenreExplorer genres={genres} />;
+  const items = await getTop100Preview(10);
+  return <RankingList title="Top 100" href="/anime/top100" items={items} />;
+}
+
+export async function HomeUpcoming() {
+  await io();
+  const now = Math.floor(Date.now() / 1000);
+  const bucket = Math.floor(now / 300) * 300;
+  const { upcoming } = await getHomeSecondaryBatch(bucket - 43_200, bucket + 129_600);
+  return <UpcomingStrip title="Coming soon" href="/anime/upcoming" items={upcoming.slice(0, 4)} />;
+}
+
+export async function HomeGenres() {
+  await io();
+  const genres = (await getGenres()).filter(
+    (genre) => !FILTER_ADULT_GENRES.some((adultGenre) => adultGenre === genre),
+  );
+  return <GenreIndex genres={genres} />;
 }
