@@ -96,7 +96,9 @@ export function AiringNow({
             className="object-cover object-[50%_25%]"
           />
         )}
-        {!banner && color && <div className="absolute inset-0" style={{ backgroundColor: color }} />}
+        {!banner && color && (
+          <div className="absolute inset-0" style={{ backgroundColor: color }} />
+        )}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/20" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/70 to-transparent" />
 
@@ -167,7 +169,7 @@ export function AiringNow({
             <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
               <Link
                 href={`/anime/${media.id}` as Route<string>}
-                className="inline-flex items-center gap-1.5 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-foreground transition-colors hover:text-signal"
+                className="inline-flex min-h-9 items-center gap-1.5 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-foreground transition-colors hover:text-signal"
               >
                 Open
                 <ArrowRightIcon className="size-3" />
@@ -178,7 +180,7 @@ export function AiringNow({
                   href={streamingLinks[0].url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 font-mono text-[0.62rem] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground"
+                  className="inline-flex min-h-9 items-center gap-1.5 font-mono text-[0.62rem] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <PlayIcon className="size-3" />
                   Watch{streamingLinks[0].site ? ` on ${streamingLinks[0].site}` : ""}

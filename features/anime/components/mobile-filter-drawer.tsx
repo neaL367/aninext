@@ -52,7 +52,7 @@ export function MobileFilterDrawer({
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="w-[min(24rem,calc(100vw-1rem))] overflow-y-auto bg-background"
+        className="w-[min(24rem,calc(100vw-1rem))]! pb-[env(safe-area-inset-bottom)] overflow-y-auto bg-background"
       >
         <SheetHeader className="border-b border-border-soft pb-4 text-left">
           <SheetTitle className="font-mono text-[0.68rem] uppercase tracking-[0.18em]">

@@ -29,7 +29,7 @@ export function TrendingIndex({ items }: { items: Media[] }) {
         title="Trending"
         action={<ViewAllLink href="/anime/trending">All trending</ViewAllLink>}
       />
-      <div className="grid gap-8 lg:grid-cols-[1.05fr_1fr] lg:gap-12">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1.05fr_1fr] lg:gap-12">
         <Link
           href={`/anime/${lead.id}` as Route<string>}
           className="group relative block min-h-[420px] overflow-hidden rounded-[3px] bg-surface-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal lg:min-h-[560px]"
@@ -198,7 +198,7 @@ export function RankingList({
         title={title}
         action={<ViewAllLink href={href}>Full ranking</ViewAllLink>}
       />
-      <ol className="grid gap-x-12 md:grid-cols-2">
+      <ol className="grid grid-cols-1 gap-x-12 md:grid-cols-2">
         {items.slice(0, 10).map((item, index) => {
           const itemTitle = getMediaTitle(item);
           return (
@@ -313,7 +313,11 @@ export function GenreIndex({ genres }: { genres: string[] }) {
   );
 }
 
-export function HomeSectionSkeleton({ kind = "row" }: { kind?: "row" | "mosaic" | "list" | "wide" }) {
+export function HomeSectionSkeleton({
+  kind = "row",
+}: {
+  kind?: "row" | "mosaic" | "list" | "wide";
+}) {
   if (kind === "mosaic") {
     return (
       <section>
@@ -336,7 +340,7 @@ export function HomeSectionSkeleton({ kind = "row" }: { kind?: "row" | "mosaic" 
         <div className="mb-8 border-b border-border-soft pb-4">
           <div className="shimmer h-9 w-56 rounded-[2px]" />
         </div>
-        <div className="grid gap-x-12 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-x-12 md:grid-cols-2">
           {Array.from({ length: 10 }).map((_, i) => (
             <div key={i} className="border-b border-border-soft py-4">
               <div className="shimmer h-5 w-full max-w-sm rounded-[2px]" />
@@ -367,7 +371,7 @@ export function HomeSectionSkeleton({ kind = "row" }: { kind?: "row" | "mosaic" 
       <div className="mb-8 border-b border-border-soft pb-4">
         <div className="shimmer h-9 w-52 rounded-[2px]" />
       </div>
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <div className="shimmer min-h-[420px] rounded-[3px] lg:min-h-[560px]" />
         <div className="space-y-4">
           {Array.from({ length: 5 }).map((_, i) => (

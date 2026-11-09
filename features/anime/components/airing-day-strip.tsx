@@ -61,7 +61,10 @@ export function AiringDayStrip({
   return (
     <div className="sticky top-14 z-40 -mx-4 border-b border-border-soft bg-background/85 backdrop-blur-2xl sm:-mx-7 lg:-mx-10">
       <div className="mx-auto w-full max-w-[1760px] px-4 sm:px-7 lg:px-10">
-        <nav className="no-scrollbar flex items-end gap-1 overflow-x-auto" aria-label="Airing days">
+        <nav
+          className="no-scrollbar flex items-end gap-1 overflow-x-auto max-sm:[mask-image:linear-gradient(to_right,black_90%,transparent)]"
+          aria-label="Airing days"
+        >
           {week.map(({ day, count }) => {
             const date = new Date(day + "T00:00:00");
             const isToday = day === today;
@@ -130,7 +133,7 @@ export function AiringDayStrip({
                       ?.scrollIntoView({ behavior: "smooth", block: "start" });
                   }}
                   className={cn(
-                    "flex shrink-0 items-center gap-1 font-mono text-[0.58rem] tabular-nums transition-colors",
+                    "relative flex shrink-0 items-center gap-1 font-mono text-[0.58rem] tabular-nums transition-colors before:absolute before:-inset-x-2 before:-inset-y-2.5 before:content-['']",
                     isNow ? "text-signal" : "text-muted-foreground/60 hover:text-foreground",
                   )}
                 >

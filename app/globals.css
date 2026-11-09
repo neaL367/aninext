@@ -168,7 +168,9 @@
   h3,
   .font-serif {
     font-kerning: normal;
-    font-feature-settings: "kern" 1, "liga" 1;
+    font-feature-settings:
+      "kern" 1,
+      "liga" 1;
   }
 
   ::-webkit-scrollbar {

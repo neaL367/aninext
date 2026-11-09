@@ -50,7 +50,7 @@ export function FilterOptionGrid({
     <div
       className={cn(
         "grid grid-cols-2 gap-0.5",
-        scroll && "max-h-56 overflow-y-auto pr-1 scrollbar-thin",
+        scroll && "max-h-[min(18rem,45vh)] overflow-y-auto pr-1 scrollbar-thin",
       )}
     >
       {options.map((option) => (

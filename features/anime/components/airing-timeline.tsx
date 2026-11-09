@@ -114,10 +114,7 @@ export function AiringTimeline({
         : visible.filter((schedule) => schedule.media?.format === formatFilter),
     [visible, formatFilter],
   );
-  const sorted = useMemo(
-    () => [...filtered].sort((a, b) => a.airingAt - b.airingAt),
-    [filtered],
-  );
+  const sorted = useMemo(() => [...filtered].sort((a, b) => a.airingAt - b.airingAt), [filtered]);
 
   const bands = useMemo<Band[]>(() => {
     const map = new Map<number, AiringScheduleNode[]>();
@@ -127,9 +124,7 @@ export function AiringTimeline({
       list.push(schedule);
       map.set(hour, list);
     }
-    return [...map.entries()]
-      .sort((a, b) => a[0] - b[0])
-      .map(([hour, items]) => ({ hour, items }));
+    return [...map.entries()].sort((a, b) => a[0] - b[0]).map(([hour, items]) => ({ hour, items }));
   }, [sorted, offset]);
 
   const liveCount = useMemo(
@@ -169,7 +164,11 @@ export function AiringTimeline({
           </p>
         </div>
 
-        <div className="no-scrollbar flex items-center gap-4 overflow-x-auto" role="group" aria-label="Filter by format">
+        <div
+          className="no-scrollbar flex items-center gap-4 overflow-x-auto max-sm:[mask-image:linear-gradient(to_right,black_88%,transparent)]"
+          role="group"
+          aria-label="Filter by format"
+        >
           {FORMAT_FILTERS.map((filter) => (
             <button
               key={filter}
@@ -177,7 +176,7 @@ export function AiringTimeline({
               onClick={() => setFormatFilter(filter)}
               aria-pressed={formatFilter === filter}
               className={cn(
-                "shrink-0 border-b pb-1 font-mono text-[0.6rem] uppercase tracking-[0.14em] transition-colors",
+                "relative shrink-0 border-b pb-1 font-mono text-[0.6rem] uppercase tracking-[0.14em] transition-colors before:absolute before:-inset-x-1.5 before:-inset-y-2.5 before:content-['']",
                 formatFilter === filter
                   ? "border-signal text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground",
@@ -205,9 +204,7 @@ export function AiringTimeline({
             !bands
               .slice(0, index)
               .some((previous) =>
-                previous.items.some(
-                  (schedule) => getPhase(schedule.airingAt, now) === "upcoming",
-                ),
+                previous.items.some((schedule) => getPhase(schedule.airingAt, now) === "upcoming"),
               );
 
           return (
@@ -301,7 +298,14 @@ function ScheduleRow({
         </span>
         <span className="relative aspect-[2/3] w-7 shrink-0 overflow-hidden rounded-[2px] bg-surface-2">
           {media.coverImage.medium && (
-            <MediaImage src={media.coverImage.medium} alt="" fill sizes="28px" loading="lazy" className="object-cover" />
+            <MediaImage
+              src={media.coverImage.medium}
+              alt=""
+              fill
+              sizes="28px"
+              loading="lazy"
+              className="object-cover"
+            />
           )}
         </span>
         <span className="min-w-0 flex-1 truncate font-serif text-sm text-foreground/85 transition-colors group-hover:text-signal">
@@ -315,12 +319,7 @@ function ScheduleRow({
   }
 
   return (
-    <div
-      className={cn(
-        "border-b border-border-soft",
-        isLive && "bg-signal/[0.045]",
-      )}
-    >
+    <div className={cn("border-b border-border-soft", isLive && "bg-signal/[0.045]")}>
       <Link
         href={`/anime/${media.id}` as Route<string>}
         aria-label={`Open ${title}`}

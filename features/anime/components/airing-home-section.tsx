@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useMemo } from "react";
 
 import { LocalTime } from "@/components/ui/local-time";
-import { ViewAllLink } from "@/components/ui/view-all-link";
 import { MediaImage } from "@/components/ui/media-image";
+import { ViewAllLink } from "@/components/ui/view-all-link";
 import { formatCountdown, getAiringPhase, getTitle } from "@/features/anime/lib/media-helpers";
 import { cn } from "@/lib/utils";
 

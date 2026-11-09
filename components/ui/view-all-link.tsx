@@ -13,7 +13,7 @@ export function ViewAllLink({
   return (
     <HoverPrefetchLink
       href={href}
-      className="group inline-flex shrink-0 items-center gap-1.5 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
+      className="group relative inline-flex shrink-0 items-center gap-1.5 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground transition-colors before:absolute before:-inset-x-2 before:-inset-y-2.5 before:content-[''] hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
       {...props}
     >
       {children}

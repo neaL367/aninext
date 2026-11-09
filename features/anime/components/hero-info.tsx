@@ -64,7 +64,7 @@ export function HeroInfo({ media }: { media: Media }) {
       >
         <Link
           href={`/anime/${media.id}` as Route<string>}
-          className="group inline-flex items-center gap-2 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
+          className="group inline-flex min-h-10 items-center gap-2 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
         >
           Open title
           <ArrowRightIcon className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
@@ -74,7 +74,7 @@ export function HeroInfo({ media }: { media: Media }) {
             href={`https://www.youtube.com/watch?v=${media.trailer.id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
+            className="inline-flex min-h-10 items-center gap-2 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
           >
             <PlayIcon className="size-3 fill-current" />
             Trailer

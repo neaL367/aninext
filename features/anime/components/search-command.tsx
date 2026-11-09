@@ -88,9 +88,7 @@ export function SearchCommand() {
           }}
         />
         <CommandList>
-          <CommandEmpty>
-            {query ? "Press Enter to search." : "No commands."}
-          </CommandEmpty>
+          <CommandEmpty>{query ? "Press Enter to search." : "No commands."}</CommandEmpty>
           <CommandGroup heading="Collections">
             {COLLECTION_NAV_ITEMS.map(({ id, label }) => (
               <CommandItem key={id} onSelect={() => navigateTo(`/anime/${id}`)}>

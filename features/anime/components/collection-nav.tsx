@@ -15,7 +15,7 @@ export function CollectionNav() {
 
   return (
     <nav
-      className="no-scrollbar flex items-center gap-6 overflow-x-auto border-b border-border-soft max-sm:[mask-image:linear-gradient(to_right,black_88%,transparent)]"
+      className="no-scrollbar flex items-center gap-6 overflow-x-auto border-b border-border-soft max-sm:[mask-image:linear-gradient(to_right,black_86%,transparent)]"
       aria-label="Anime collections"
     >
       {COLLECTION_NAV_ITEMS.map(({ id, label }) => {
@@ -27,7 +27,7 @@ export function CollectionNav() {
             prefetch={id === "seasonal" ? false : undefined}
             aria-current={isActive ? "page" : undefined}
             className={cn(
-              "relative shrink-0 pb-3 pt-2 font-mono text-[0.62rem] uppercase tracking-[0.16em] transition-colors",
+              "relative flex min-h-11 shrink-0 items-center pb-3 pt-2 font-mono text-[0.62rem] uppercase tracking-[0.16em] transition-colors",
               isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
             )}
           >

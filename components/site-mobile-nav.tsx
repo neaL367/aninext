@@ -42,9 +42,7 @@ export function SiteMobileNav() {
                 active ? "text-foreground" : "text-muted-foreground",
               )}
             >
-              {active && (
-                <span aria-hidden="true" className="absolute top-0 h-px w-7 bg-signal" />
-              )}
+              {active && <span aria-hidden="true" className="absolute top-0 h-px w-7 bg-signal" />}
               <Icon aria-hidden="true" className="size-4" strokeWidth={active ? 1.8 : 1.4} />
               {label}
             </Link>

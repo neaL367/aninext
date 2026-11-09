@@ -51,7 +51,7 @@ export function BrowsePageShell({
         </Suspense>
       </div>
 
-      <div className="mt-8 grid gap-10 lg:grid-cols-[210px_minmax(0,1fr)] lg:gap-14">
+      <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[210px_minmax(0,1fr)] lg:gap-14">
         <aside className="hidden lg:block">
           <div className="sticky top-20 space-y-5">
             <Suspense fallback={<SearchBarFallback />}>

@@ -4,8 +4,8 @@ import { PauseIcon, PlayIcon } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { HeroInfo } from "./hero-info";
 import { usePrefersReducedMotion } from "../hooks/use-reduced-motion";
+import { HeroInfo } from "./hero-info";
 
 import type { Media } from "@/features/anime/types/anime";
 
@@ -106,7 +106,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
       onTouchEnd={handleTouchEnd}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
-      className="relative h-[76vh] min-h-[520px] max-h-[780px] w-full cursor-grab select-none overflow-hidden bg-background focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-signal active:cursor-grabbing"
+      className="relative h-[76svh] min-h-[440px] max-h-[780px] w-full cursor-grab select-none overflow-hidden bg-background focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-signal active:cursor-grabbing sm:min-h-[520px]"
     >
       <div className="pointer-events-none absolute inset-0">
         {items.map((item, i) => {
@@ -205,7 +205,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
 
 export function HeroCarouselSkeleton() {
   return (
-    <div className="relative h-[76vh] min-h-[520px] max-h-[780px] w-full overflow-hidden bg-background">
+    <div className="relative h-[76svh] min-h-[440px] max-h-[780px] w-full overflow-hidden bg-background sm:min-h-[520px]">
       <div className="absolute inset-0 shimmer" />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 z-20 pb-16 sm:pb-20 lg:pb-24">

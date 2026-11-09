@@ -10,7 +10,13 @@ import { FILTER_ADULT_GENRES } from "@/features/anime/lib/filter-constants";
 
 import { AiringHomeSection } from "./airing-home-section";
 import { HeroCarousel } from "./hero-carousel";
-import { GenreIndex, RankingList, SeasonMosaic, TrendingIndex, UpcomingStrip } from "./home-sections";
+import {
+  GenreIndex,
+  RankingList,
+  SeasonMosaic,
+  TrendingIndex,
+  UpcomingStrip,
+} from "./home-sections";
 
 export function HomeFeaturedShell({
   hero,
@@ -45,9 +51,7 @@ export async function HomeTrending() {
 export async function HomeSeason() {
   await io();
   const { popular } = await getHomePrimaryBatch();
-  return (
-    <SeasonMosaic title="This season" href="/anime/popular" items={popular.slice(0, 5)} />
-  );
+  return <SeasonMosaic title="This season" href="/anime/popular" items={popular.slice(0, 5)} />;
 }
 
 export async function HomeTonight() {

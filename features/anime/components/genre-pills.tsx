@@ -10,12 +10,12 @@ export function GenreList({ genres }: { genres: string[] }) {
   if (visible.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+    <div className="flex flex-wrap gap-x-4 gap-y-2">
       {visible.map((genre) => (
         <Link
           key={genre}
           href={`/anime/trending?genre=${encodeURIComponent(genre)}`}
-          className="font-mono text-[0.62rem] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-signal"
+          className="inline-flex min-h-8 items-center font-mono text-[0.62rem] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-signal"
         >
           {genre}
         </Link>

@@ -48,7 +48,7 @@ export function SiteHeader() {
               prefetch={item.prefetch}
               aria-current={isActive(item.href) ? "page" : undefined}
               className={cn(
-                "relative py-1 font-mono text-[0.68rem] uppercase tracking-[0.16em] transition-colors",
+                "relative py-1 font-mono text-[0.68rem] uppercase tracking-[0.16em] transition-colors before:absolute before:-inset-x-1.5 before:-inset-y-2.5 before:content-['']",
                 isActive(item.href)
                   ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground",

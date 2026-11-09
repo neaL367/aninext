@@ -74,7 +74,7 @@ export function AnimeHero({ media }: { media: Media }) {
       </div>
 
       <div className="relative mx-auto -mt-24 w-full max-w-[1760px] px-4 pb-10 sm:-mt-32 sm:px-7 lg:-mt-36 lg:px-10">
-        <div className="grid gap-7 lg:grid-cols-[250px_minmax(0,1fr)] lg:items-end lg:gap-10">
+        <div className="grid grid-cols-1 gap-7 lg:grid-cols-[250px_minmax(0,1fr)] lg:items-end lg:gap-10">
           <div className="relative mx-auto w-40 shrink-0 sm:mx-0 sm:w-52 lg:w-[250px]">
             <div
               className="relative aspect-[2/3] overflow-hidden rounded-[3px] bg-surface-2 shadow-[0_30px_60px_-20px_rgba(0,0,0,0.9)]"
@@ -137,7 +137,7 @@ export function AnimeHero({ media }: { media: Media }) {
               {media.trailer?.id && media.trailer.site === "youtube" && (
                 <a
                   href="#trailer"
-                  className="inline-flex items-center gap-2 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-white transition-colors hover:text-signal focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
+                  className="inline-flex min-h-9 items-center gap-2 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-white transition-colors hover:text-signal focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
                 >
                   <PlayIcon className="size-3 fill-current" /> Trailer
                 </a>
@@ -184,7 +184,7 @@ export function AnimeHeroSkeleton() {
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
       </div>
       <div className="relative mx-auto -mt-24 w-full max-w-[1760px] px-4 pb-10 sm:-mt-32 sm:px-7 lg:-mt-36 lg:px-10">
-        <div className="grid gap-7 lg:grid-cols-[250px_minmax(0,1fr)] lg:items-end lg:gap-10">
+        <div className="grid grid-cols-1 gap-7 lg:grid-cols-[250px_minmax(0,1fr)] lg:items-end lg:gap-10">
           <div className="relative mx-auto w-40 shrink-0 sm:mx-0 sm:w-52 lg:w-[250px]">
             <div className="relative aspect-[2/3] overflow-hidden rounded-[3px] bg-surface-2">
               <div className="absolute inset-0 shimmer" />

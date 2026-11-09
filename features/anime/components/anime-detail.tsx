@@ -31,14 +31,12 @@ export async function AnimeDetail({ id }: { id: number | null }) {
               : "max-w-4xl"
           }
         >
-          {media.trailer?.id && media.trailer.site === "youtube" && (
-            <AnimeTrailer media={media} />
-          )}
+          {media.trailer?.id && media.trailer.site === "youtube" && <AnimeTrailer media={media} />}
           <AnimeStreamingEpisodes media={media} />
         </div>
       </section>
 
-      <div className="grid gap-14 pb-16 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-16">
+      <div className="grid grid-cols-1 gap-14 pb-16 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-16">
         <div className="min-w-0 space-y-14">
           <section aria-label="Characters">
             <SectionHeader title="Characters and voices" />
@@ -128,13 +126,13 @@ export function AnimeDetailSkeleton() {
         <div className="mb-6 border-b border-border-soft pb-4">
           <div className="shimmer h-8 w-28 rounded-[2px]" />
         </div>
-        <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1.15fr_0.85fr]">
           <AnimeTrailerSkeleton />
           <AnimeStreamingEpisodesSkeleton />
         </div>
       </section>
 
-      <div className="grid gap-14 pb-16 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-16">
+      <div className="grid grid-cols-1 gap-14 pb-16 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-16">
         <div className="min-w-0 space-y-14">
           <section aria-label="Characters">
             <div className="mb-6 border-b border-border-soft pb-4">
