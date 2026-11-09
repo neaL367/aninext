@@ -2,7 +2,7 @@
 
 # AniNext
 
-An anime discovery and airing platform on [Next.js 16.3](https://nextjs.org/blog/next-16-3-instant-navigations) — a fast, cinematic live TV guide over the [AniList GraphQL API](https://docs.anilist.co/).
+An anime discovery and airing platform on [Next.js 16.4](https://nextjs.org/blog/next-16-3-instant-navigations) — a fast, cinematic live TV guide over the [AniList GraphQL API](https://docs.anilist.co/).
 
 [**Live demo →**](https://ani-next.vercel.app)
 
@@ -42,7 +42,7 @@ bun run test:e2e
 
 ## Stack
 
-- **[Next.js 16.3](https://nextjs.org/)**: App Router, Cache Components, Server Functions, Instant Navigations
+- **[Next.js 16.4](https://nextjs.org/)**: App Router, Cache Components, Server Functions, Instant Navigations
 - **[React 19](https://react.dev/)** with React Compiler: Suspense, `use()`, View Transitions
 - **[Geist Serif](https://vercel.com/font)** as the single typeface for editorial UI and tabular metadata
 - **[TypeScript](https://www.typescriptlang.org/)** and **[Tailwind CSS v4](https://tailwindcss.com/)**

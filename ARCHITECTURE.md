@@ -1,6 +1,6 @@
 # AniNext — Production Architecture Plan
 
-**Stack**: Next.js 16.3 (stable) — App Router, Cache Components, Instant Navigations · React 19 + Compiler · TypeScript · Tailwind CSS v4 · shadcn/ui · AniList GraphQL API
+**Stack**: Next.js 16.4 (stable) — App Router, Cache Components, Instant Navigations · React 19 + Compiler · TypeScript · Tailwind CSS v4 · shadcn/ui · AniList GraphQL API
 
 **Architecture target**: `next-beats` feature-sliced RSC pattern — pages compose, features own data, route props become plain values at the boundary.
 
