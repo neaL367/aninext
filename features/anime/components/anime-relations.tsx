@@ -25,7 +25,8 @@ export function AnimeRelations({ edges }: { edges: RelationEdge[] }) {
     >
       {edges.map((edge, i) => {
         const title = getTitle(edge.node.title);
-        const cover = getCover(edge.node.coverImage);
+        // 32px box: medium is the right source, not the 230px "large".
+        const cover = getCover(edge.node.coverImage, "medium");
         const color = edge.node.coverImage.color;
         return (
           <Link

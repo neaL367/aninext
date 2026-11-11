@@ -1,6 +1,5 @@
 "use client";
 
-import { ThemeProvider } from "next-themes";
 import { useEffect, type ReactNode } from "react";
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -9,14 +8,7 @@ export function Providers({ children }: { children: ReactNode }) {
     document.cookie = `tz_offset=${offset}; path=/; max-age=31536000; SameSite=Lax`;
   }, []);
 
-  return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="dark"
-      enableSystem={false}
-      disableTransitionOnChange
-    >
-      {children}
-    </ThemeProvider>
-  );
+  // The theme is fixed to dark in the root layout, so no theme provider here:
+  // it used to ship next-themes and its blocking inline script to every page.
+  return <>{children}</>;
 }
