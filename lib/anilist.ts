@@ -4,7 +4,17 @@ import { AniListError } from "./anilist-errors";
 const ENDPOINT = process.env.ANILIST_ENDPOINT ?? "https://graphql.anilist.co";
 const USER_AGENT = "AniNext/0.1 (+https://ani-next.vercel.app)";
 const REQUEST_TIMEOUT_MS = 15_000;
+// Budget for work actually spent on AniList: network attempts plus their
+// backoffs. Time queued behind the concurrency cap or held by a 429 gate is
+// excluded, so a cold render no longer reports a timeout for a request that
+// never got a chance to run.
 const TOTAL_BUDGET_MS = 20_000;
+// Hard cap on waiting for a concurrency slot, so a saturated queue fails loudly
+// instead of hanging the render.
+const MAX_QUEUE_WAIT_MS = 10_000;
+// A 429 gate longer than this is surfaced as rate_limited instead of being
+// slept through.
+const MAX_RATE_LIMIT_WAIT_MS = 10_000;
 
 const MAX_CONCURRENT = 3;
 let activeRequestCount = 0;
@@ -70,8 +80,17 @@ function jitter(ms: number) {
 async function respectLocalBudget(): Promise<void> {
   const now = Date.now();
   if (now < rateLimitedUntilMs) {
-    await wait(Math.min(rateLimitedUntilMs - now, 2000));
-    return respectLocalBudget();
+    const gateRemaining = rateLimitedUntilMs - now;
+    if (gateRemaining > MAX_RATE_LIMIT_WAIT_MS) {
+      throw new AniListError(
+        "AniList rate limit hit",
+        "rate_limited",
+        Math.ceil(gateRemaining / 1000),
+        429,
+      );
+    }
+    await wait(gateRemaining);
+    return;
   }
   const sinceLastStart = now - lastRequestStartMs;
   if (lastRequestStartMs > 0 && sinceLastStart < MIN_START_INTERVAL_MS) {
@@ -174,7 +193,18 @@ function checkCircuitBreaker() {
 
 async function track<T>(run: () => Promise<T>): Promise<T> {
   if (activeRequestCount >= MAX_CONCURRENT) {
-    await new Promise<void>((resolve) => requestQueue.push(resolve));
+    await new Promise<void>((resolve, reject) => {
+      const wake = () => {
+        clearTimeout(timer);
+        resolve();
+      };
+      const timer = setTimeout(() => {
+        const index = requestQueue.indexOf(wake);
+        if (index !== -1) requestQueue.splice(index, 1);
+        reject(new AniListError("AniList request queue is full", "network"));
+      }, MAX_QUEUE_WAIT_MS);
+      requestQueue.push(wake);
+    });
   } else {
     activeRequestCount += 1;
   }
@@ -203,16 +233,22 @@ export async function anilistFetch<T>(
   }
 
   const promise = (async (): Promise<T> => {
+    // Only the network attempts and their backoffs count against the budget —
+    // queueing and 429 gates are bounded separately above.
+    let spentMs = 0;
+
     const attempt = async (remaining: number): Promise<T> => {
       await respectLocalBudget();
 
       let res: Response;
       let fetchError: unknown = null;
+      const attemptTimeoutMs = Math.max(1_000, TOTAL_BUDGET_MS - spentMs);
 
       try {
         noteOriginEvent("request");
-        res = await track(() =>
-          fetch(ENDPOINT, {
+        res = await track(() => {
+          const dispatchedAt = Date.now();
+          return fetch(ENDPOINT, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -220,19 +256,22 @@ export async function anilistFetch<T>(
               "User-Agent": USER_AGENT,
             },
             body: JSON.stringify({ query, variables }),
-            signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-          }),
-        );
+            signal: AbortSignal.timeout(Math.min(REQUEST_TIMEOUT_MS, attemptTimeoutMs)),
+          }).finally(() => {
+            spentMs += Date.now() - dispatchedAt;
+          });
+        });
       } catch (error) {
         fetchError = error;
         res = null as unknown as Response;
       }
 
       if (fetchError != null || !res) {
-        if (remaining > 0) {
+        if (remaining > 0 && spentMs < TOTAL_BUDGET_MS) {
           const attemptIndex = retries - remaining;
           const backoff = jitter(Math.min(3000, Math.round(300 * Math.pow(2, attemptIndex))));
           await wait(backoff);
+          spentMs += backoff;
           return attempt(remaining - 1);
         }
         onUltimateFailure();
@@ -244,10 +283,11 @@ export async function anilistFetch<T>(
         onRateLimitHit(retryAfter);
         const retryAfterMs = retryAfter * 1000;
 
-        if (retryAfterMs <= MAX_WORTH_RETRYING_MS && remaining > 0) {
+        if (retryAfterMs <= MAX_WORTH_RETRYING_MS && remaining > 0 && spentMs < TOTAL_BUDGET_MS) {
           noteOriginEvent("retry429");
           const backoff = jitter(retryAfterMs);
           await wait(backoff);
+          spentMs += backoff;
           return attempt(remaining - 1);
         }
         onUltimateFailure();
@@ -269,10 +309,11 @@ export async function anilistFetch<T>(
       }
 
       if (res.status >= 500 && res.status < 600) {
-        if (remaining > 0) {
+        if (remaining > 0 && spentMs < TOTAL_BUDGET_MS) {
           const attemptIndex = retries - remaining;
           const backoff = jitter(Math.min(3000, Math.round(300 * Math.pow(2, attemptIndex))));
           await wait(backoff);
+          spentMs += backoff;
           return attempt(remaining - 1);
         }
         onUltimateFailure();
@@ -302,10 +343,11 @@ export async function anilistFetch<T>(
       try {
         json = (await res.json()) as { errors?: { message: string }[]; data?: T | null };
       } catch (error) {
-        if (remaining > 0) {
+        if (remaining > 0 && spentMs < TOTAL_BUDGET_MS) {
           const attemptIndex = retries - remaining;
           const backoff = jitter(Math.min(3000, Math.round(300 * Math.pow(2, attemptIndex))));
           await wait(backoff);
+          spentMs += backoff;
           return attempt(remaining - 1);
         }
         onUltimateFailure();
@@ -326,21 +368,9 @@ export async function anilistFetch<T>(
       throw new AniListError("AniList returned an empty response", "outage", undefined, res.status);
     };
 
-    let timerId: ReturnType<typeof setTimeout> | undefined;
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      timerId = setTimeout(() => {
-        reject(new AniListError("AniList request timed out", "network"));
-      }, TOTAL_BUDGET_MS);
-      if (typeof timerId === "object" && timerId && "unref" in timerId) {
-        (timerId as { unref: () => void }).unref();
-      }
-    });
-
-    try {
-      return await Promise.race([attempt(retries), timeoutPromise]);
-    } finally {
-      if (timerId) clearTimeout(timerId);
-    }
+    // The wall-clock race is gone: it fired while requests were still queued.
+    // Each attempt is bounded by what is left of the network budget instead.
+    return attempt(retries);
   })().finally(() => {
     inFlightMap.delete(key);
   });
