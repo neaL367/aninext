@@ -43,6 +43,24 @@ const MEDIA_CARD_FIELDS = `
   studios(isMain: true) { nodes { id name } }
 `;
 
+// Grid cards clamp the synopsis to three lines (~220 characters), so the full
+// multi-KB description only inflates the cache entry and the RSC payload.
+const CARD_SYNOPSIS_CHARS = 220;
+
+function trimCardMedia(media: Media): Media {
+  const description = media.description;
+  if (!description || description.length <= CARD_SYNOPSIS_CHARS) return media;
+  return { ...media, description: `${description.slice(0, CARD_SYNOPSIS_CHARS).trimEnd()}…` };
+}
+
+function trimCardList(items: Media[]): Media[] {
+  return items.map(trimCardMedia);
+}
+
+// The episode panel is a 420px scroll area; a long-running series ships around
+// 1k rows (~21 KB) that nobody scrolls to.
+const STREAMING_EPISODE_LIMIT = 24;
+
 // Slim fragment for airing schedules: timeline/now/home sections render only
 // identity, artwork, progress inputs, and streaming links — never description,
 // studios, or scores. Used × up to 300 schedules per week fetch, so every
@@ -124,68 +142,18 @@ export async function getBrowseCollection(
   }>(BROWSE_QUERY, variables);
 
   return {
-    items: data.Page.media,
+    items: trimCardList(data.Page.media),
     pageInfo: data.Page.pageInfo,
   };
 }
 
-const TOP100_FULL_QUERY = `
-  query Top100Full {
-    page1: Page(page: 1, perPage: 50) {
-      media(type: ANIME, sort: [SCORE_DESC], isAdult: false) {
-        ${MEDIA_CARD_FIELDS}
-      }
-    }
-    page2: Page(page: 2, perPage: 50) {
-      media(type: ANIME, sort: [SCORE_DESC], isAdult: false) {
-        ${MEDIA_CARD_FIELDS}
-      }
-    }
-  }
-`;
-
-export async function getTop100Full(): Promise<Media[]> {
-  "use cache: remote";
-  cacheTag("anime", "anime:top100:full");
-  cacheLife("static");
-
-  const data = await anilistFetch<{
-    page1: { media: Media[] };
-    page2: { media: Media[] };
-  }>(TOP100_FULL_QUERY, {});
-
-  return [...data.page1.media, ...data.page2.media];
-}
-
-const TOP100_PREVIEW_QUERY = `
-  query Top100Preview($perPage: Int) {
-    Page(page: 1, perPage: $perPage) {
-      media(type: ANIME, sort: [SCORE_DESC], isAdult: false) {
-        ${MEDIA_CARD_FIELDS}
-      }
-    }
-  }
-`;
-
-/**
- * Homepage Top100 section only renders `perPage` cards — fetch exactly that
- * instead of the full 100-record `getTop100Full` snapshot (browse keeps the
- * full snapshot for rank slicing across infinite-scroll pages).
- */
-export async function getTop100Preview(perPage: number): Promise<Media[]> {
-  "use cache: remote";
-  cacheTag("anime", `anime:top100:preview:${perPage}`);
-  cacheLife("static");
-
-  const data = await anilistFetch<{
-    Page: { media: Media[] };
-  }>(TOP100_PREVIEW_QUERY, { perPage });
-
-  return data.Page.media;
-}
-
-const HOME_PRIMARY_BATCH_QUERY = `
-  query HomePrimaryBatch($season: MediaSeason, $seasonYear: Int) {
+// One request for the whole homepage feed. The sections used to make four
+// separate calls (primary, secondary, top-100 preview, genres), which on a cold
+// render meant four round trips paced 300ms apart by the rate limiter.
+const HOME_FEED_QUERY = `
+  query HomeFeed(
+    $season: MediaSeason, $seasonYear: Int, $airingStart: Int, $airingEnd: Int
+  ) {
     trending: Page(page: 1, perPage: 14) {
       media(type: ANIME, sort: [TRENDING_DESC], isAdult: false) {
         ${MEDIA_CARD_FIELDS}
@@ -196,28 +164,6 @@ const HOME_PRIMARY_BATCH_QUERY = `
         ${MEDIA_CARD_FIELDS}
       }
     }
-  }
-`;
-
-export async function getHomePrimaryBatch() {
-  "use cache: remote";
-  cacheTag("anime", "anime:home:primary");
-  cacheLife("trending");
-
-  const current = getCurrentSeason();
-  const data = await anilistFetch<{
-    trending: { media: Media[] };
-    popular: { media: Media[] };
-  }>(HOME_PRIMARY_BATCH_QUERY, { season: current.season, seasonYear: current.seasonYear });
-
-  return {
-    trending: data.trending.media,
-    popular: data.popular.media,
-  };
-}
-
-const HOME_SECONDARY_BATCH_QUERY = `
-  query HomeSecondaryBatch($airingStart: Int, $airingEnd: Int) {
     upcoming: Page(page: 1, perPage: 7) {
       media(type: ANIME, status: NOT_YET_RELEASED, sort: [POPULARITY_DESC], isAdult: false) {
         ${MEDIA_CARD_FIELDS}
@@ -228,7 +174,12 @@ const HOME_SECONDARY_BATCH_QUERY = `
         ${MEDIA_CARD_FIELDS}
       }
     }
-    airing: Page(perPage: 50) {
+    top100: Page(page: 1, perPage: 10) {
+      media(type: ANIME, sort: [SCORE_DESC], isAdult: false) {
+        ${MEDIA_CARD_FIELDS}
+      }
+    }
+    airing: Page(perPage: 12) {
       airingSchedules(airingAt_greater: $airingStart, airingAt_lesser: $airingEnd, sort: [TIME]) {
         episode
         airingAt
@@ -241,20 +192,50 @@ const HOME_SECONDARY_BATCH_QUERY = `
   }
 `;
 
-export async function getHomeSecondaryBatch(start: number, end: number) {
+export interface HomeFeed {
+  trending: Media[];
+  popular: Media[];
+  upcoming: Media[];
+  alltimepopular: Media[];
+  top100: Media[];
+  airingSchedules: AiringScheduleNode[];
+}
+
+/**
+ * 5-minute window shared by every homepage section so they land on one cache
+ * entry: the whole feed is a single upstream request instead of four.
+ */
+export function getHomeBucket(now = Date.now()): number {
+  // Epoch seconds (AniList's airingAt type), rounded down to a 5-minute window.
+  return Math.floor(now / 300_000) * 300;
+}
+
+export async function getHomeFeed(bucket: number): Promise<HomeFeed> {
   "use cache: remote";
-  cacheTag("anime", "anime:home:secondary");
+  cacheTag("anime", "anime:home:feed");
   cacheLife("home");
 
+  const current = getCurrentSeason();
   const data = await anilistFetch<{
+    trending: { media: Media[] };
+    popular: { media: Media[] };
     upcoming: { media: Media[] };
     alltimepopular: { media: Media[] };
+    top100: { media: Media[] };
     airing: { airingSchedules: AiringScheduleNode[] };
-  }>(HOME_SECONDARY_BATCH_QUERY, { airingStart: start, airingEnd: end });
+  }>(HOME_FEED_QUERY, {
+    season: current.season,
+    seasonYear: current.seasonYear,
+    airingStart: bucket,
+    airingEnd: bucket + 64_800,
+  });
 
   return {
-    upcoming: data.upcoming.media,
-    alltimepopular: data.alltimepopular.media,
+    trending: trimCardList(data.trending.media),
+    popular: trimCardList(data.popular.media),
+    upcoming: trimCardList(data.upcoming.media),
+    alltimepopular: trimCardList(data.alltimepopular.media),
+    top100: trimCardList(data.top100.media),
     airingSchedules: data.airing.airingSchedules,
   };
 }
@@ -339,11 +320,19 @@ const STAFF_SUBFIELDS = `
   edges { role node { id name { full } image { medium } } }
 `;
 
+// Relations render as a compact list: cover, title, relation type. Shipping
+// MEDIA_SUMMARY_FIELDS there cost ~49 KB on a long-running series.
+const RELATION_MEDIA_FIELDS = `
+  id
+  title { romaji english userPreferred }
+  coverImage { large medium color }
+`;
+
 const RELATIONS_SUBFIELDS = `
   edges {
     relationType(version: 2)
     node {
-      ${MEDIA_SUMMARY_FIELDS}
+      ${RELATION_MEDIA_FIELDS}
     }
   }
 `;
@@ -567,8 +556,13 @@ export async function getAnimePageBatch(id: number): Promise<AnimePageBatch> {
     }>(ANIME_PAGE_BATCH_QUERY, { id });
     const m = data.Media;
     if (!m) return empty;
+    const episodes = m.streamingEpisodes;
+    const media =
+      episodes && episodes.length > STREAMING_EPISODE_LIMIT
+        ? { ...m, streamingEpisodes: episodes.slice(0, STREAMING_EPISODE_LIMIT) }
+        : m;
     return {
-      media: m,
+      media,
       characters: m.characters?.edges ?? [],
       staff: m.staff?.edges ?? [],
       relations: m.relations?.edges ?? [],

@@ -1,11 +1,6 @@
 import { io } from "next/cache";
 
-import {
-  getGenres,
-  getHomePrimaryBatch,
-  getHomeSecondaryBatch,
-  getTop100Preview,
-} from "@/features/anime/anime-queries";
+import { getGenres, getHomeBucket, getHomeFeed } from "@/features/anime/anime-queries";
 import { FILTER_ADULT_GENRES } from "@/features/anime/lib/filter-constants";
 
 import { AiringHomeSection } from "./airing-home-section";
@@ -35,44 +30,42 @@ export function HomeFeaturedShell({
   );
 }
 
+// Every section reads the same cached feed, so the homepage costs one upstream
+// request per 5-minute window instead of four.
 export async function HomeHero() {
   await io();
-  const { trending } = await getHomePrimaryBatch();
+  const { trending } = await getHomeFeed(getHomeBucket());
   const items = trending.slice(0, 5);
   return items.length > 0 ? <HeroCarousel items={items} /> : null;
 }
 
 export async function HomeTrending() {
   await io();
-  const { trending } = await getHomePrimaryBatch();
+  const { trending } = await getHomeFeed(getHomeBucket());
   return <TrendingIndex items={trending.slice(0, 7)} />;
 }
 
 export async function HomeSeason() {
   await io();
-  const { popular } = await getHomePrimaryBatch();
+  const { popular } = await getHomeFeed(getHomeBucket());
   return <SeasonMosaic title="This season" href="/anime/popular" items={popular.slice(0, 5)} />;
 }
 
 export async function HomeTonight() {
   await io();
-  const now = Math.floor(Date.now() / 1000);
-  const bucket = Math.floor(now / 300) * 300;
-  const { airingSchedules } = await getHomeSecondaryBatch(bucket - 43_200, bucket + 129_600);
+  const { airingSchedules } = await getHomeFeed(getHomeBucket());
   return <AiringHomeSection schedules={airingSchedules} />;
 }
 
 export async function HomeRanking() {
   await io();
-  const items = await getTop100Preview(10);
-  return <RankingList title="Top 100" href="/anime/top100" items={items} />;
+  const { top100 } = await getHomeFeed(getHomeBucket());
+  return <RankingList title="Top 100" href="/anime/top100" items={top100} />;
 }
 
 export async function HomeUpcoming() {
   await io();
-  const now = Math.floor(Date.now() / 1000);
-  const bucket = Math.floor(now / 300) * 300;
-  const { upcoming } = await getHomeSecondaryBatch(bucket - 43_200, bucket + 129_600);
+  const { upcoming } = await getHomeFeed(getHomeBucket());
   return <UpcomingStrip title="Coming soon" href="/anime/upcoming" items={upcoming.slice(0, 4)} />;
 }
 
