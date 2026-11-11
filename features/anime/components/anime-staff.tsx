@@ -25,7 +25,7 @@ export function AnimeStaff({ edges }: { edges: StaffEdge[] }) {
                 className="object-cover"
               />
             ) : (
-              <span className="flex size-full items-center justify-center font-mono text-[0.6rem] text-muted-foreground">
+              <span className="flex size-full items-center justify-center font-mono text-[0.8125rem] text-muted-foreground">
                 {edge.node.name.full.charAt(0)}
               </span>
             )}
@@ -34,7 +34,7 @@ export function AnimeStaff({ edges }: { edges: StaffEdge[] }) {
             <p className="truncate font-serif text-sm leading-snug text-foreground">
               {edge.node.name.full}
             </p>
-            <p className="truncate font-mono text-[0.55rem] uppercase tracking-[0.12em] text-muted-foreground/70">
+            <p className="truncate font-mono text-[0.75rem] uppercase tracking-[0.12em] text-muted-foreground">
               {edge.role}
             </p>
           </div>

@@ -122,7 +122,7 @@ export function AiringNow({
           </Link>
 
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-3 font-mono text-[0.58rem] uppercase tracking-[0.16em]">
+            <div className="flex flex-wrap items-center gap-3 font-mono text-[0.75rem] uppercase tracking-[0.16em]">
               <span
                 className={cn(
                   "flex items-center gap-1.5",
@@ -152,7 +152,7 @@ export function AiringNow({
               </h2>
             </Link>
 
-            <p className="mt-2 font-mono text-[0.62rem] uppercase tracking-[0.1em] text-muted-foreground">
+            <p className="mt-2 font-mono text-[0.8125rem] uppercase tracking-[0.1em] text-muted-foreground">
               {phase === "live" && `Started ${formatAgo(featured.airingAt, now)}`}
               {phase === "upcoming" && countdown && `In ${countdown}`}
               {phase === "aired" && `Aired ${formatAgo(featured.airingAt, now)}`}
@@ -169,7 +169,7 @@ export function AiringNow({
             <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
               <Link
                 href={`/anime/${media.id}` as Route<string>}
-                className="inline-flex min-h-9 items-center gap-1.5 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-foreground transition-colors hover:text-signal"
+                className="inline-flex min-h-9 items-center gap-1.5 font-mono text-[0.8125rem] uppercase tracking-[0.14em] text-foreground transition-colors hover:text-signal"
               >
                 Open
                 <ArrowRightIcon className="size-3" />
@@ -180,7 +180,7 @@ export function AiringNow({
                   href={streamingLinks[0].url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex min-h-9 items-center gap-1.5 font-mono text-[0.62rem] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground"
+                  className="inline-flex min-h-9 items-center gap-1.5 font-mono text-[0.8125rem] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground"
                 >
                   <PlayIcon className="size-3" />
                   Watch{streamingLinks[0].site ? ` on ${streamingLinks[0].site}` : ""}
@@ -194,7 +194,7 @@ export function AiringNow({
                   target="_blank"
                   rel="noopener noreferrer"
                   title={`Watch on ${link.site ?? "streaming"}`}
-                  className="flex items-center gap-1 font-mono text-[0.58rem] uppercase tracking-[0.1em] text-muted-foreground/70 transition-colors hover:text-foreground"
+                  className="flex items-center gap-1 font-mono text-[0.75rem] uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {getFaviconUrl(link.url) ? (
                     <Image
@@ -216,7 +216,7 @@ export function AiringNow({
 
       {upNext.length > 0 && (
         <section aria-label="Up next" className="space-y-2">
-          <p className="font-mono text-[0.56rem] uppercase tracking-[0.18em] text-muted-foreground/70">
+          <p className="font-mono text-[0.75rem] uppercase tracking-[0.16em] text-muted-foreground">
             Up next
           </p>
           <div className="divide-y divide-border-soft border-t border-border-soft">
@@ -229,17 +229,17 @@ export function AiringNow({
                   href={`/anime/${itemMedia.id}` as Route<string>}
                   className="group flex items-center gap-3 py-2.5"
                 >
-                  <span className="w-12 shrink-0 font-mono text-[0.62rem] tabular-nums text-foreground/80">
+                  <span className="w-12 shrink-0 font-mono text-[0.8125rem] tabular-nums text-foreground">
                     <LocalTime timestamp={item.airingAt} offsetMinutes={offsetMinutes} />
                   </span>
                   <span className="min-w-0 flex-1 truncate font-serif text-sm text-foreground transition-colors group-hover:text-signal">
                     {getTitle(itemMedia.title)}
                   </span>
-                  <span className="shrink-0 font-mono text-[0.56rem] text-muted-foreground/70">
+                  <span className="shrink-0 font-mono text-[0.75rem] text-muted-foreground">
                     Ep {item.episode}
                   </span>
                   {itemCountdown && (
-                    <span className="w-16 shrink-0 text-right font-mono text-[0.58rem] tabular-nums text-signal">
+                    <span className="w-16 shrink-0 text-right font-mono text-[0.75rem] tabular-nums text-signal">
                       in {itemCountdown}
                     </span>
                   )}

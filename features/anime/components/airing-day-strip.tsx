@@ -76,13 +76,15 @@ export function AiringDayStrip({
                 prefetch={isSelected ? false : undefined}
                 aria-current={isSelected ? "date" : undefined}
                 className={cn(
-                  "group relative flex min-w-[4rem] snap-start flex-col items-center gap-0.5 px-2 pb-2.5 pt-3 transition-colors sm:min-w-0 sm:flex-1",
-                  isSelected ? "text-foreground" : "text-muted-foreground hover:text-foreground",
+                  "group relative flex min-w-[4rem] snap-start flex-col items-center gap-0.5 rounded-[2px] px-2 pb-2.5 pt-3 transition-colors sm:min-w-0 sm:flex-1",
+                  isSelected
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:bg-surface-1/70 hover:text-foreground",
                 )}
               >
                 <span
                   className={cn(
-                    "font-mono text-[0.55rem] uppercase tracking-[0.18em]",
+                    "font-mono text-[0.75rem] uppercase tracking-[0.16em]",
                     isToday ? "text-signal" : "opacity-60 group-hover:opacity-100",
                   )}
                 >
@@ -98,8 +100,8 @@ export function AiringDayStrip({
                 </span>
                 <span
                   className={cn(
-                    "font-mono text-[0.5rem] uppercase tracking-[0.1em]",
-                    isToday ? "text-signal" : "text-muted-foreground/50",
+                    "font-mono text-[0.6875rem] uppercase tracking-[0.1em]",
+                    isToday ? "text-signal" : "text-muted-foreground",
                   )}
                 >
                   {isToday ? "Today" : count > 0 ? count : "—"}
@@ -133,8 +135,10 @@ export function AiringDayStrip({
                       ?.scrollIntoView({ behavior: "smooth", block: "start" });
                   }}
                   className={cn(
-                    "relative flex shrink-0 items-center gap-1 font-mono text-[0.58rem] tabular-nums transition-colors before:absolute before:-inset-x-2 before:-inset-y-2.5 before:content-['']",
-                    isNow ? "text-signal" : "text-muted-foreground/60 hover:text-foreground",
+                    "relative flex shrink-0 items-center gap-1 rounded-[2px] px-1.5 py-0.5 font-mono text-[0.75rem] tabular-nums transition-colors before:absolute before:-inset-x-1 before:-inset-y-1.5 before:content-['']",
+                    isNow
+                      ? "text-signal hover:bg-signal-soft"
+                      : "text-muted-foreground hover:bg-surface-1/70 hover:text-foreground",
                   )}
                 >
                   {isNow && <span className="size-1 rounded-full bg-signal" />}

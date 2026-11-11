@@ -107,9 +107,9 @@ export function AnimeHero({ media }: { media: Media }) {
               {title}
             </h1>
 
-            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[0.68rem] uppercase tracking-[0.1em] text-white/60">
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[0.875rem] uppercase tracking-[0.1em] text-white/75">
               {media.averageScore !== undefined && (
-                <MediaScore score={media.averageScore} className="text-[0.8rem] text-white" />
+                <MediaScore score={media.averageScore} className="text-[0.875rem] text-white" />
               )}
               {media.format && <span>{formatFormat(media.format)}</span>}
               {media.episodes && <span>{media.episodes} episodes</span>}
@@ -119,7 +119,7 @@ export function AnimeHero({ media }: { media: Media }) {
                 <span
                   className={cn(
                     "flex items-center gap-1.5",
-                    media.status === "RELEASING" ? "text-signal" : "text-white/60",
+                    media.status === "RELEASING" ? "text-signal" : "text-white/75",
                   )}
                 >
                   {media.status === "RELEASING" && (
@@ -131,7 +131,7 @@ export function AnimeHero({ media }: { media: Media }) {
             </div>
 
             {description && (
-              <p className="mt-4 line-clamp-3 max-w-3xl text-sm leading-6 text-white/70">
+              <p className="mt-5 line-clamp-3 max-w-3xl text-[0.95rem] leading-7 text-white/85">
                 {description}
               </p>
             )}
@@ -140,7 +140,7 @@ export function AnimeHero({ media }: { media: Media }) {
               {media.trailer?.id && media.trailer.site === "youtube" && (
                 <a
                   href="#trailer"
-                  className="inline-flex min-h-9 items-center gap-2 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-white transition-colors hover:text-signal focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
+                  className="inline-flex min-h-9 items-center gap-2 font-mono text-[0.8125rem] uppercase tracking-[0.14em] text-white transition-colors hover:text-signal focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
                 >
                   <PlayIcon className="size-3 fill-current" /> Trailer
                 </a>
@@ -153,7 +153,7 @@ export function AnimeHero({ media }: { media: Media }) {
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 font-mono text-[0.66rem] uppercase tracking-[0.12em] text-white/60 transition-colors hover:text-white"
+                    className="inline-flex items-center gap-1.5 font-mono text-[0.8125rem] uppercase tracking-[0.12em] text-white/75 transition-colors hover:text-white"
                   >
                     {favicon ? (
                       <Image

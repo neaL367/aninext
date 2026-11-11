@@ -205,7 +205,7 @@ export function FilterSidebarContent({
       </div>
 
       {mobile && facetCount > 0 && (
-        <p className="mt-4 font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted-foreground">
+        <p className="mt-4 font-mono text-[0.8125rem] uppercase tracking-[0.1em] text-muted-foreground">
           {facetCount} active {facetCount === 1 ? "filter" : "filters"}
         </p>
       )}
@@ -307,11 +307,11 @@ function FilterSection({
             open && "rotate-180",
           )}
         />
-        <span className="font-mono text-[0.62rem] uppercase tracking-[0.14em] text-foreground/85">
+        <span className="font-mono text-[0.8125rem] uppercase tracking-[0.14em] text-foreground">
           {label}
         </span>
         {count !== undefined && count > 0 && (
-          <span className="ml-auto font-mono text-[0.58rem] text-signal">{count}</span>
+          <span className="ml-auto font-mono text-[0.75rem] text-signal">{count}</span>
         )}
       </button>
       {open && (

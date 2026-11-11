@@ -192,7 +192,7 @@ function BrowsePaginatorContent({
           error={error}
         />
       ) : (
-        <p className="border-t border-border-soft py-8 text-center font-mono text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground">
+        <p className="border-t border-border-soft py-8 text-center font-mono text-[0.8125rem] uppercase tracking-[0.14em] text-muted-foreground">
           End of results
         </p>
       )}
@@ -390,7 +390,7 @@ function PaginationRail({
         marker === "gap" ? (
           <span
             key={`gap-${i}`}
-            className="flex size-6 items-center justify-center font-mono text-[0.6rem] leading-none text-muted-foreground/50"
+            className="flex size-6 items-center justify-center font-mono text-[0.8125rem] leading-none text-muted-foreground"
           >
             …
           </span>
@@ -402,7 +402,7 @@ function PaginationRail({
             aria-label={`Go to page ${marker}`}
             aria-current={marker === active ? "true" : undefined}
             className={cn(
-              "flex size-6 cursor-pointer items-center justify-center rounded-[2px] font-mono text-[0.62rem] tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal",
+              "flex size-6 cursor-pointer items-center justify-center rounded-[2px] font-mono text-[0.8125rem] tabular-nums transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal",
               marker === active
                 ? "bg-signal text-white"
                 : "text-muted-foreground hover:bg-surface-1 hover:text-foreground",
@@ -462,7 +462,7 @@ function InfiniteScrollSentinel({
           <button
             type="button"
             onClick={onRetry}
-            className="cursor-pointer font-mono text-[0.62rem] font-semibold uppercase tracking-[0.1em] text-signal hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+            className="cursor-pointer font-mono text-[0.8125rem] font-semibold uppercase tracking-[0.1em] text-signal hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
           >
             Try again
           </button>

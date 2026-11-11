@@ -80,30 +80,34 @@ export function MediaCard({
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 hidden flex-col justify-end bg-gradient-to-t from-black via-black/55 to-transparent p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 sm:flex"
         >
-          <p className="line-clamp-3 text-[0.68rem] leading-4 text-white/75">
+          <p className="line-clamp-3 text-[0.875rem] leading-5 text-white/75">
             {synopsis ?? media.genres.slice(0, 3).join(" · ")}
           </p>
           {studio && (
-            <p className="mt-2 font-mono text-[0.52rem] uppercase tracking-[0.12em] text-white/45">
+            <p className="mt-2 font-mono text-[0.75rem] uppercase tracking-[0.12em] text-white/75">
               {studio}
             </p>
           )}
         </div>
 
         {rank !== undefined && rank <= 100 && (
-          <span className="pointer-events-none absolute left-2.5 top-2.5 font-serif text-sm italic tabular-nums text-white/90 drop-shadow-md">
+          <span
+            className={`pointer-events-none absolute left-2.5 top-2.5 rounded-[2px] bg-black/70 px-1.5 py-0.5 font-serif text-[0.9375rem] italic tabular-nums backdrop-blur-sm ${
+              rank <= 3 ? "text-signal" : "text-white"
+            }`}
+          >
             {String(rank).padStart(2, "0")}
           </span>
         )}
 
         {score !== undefined && (
           <span className="pointer-events-none absolute right-2.5 top-2.5 rounded-[2px] bg-black/55 px-1.5 py-0.5 backdrop-blur-sm">
-            <MediaScore score={score} className="text-[0.65rem] font-medium text-white/90" />
+            <MediaScore score={score} className="text-[0.8125rem] font-medium text-white/90" />
           </span>
         )}
 
         {isReleasing && rank === undefined && (
-          <span className="pointer-events-none absolute left-2.5 top-2.5 flex items-center gap-1.5 rounded-[2px] bg-signal px-1.5 py-0.5 font-mono text-[0.55rem] font-semibold uppercase tracking-[0.14em] text-white">
+          <span className="pointer-events-none absolute left-2.5 top-2.5 flex items-center gap-1.5 rounded-[2px] bg-signal px-1.5 py-0.5 font-mono text-[0.75rem] font-semibold uppercase tracking-[0.14em] text-white">
             <span className="size-1 rounded-full bg-white" />
             Live
           </span>
@@ -111,10 +115,10 @@ export function MediaCard({
       </div>
 
       <div className="pt-2.5">
-        <p className="line-clamp-2 font-serif text-[0.98rem] leading-[1.25] tracking-[-0.01em] text-foreground transition-colors duration-300 group-hover:text-signal">
+        <p className="line-clamp-2 font-serif text-[1.125rem] leading-[1.25] tracking-[-0.01em] text-foreground transition-colors duration-300 group-hover:text-signal">
           {title}
         </p>
-        <p className="mt-1 truncate font-mono text-[0.6rem] uppercase tracking-[0.1em] text-muted-foreground/80">
+        <p className="mt-1 truncate font-mono text-[0.8125rem] uppercase tracking-[0.1em] text-muted-foreground">
           {[media.format ? formatFormat(media.format) : null, media.seasonYear]
             .filter(Boolean)
             .join(" · ")}

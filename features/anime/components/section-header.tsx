@@ -24,7 +24,9 @@ export function SectionHeader({
       <div className="min-w-0">
         <div className="flex items-baseline gap-3">
           {index && (
-            <span className="font-mono text-[0.62rem] tracking-[0.14em] text-signal">{index}</span>
+            <span className="font-mono text-[0.8125rem] tracking-[0.14em] text-signal">
+              {index}
+            </span>
           )}
           <h2 className="display text-3xl sm:text-[2.6rem]">{title}</h2>
         </div>

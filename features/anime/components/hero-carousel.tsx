@@ -164,7 +164,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
                 <PlayIcon className="ml-0.5 size-3 fill-current" />
               )}
             </button>
-            <span className="font-mono text-[0.62rem] tabular-nums tracking-[0.12em] text-white/60">
+            <span className="font-mono text-[0.8125rem] tabular-nums tracking-[0.12em] text-white/75">
               {String(current + 1).padStart(2, "0")} / {String(len).padStart(2, "0")}
             </span>
           </div>

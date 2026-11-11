@@ -11,6 +11,23 @@ A quiet, editorial anime index. Near-black surfaces, warm ivory type, one vermil
 - **Space:** generous vertical rhythm; section headers are rules, not boxes.
 - **Copy:** one label and one action where possible. Remove marketing lines and duplicated metadata.
 
+## Type scale
+
+Legibility floor for body copy and labels. Nothing goes below 11px, and 11px is
+reserved for text inside 32px cover placeholders and the airing hour strip.
+
+- **12px** — tracked uppercase labels: eyebrows, nav, section actions, chip text
+- **13px** — metadata runs: format, year, episode counts, counts, captions
+- **14px** — dense list titles (relations, cast, episodes)
+- **15px** — body copy and synopses (`leading-7`)
+- **18px** — card titles, ledger titles
+- **Display** — section headings and hero titles stay fluid (`clamp`); they carry
+  the page, everything else stays quiet.
+
+Contrast: body text is `--foreground`; metadata is the solid
+`--muted-foreground` token — do not fade it with an opacity suffix. Text over
+artwork may use `text-white/75` or stronger, never below 70%.
+
 ## Layout
 
 - Fluid rail up to `1760px`; do not center every route into a narrow column.

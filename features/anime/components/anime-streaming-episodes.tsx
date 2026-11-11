@@ -61,7 +61,7 @@ function EpisodeList({ episodes }: { episodes: (StreamingEpisode & { url: string
                 {ep.title || `Episode ${i + 1}`}
               </p>
               {ep.site && (
-                <p className="mt-0.5 font-mono text-[0.65rem] uppercase tracking-[0.06em] text-muted-foreground">
+                <p className="mt-0.5 font-mono text-[0.8125rem] uppercase tracking-[0.06em] text-muted-foreground">
                   {ep.site}
                 </p>
               )}
@@ -106,7 +106,7 @@ function SiteList({ sites }: { sites: MediaExternalLink[] }) {
                 <p className="line-clamp-2 font-serif text-sm text-foreground transition-colors group-hover:text-signal">
                   Watch on {link.site}
                 </p>
-                <p className="mt-0.5 font-mono text-[0.58rem] uppercase tracking-[0.12em] text-muted-foreground/70">
+                <p className="mt-0.5 font-mono text-[0.75rem] uppercase tracking-[0.12em] text-muted-foreground">
                   Streaming
                 </p>
               </div>

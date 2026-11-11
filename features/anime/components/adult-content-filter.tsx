@@ -44,11 +44,11 @@ export function AdultContentFilter({
             open && "rotate-180",
           )}
         />
-        <span className="font-mono text-[0.62rem] uppercase tracking-[0.14em] text-foreground/85">
+        <span className="font-mono text-[0.8125rem] uppercase tracking-[0.14em] text-foreground">
           Adult content
         </span>
         {enabled && (
-          <span className="ml-auto font-mono text-[0.56rem] uppercase tracking-[0.12em] text-signal">
+          <span className="ml-auto font-mono text-[0.75rem] uppercase tracking-[0.12em] text-signal">
             On
           </span>
         )}

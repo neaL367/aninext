@@ -50,7 +50,7 @@ export function AiringHomeSection({ schedules }: { schedules: AiringScheduleNode
                 href={`/anime/${item.media.id}` as Route<string>}
                 className="group flex items-center gap-4 py-3.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
               >
-                <span className="w-14 shrink-0 font-mono text-sm tabular-nums text-foreground/80">
+                <span className="w-14 shrink-0 font-mono text-sm tabular-nums text-foreground">
                   <LocalTime timestamp={item.airingAt} />
                 </span>
                 <span className="relative aspect-[2/3] w-8 shrink-0 overflow-hidden rounded-[2px] bg-surface-2">
@@ -69,13 +69,13 @@ export function AiringHomeSection({ schedules }: { schedules: AiringScheduleNode
                   <span className="block truncate font-serif text-base leading-snug text-foreground transition-colors group-hover:text-signal sm:text-lg">
                     {title}
                   </span>
-                  <span className="mt-0.5 block font-mono text-[0.56rem] uppercase tracking-[0.12em] text-muted-foreground/75">
+                  <span className="mt-0.5 block font-mono text-[0.75rem] uppercase tracking-[0.12em] text-muted-foreground">
                     Episode {item.episode}
                   </span>
                 </span>
                 <span
                   className={cn(
-                    "shrink-0 font-mono text-[0.62rem] tabular-nums",
+                    "shrink-0 font-mono text-[0.8125rem] tabular-nums",
                     isSoon ? "text-signal" : "text-muted-foreground",
                   )}
                 >

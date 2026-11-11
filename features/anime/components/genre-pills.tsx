@@ -15,7 +15,7 @@ export function GenreList({ genres }: { genres: string[] }) {
         <Link
           key={genre}
           href={`/anime/trending?genre=${encodeURIComponent(genre)}`}
-          className="inline-flex min-h-8 items-center font-mono text-[0.62rem] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-signal"
+          className="inline-flex min-h-8 items-center font-mono text-[0.8125rem] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-signal"
         >
           {genre}
         </Link>

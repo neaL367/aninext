@@ -38,7 +38,7 @@ export function SiteMobileNav() {
               prefetch={prefetch}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "relative flex min-h-11 flex-col items-center justify-center gap-1 font-mono text-[0.58rem] uppercase tracking-[0.12em] transition-colors",
+                "relative flex min-h-11 flex-col items-center justify-center gap-1 font-mono text-[0.75rem] uppercase tracking-[0.12em] transition-colors",
                 active ? "text-foreground" : "text-muted-foreground",
               )}
             >
@@ -51,7 +51,7 @@ export function SiteMobileNav() {
         <button
           type="button"
           onClick={() => document.dispatchEvent(new CustomEvent("open-search"))}
-          className="flex min-h-11 flex-col items-center justify-center gap-1 font-mono text-[0.58rem] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground"
+          className="flex min-h-11 flex-col items-center justify-center gap-1 font-mono text-[0.75rem] uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground"
         >
           <SearchIcon aria-hidden="true" className="size-4" strokeWidth={1.4} />
           Search

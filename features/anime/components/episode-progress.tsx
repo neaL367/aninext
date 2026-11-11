@@ -14,7 +14,7 @@ export function EpisodeProgress({
   const pct = total ? Math.min(100, Math.round((episode / total) * 100)) : null;
   return (
     <div className={cn("flex items-center gap-3", className)}>
-      <span className="shrink-0 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-foreground/80">
+      <span className="shrink-0 font-mono text-[0.8125rem] uppercase tracking-[0.12em] text-foreground">
         Ep {episode}
         {total ? <span className="text-muted-foreground"> / {total}</span> : null}
       </span>

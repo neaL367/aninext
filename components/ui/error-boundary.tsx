@@ -50,7 +50,7 @@ function RateLimitCountdown({ seconds, onTick }: { seconds: number; onTick: () =
 
   if (remaining <= 0) return null;
   return (
-    <p className="font-mono text-[0.58rem] uppercase tracking-[0.14em] text-muted-foreground">
+    <p className="font-mono text-[0.75rem] uppercase tracking-[0.14em] text-muted-foreground">
       Retrying in {remaining}s
     </p>
   );
@@ -75,13 +75,13 @@ function ErrorFallback(props: { title: string }, { error, retry }: ErrorInfo) {
 
   return (
     <div className="flex flex-col items-start gap-3 border border-border-soft p-6">
-      <p className="font-mono text-[0.58rem] uppercase tracking-[0.2em] text-signal">Error</p>
+      <p className="font-mono text-[0.75rem] uppercase tracking-[0.16em] text-signal">Error</p>
       <h2 className="font-serif text-2xl leading-none tracking-[-0.03em]">
         {copy?.title ?? props.title}
       </h2>
       <p className="max-w-md text-sm leading-6 text-muted-foreground">{body}</p>
       {err.digest && (
-        <p className="font-mono text-[0.55rem] uppercase tracking-[0.16em] text-muted-foreground/60">
+        <p className="font-mono text-[0.75rem] uppercase tracking-[0.16em] text-muted-foreground">
           Ref {err.digest}
         </p>
       )}
@@ -94,7 +94,7 @@ function ErrorFallback(props: { title: string }, { error, retry }: ErrorInfo) {
         <button
           type="button"
           onClick={() => retry()}
-          className="mt-1 border-b border-border-soft pb-1 font-mono text-[0.6rem] uppercase tracking-[0.16em] text-foreground transition-colors hover:border-signal hover:text-signal focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
+          className="mt-1 border-b border-border-soft pb-1 font-mono text-[0.8125rem] uppercase tracking-[0.16em] text-foreground transition-colors hover:border-signal hover:text-signal focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
         >
           Try again
         </button>

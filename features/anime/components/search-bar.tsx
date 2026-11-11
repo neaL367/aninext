@@ -55,7 +55,7 @@ export function SearchBar() {
           autoComplete="off"
           value={value}
           placeholder="Search anime"
-          className="h-full w-full min-w-0 bg-transparent px-2.5 font-mono text-xs text-foreground outline-none placeholder:text-muted-foreground/60 [&::-webkit-search-cancel-button]:hidden"
+          className="h-full w-full min-w-0 bg-transparent px-2.5 font-mono text-xs text-foreground outline-none placeholder:text-muted-foreground [&::-webkit-search-cancel-button]:hidden"
           onChange={(event) => {
             const nextValue = event.target.value;
             setValue(nextValue);

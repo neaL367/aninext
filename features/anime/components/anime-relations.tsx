@@ -52,17 +52,17 @@ export function AnimeRelations({ edges }: { edges: RelationEdge[] }) {
                   className="flex h-full items-center justify-center p-1"
                   style={color ? { backgroundColor: `${color}35` } : undefined}
                 >
-                  <span className="line-clamp-3 text-center font-mono text-[0.5rem] uppercase text-muted-foreground">
+                  <span className="line-clamp-3 text-center font-mono text-[0.6875rem] uppercase text-muted-foreground">
                     {title}
                   </span>
                 </div>
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="line-clamp-2 font-serif text-sm leading-snug text-foreground transition-colors group-hover:text-signal">
+              <p className="line-clamp-2 font-serif text-[0.9375rem] leading-snug text-foreground transition-colors group-hover:text-signal">
                 {title}
               </p>
-              <p className="mt-0.5 font-mono text-[0.55rem] uppercase tracking-[0.1em] text-muted-foreground/70">
+              <p className="mt-0.5 font-mono text-[0.75rem] uppercase tracking-[0.1em] text-muted-foreground">
                 {edge.relationType.replaceAll("_", " ")}
               </p>
             </div>

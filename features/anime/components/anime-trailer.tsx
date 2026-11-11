@@ -66,7 +66,7 @@ export function AnimeTrailer({ media }: { media: Media }) {
 
   if (!trailer?.id || trailer.site !== "youtube") {
     return (
-      <div className="flex min-h-32 items-center rounded-[3px] border border-border-soft px-5 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground">
+      <div className="flex min-h-32 items-center rounded-[3px] border border-border-soft px-5 font-mono text-[0.8125rem] uppercase tracking-[0.14em] text-muted-foreground">
         No trailer
       </div>
     );
@@ -123,7 +123,7 @@ export function AnimeTrailer({ media }: { media: Media }) {
             </span>
           </div>
 
-          <div className="absolute bottom-4 left-4 flex items-center gap-3 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-white drop-shadow-md">
+          <div className="absolute bottom-4 left-4 flex items-center gap-3 font-mono text-[0.8125rem] uppercase tracking-[0.14em] text-white drop-shadow-md">
             <span>Watch trailer</span>
           </div>
         </button>

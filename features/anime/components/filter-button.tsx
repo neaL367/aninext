@@ -23,7 +23,7 @@ export function FilterButton({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "flex min-h-8 min-w-0 items-center justify-start rounded-[2px] px-2 py-1 text-left font-mono text-[0.64rem] leading-tight transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal",
+        "flex min-h-8 min-w-0 items-center justify-start rounded-[2px] px-2 py-1 text-left font-mono text-[0.8125rem] leading-tight transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal",
         active
           ? "bg-signal text-white"
           : "text-muted-foreground hover:bg-surface-1 hover:text-foreground",
@@ -80,7 +80,7 @@ export function FilterChip({
   return (
     <span
       className={cn(
-        "group inline-flex items-center gap-1 rounded-[2px] bg-surface-1 px-2 py-1 font-mono text-[0.6rem] text-foreground/80 transition-colors hover:text-foreground",
+        "group inline-flex items-center gap-1 rounded-[2px] bg-surface-1 px-2 py-1 font-mono text-[0.8125rem] text-foreground transition-colors hover:text-foreground",
         className,
       )}
     >

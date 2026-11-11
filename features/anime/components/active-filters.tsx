@@ -19,7 +19,7 @@ export function ActiveFilters() {
       data-pending={isPending ? "" : undefined}
       className="flex flex-wrap items-center gap-2 border-b border-border-soft pb-4 transition-opacity data-[pending]:opacity-50"
     >
-      <span className="font-mono text-[0.58rem] uppercase tracking-[0.14em] text-muted-foreground/70">
+      <span className="font-mono text-[0.75rem] uppercase tracking-[0.14em] text-muted-foreground">
         Active
       </span>
       {activeFilters.map((item, index) => (
@@ -32,7 +32,7 @@ export function ActiveFilters() {
       <button
         type="button"
         onClick={clearAll}
-        className="ml-1 font-mono text-[0.58rem] uppercase tracking-[0.12em] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
+        className="ml-1 font-mono text-[0.75rem] uppercase tracking-[0.12em] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
       >
         Clear
       </button>

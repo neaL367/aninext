@@ -50,13 +50,13 @@ export function TrendingIndex({ items }: { items: Media[] }) {
           <div className="absolute inset-x-0 bottom-0 z-10 p-5 sm:p-7">
             <div className="flex items-end justify-between gap-4">
               <div className="min-w-0">
-                <p className="font-mono text-[0.6rem] uppercase tracking-[0.2em] text-white/50">
+                <p className="font-mono text-[0.8125rem] uppercase tracking-[0.16em] text-white/75">
                   No. 01
                 </p>
                 <h3 className="mt-2 line-clamp-2 font-serif text-3xl leading-[1.02] tracking-[-0.03em] text-white sm:text-4xl">
                   {leadTitle}
                 </h3>
-                <p className="mt-2 font-mono text-[0.62rem] uppercase tracking-[0.12em] text-white/55">
+                <p className="mt-2 font-mono text-[0.8125rem] uppercase tracking-[0.12em] text-white/75">
                   {[lead.format ? formatFormat(lead.format) : null, lead.seasonYear]
                     .filter(Boolean)
                     .join(" · ")}
@@ -79,7 +79,7 @@ export function TrendingIndex({ items }: { items: Media[] }) {
                   href={`/anime/${item.id}` as Route<string>}
                   className="group flex items-center gap-4 py-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
                 >
-                  <span className="w-6 shrink-0 font-mono text-[0.62rem] tabular-nums text-muted-foreground/60">
+                  <span className="w-6 shrink-0 font-mono text-[0.8125rem] tabular-nums text-muted-foreground">
                     {String(index + 2).padStart(2, "0")}
                   </span>
                   <span className="relative aspect-[2/3] w-9 shrink-0 overflow-hidden rounded-[2px] bg-surface-2">
@@ -98,7 +98,7 @@ export function TrendingIndex({ items }: { items: Media[] }) {
                     <span className="block truncate font-serif text-base leading-snug text-foreground transition-colors group-hover:text-signal sm:text-lg">
                       {title}
                     </span>
-                    <span className="mt-0.5 block font-mono text-[0.58rem] uppercase tracking-[0.12em] text-muted-foreground/75">
+                    <span className="mt-0.5 block font-mono text-[0.75rem] uppercase tracking-[0.12em] text-muted-foreground">
                       {[item.format ? formatFormat(item.format) : null, item.seasonYear]
                         .filter(Boolean)
                         .join(" · ")}
@@ -162,7 +162,7 @@ export function SeasonMosaic({
             <h3 className="line-clamp-2 font-serif text-2xl leading-[1.05] tracking-[-0.03em] text-white sm:text-3xl">
               {leadTitle}
             </h3>
-            <p className="mt-1.5 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-white/55">
+            <p className="mt-1.5 font-mono text-[0.8125rem] uppercase tracking-[0.12em] text-white/75">
               {[lead.format ? formatFormat(lead.format) : null, lead.seasonYear]
                 .filter(Boolean)
                 .join(" · ")}
@@ -207,14 +207,14 @@ export function RankingList({
                 href={`/anime/${item.id}` as Route<string>}
                 className="group flex items-baseline gap-4 py-3.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
               >
-                <span className="w-7 shrink-0 font-serif text-lg italic tabular-nums text-muted-foreground/60">
+                <span className="w-7 shrink-0 font-serif text-lg italic tabular-nums text-muted-foreground">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-serif text-base leading-snug text-foreground transition-colors group-hover:text-signal sm:text-lg">
                     {itemTitle}
                   </span>
-                  <span className="mt-0.5 block font-mono text-[0.56rem] uppercase tracking-[0.12em] text-muted-foreground/70">
+                  <span className="mt-0.5 block font-mono text-[0.75rem] uppercase tracking-[0.12em] text-muted-foreground">
                     {[item.format ? formatFormat(item.format) : null, item.seasonYear]
                       .filter(Boolean)
                       .join(" · ")}
@@ -274,7 +274,7 @@ export function UpcomingStrip({
               )}
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-4">
-                <p className="font-mono text-[0.56rem] uppercase tracking-[0.16em] text-white/50">
+                <p className="font-mono text-[0.75rem] uppercase tracking-[0.16em] text-white/75">
                   {item.seasonYear ?? "TBA"}
                 </p>
                 <h3 className="mt-1 line-clamp-2 font-serif text-lg leading-[1.1] tracking-[-0.02em] text-white">

@@ -15,7 +15,7 @@ export function OfflineBanner() {
       className="fixed inset-x-0 bottom-16 z-[90] flex items-center justify-center gap-2 border-t border-border-soft bg-background/95 px-4 py-2.5 pb-[calc(env(safe-area-inset-bottom)+0.625rem)] backdrop-blur-xl md:bottom-0 md:pb-2.5"
     >
       <WifiOffIcon className="size-3.5 text-signal" />
-      <p className="font-mono text-[0.6rem] uppercase tracking-[0.14em] text-foreground">
+      <p className="font-mono text-[0.8125rem] uppercase tracking-[0.14em] text-foreground">
         Offline. Reconnecting automatically.
       </p>
     </div>

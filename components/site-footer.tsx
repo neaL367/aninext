@@ -31,7 +31,7 @@ export function SiteFooter() {
             <Link
               key={link.href}
               href={link.href}
-              className="inline-flex min-h-10 items-center font-mono text-[0.65rem] uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-foreground"
+              className="inline-flex min-h-10 items-center font-mono text-[0.8125rem] uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-foreground"
             >
               {link.label}
             </Link>
@@ -41,10 +41,10 @@ export function SiteFooter() {
 
       <div className="border-t border-border-soft">
         <div className="mx-auto flex w-full max-w-[1760px] items-center justify-between gap-4 px-4 py-4 sm:px-7 lg:px-10">
-          <p className="font-mono text-[0.6rem] uppercase tracking-[0.16em] text-muted-foreground/70">
+          <p className="font-mono text-[0.8125rem] uppercase tracking-[0.16em] text-muted-foreground">
             © 2026 AniNext
           </p>
-          <p className="font-mono text-[0.6rem] uppercase tracking-[0.16em] text-muted-foreground/70">
+          <p className="font-mono text-[0.8125rem] uppercase tracking-[0.16em] text-muted-foreground">
             Not affiliated with AniList
           </p>
         </div>

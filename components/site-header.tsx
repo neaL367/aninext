@@ -48,7 +48,7 @@ export function SiteHeader() {
               prefetch={item.prefetch}
               aria-current={isActive(item.href) ? "page" : undefined}
               className={cn(
-                "relative py-1 font-mono text-[0.68rem] uppercase tracking-[0.16em] transition-colors before:absolute before:-inset-x-1.5 before:-inset-y-2.5 before:content-['']",
+                "relative py-1 font-mono text-[0.875rem] uppercase tracking-[0.16em] transition-colors before:absolute before:-inset-x-1.5 before:-inset-y-2.5 before:content-['']",
                 isActive(item.href)
                   ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground",
@@ -74,7 +74,7 @@ export function SiteHeader() {
             className="group flex h-9 items-center gap-2.5 rounded-sm px-2 text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
           >
             <SearchIcon aria-hidden="true" className="size-4" strokeWidth={1.5} />
-            <kbd className="hidden font-mono text-[0.62rem] tracking-[0.12em] text-muted-foreground/60 transition-colors group-hover:text-muted-foreground sm:inline">
+            <kbd className="hidden font-mono text-[0.8125rem] tracking-[0.12em] text-muted-foreground transition-colors group-hover:text-muted-foreground sm:inline">
               ⌘K
             </kbd>
           </button>

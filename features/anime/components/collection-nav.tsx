@@ -27,7 +27,7 @@ export function CollectionNav() {
             prefetch={id === "seasonal" ? false : undefined}
             aria-current={isActive ? "page" : undefined}
             className={cn(
-              "relative flex min-h-11 shrink-0 items-center pb-3 pt-2 font-mono text-[0.62rem] uppercase tracking-[0.16em] transition-colors",
+              "relative flex min-h-11 shrink-0 items-center pb-3 pt-2 font-mono text-[0.8125rem] uppercase tracking-[0.16em] transition-colors",
               isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground",
             )}
           >

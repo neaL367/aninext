@@ -31,7 +31,7 @@ export function AnimeCharacters({ edges }: { edges: CharacterEdge[] }) {
                   className="object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transform-none"
                 />
               ) : (
-                <div className="flex h-full items-center justify-center p-1 text-center font-mono text-[0.5rem] uppercase text-muted-foreground">
+                <div className="flex h-full items-center justify-center p-1 text-center font-mono text-[0.6875rem] uppercase text-muted-foreground">
                   {edge.node.name.full}
                 </div>
               )}
@@ -40,7 +40,7 @@ export function AnimeCharacters({ edges }: { edges: CharacterEdge[] }) {
               <p className="truncate font-serif text-sm leading-snug text-foreground">
                 {edge.node.name.full}
               </p>
-              <p className="mt-0.5 truncate font-mono text-[0.55rem] uppercase tracking-[0.12em] text-muted-foreground/70">
+              <p className="mt-0.5 truncate font-mono text-[0.75rem] uppercase tracking-[0.12em] text-muted-foreground">
                 {edge.role}
               </p>
             </div>
@@ -56,12 +56,12 @@ export function AnimeCharacters({ edges }: { edges: CharacterEdge[] }) {
                       className="object-cover"
                     />
                   ) : (
-                    <span className="flex size-full items-center justify-center font-mono text-[0.55rem] text-muted-foreground">
+                    <span className="flex size-full items-center justify-center font-mono text-[0.75rem] text-muted-foreground">
                       {voiceActor.name.full.charAt(0)}
                     </span>
                   )}
                 </div>
-                <p className="hidden max-w-[88px] truncate font-mono text-[0.55rem] text-muted-foreground/80 sm:block">
+                <p className="hidden max-w-[88px] truncate font-mono text-[0.75rem] text-muted-foreground sm:block">
                   {voiceActor.name.full}
                 </p>
               </div>

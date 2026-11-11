@@ -157,10 +157,10 @@ export function AiringTimeline({
           <h2 className="display text-3xl sm:text-4xl">
             {isToday ? "Today" : formatDayLabel(day)}
           </h2>
-          <p className="mt-1.5 font-mono text-[0.62rem] uppercase tracking-[0.12em] text-muted-foreground">
+          <p className="mt-1.5 font-mono text-[0.8125rem] uppercase tracking-[0.12em] text-muted-foreground">
             {sorted.length} {sorted.length === 1 ? "episode" : "episodes"}
             {liveCount > 0 && <span className="text-signal"> · {liveCount} live</span>}
-            <span className="text-muted-foreground/60"> · {timezone}</span>
+            <span className="text-muted-foreground"> · {timezone}</span>
           </p>
         </div>
 
@@ -176,10 +176,10 @@ export function AiringTimeline({
               onClick={() => setFormatFilter(filter)}
               aria-pressed={formatFilter === filter}
               className={cn(
-                "relative shrink-0 border-b pb-1 font-mono text-[0.6rem] uppercase tracking-[0.14em] transition-colors before:absolute before:-inset-x-1.5 before:-inset-y-2.5 before:content-['']",
+                "relative shrink-0 rounded-t-[2px] border-b px-1.5 pb-1 font-mono text-[0.8125rem] uppercase tracking-[0.14em] transition-colors before:absolute before:-inset-x-1 before:-inset-y-2.5 before:content-['']",
                 formatFilter === filter
                   ? "border-signal text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground",
+                  : "border-transparent text-muted-foreground hover:border-border hover:bg-surface-1/60 hover:text-foreground",
               )}
             >
               {formatFilterLabel(filter)}
@@ -223,10 +223,10 @@ export function AiringTimeline({
                   <LocalTime
                     timestamp={now}
                     offsetMinutes={offset}
-                    className="font-mono text-[0.62rem] font-semibold tabular-nums text-signal"
+                    className="font-mono text-[0.8125rem] font-semibold tabular-nums text-signal"
                   />
                   <span className="h-px flex-1 bg-signal/20" />
-                  <span className="font-mono text-[0.56rem] uppercase tracking-[0.18em] text-muted-foreground">
+                  <span className="font-mono text-[0.75rem] uppercase tracking-[0.16em] text-muted-foreground">
                     Now
                   </span>
                 </div>
@@ -236,13 +236,13 @@ export function AiringTimeline({
                 <span
                   className={cn(
                     "font-mono text-sm font-semibold tabular-nums tracking-tight",
-                    hasLive ? "text-signal" : "text-foreground/80",
+                    hasLive ? "text-signal" : "text-foreground",
                   )}
                 >
                   {String(band.hour).padStart(2, "0")}:00
                 </span>
                 <span className="h-px flex-1 bg-border-soft" />
-                <span className="font-mono text-[0.56rem] uppercase tracking-[0.14em] text-muted-foreground/70">
+                <span className="font-mono text-[0.75rem] uppercase tracking-[0.14em] text-muted-foreground">
                   {band.items.length}
                 </span>
               </div>
@@ -293,7 +293,7 @@ function ScheduleRow({
         aria-label={`Open ${title}`}
         className="group flex items-center gap-3 border-b border-border-soft py-1.5 opacity-65 transition-opacity hover:opacity-100"
       >
-        <span className="w-12 shrink-0 font-mono text-[0.6rem] tabular-nums text-muted-foreground">
+        <span className="w-12 shrink-0 font-mono text-[0.8125rem] tabular-nums text-muted-foreground">
           <LocalTime timestamp={item.airingAt} offsetMinutes={offsetMinutes} />
         </span>
         <span className="relative aspect-[2/3] w-7 shrink-0 overflow-hidden rounded-[2px] bg-surface-2">
@@ -308,10 +308,10 @@ function ScheduleRow({
             />
           )}
         </span>
-        <span className="min-w-0 flex-1 truncate font-serif text-sm text-foreground/85 transition-colors group-hover:text-signal">
+        <span className="min-w-0 flex-1 truncate font-serif text-sm text-foreground transition-colors group-hover:text-signal">
           {title}
         </span>
-        <span className="shrink-0 font-mono text-[0.56rem] text-muted-foreground/60">
+        <span className="shrink-0 font-mono text-[0.75rem] text-muted-foreground">
           Ep {item.episode} · {formatAgo(item.airingAt, now)} ago
         </span>
       </Link>
@@ -331,13 +331,13 @@ function ScheduleRow({
             offsetMinutes={offsetMinutes}
             className={cn(
               "font-mono text-sm tabular-nums",
-              isLive ? "font-semibold text-signal" : "font-medium text-foreground/85",
+              isLive ? "font-semibold text-signal" : "font-medium text-foreground",
             )}
           />
           <span
             className={cn(
-              "font-mono text-[0.52rem] uppercase tracking-[0.14em]",
-              isLive ? "text-signal" : "text-muted-foreground/60",
+              "font-mono text-[0.6875rem] uppercase tracking-[0.14em]",
+              isLive ? "text-signal" : "text-muted-foreground",
             )}
           >
             {isLive ? "Live" : isUpcoming ? "Airs" : "Aired"}
@@ -355,7 +355,7 @@ function ScheduleRow({
               className="object-cover transition-transform duration-500 group-hover:scale-[1.04] motion-reduce:transform-none"
             />
           ) : (
-            <div className="flex h-full items-center justify-center p-1 text-center font-mono text-[0.45rem] text-muted-foreground">
+            <div className="flex h-full items-center justify-center p-1 text-center font-mono text-[0.6875rem] text-muted-foreground">
               {title}
             </div>
           )}
@@ -367,12 +367,12 @@ function ScheduleRow({
               {title}
             </p>
             {isUpcoming && (
-              <span className="shrink-0 font-mono text-[0.6rem] tabular-nums text-muted-foreground">
+              <span className="shrink-0 font-mono text-[0.8125rem] tabular-nums text-muted-foreground">
                 in {countdown}
               </span>
             )}
           </div>
-          <p className="mt-0.5 font-mono text-[0.55rem] uppercase tracking-[0.1em] text-muted-foreground/75">
+          <p className="mt-0.5 font-mono text-[0.75rem] uppercase tracking-[0.1em] text-muted-foreground">
             Ep {item.episode}
             {media.episodes ? `/${media.episodes}` : ""}
             {media.format ? ` · ${formatFormat(media.format)}` : ""}
@@ -398,7 +398,7 @@ function ScheduleRow({
               target="_blank"
               rel="noopener noreferrer"
               title={`Watch on ${link.site ?? "streaming"}`}
-              className="flex items-center gap-1 font-mono text-[0.55rem] uppercase tracking-[0.1em] text-muted-foreground/70 transition-colors hover:text-foreground"
+              className="flex items-center gap-1 font-mono text-[0.75rem] uppercase tracking-[0.1em] text-muted-foreground transition-colors hover:text-foreground"
             >
               {getFaviconUrl(link.url) ? (
                 <Image

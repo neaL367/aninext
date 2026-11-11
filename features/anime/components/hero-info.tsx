@@ -22,7 +22,7 @@ export function HeroInfo({ media }: { media: Media }) {
 
   return (
     <div className="max-w-3xl">
-      <p className="reveal-up font-mono text-[0.62rem] uppercase tracking-[0.24em] text-signal">
+      <p className="reveal-up font-mono text-[0.8125rem] uppercase tracking-[0.16em] text-signal">
         Featured
       </p>
 
@@ -34,11 +34,11 @@ export function HeroInfo({ media }: { media: Media }) {
       </h1>
 
       <div
-        className="reveal-up mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[0.68rem] uppercase tracking-[0.1em] text-muted-foreground"
+        className="reveal-up mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[0.875rem] uppercase tracking-[0.1em] text-muted-foreground"
         style={{ animationDelay: "160ms" }}
       >
         {media.averageScore !== undefined && (
-          <MediaScore score={media.averageScore} className="text-[0.72rem] text-foreground" />
+          <MediaScore score={media.averageScore} className="text-[0.875rem] text-foreground" />
         )}
         {meta && <span>{meta}</span>}
         {media.status === "RELEASING" && (
@@ -51,7 +51,7 @@ export function HeroInfo({ media }: { media: Media }) {
 
       {description && (
         <p
-          className="reveal-up mt-4 line-clamp-2 max-w-xl text-sm leading-6 text-muted-foreground"
+          className="reveal-up mt-5 line-clamp-2 max-w-xl text-[0.95rem] leading-7 text-muted-foreground"
           style={{ animationDelay: "240ms" }}
         >
           {description}
@@ -64,7 +64,7 @@ export function HeroInfo({ media }: { media: Media }) {
       >
         <Link
           href={`/anime/${media.id}` as Route<string>}
-          className="group inline-flex min-h-10 items-center gap-2 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
+          className="group inline-flex min-h-10 items-center gap-2 font-mono text-[0.875rem] uppercase tracking-[0.16em] text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
         >
           Open title
           <ArrowRightIcon className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
@@ -74,7 +74,7 @@ export function HeroInfo({ media }: { media: Media }) {
             href={`https://www.youtube.com/watch?v=${media.trailer.id}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-10 items-center gap-2 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
+            className="inline-flex min-h-10 items-center gap-2 font-mono text-[0.875rem] uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
           >
             <PlayIcon className="size-3 fill-current" />
             Trailer

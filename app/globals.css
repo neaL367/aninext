@@ -63,13 +63,13 @@
   --secondary: #161411;
   --secondary-foreground: #e6e1d7;
   --muted: #161411;
-  --muted-foreground: #9c9588;
+  --muted-foreground: #b8afa2;
   --accent: #ff5433;
   --accent-foreground: #fff8f4;
   --destructive: #ff4a2e;
   --destructive-foreground: #fff8f4;
-  --border: rgba(242, 238, 230, 0.14);
-  --border-soft: rgba(242, 238, 230, 0.075);
+  --border: rgba(242, 238, 230, 0.18);
+  --border-soft: rgba(242, 238, 230, 0.11);
   --input: rgba(242, 238, 230, 0.14);
   --ring: color-mix(in srgb, #ff5433 55%, transparent);
   --glow: color-mix(in srgb, #ff5433 12%, transparent);
@@ -80,7 +80,7 @@
   --signal-soft: color-mix(in srgb, #ff5433 12%, transparent);
   --score-high: #a3c18d;
   --score-mid: #d9b26f;
-  --score-low: #8b8478;
+  --score-low: #a89f92;
   --live-badge: #ff5433;
   --paper: #f2eee6;
 }
@@ -195,6 +195,19 @@
     background: var(--signal);
     color: var(--accent-foreground);
   }
+
+  /* Tailwind v4 leaves native buttons on the default cursor. Filter chips,
+     day tabs and every other control here is a button, so restore the pointer
+     (and keep disabled controls honest). */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -211,7 +224,7 @@
   }
 
   .meta {
-    @apply font-mono text-[0.66rem] uppercase tracking-[0.12em] text-muted-foreground;
+    @apply font-mono text-[0.8125rem] uppercase tracking-[0.12em] text-muted-foreground;
   }
 
   .rule {
