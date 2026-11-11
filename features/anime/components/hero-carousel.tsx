@@ -37,9 +37,11 @@ export function HeroCarousel({ items }: { items: Media[] }) {
   const next = useCallback(() => goTo(current + 1), [current, goTo]);
   const prevSlide = useCallback(() => goTo(current - 1), [current, goTo]);
 
-  // Autoplay is a progressive enhancement: off for reduced-motion visitors.
+  // Autoplay runs unless the visitor pauses it. prefers-reduced-motion drops the
+  // cinematic zoom below, but it must not silently stop the slideshow: the
+  // control still said "Pause", so the carousel just looked broken.
   useEffect(() => {
-    if (len < 2 || !isPlaying || reducedMotion) return;
+    if (len < 2 || !isPlaying) return;
 
     const startTime = Date.now();
     const intervalId = setInterval(() => {
@@ -50,7 +52,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
     }, 100);
 
     return () => clearInterval(intervalId);
-  }, [current, isPlaying, len, next, reducedMotion]);
+  }, [current, isPlaying, len, next]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
     if (event.key === "ArrowLeft") {
@@ -190,7 +192,7 @@ export function HeroCarousel({ items }: { items: Media[] }) {
                   {isActive && (
                     <span
                       className="absolute left-0 top-1/2 h-px -translate-y-1/2 bg-signal"
-                      style={{ width: reducedMotion ? "100%" : `${progress}%` }}
+                      style={{ width: `${progress}%` }}
                     />
                   )}
                 </button>
