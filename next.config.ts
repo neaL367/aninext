@@ -1,9 +1,5 @@
 import type { NextConfig } from "next";
 
-// Keep the Instant Navigation testing API out of user-facing deployments.
-// Build the artifact under test with EXPOSE_TESTING_API=1.
-const exposeTestingApi = process.env.EXPOSE_TESTING_API === "1";
-
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
@@ -32,7 +28,6 @@ const nextConfig: NextConfig = {
     agentUpgrade: "security",
     useTypeScriptCli: true,
     useOffline: true,
-    exposeTestingApiInProductionBuild: exposeTestingApi,
     // CSS ships as one immutable file instead of ~159 KB inlined into every
     // HTML response (a piece of that is serialised again in the flight payload),
     // so repeat views and crawler hits stop paying for it.

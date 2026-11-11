@@ -32,14 +32,6 @@ bun run dev
 
 Open [http://localhost:3000](http://localhost:3000). The homepage, six browse collections (`/anime/trending`, `/anime/popular`, `/anime/top100`, `/anime/upcoming`, `/anime/alltimepopular`, `/anime/seasonal`), anime detail pages, and the airing schedule all read live AniList data.
 
-## Testing
-
-End-to-end tests use [`@next/playwright`](https://nextjs.org/docs/app/guides/testing/playwright) with the [`instant()`](https://preview.nextjs.org/docs/app/api-reference/file-conventions/route-segment-config/instant) API to assert that static shells commit immediately and content streams behind them — covering hard navigations, client-side navigations, and the detail page's streamed sections. The suite runs against the live AniList API through the configured endpoint (`ANILIST_ENDPOINT`, defaulting to `https://graphql.anilist.co`), so assertions target page structure rather than specific titles.
-
-```bash
-bun run test:e2e
-```
-
 ## Stack
 
 - **[Next.js 16.4](https://nextjs.org/)**: App Router, Cache Components, Server Functions, Instant Navigations
@@ -49,7 +41,6 @@ bun run test:e2e
 - **[shadcn/ui](https://ui.shadcn.com/)** on **[Base UI](https://base-ui.com/)**
 - **[AniList GraphQL](https://docs.anilist.co/)** — read-only data source; no auth, no mutations
 - **[Bun](https://bun.sh/)** runtime, **[oxlint](https://oxc.rs/)** + **[oxfmt](https://oxc.rs/)** for lint and formatting
-- **[Playwright](https://playwright.dev/)** + `@next/playwright` for instant-navigation e2e
 
 ## Architecture
 
