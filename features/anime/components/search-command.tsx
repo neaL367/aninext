@@ -1,46 +1,31 @@
 "use client";
-import { CalendarIcon, ClockIcon, StarIcon, TrendingUpIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 
-import {
-  Command,
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-} from "@/components/ui/command";
-import { COLLECTION_NAV_ITEMS } from "@/features/anime/lib/collection-config";
-
-import type { AnimeCollection } from "@/features/anime/types/anime";
-import type { Route } from "next";
-
-const COLLECTION_ICONS: Record<AnimeCollection, React.ReactNode> = {
-  trending: <TrendingUpIcon aria-hidden="true" />,
-  popular: <StarIcon aria-hidden="true" />,
-  top100: <StarIcon aria-hidden="true" />,
-  upcoming: <CalendarIcon aria-hidden="true" />,
-  seasonal: <ClockIcon aria-hidden="true" />,
-  alltimepopular: <StarIcon aria-hidden="true" />,
-};
+// cmdk + dialog primitives are ~50 KB of the shell budget. Nothing renders them
+// until the palette is actually opened, so keep them off the initial payload.
+const SearchDialog = dynamic(() => import("./search-dialog").then((mod) => mod.SearchDialog), {
+  ssr: false,
+});
 
 export function SearchCommand() {
-  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
 
   useEffect(() => {
     const down = (event: KeyboardEvent) => {
       if (event.key === "k" && (event.metaKey || event.ctrlKey)) {
         event.preventDefault();
+        setMounted(true);
         setOpen((current) => !current);
       }
     };
 
-    const customOpen = () => setOpen(true);
+    const customOpen = () => {
+      setMounted(true);
+      setOpen(true);
+    };
 
     document.addEventListener("keydown", down);
     document.addEventListener("open-search", customOpen);
@@ -50,62 +35,7 @@ export function SearchCommand() {
     };
   }, []);
 
-  function close() {
-    setOpen(false);
-    setQuery("");
-  }
+  if (!mounted) return null;
 
-  function search() {
-    const value = query.trim();
-    if (!value) return;
-    // oxlint-disable-next-line typescript/no-unnecessary-type-assertion -- typedRoutes narrowing for router.push
-    router.push(`/anime/trending?search=${encodeURIComponent(value)}` as Route<string>);
-    close();
-  }
-
-  function navigateTo(path: string) {
-    // oxlint-disable-next-line typescript/no-unnecessary-type-assertion -- typedRoutes narrowing for router.push
-    router.push(path as Route<string>);
-    close();
-  }
-
-  return (
-    <CommandDialog
-      open={open}
-      onOpenChange={setOpen}
-      title="Search"
-      description="Find an anime or jump to a collection."
-    >
-      <Command>
-        <CommandInput
-          aria-label="Search anime or choose a collection"
-          autoComplete="off"
-          placeholder="Search anime"
-          value={query}
-          onValueChange={setQuery}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") search();
-          }}
-        />
-        <CommandList>
-          <CommandEmpty>{query ? "Press Enter to search." : "No commands."}</CommandEmpty>
-          <CommandGroup heading="Collections">
-            {COLLECTION_NAV_ITEMS.map(({ id, label }) => (
-              <CommandItem key={id} onSelect={() => navigateTo(`/anime/${id}`)}>
-                {COLLECTION_ICONS[id]}
-                {label}
-              </CommandItem>
-            ))}
-          </CommandGroup>
-          <CommandSeparator />
-          <CommandGroup heading="Pages">
-            <CommandItem onSelect={() => navigateTo("/airing")}>
-              <ClockIcon aria-hidden="true" />
-              Airing schedule
-            </CommandItem>
-          </CommandGroup>
-        </CommandList>
-      </Command>
-    </CommandDialog>
-  );
+  return <SearchDialog open={open} onOpenChange={setOpen} />;
 }

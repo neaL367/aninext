@@ -2,6 +2,8 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./e2e",
+  // Production-only instant() contracts run through playwright.instant.config.ts.
+  testIgnore: /\.prod\.test\.ts/,
   globalSetup: "./e2e/global-setup.ts",
   fullyParallel: false,
   workers: 1,

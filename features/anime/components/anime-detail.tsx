@@ -121,7 +121,10 @@ async function StaffSection({ id }: { id: number }) {
 
 export function AnimeDetailSkeleton() {
   return (
-    <div className="mx-auto w-full max-w-[1760px] px-4 sm:px-7 lg:px-10">
+    <div
+      className="mx-auto w-full max-w-[1760px] px-4 sm:px-7 lg:px-10"
+      data-testid="anime-detail-skeleton"
+    >
       <section className="rule py-10 sm:py-12">
         <div className="mb-6 border-b border-border-soft pb-4">
           <div className="shimmer h-8 w-28 rounded-[2px]" />

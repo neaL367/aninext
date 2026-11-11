@@ -8,17 +8,19 @@
     "start": "next start",
     "lint": "oxlint",
     "test:e2e": "playwright test",
+    "test:instant": "playwright test --config=playwright.instant.config.ts",
     "format": "oxfmt",
     "format:check": "oxfmt --check"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
+    "@vercel/analytics": "^2.0.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "geist": "^1.9.0",
     "lucide-react": "^1.28.0",
-    "next": "16.4.3",
+    "next": "16.4.6",
     "next-themes": "^0.4.6",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -29,7 +31,7 @@
     "use-debounce": "^10.1.1"
   },
   "devDependencies": {
-    "@next/playwright": "^16.4.3",
+    "@next/playwright": "16.4.6",
     "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",

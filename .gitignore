@@ -42,6 +42,7 @@ next-env.d.ts
 
 .vscode
 .agents
+.claude
 skills-lock.json
 
 # playwright

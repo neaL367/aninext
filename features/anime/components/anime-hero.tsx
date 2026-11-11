@@ -178,7 +178,7 @@ export function AnimeHero({ media }: { media: Media }) {
 
 export function AnimeHeroSkeleton() {
   return (
-    <section className="relative">
+    <section className="relative" data-testid="anime-hero-skeleton">
       <div className="relative h-[300px] overflow-hidden sm:h-[380px] lg:h-[440px]">
         <div className="absolute inset-0 shimmer" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />

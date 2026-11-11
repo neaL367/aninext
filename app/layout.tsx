@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import { GeistSerif } from "geist/font/serif/variable";
 import { Suspense } from "react";
 
@@ -8,8 +9,6 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader, SiteHeaderFallback } from "@/components/site-header";
 import { SiteMobileNav } from "@/components/site-mobile-nav";
 import { ScrollToTopButton } from "@/components/ui/scroll-to-top-button";
-import { Toaster } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { SearchCommand } from "@/features/anime/components/search-command";
 
 import type { Metadata, Viewport } from "next";
@@ -39,36 +38,34 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="font-sans antialiased">
         <Providers>
-          <TooltipProvider>
-            <SearchCommand />
-            <div className="flex min-h-screen flex-col">
-              <a
-                href="#main-content"
-                className="sr-only z-[100] rounded-sm bg-background px-3 py-2 text-sm font-medium focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
-              >
-                Skip to content
-              </a>
-              <Suspense fallback={<SiteHeaderFallback />}>
-                <SiteHeader />
-              </Suspense>
-              <Suspense fallback={null}>
-                <ScrollToTop />
-              </Suspense>
-              <main id="main-content" className="min-w-0 flex-1 pb-20 md:pb-0">
-                {children}
-              </main>
-              <SiteFooter />
-              <Suspense fallback={null}>
-                <SiteMobileNav />
-              </Suspense>
-              <Suspense fallback={null}>
-                <ScrollToTopButton />
-              </Suspense>
-            </div>
-          </TooltipProvider>
-          <Toaster position="top-right" />
+          <SearchCommand />
+          <div className="flex min-h-screen flex-col">
+            <a
+              href="#main-content"
+              className="sr-only z-[100] rounded-sm bg-background px-3 py-2 text-sm font-medium focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+            >
+              Skip to content
+            </a>
+            <Suspense fallback={<SiteHeaderFallback />}>
+              <SiteHeader />
+            </Suspense>
+            <Suspense fallback={null}>
+              <ScrollToTop />
+            </Suspense>
+            <main id="main-content" className="min-w-0 flex-1 pb-20 md:pb-0">
+              {children}
+            </main>
+            <SiteFooter />
+            <Suspense fallback={null}>
+              <SiteMobileNav />
+            </Suspense>
+            <Suspense fallback={null}>
+              <ScrollToTopButton />
+            </Suspense>
+          </div>
           <OfflineBanner />
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
