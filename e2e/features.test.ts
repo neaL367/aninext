@@ -47,17 +47,6 @@ test.describe("canonical URLs", () => {
       await context.close();
     }
   });
-
-  test("airing distinguishes an empty day from an API failure", async ({ page }) => {
-    await page.goto("/airing/2099-01-15");
-    await expect(page.getByText("Nothing airing this day")).toBeVisible();
-
-    await page.goto("/airing/2098-01-15");
-    await expect(page.getByRole("heading", { name: "Airing schedule failed to load" })).toBeVisible(
-      { timeout: 15_000 },
-    );
-    await expect(page.getByRole("button", { name: "Try again" })).toBeVisible();
-  });
 });
 
 test.describe("browse interactions", () => {

@@ -100,7 +100,10 @@ export function AnimeHero({ media }: { media: Media }) {
           </div>
 
           <div className="min-w-0 self-end">
-            <h1 className="display-tight line-clamp-2 text-[clamp(2.4rem,5.5vw,5rem)] text-white">
+            <h1
+              className="display-tight line-clamp-2 text-[clamp(2.4rem,5.5vw,5rem)] text-white"
+              data-testid="anime-title"
+            >
               {title}
             </h1>
 

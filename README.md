@@ -34,7 +34,7 @@ Open [http://localhost:3000](http://localhost:3000). The homepage, six browse co
 
 ## Testing
 
-End-to-end tests use [`@next/playwright`](https://nextjs.org/docs/app/guides/testing/playwright) with the [`instant()`](https://preview.nextjs.org/docs/app/api-reference/file-conventions/route-segment-config/instant) API to assert that static shells commit immediately and content streams behind them — covering hard navigations, client-side navigations, and the detail page's streamed sections. Playwright starts a local deterministic AniList GraphQL fixture (`e2e/mock-anilist.ts`) so pagination, empty states, and detail tests do not depend on live API rate limits; production development still defaults to AniList unless `ANILIST_ENDPOINT` is set.
+End-to-end tests use [`@next/playwright`](https://nextjs.org/docs/app/guides/testing/playwright) with the [`instant()`](https://preview.nextjs.org/docs/app/api-reference/file-conventions/route-segment-config/instant) API to assert that static shells commit immediately and content streams behind them — covering hard navigations, client-side navigations, and the detail page's streamed sections. The suite runs against the live AniList API through the configured endpoint (`ANILIST_ENDPOINT`, defaulting to `https://graphql.anilist.co`), so assertions target page structure rather than specific titles.
 
 ```bash
 bun run test:e2e

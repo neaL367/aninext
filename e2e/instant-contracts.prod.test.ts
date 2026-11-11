@@ -7,20 +7,20 @@ import { expect, test } from "@playwright/test";
 test("browse card commits the detail shell before its data", async ({ page }) => {
   await page.goto("/anime/top100");
 
-  const card = page.locator('a[href="/anime/1"]').first();
-  await expect(card).toBeVisible();
+  const card = page.locator('[role="listitem"] a[href^="/anime/"]').first();
+  await expect(card).toBeVisible({ timeout: 30_000 });
 
   await instant(page, async () => {
     await card.click();
-    await page.waitForURL((url) => url.pathname === "/anime/1");
+    await page.waitForURL((url) => /^\/anime\/\d+$/.test(url.pathname));
 
     // App Shell: both route-level Suspense fallbacks commit immediately.
     await expect(page.getByTestId("anime-hero-skeleton")).toBeVisible();
     await expect(page.getByTestId("anime-detail-skeleton")).toBeVisible();
 
-    // Navigation stage: URL-derived content is not part of the prefetch.
-    await expect(page.getByRole("heading", { name: "Mock Anime 1", exact: true })).toHaveCount(0);
+    // Navigation stage: the title is params-derived, so it is not prefetched.
+    await expect(page.getByTestId("anime-title")).toHaveCount(0);
   });
 
-  await expect(page.getByRole("heading", { name: "Mock Anime 1", exact: true })).toBeVisible();
+  await expect(page.getByTestId("anime-title")).toBeVisible({ timeout: 30_000 });
 });
