@@ -17,7 +17,6 @@ export function HeroCarousel({ items }: { items: Media[] }) {
   const [current, setCurrent] = useState(0);
   const [prev, setPrev] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [progress, setProgress] = useState(0);
   const reducedMotion = usePrefersReducedMotion();
 
   const dragStartX = useRef<number | null>(null);
@@ -29,7 +28,6 @@ export function HeroCarousel({ items }: { items: Media[] }) {
     (index: number) => {
       setPrev(current);
       setCurrent((index + len) % len);
-      setProgress(0);
     },
     [current, len],
   );
@@ -43,15 +41,10 @@ export function HeroCarousel({ items }: { items: Media[] }) {
   useEffect(() => {
     if (len < 2 || !isPlaying) return;
 
-    const startTime = Date.now();
-    const intervalId = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const pct = Math.min((elapsed / AUTOPLAY_INTERVAL) * 100, 100);
-      setProgress(pct);
-      if (elapsed >= AUTOPLAY_INTERVAL) next();
-    }, 100);
-
-    return () => clearInterval(intervalId);
+    // One timeout per slide: the countdown bar is a CSS animation, so nothing
+    // re-renders while it runs.
+    const timeoutId = setTimeout(next, AUTOPLAY_INTERVAL);
+    return () => clearTimeout(timeoutId);
   }, [current, isPlaying, len, next]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
@@ -191,8 +184,20 @@ export function HeroCarousel({ items }: { items: Media[] }) {
                   <span className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-white/25 transition-colors group-hover:bg-white/60" />
                   {isActive && (
                     <span
-                      className="absolute left-0 top-1/2 h-px -translate-y-1/2 bg-signal"
-                      style={{ width: `${progress}%` }}
+                      // Restart the bar whenever the slide or play state changes,
+                      // matching the timer that was just (re)scheduled.
+                      key={`${current}:${isPlaying}`}
+                      className={`absolute left-0 top-1/2 h-px -translate-y-1/2 bg-signal ${
+                        reducedMotion ? "" : "animate-carousel-progress"
+                      }`}
+                      style={
+                        reducedMotion
+                          ? { width: "100%" }
+                          : {
+                              animationDuration: `${AUTOPLAY_INTERVAL}ms`,
+                              animationPlayState: isPlaying ? "running" : "paused",
+                            }
+                      }
                     />
                   )}
                 </button>

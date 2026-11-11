@@ -331,6 +331,21 @@
   transform: translateZ(0);
 }
 
+/* Autoplay countdown for the hero carousel. Duration and play state come from
+   the component, so the bar can pause without a React render every 100ms. */
+@keyframes carousel-progress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.animate-carousel-progress {
+  animation: carousel-progress linear forwards;
+}
+
 /* ------------------------------------------------------------------ */
 /* View transitions (React <ViewTransition>)                          */
 /* ------------------------------------------------------------------ */
