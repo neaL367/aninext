@@ -3,7 +3,10 @@ import { AniListError } from "./anilist-errors";
 
 const ENDPOINT = process.env.ANILIST_ENDPOINT ?? "https://graphql.anilist.co";
 const USER_AGENT = "AniNext/0.1 (+https://ani-next.vercel.app)";
-const REQUEST_TIMEOUT_MS = 15_000;
+// Per-attempt network cap. Short enough that a stalled socket can be retried
+// inside the total budget instead of consuming it whole (a 15s cap left ~5s —
+// not enough for a second full attempt, so one stall failed the render).
+const REQUEST_TIMEOUT_MS = 8_000;
 // Budget for work actually spent on AniList: network attempts plus their
 // backoffs. Time queued behind the concurrency cap or held by a 429 gate is
 // excluded, so a cold render no longer reports a timeout for a request that
@@ -125,11 +128,14 @@ function retryAfterSeconds(headers: Headers, fallback: number) {
   return fallback;
 }
 
+function isTimeoutError(error: unknown): boolean {
+  return error instanceof Error && (error.name === "AbortError" || error.name === "TimeoutError");
+}
+
 function toNetworkError(error: unknown, status?: number): AniListError {
   if (error instanceof AniListError) return error;
 
-  const timedOut =
-    error instanceof Error && (error.name === "AbortError" || error.name === "TimeoutError");
+  const timedOut = isTimeoutError(error);
   return new AniListError(
     timedOut ? "AniList request timed out" : "AniList request failed",
     "network",
@@ -267,9 +273,17 @@ export async function anilistFetch<T>(
       }
 
       if (fetchError != null || !res) {
-        if (remaining > 0 && spentMs < TOTAL_BUDGET_MS) {
+        const timedOut = isTimeoutError(fetchError);
+        // A stalled socket usually clears on a fresh connection, so timeouts
+        // retry quickly — but only when a whole new attempt still fits in the
+        // budget. Otherwise the remainder is too short to succeed and the
+        // request fails fast instead of hanging the render twice over.
+        const retryFits = !timedOut || spentMs + REQUEST_TIMEOUT_MS <= TOTAL_BUDGET_MS;
+        if (remaining > 0 && spentMs < TOTAL_BUDGET_MS && retryFits) {
           const attemptIndex = retries - remaining;
-          const backoff = jitter(Math.min(3000, Math.round(300 * Math.pow(2, attemptIndex))));
+          const backoff = timedOut
+            ? jitter(250)
+            : jitter(Math.min(3000, Math.round(300 * Math.pow(2, attemptIndex))));
           await wait(backoff);
           spentMs += backoff;
           return attempt(remaining - 1);

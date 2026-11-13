@@ -6,6 +6,7 @@ import { AniListError } from "@/lib/anilist-errors";
 
 import { ANIME_CACHE } from "./anime-cache";
 import { addDays, createAiringContext, dateStrFromEpoch, getAiringDayBounds } from "./lib/airing";
+import { compact, compactEdges, compactRecommendations } from "./lib/anime-nodes";
 import { getCollectionConfig } from "./lib/collection-config";
 import { buildFilterHash } from "./lib/parse-filters";
 import { getCurrentSeason } from "./lib/season";
@@ -53,8 +54,9 @@ function trimCardMedia(media: Media): Media {
   return { ...media, description: `${description.slice(0, CARD_SYNOPSIS_CHARS).trimEnd()}…` };
 }
 
-function trimCardList(items: Media[]): Media[] {
-  return items.map(trimCardMedia);
+// `Page.media` can carry nulls for entries AniList removed mid-crawl.
+function trimCardList(items: ReadonlyArray<Media | null | undefined> | null | undefined): Media[] {
+  return compact(items).map(trimCardMedia);
 }
 
 // The episode panel is a 420px scroll area; a long-running series ships around
@@ -236,7 +238,7 @@ export async function getHomeFeed(bucket: number): Promise<HomeFeed> {
     upcoming: trimCardList(data.upcoming.media),
     alltimepopular: trimCardList(data.alltimepopular.media),
     top100: trimCardList(data.top100.media),
-    airingSchedules: data.airing.airingSchedules,
+    airingSchedules: compact(data.airing.airingSchedules),
   };
 }
 
@@ -391,9 +393,9 @@ export async function getAnimeCharacters(id: number): Promise<CharacterEdge[]> {
   cacheLife("static");
 
   const data = await anilistFetch<{
-    Media: { characters?: { edges?: CharacterEdge[] | null } | null } | null;
+    Media: { characters?: { edges?: (CharacterEdge | null)[] | null } | null } | null;
   }>(ANIME_CHARACTERS_QUERY, { id });
-  return data.Media?.characters?.edges ?? [];
+  return compactEdges(data.Media?.characters?.edges);
 }
 
 const ANIME_STAFF_QUERY = `
@@ -412,9 +414,9 @@ export async function getAnimeStaff(id: number): Promise<StaffEdge[]> {
   cacheLife("static");
 
   const data = await anilistFetch<{
-    Media: { staff?: { edges?: StaffEdge[] | null } | null } | null;
+    Media: { staff?: { edges?: (StaffEdge | null)[] | null } | null } | null;
   }>(ANIME_STAFF_QUERY, { id });
-  return data.Media?.staff?.edges ?? [];
+  return compactEdges(data.Media?.staff?.edges);
 }
 
 const ANIME_RELATIONS_QUERY = `
@@ -433,9 +435,9 @@ export async function getAnimeRelations(id: number): Promise<RelationEdge[]> {
   cacheLife("static");
 
   const data = await anilistFetch<{
-    Media: { relations?: { edges?: RelationEdge[] | null } | null } | null;
+    Media: { relations?: { edges?: (RelationEdge | null)[] | null } | null } | null;
   }>(ANIME_RELATIONS_QUERY, { id });
-  return data.Media?.relations?.edges ?? [];
+  return compactEdges(data.Media?.relations?.edges);
 }
 
 const ANIME_RECOMMENDATIONS_QUERY = `
@@ -454,9 +456,9 @@ export async function getAnimeRecommendations(id: number): Promise<Recommendatio
   cacheLife("home");
 
   const data = await anilistFetch<{
-    Media: { recommendations?: { nodes?: RecommendationNode[] | null } | null } | null;
+    Media: { recommendations?: { nodes?: (RecommendationNode | null)[] | null } | null } | null;
   }>(ANIME_RECOMMENDATIONS_QUERY, { id });
-  return data.Media?.recommendations?.nodes ?? [];
+  return compactRecommendations(data.Media?.recommendations?.nodes);
 }
 
 const ANIME_AIRING_SCHEDULE_QUERY = `
@@ -546,11 +548,11 @@ export async function getAnimePageBatch(id: number): Promise<AnimePageBatch> {
     const data = await anilistFetch<{
       Media:
         | (Media & {
-            characters?: { edges?: CharacterEdge[] | null } | null;
-            staff?: { edges?: StaffEdge[] | null } | null;
-            relations?: { edges?: RelationEdge[] | null } | null;
-            recommendations?: { nodes?: RecommendationNode[] | null } | null;
-            airingSchedule?: { nodes?: AiringScheduleNode[] | null } | null;
+            characters?: { edges?: (CharacterEdge | null)[] | null } | null;
+            staff?: { edges?: (StaffEdge | null)[] | null } | null;
+            relations?: { edges?: (RelationEdge | null)[] | null } | null;
+            recommendations?: { nodes?: (RecommendationNode | null)[] | null } | null;
+            airingSchedule?: { nodes?: (AiringScheduleNode | null)[] | null } | null;
           })
         | null;
     }>(ANIME_PAGE_BATCH_QUERY, { id });
@@ -563,11 +565,13 @@ export async function getAnimePageBatch(id: number): Promise<AnimePageBatch> {
         : m;
     return {
       media,
-      characters: m.characters?.edges ?? [],
-      staff: m.staff?.edges ?? [],
-      relations: m.relations?.edges ?? [],
-      recommendations: m.recommendations?.nodes ?? [],
-      airingSchedule: m.airingSchedule?.nodes ?? [],
+      characters: compactEdges(m.characters?.edges),
+      staff: compactEdges(m.staff?.edges),
+      relations: compactEdges(m.relations?.edges),
+      recommendations: compactRecommendations(m.recommendations?.nodes),
+      // A schedule row is only renderable when it still resolves to a media
+      // entry — AniList leaves the media null for entries it removed.
+      airingSchedule: compact(m.airingSchedule?.nodes).filter((node) => node.media != null),
     };
   } catch (error) {
     if (error instanceof AniListError && error.status === 404) return empty;
@@ -618,10 +622,10 @@ export async function getAiringWeekItems(
   const first = await anilistFetch<{
     Page: {
       pageInfo: { hasNextPage: boolean };
-      airingSchedules: AiringScheduleNode[];
+      airingSchedules: (AiringScheduleNode | null)[];
     };
   }>(AIRING_DAY_QUERY, { start, end, page: 1 });
-  allSchedules.push(...first.Page.airingSchedules);
+  allSchedules.push(...compact(first.Page.airingSchedules));
 
   let page = 2;
   let hasNextPage = first.Page.pageInfo.hasNextPage;
@@ -634,13 +638,13 @@ export async function getAiringWeekItems(
         anilistFetch<{
           Page: {
             pageInfo: { hasNextPage: boolean };
-            airingSchedules: AiringScheduleNode[];
+            airingSchedules: (AiringScheduleNode | null)[];
           };
         }>(AIRING_DAY_QUERY, { start, end, page: p }),
       ),
     );
 
-    for (const data of results) allSchedules.push(...data.Page.airingSchedules);
+    for (const data of results) allSchedules.push(...compact(data.Page.airingSchedules));
     hasNextPage = results[results.length - 1].Page.pageInfo.hasNextPage;
     page += waveSize;
   }

@@ -24,14 +24,17 @@ export function AnimeRelations({ edges }: { edges: RelationEdge[] }) {
       className="max-h-[360px] divide-y divide-border-soft overflow-y-auto border-t border-border-soft scrollbar-thin focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
     >
       {edges.map((edge, i) => {
-        const title = getTitle(edge.node.title);
+        const node = edge.node;
+        // Related entries that were removed upstream arrive without a node.
+        if (!node) return null;
+        const title = getTitle(node.title);
         // 32px box: medium is the right source, not the 230px "large".
-        const cover = getCover(edge.node.coverImage, "medium");
-        const color = edge.node.coverImage.color;
+        const cover = getCover(node.coverImage, "medium");
+        const color = node.coverImage.color;
         return (
           <Link
-            key={`${edge.node.id}-${i}`}
-            href={`/anime/${edge.node.id}` as Route<string>}
+            key={`${node.id}-${i}`}
+            href={`/anime/${node.id}` as Route<string>}
             role="listitem"
             className="group flex items-center gap-3 py-2.5"
           >

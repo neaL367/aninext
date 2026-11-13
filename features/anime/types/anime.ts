@@ -92,13 +92,13 @@ export interface StaffEdge {
 
 export interface RelationEdge {
   relationType: string;
-  node: Media & {
-    relationType?: string;
-  };
+  /** AniList returns a null node when the related entry was removed. */
+  node: (Media & { relationType?: string }) | null;
 }
 
 export interface RecommendationNode {
-  mediaRecommendation: Media;
+  /** AniList returns null when the recommended entry was removed or hidden. */
+  mediaRecommendation: Media | null;
 }
 
 export interface AiringScheduleNode {
