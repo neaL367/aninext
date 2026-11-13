@@ -59,9 +59,33 @@ function trimCardList(items: ReadonlyArray<Media | null | undefined> | null | un
   return compact(items).map(trimCardMedia);
 }
 
+// The hero clamps the synopsis to three lines, but CSS clamping still ships the
+// whole string in the markup and in the RSC payload. A few long-running shows
+// carry multi-kilobyte descriptions, so the visible part is all we send.
+const HERO_SYNOPSIS_CHARS = 600;
+
+function trimHeroDescription(description: string | undefined): string | undefined {
+  if (!description || description.length <= HERO_SYNOPSIS_CHARS) return description;
+  return `${description.slice(0, HERO_SYNOPSIS_CHARS).trimEnd()}…`;
+}
+
+function withEpisodeLimit(media: Media): Media {
+  const episodes = media.streamingEpisodes;
+  const limited =
+    episodes && episodes.length > STREAMING_EPISODE_LIMIT
+      ? { ...media, streamingEpisodes: episodes.slice(0, STREAMING_EPISODE_LIMIT) }
+      : media;
+  return { ...limited, description: trimHeroDescription(limited.description) };
+}
+
 // The episode panel is a 420px scroll area; a long-running series ships around
-// 1k rows (~21 KB) that nobody scrolls to.
-const STREAMING_EPISODE_LIMIT = 24;
+// 1k rows (~21 KB) that nobody scrolls to. Every row is rendered twice — once
+// as markup, once in the RSC payload — so the cap is per-response weight, not
+// just payload size.
+const STREAMING_EPISODE_LIMIT = 12;
+// Related titles: One Piece lists 65. The rail scrolls, so twelve covers carry
+// the same information at a fraction of the bytes.
+const RELATIONS_LIMIT = 12;
 
 // Slim fragment for airing schedules: timeline/now/home sections render only
 // identity, artwork, progress inputs, and streaming links — never description,
@@ -305,6 +329,7 @@ const HERO_FIELDS = `
   source
   studios(isMain: true) { nodes { id name siteUrl } }
   nextAiringEpisode { episode airingAt timeUntilAiring }
+  # streamingEpisodes takes no perPage on AniList; the list is capped in JS.
   streamingEpisodes { title thumbnail url site }
   trailer { id site thumbnail }
   externalLinks { url site type icon color }
@@ -362,11 +387,11 @@ const ANIME_DETAIL_QUERY = `
 export async function getAnimeDetail(id: number): Promise<Media | null> {
   "use cache: remote";
   cacheTag("anime", ANIME_CACHE.detail(id));
-  cacheLife("home");
+  cacheLife("detail");
 
   try {
     const data = await anilistFetch<{ Media: Media | null }>(ANIME_DETAIL_QUERY, { id });
-    return data.Media;
+    return data.Media ? withEpisodeLimit(data.Media) : null;
   } catch (error) {
     // AniList returns HTTP 404 for some impossible IDs instead of a successful
     // GraphQL response with Media: null. Preserve the not-found contract for
@@ -437,7 +462,7 @@ export async function getAnimeRelations(id: number): Promise<RelationEdge[]> {
   const data = await anilistFetch<{
     Media: { relations?: { edges?: (RelationEdge | null)[] | null } | null } | null;
   }>(ANIME_RELATIONS_QUERY, { id });
-  return compactEdges(data.Media?.relations?.edges);
+  return compactEdges(data.Media?.relations?.edges).slice(0, RELATIONS_LIMIT);
 }
 
 const ANIME_RECOMMENDATIONS_QUERY = `
@@ -464,7 +489,7 @@ export async function getAnimeRecommendations(id: number): Promise<Recommendatio
 const ANIME_AIRING_SCHEDULE_QUERY = `
   query AnimeAiringSchedule($id: Int) {
     Media(id: $id, type: ANIME) {
-      airingSchedule(notYetAired: true, perPage: 25) {
+      airingSchedule(notYetAired: true, perPage: 10) {
         ${AIRING_SCHEDULE_SUBFIELDS}
       }
     }
@@ -533,7 +558,7 @@ export async function getAnimePageBatch(id: number): Promise<AnimePageBatch> {
     ANIME_CACHE.subSection(id, "recs"),
     ANIME_CACHE.subSection(id, "airing"),
   );
-  cacheLife("home");
+  cacheLife("detail");
 
   const empty: AnimePageBatch = {
     media: null,
@@ -558,16 +583,12 @@ export async function getAnimePageBatch(id: number): Promise<AnimePageBatch> {
     }>(ANIME_PAGE_BATCH_QUERY, { id });
     const m = data.Media;
     if (!m) return empty;
-    const episodes = m.streamingEpisodes;
-    const media =
-      episodes && episodes.length > STREAMING_EPISODE_LIMIT
-        ? { ...m, streamingEpisodes: episodes.slice(0, STREAMING_EPISODE_LIMIT) }
-        : m;
+    const media = withEpisodeLimit(m);
     return {
       media,
       characters: compactEdges(m.characters?.edges),
       staff: compactEdges(m.staff?.edges),
-      relations: compactEdges(m.relations?.edges),
+      relations: compactEdges(m.relations?.edges).slice(0, RELATIONS_LIMIT),
       recommendations: compactRecommendations(m.recommendations?.nodes),
       // A schedule row is only renderable when it still resolves to a media
       // entry — AniList leaves the media null for entries it removed.

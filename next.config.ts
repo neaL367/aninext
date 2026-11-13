@@ -25,6 +25,10 @@ const nextConfig: NextConfig = {
     static: { stale: 3600, revalidate: 43200, expire: 604800 },
     airing: { stale: 300, revalidate: 3600, expire: 7200 },
     max: { stale: 86400, revalidate: 604800, expire: 1209600 },
+    // Detail pages are long-tail: most are read by crawlers a handful of times
+    // a day, so keep them cached for a week and revalidate every 6 hours
+    // instead of dropping the entry after 24h and re-fetching from AniList.
+    detail: { stale: 600, revalidate: 21600, expire: 604800 },
   },
   experimental: {
     agentUpgrade: "security",

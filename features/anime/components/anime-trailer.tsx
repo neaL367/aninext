@@ -6,12 +6,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { MediaImage } from "@/components/ui/media-image";
 
-import type { Media } from "@/features/anime/types/anime";
+import type { Trailer } from "@/features/anime/types/anime";
 
-export function AnimeTrailer({ media }: { media: Media }) {
+// Only the trailer itself crosses the server/client boundary: passing the
+// whole Media record serialised a synopsis, twelve episodes and every external
+// link into the RSC payload for no reason.
+export function AnimeTrailer({ trailer, title }: { trailer: Trailer; title: string }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const trailer = media.trailer;
   const pathname = usePathname();
   const currentPathname = useRef(pathname);
 
@@ -74,7 +76,6 @@ export function AnimeTrailer({ media }: { media: Media }) {
 
   const thumbnail =
     trailer.thumbnail || `https://img.youtube.com/vi/${trailer.id}/maxresdefault.jpg`;
-  const title = media.title.english || media.title.romaji || media.title.native || "Anime";
 
   return (
     <div

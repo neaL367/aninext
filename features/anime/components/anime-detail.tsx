@@ -3,6 +3,7 @@ import { Suspense } from "react";
 
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { getAnimePageBatch } from "@/features/anime/anime-queries";
+import { getMediaTitle } from "@/features/anime/lib/media-helpers";
 
 import { AnimeAiringSchedule, AnimeAiringScheduleSkeleton } from "./anime-airing-schedule";
 import { AnimeCharacters, AnimeCharactersSkeleton } from "./anime-characters";
@@ -31,7 +32,9 @@ export async function AnimeDetail({ id }: { id: number | null }) {
               : "max-w-4xl"
           }
         >
-          {media.trailer?.id && media.trailer.site === "youtube" && <AnimeTrailer media={media} />}
+          {media.trailer?.id && media.trailer.site === "youtube" && (
+            <AnimeTrailer trailer={media.trailer} title={getMediaTitle(media)} />
+          )}
           <AnimeStreamingEpisodes media={media} />
         </div>
       </section>
