@@ -1,4 +1,5 @@
 import { Analytics } from "@vercel/analytics/next";
+import { BotIdClient } from "botid/client";
 import { GeistSerif } from "geist/font/serif/variable";
 import { Suspense } from "react";
 
@@ -23,6 +24,15 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://ani-next.vercel.app"),
 };
 
+// Server Action posts land on the collection route the action runs from.
+const BOT_PROTECTED_ROUTES = [{ path: "/anime/*", method: "POST" }];
+
+// BotID's client script is served by Vercel's BotID routing. Anywhere else the
+// challenge request 404s, and the SDK's patched fetch then waits on a challenge
+// that never arrives — which silently stalls the Server Action it is attached
+// to. Mount it only where that routing exists.
+const BOTID_ENABLED = process.env.VERCEL === "1";
+
 export const viewport: Viewport = {
   themeColor: "#060606",
   colorScheme: "dark",
@@ -36,6 +46,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
+      <head>
+        {/* Turbopack ignores the instrumentation-client file convention, so the
+            BotID challenge is mounted here instead. Only the infinite-scroll
+            Server Action is protected; page views stay CDN-cached. */}
+        {BOTID_ENABLED && <BotIdClient protect={BOT_PROTECTED_ROUTES} />}
+      </head>
       <body className="font-sans antialiased">
         <Providers>
           <SearchCommand />
