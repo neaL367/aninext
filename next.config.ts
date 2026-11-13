@@ -43,6 +43,29 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // Read-only pages whose markup depends only on the URL (no cookies, no
+        // auth): let the CDN answer repeat requests instead of invoking the
+        // function, which is what Fast Origin Transfer bills for. Vercel honours
+        // this header over the response's own Cache-Control; the data inside is
+        // already cached by cacheLife, so a short CDN TTL costs no freshness.
+        source: "/",
+        headers: [
+          {
+            key: "Vercel-CDN-Cache-Control",
+            value: "public, max-age=0, s-maxage=600, stale-while-revalidate=86400",
+          },
+        ],
+      },
+      {
+        source: "/anime/:path*",
+        headers: [
+          {
+            key: "Vercel-CDN-Cache-Control",
+            value: "public, max-age=0, s-maxage=600, stale-while-revalidate=86400",
+          },
+        ],
+      },
+      {
         source: "/(.*)",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
