@@ -232,8 +232,12 @@ export interface HomeFeed {
  * entry: the whole feed is a single upstream request instead of four.
  */
 export function getHomeBucket(now = Date.now()): number {
-  // Epoch seconds (AniList's airingAt type), rounded down to a 5-minute window.
-  return Math.floor(now / 300_000) * 300;
+  // "use cache" keys on arguments, so the bucket *is* part of the cache key. A
+  // 5-minute bucket meant the home feed got a brand-new key every five minutes
+  // - a new entry nobody reads again, and an origin call each time - even
+  // though cacheLife("home") allows an hour. Round to the hour it revalidates
+  // on instead. The value is epoch seconds, matching AniList's airingAt.
+  return Math.floor(now / 3_600_000) * 3600;
 }
 
 export async function getHomeFeed(bucket: number): Promise<HomeFeed> {

@@ -47,6 +47,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <head>
+        {/* Every cover and banner comes straight from AniList's CDN (images are
+            unoptimized), so warm DNS+TLS before the first <img> is parsed.
+            React hoists this into the head; ReactDOM.preconnect() from a Server
+            Component emits nothing in Next 16. */}
+        <link rel="preconnect" href="https://s4.anilist.co" crossOrigin="" />
         {/* Turbopack ignores the instrumentation-client file convention, so the
             BotID challenge is mounted here instead. Only the infinite-scroll
             Server Action is protected; page views stay CDN-cached. */}
