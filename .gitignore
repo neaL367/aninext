@@ -44,3 +44,12 @@ next-env.d.ts
 .agents
 .claude
 skills-lock.json
+
+# testing
+/test-results/
+test-results/
+/playwright-report/
+playwright-report/
+
+# local build output
+build.log

@@ -29,89 +29,60 @@ Everything anime-related — queries, cache tags, types, components — lives un
 
 ```text
 app/
-  layout.tsx                        # Root layout: fonts, theme, shell
+  layout.tsx                        # Root layout: fonts, shell, BotID mount
   page.tsx                          # Homepage — composition only
+  error.tsx                         # Route-level error UI
+  not-found.tsx                     # Site-styled 404
+  icon.tsx  manifest.ts  robots.ts  # Metadata routes
+  sitemap.ts                        # Static: routes + top ~260 detail pages
   (browse)/
     anime/
       page.tsx                      # /anime → permanentRedirect('/anime/trending')
-      trending/
-        page.tsx
-        opengraph-image.tsx
-      popular/
-        page.tsx
-        opengraph-image.tsx
-      top100/
-        page.tsx
-        opengraph-image.tsx
-      upcoming/
-        page.tsx
-        opengraph-image.tsx
-      alltimepopular/
-        page.tsx
-        opengraph-image.tsx
-      seasonal/
-        page.tsx
+      trending/     page.tsx  layout.tsx
+      popular/      page.tsx  layout.tsx
+      top100/       page.tsx  layout.tsx
+      upcoming/     page.tsx  layout.tsx
+      alltimepopular/ page.tsx layout.tsx
+      seasonal/     page.tsx  layout.tsx
       [id]/
         page.tsx                    # /anime/[id] — detail page
         not-found.tsx
     airing/
-      page.tsx                      # /airing — schedule page
-  error.tsx
-  not-found.tsx
+      page.tsx                      # /airing → redirects to a clean day path
+      layout.tsx
+      [day]/page.tsx                # /airing/YYYY-MM-DD
 
 features/
   anime/
-    anime-cache.ts                  # Pure cache tag builders (no favorites/watchlist tags)
-    anime-queries.ts                # All server-side AniList GraphQL reads — import 'server-only'
-    anime-metadata.ts               # Anime detail metadata derived from cached reads
+    anime-cache.ts                  # Pure cache tag builders
+    anime-queries.ts                # All AniList reads — import 'server-only'
+    anime-metadata.ts               # Detail metadata from the cached batch
     types/
-      anime.ts                      # Domain types (Media, PageResult, etc.)
+      anime.ts                      # Domain types (Media, PageResult, …)
+    hooks/
+      use-filter-state.ts           # searchParams → filter state
+      use-filter-actions.ts         # filter state → router.replace
+      use-infinite-scroll.ts        # Page cursor, cooldown, retry
+      use-now.ts                    # 30s clock via useSyncExternalStore
+      use-reduced-motion.ts
     lib/
-      parse-filters.ts              # searchParams → AnimeFilters (pure)
-      collection-config.ts          # Per-collection AniList variables + copy + cacheLife
-      season.ts                     # Current/next season + year computation
-    components/
-      hero-banner.tsx                # Homepage hero + skeleton
-      media-card.tsx                 # Reusable anime card + skeleton
-      media-grid.tsx                 # Grid layout + skeleton
-      section-row.tsx                # Horizontal scrollable section + skeleton
-      collection-nav.tsx             # Browse tab bar (client — useSearchParams/usePathname)
-      search-bar.tsx                 # Client search input, URL-synced
-      filter-sidebar.tsx             # Desktop sidebar + mobile drawer (client)
-      active-filters.tsx             # Removable filter chips (client)
-      anime-results.tsx              # async RSC — page-1 browse results
-      browse-paginator.tsx           # 'use client' — accumulates pages 2+ via Server Function
-      browse-page-action.tsx         # 'use server' — renders one browse page as RSC
-      infinite-scroll-sentinel.tsx   # 'use client' — IntersectionObserver, calls loadMore()
-      anime-hero.tsx                 # Detail page hero + skeleton
-      anime-info.tsx                 # Detail metadata
-      anime-characters.tsx           # Character grid
-      anime-staff.tsx                # Staff list
-      anime-relations.tsx            # Related anime
-      anime-recommendations.tsx      # AniList's own recommendation data (not personalized)
-      anime-reviews.tsx              # Reviews
-      anime-airing-schedule.tsx      # Detail page episode list
-      airing-timeline.tsx            # /airing page schedule
-      airing-calendar.tsx            # Weekly calendar
-      genre-pills.tsx                # Genre navigation
-      studio-card.tsx                # Studio display
-      character-voice-card.tsx       # Character + VA pairing
+      airing.ts                     # Day windows, visitor timezone math
+      anime-nodes.ts                # Null-edge compaction at the data boundary
+      collection-config.ts          # Per-collection AniList variables + copy
+      filter-constants.ts  parse-filters.ts  labels.ts  score.ts  season.ts
+      media-helpers.ts
+    components/                     # Every section, card and control for /anime/*
 
 components/
-  ui/                                # shadcn/ui primitives
-  theme/                             # Theme provider + toggle
-  site-header.tsx
-  site-footer.tsx
-  crossfade.tsx                      # <ViewTransition enter="auto" default="none"> wrapper
-  hover-prefetch-link.tsx            # Intent-based deep prefetch wrapper around next/link
-  error-boundary.tsx                 # catchError-based boundary (not react-error-boundary)
+  providers.tsx                     # Timezone cookie writer
+  site-header.tsx  site-footer.tsx  site-mobile-nav.tsx
+  scroll-to-top.tsx  offline-banner.tsx
+  ui/                               # 19 primitives still in use
 
 lib/
-  anilist.ts                         # GraphQL client — POST wrapper, rate-limit/outage classification
+  anilist.ts                        # GraphQL client: limits, retries, circuit breaker
+  anilist-errors.ts                 # AniListError + kind union
   utils.ts
-
-types/
-  anilist.ts                         # Shared AniList response types
 ```
 
 ### 1.2 Global Configuration
@@ -131,7 +102,7 @@ const nextConfig: NextConfig = {
 export default nextConfig;
 ```
 
-Both flags are **opt-in even in stable 16.3** — Next.js has said they'll become defaults in a future major version, but as of this release you still turn them on explicitly. Everything in this document assumes both are on; without them, `'use cache'`/`cacheTag`/`cacheLife` aren't available and prefetching falls back to the pre-16.3 per-link behavior.
+Both flags are **opt-in even in stable 16.4** — Next.js has said they'll become defaults in a future major version, but as of this release you still turn them on explicitly. Everything in this document assumes both are on; without them, `'use cache'`/`cacheTag`/`cacheLife` aren't available and prefetching falls back to the pre-16.3 per-link behavior.
 
 `cacheLife` profiles (named, referenced by string elsewhere):
 
@@ -150,7 +121,7 @@ cacheLife: {
 
 - **Stream** — wrap the dynamic part in `<Suspense>`; the user gets a shell instantly, content streams in.
 - **Cache** — mark the read `'use cache'` with a `cacheTag`/`cacheLife`; the user gets a previously-cached UI instantly.
-- **Block** — explicitly opt out with `export const instant = false` on a route that should wait for the full server response before navigating (e.g., a page where a stale/loading shell would be actively misleading). **Nothing in this app uses Block** — every route here is either streamed or cached, which is the whole point of §2–§5.
+- **Block** — explicitly opt out with `export const instant = false` on a route that should wait for the full server response before navigating (e.g., a page where a stale/loading shell would be actively misleading). Exactly one route uses it: `/airing`, which holds no content of its own and always redirects to `/airing/<day>`, so there is no shell worth streaming. Everything else is streamed or cached, which is the point of §2–§5.
 
 **Partial Prefetching, precisely.** Next.js prefetches one reusable shell **per route template**, not per link. A grid of 40 `MediaCard`s linking to `/anime/[id]` triggers exactly one shell prefetch for that template, cached client-side and reused across every card — not 40 separate requests. This means the default (`prefetch="auto"`, i.e. no `prefetch` prop) is already cheap on `MediaCard`; see §3.10 for what `HoverPrefetchLink` actually buys on top of that baseline.
 
@@ -813,7 +784,7 @@ export function getCollectionMetadata(collection: AnimeCollection): Metadata {
 
 Covered by §1.1.
 
-### 3.24 Architectural Rationale for Next.js 16.3
+### 3.24 Architectural Rationale for Next.js 16.4
 
 Path-based routing is what makes the rest of this section's cache and prefetch story work cleanly: each route gets its own `cacheLife` (§3.9), its own shell (§3.10), and its own Instant Insight compliance (§1.3) independently. Collapsing all six into `/anime?sort=` would force one shared cache profile and one shared shell across data with very different freshness needs — the opposite of what Cache Components is for.
 
@@ -1103,7 +1074,7 @@ Favorite/watchlist toggles, once accounts exist, would be a small `'use client'`
 
 Covered by §1.1.
 
-### 4.22 Architectural Rationale for Next.js 16.3
+### 4.22 Architectural Rationale for Next.js 16.4
 
 This page is the clearest case for Stream-over-Block: nothing here should trigger `export const instant = false`. A slightly-stale cached hero streaming in instantly is strictly better UX than making every detail-page navigation wait on seven parallel AniList queries.
 
@@ -1357,7 +1328,7 @@ export interface AnimeFilters {
 
 ## 8. Build Order
 
-1. Scaffold — Next 16.3, `cacheComponents`/`partialPrefetching` flags, Tailwind v4 tokens, shadcn/ui base.
+1. Scaffold — Next 16.4, `cacheComponents`/`partialPrefetching` flags, Tailwind v4 tokens, shadcn/ui base.
 2. `lib/anilist.ts` + fragments — verify a raw trending query against the live API before wiring the app.
 3. `features/anime/anime-queries.ts` for `trending` only, plus `collection-config.ts` and `anime-cache.ts`.
 4. `/anime/trending` end-to-end: `AnimeResults`/`MediaGrid`/`MediaCard` + skeletons, `permanentRedirect` from `/anime`. Drive CLS to zero here before replicating.
