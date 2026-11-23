@@ -82,10 +82,10 @@ function withEpisodeLimit(media: Media): Media {
 // 1k rows (~21 KB) that nobody scrolls to. Every row is rendered twice — once
 // as markup, once in the RSC payload — so the cap is per-response weight, not
 // just payload size.
-const STREAMING_EPISODE_LIMIT = 12;
+const STREAMING_EPISODE_LIMIT = 8;
 // Related titles: One Piece lists 65. The rail scrolls, so twelve covers carry
 // the same information at a fraction of the bytes.
-const RELATIONS_LIMIT = 12;
+const RELATIONS_LIMIT = 6;
 
 // Slim fragment for airing schedules: timeline/now/home sections render only
 // identity, artwork, progress inputs, and streaming links — never description,
@@ -365,154 +365,23 @@ const AIRING_SCHEDULE_SUBFIELDS = `
   nodes { episode airingAt }
 `;
 
-const ANIME_DETAIL_QUERY = `
-  query AnimeDetailMedia($id: Int) {
-    Media(id: $id, type: ANIME) {
-      ${HERO_FIELDS}
-    }
-  }
-`;
-
-export async function getAnimeDetail(id: number): Promise<Media | null> {
-  "use cache: remote";
-  cacheTag("anime", ANIME_CACHE.detail(id));
-  cacheLife("detail");
-
-  try {
-    const data = await anilistFetch<{ Media: Media | null }>(ANIME_DETAIL_QUERY, { id });
-    return data.Media ? withEpisodeLimit(data.Media) : null;
-  } catch (error) {
-    // AniList returns HTTP 404 for some impossible IDs instead of a successful
-    // GraphQL response with Media: null. Preserve the not-found contract for
-    // that case, while allowing real outages and network errors to reach the
-    // route's retryable error boundary.
-    if (error instanceof AniListError && error.status === 404) return null;
-    throw error;
-  }
-}
-
-const ANIME_CHARACTERS_QUERY = `
-  query AnimeCharacters($id: Int) {
-    Media(id: $id, type: ANIME) {
-      characters(page: 1, perPage: 12, sort: [ROLE, RELEVANCE]) {
-        ${CHARACTERS_SUBFIELDS}
-      }
-    }
-  }
-`;
-
-export async function getAnimeCharacters(id: number): Promise<CharacterEdge[]> {
-  "use cache: remote";
-  cacheTag("anime", ANIME_CACHE.characters(id));
-  cacheLife("static");
-
-  const data = await anilistFetch<{
-    Media: { characters?: { edges?: (CharacterEdge | null)[] | null } | null } | null;
-  }>(ANIME_CHARACTERS_QUERY, { id });
-  return compactEdges(data.Media?.characters?.edges);
-}
-
-const ANIME_STAFF_QUERY = `
-  query AnimeStaff($id: Int) {
-    Media(id: $id, type: ANIME) {
-      staff(page: 1, perPage: 10) {
-        ${STAFF_SUBFIELDS}
-      }
-    }
-  }
-`;
-
-export async function getAnimeStaff(id: number): Promise<StaffEdge[]> {
-  "use cache: remote";
-  cacheTag("anime", ANIME_CACHE.staff(id));
-  cacheLife("static");
-
-  const data = await anilistFetch<{
-    Media: { staff?: { edges?: (StaffEdge | null)[] | null } | null } | null;
-  }>(ANIME_STAFF_QUERY, { id });
-  return compactEdges(data.Media?.staff?.edges);
-}
-
-const ANIME_RELATIONS_QUERY = `
-  query AnimeRelations($id: Int) {
-    Media(id: $id, type: ANIME) {
-      relations {
-        ${RELATIONS_SUBFIELDS}
-      }
-    }
-  }
-`;
-
-export async function getAnimeRelations(id: number): Promise<RelationEdge[]> {
-  "use cache: remote";
-  cacheTag("anime", ANIME_CACHE.subSection(id, "relations"));
-  cacheLife("static");
-
-  const data = await anilistFetch<{
-    Media: { relations?: { edges?: (RelationEdge | null)[] | null } | null } | null;
-  }>(ANIME_RELATIONS_QUERY, { id });
-  return compactEdges(data.Media?.relations?.edges).slice(0, RELATIONS_LIMIT);
-}
-
-const ANIME_RECOMMENDATIONS_QUERY = `
-  query AnimeRecommendations($id: Int) {
-    Media(id: $id, type: ANIME) {
-      recommendations(page: 1, perPage: 8, sort: [RATING_DESC]) {
-        ${RECOMMENDATIONS_SUBFIELDS}
-      }
-    }
-  }
-`;
-
-export async function getAnimeRecommendations(id: number): Promise<RecommendationNode[]> {
-  "use cache: remote";
-  cacheTag("anime", ANIME_CACHE.subSection(id, "recs"));
-  cacheLife("home");
-
-  const data = await anilistFetch<{
-    Media: { recommendations?: { nodes?: (RecommendationNode | null)[] | null } | null } | null;
-  }>(ANIME_RECOMMENDATIONS_QUERY, { id });
-  return compactRecommendations(data.Media?.recommendations?.nodes);
-}
-
-const ANIME_AIRING_SCHEDULE_QUERY = `
-  query AnimeAiringSchedule($id: Int) {
-    Media(id: $id, type: ANIME) {
-      airingSchedule(notYetAired: true, perPage: 10) {
-        ${AIRING_SCHEDULE_SUBFIELDS}
-      }
-    }
-  }
-`;
-
-export async function getAnimeAiringSchedule(id: number): Promise<AiringScheduleNode[]> {
-  "use cache: remote";
-  cacheTag("anime", ANIME_CACHE.subSection(id, "airing"));
-  cacheLife("trending");
-
-  const data = await anilistFetch<{
-    Media: { airingSchedule?: { nodes?: AiringScheduleNode[] | null } | null } | null;
-  }>(ANIME_AIRING_SCHEDULE_QUERY, { id });
-  return data.Media?.airingSchedule?.nodes ?? [];
-}
-
 const ANIME_PAGE_BATCH_QUERY = `
   query AnimePageBatch($id: Int) {
     Media(id: $id, type: ANIME) {
       ${HERO_FIELDS}
-      characters(page: 1, perPage: 12, sort: [ROLE, RELEVANCE]) {
+      characters(page: 1, perPage: 8, sort: [ROLE, RELEVANCE]) {
         ${CHARACTERS_SUBFIELDS}
       }
-      staff(page: 1, perPage: 10) {
+      staff(page: 1, perPage: 6) {
         ${STAFF_SUBFIELDS}
       }
       relations {
         ${RELATIONS_SUBFIELDS}
       }
-      recommendations(page: 1, perPage: 8, sort: [RATING_DESC]) {
+      recommendations(page: 1, perPage: 6, sort: [RATING_DESC]) {
         ${RECOMMENDATIONS_SUBFIELDS}
       }
-      airingSchedule(notYetAired: true, perPage: 25) {
+      airingSchedule(notYetAired: true, perPage: 10) {
         ${AIRING_SCHEDULE_SUBFIELDS}
       }
     }

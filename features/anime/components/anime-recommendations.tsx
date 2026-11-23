@@ -39,7 +39,7 @@ export function AnimeRecommendations({ nodes }: { nodes: RecommendationNode[] })
 export function AnimeRecommendationsSkeleton() {
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-      {Array.from({ length: 8 }).map((_, i) => (
+      {Array.from({ length: 6 }).map((_, i) => (
         <MediaCardSkeleton key={i} />
       ))}
     </div>
