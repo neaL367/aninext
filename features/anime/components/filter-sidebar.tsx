@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDownIcon } from "lucide-react";
-import { memo, use, useCallback, useMemo, useState } from "react";
+import { memo, use, useCallback, useId, useMemo, useState } from "react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -289,15 +289,21 @@ function FilterSection({
 }) {
   "use memo";
   const [toggled, setToggled] = useState<boolean | null>(null);
+  // The desktop sidebar stays in the DOM behind `hidden lg:flex` while the
+  // mobile drawer renders a second copy, so a constant id appeared twice and
+  // aria-controls resolved to whichever copy came first.
+  const uid = useId();
   const open = toggled ?? ((count ?? 0) > 0 ? true : defaultOpen);
-  const contentId = `filter-${id}-content`;
+  const contentId = `filter-${id}-${uid}`;
 
   return (
     <section className="border-b border-border-soft py-2.5">
       <button
         type="button"
         aria-expanded={open}
-        aria-controls={contentId}
+        // The panel only exists while open, so a reference to it when collapsed
+        // points at nothing.
+        aria-controls={open ? contentId : undefined}
         onClick={() => setToggled(!open)}
         className="flex min-h-8 w-full items-center gap-2 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
       >

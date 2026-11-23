@@ -1,6 +1,15 @@
 "use client";
 
-import { Suspense, use, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  Suspense,
+  use,
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 import { Spinner } from "@/components/ui/spinner";
 import { renderBrowsePage, type BrowsePage } from "@/features/anime/components/browse-page-action";
@@ -428,10 +437,10 @@ function InfiniteScrollSentinel({
   error: unknown;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  // Latest-callback ref assigned during render (docs-blessed pattern) — the
-  // observer effect below never re-subscribes just for callback identity.
-  const callbackRef = useRef(onLoadMore);
-  callbackRef.current = onLoadMore;
+  // Writing a ref during render is not allowed, and the observer effect must not
+  // re-subscribe whenever the callback identity changes — an Effect Event is the
+  // supported way to read the latest callback from inside an effect.
+  const loadMore = useEffectEvent(() => onLoadMore());
 
   useEffect(() => {
     const el = ref.current;
@@ -440,7 +449,7 @@ function InfiniteScrollSentinel({
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          callbackRef.current();
+          loadMore();
         }
       },
       { rootMargin: "600px" },

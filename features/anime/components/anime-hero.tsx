@@ -2,6 +2,7 @@ import { ExternalLinkIcon, PlayIcon } from "lucide-react";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ViewTransition } from "react";
+import { preload } from "react-dom";
 
 import { MediaImage } from "@/components/ui/media-image";
 import { getAnimePageBatch } from "@/features/anime/anime-queries";
@@ -36,6 +37,11 @@ export function AnimeHero({ media }: { media: Media }) {
   const description = stripHtml(media.description);
   const studio = media.studios?.nodes[0]?.name;
   const streamingLinks = getStreamingLinks(media.externalLinks);
+  // The banner is this page's LCP element. Next's image preload is skipped for
+  // unoptimized sources, so ask for it explicitly and let React hoist the hint
+  // into <head> before the markup streams.
+  const heroImage = banner ?? cover;
+  if (heroImage) preload(heroImage, { as: "image", fetchPriority: "high" });
 
   return (
     <section className="relative">
