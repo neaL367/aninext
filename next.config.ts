@@ -28,7 +28,10 @@ const nextConfig: NextConfig = {
     // Detail pages are long-tail: most are read by crawlers a handful of times
     // a day, so keep them cached for a week and revalidate every 6 hours
     // instead of dropping the entry after 24h and re-fetching from AniList.
-    detail: { stale: 600, revalidate: 21600, expire: 604800 },
+    // `stale` is the client-side cache window for this entry. A reader who
+    // moves between titles reuses the segment for half an hour instead of
+    // re-requesting it; the data itself is still only revalidated every 6h.
+    detail: { stale: 1800, revalidate: 21600, expire: 604800 },
   },
   experimental: {
     agentUpgrade: "security",
