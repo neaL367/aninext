@@ -62,12 +62,8 @@ export function AnimeRelations({ edges }: { edges: RelationEdge[] }) {
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="line-clamp-2 font-serif text-[0.9375rem] leading-snug text-foreground transition-colors group-hover:text-signal">
-                {title}
-              </p>
-              <p className="mt-0.5 font-mono text-[0.75rem] uppercase tracking-[0.1em] text-muted-foreground">
-                {edge.relationType.replaceAll("_", " ")}
-              </p>
+              <p className="row-title">{title}</p>
+              <p className="row-sub">{edge.relationType.replaceAll("_", " ")}</p>
             </div>
           </Link>
         );

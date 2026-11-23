@@ -37,12 +37,8 @@ export function AnimeCharacters({ edges }: { edges: CharacterEdge[] }) {
               )}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate font-serif text-sm leading-snug text-foreground">
-                {edge.node.name.full}
-              </p>
-              <p className="mt-0.5 truncate font-mono text-[0.75rem] uppercase tracking-[0.12em] text-muted-foreground">
-                {edge.role}
-              </p>
+              <p className="row-name">{edge.node.name.full}</p>
+              <p className="row-sub">{edge.role}</p>
             </div>
             {voiceActor && (
               <div className="flex shrink-0 items-center gap-2">

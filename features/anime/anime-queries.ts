@@ -266,12 +266,6 @@ export async function getHomeFeed(bucket: number): Promise<HomeFeed> {
   };
 }
 
-const GENRE_QUERY = `
-  query GenreCollection {
-    GenreCollection
-  }
-`;
-
 export const STATIC_GENRES = [
   "Action",
   "Adventure",
@@ -294,19 +288,14 @@ export const STATIC_GENRES = [
   "Thriller",
 ] as const;
 
+/**
+ * AniList's genre list is a closed set of nineteen values, and it is the only
+ * thing this app ever asked the API for that never changes in practice. Serving
+ * it from the constant removes an origin call from every cold homepage and
+ * browse render — and one more thing that can time out.
+ */
 export async function getGenres(): Promise<string[]> {
-  "use cache: remote";
-  cacheTag(ANIME_CACHE.genres);
-  cacheLife("max");
-
-  try {
-    const data = await anilistFetch<{ GenreCollection: string[] }>(GENRE_QUERY, {});
-    return data.GenreCollection;
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    console.warn(`[AniList] GenreCollection fetch failed (${message}), using static fallback.`);
-    return [...STATIC_GENRES];
-  }
+  return [...STATIC_GENRES];
 }
 
 const HERO_FIELDS = `

@@ -31,12 +31,8 @@ export function AnimeStaff({ edges }: { edges: StaffEdge[] }) {
             )}
           </div>
           <div className="min-w-0">
-            <p className="truncate font-serif text-sm leading-snug text-foreground">
-              {edge.node.name.full}
-            </p>
-            <p className="truncate font-mono text-[0.75rem] uppercase tracking-[0.12em] text-muted-foreground">
-              {edge.role}
-            </p>
+            <p className="row-name">{edge.node.name.full}</p>
+            <p className="row-sub">{edge.role}</p>
           </div>
         </div>
       ))}

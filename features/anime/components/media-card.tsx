@@ -44,7 +44,7 @@ export function MediaCard({
       fill
       priority={priority}
       sizes="(min-width: 1280px) 17vw, (min-width: 768px) 26vw, 46vw"
-      className="object-cover transition-transform duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04] motion-reduce:transform-none"
+      className="card-cover"
     />
   ) : null;
 
@@ -54,10 +54,7 @@ export function MediaCard({
       aria-label={`Open ${title}`}
       className="group block min-w-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal"
     >
-      <div
-        className="relative isolate aspect-[2/3] overflow-hidden rounded-[3px] bg-surface-1"
-        style={!cover && color ? { backgroundColor: color } : undefined}
-      >
+      <div className="card-frame" style={!cover && color ? { backgroundColor: color } : undefined}>
         {coverImage ? (
           viewTransition ? (
             <ViewTransition name={`anime-cover-${media.id}`} share="morph" default="none">
@@ -72,14 +69,10 @@ export function MediaCard({
           </div>
         )}
 
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/5 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-100" />
+        <div className="card-scrim" />
 
         {/* CSS-only hover preview: no client JS per card. */}
-        <div
-          data-slot="card-preview"
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 hidden flex-col justify-end bg-gradient-to-t from-black via-black/55 to-transparent p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 sm:flex"
-        >
+        <div data-slot="card-preview" aria-hidden="true" className="card-preview">
           <p className="line-clamp-3 text-[0.875rem] leading-5 text-white/75">
             {synopsis ?? media.genres.slice(0, 3).join(" · ")}
           </p>
@@ -115,10 +108,8 @@ export function MediaCard({
       </div>
 
       <div className="pt-2.5">
-        <p className="line-clamp-2 font-serif text-[1.125rem] leading-[1.25] tracking-[-0.01em] text-foreground transition-colors duration-300 group-hover:text-signal">
-          {title}
-        </p>
-        <p className="mt-1 truncate font-mono text-[0.8125rem] uppercase tracking-[0.1em] text-muted-foreground">
+        <p className="card-title">{title}</p>
+        <p className="card-meta">
           {[media.format ? formatFormat(media.format) : null, media.seasonYear]
             .filter(Boolean)
             .join(" · ")}
@@ -131,12 +122,12 @@ export function MediaCard({
 export function MediaCardSkeleton() {
   return (
     <div className="min-w-0">
-      <div className="relative isolate aspect-[2/3] overflow-hidden rounded-[3px] bg-surface-1">
-        <div className="absolute inset-0 shimmer" />
+      <div className="card-frame">
+        <div className="shimmer absolute inset-0" />
       </div>
       <div className="space-y-2 pt-2.5">
-        <div className="shimmer h-3.5 w-4/5 rounded-[2px]" />
-        <div className="shimmer h-2.5 w-1/2 rounded-[2px] opacity-70" />
+        <div className="skeleton-line" />
+        <div className="skeleton-line-sm" />
       </div>
     </div>
   );

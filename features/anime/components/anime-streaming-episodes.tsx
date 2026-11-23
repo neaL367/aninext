@@ -38,10 +38,10 @@ function EpisodeList({ episodes }: { episodes: (StreamingEpisode & { url: string
             href={ep.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex items-center gap-4 px-1 py-2.5 transition-colors hover:bg-surface-1/40"
+            className="group row-link"
           >
             {ep.thumbnail ? (
-              <div className="relative h-[54px] w-[96px] shrink-0 overflow-hidden rounded border border-border-soft bg-surface-2">
+              <div className="row-thumb">
                 <Image
                   src={ep.thumbnail}
                   alt=""
@@ -57,9 +57,7 @@ function EpisodeList({ episodes }: { episodes: (StreamingEpisode & { url: string
               </span>
             )}
             <div className="min-w-0 flex-1">
-              <p className="line-clamp-2 text-xs sm:text-sm font-semibold text-foreground group-hover:text-signal transition-colors">
-                {ep.title || `Episode ${i + 1}`}
-              </p>
+              <p className="row-title font-semibold">{ep.title || `Episode ${i + 1}`}</p>
               {ep.site && (
                 <p className="mt-0.5 font-mono text-[0.8125rem] uppercase tracking-[0.06em] text-muted-foreground">
                   {ep.site}
@@ -86,7 +84,7 @@ function SiteList({ sites }: { sites: MediaExternalLink[] }) {
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center gap-4 px-1 py-2.5 transition-colors hover:bg-surface-1/40"
+              className="group row-link"
             >
               <span className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-[2px] bg-surface-1">
                 {favicon ? (
