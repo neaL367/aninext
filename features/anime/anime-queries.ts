@@ -590,9 +590,11 @@ export async function getAnimePageBatch(id: number): Promise<AnimePageBatch> {
       staff: compactEdges(m.staff?.edges),
       relations: compactEdges(m.relations?.edges).slice(0, RELATIONS_LIMIT),
       recommendations: compactRecommendations(m.recommendations?.nodes),
-      // A schedule row is only renderable when it still resolves to a media
-      // entry — AniList leaves the media null for entries it removed.
-      airingSchedule: compact(m.airingSchedule?.nodes).filter((node) => node.media != null),
+      // This query selects only episode + airingAt (see
+      // AIRING_SCHEDULE_SUBFIELDS), so a row cannot be checked against a media
+      // entry here — filtering on `node.media` would drop every row. Null rows
+      // are still removed.
+      airingSchedule: compact(m.airingSchedule?.nodes),
     };
   } catch (error) {
     if (error instanceof AniListError && error.status === 404) return empty;
