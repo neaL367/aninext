@@ -41,27 +41,37 @@ const nextConfig: NextConfig = {
     turbopackRustReactCompiler: true,
   },
   async headers() {
+    // A page cannot be fresher than the data behind it: the collections
+    // revalidate hourly and detail pages every six hours, so a CDN entry that
+    // expires after ten minutes only sends a request back to the function for
+    // content that is still current. Each rule below matches its route's own
+    // cacheLife window instead.
+    // (/airing is absent on purpose: its day comes from the tz_offset cookie.)
     return [
       {
-        // Read-only pages whose markup depends only on the URL (no cookies, no
-        // auth): let the CDN answer repeat requests instead of invoking the
-        // function, which is what Fast Origin Transfer bills for. Vercel honours
-        // this header over the response's own Cache-Control; the data inside is
-        // already cached by cacheLife, so a short CDN TTL costs no freshness.
         source: "/",
         headers: [
           {
             key: "Vercel-CDN-Cache-Control",
-            value: "public, max-age=0, s-maxage=600, stale-while-revalidate=86400",
+            value: "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400",
           },
         ],
       },
       {
-        source: "/anime/:path*",
+        source: "/anime/:collection(trending|popular|top100|upcoming|alltimepopular|seasonal)",
         headers: [
           {
             key: "Vercel-CDN-Cache-Control",
-            value: "public, max-age=0, s-maxage=600, stale-while-revalidate=86400",
+            value: "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400",
+          },
+        ],
+      },
+      {
+        source: "/anime/:id(\\d+)",
+        headers: [
+          {
+            key: "Vercel-CDN-Cache-Control",
+            value: "public, max-age=0, s-maxage=21600, stale-while-revalidate=604800",
           },
         ],
       },
